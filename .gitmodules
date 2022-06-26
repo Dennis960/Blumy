@@ -1,0 +1,6 @@
+[submodule "PlantsFrontend"]
+	path = PlantsFrontend
+	url = https://github.com/Dennis960/PlantsFrontend
+[submodule "interface/PlantsFrontend"]
+	path = interface/PlantsFrontend
+	url = https://github.com/Dennis960/PlantsFrontend
