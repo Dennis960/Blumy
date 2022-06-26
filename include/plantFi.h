@@ -45,17 +45,7 @@ public:
             if (millis()-startTime > 30000 || wifiStatus == WL_IDLE_STATUS || wifiStatus == WL_CONNECT_FAILED) // timeout after 30 seconds or on no connection found
             {
                 Serial.println("Connection failed");
-                startPlantServer(); // this should set ssid and password
-                if (isWifiConnected())
-                {
-                    if (!isPlantIdInit) {
-                        rtcStore.plant_id = initPlantId();
-                    }
-                }
-                else
-                {
-                    Serial.println("Access point setup unsuccessful");
-                }
+                return false;
             }
             delay(1); // delay to prevent esp watchdog errors
         }

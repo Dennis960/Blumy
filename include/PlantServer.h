@@ -32,6 +32,7 @@ void startPlantServer()
     WiFi.softAPConfig(local_ip, gateway, netmask);
     WiFi.softAP(APSSID);
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+        Serial.println("main page accessed");
         request->send(LittleFS, "/index.html");
     });
     server.on("/main.css", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -44,6 +45,7 @@ void startPlantServer()
         request->send(LittleFS, "/favicon.ico");
     });
     server.on("/setWiFi", HTTP_GET, [](AsyncWebServerRequest *request){
+        Serial.println("wifi credentials entered");
         int paramsCount = request->params();
         if (paramsCount == 2)
         {
@@ -55,6 +57,7 @@ void startPlantServer()
         wifiSet = true;
     });
     server.on("/setId", HTTP_GET, [](AsyncWebServerRequest *request){
+        Serial.println("plant id set");
         int paramsCount = request->params();
         if (paramsCount == 1)
         {

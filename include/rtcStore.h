@@ -6,13 +6,13 @@
 typedef struct {
     uint32_t crc32; // 4U
     // needs to be at the top to calculate crc32 correctly
+    char password[40]; // 40U
+    char ssid[32]; // 32U
     uint8_t channel; // 1U
     uint8_t bssid[6]; // 6U
     // ----------------------
     boolean isDoubleReset = true; // 1U
     uint8_t plant_id; // 1U
-    char password[40]; // 40U
-    char ssid[32]; // 32U
     boolean isHappy; // 1U
     unsigned short referenceCapacitance; // 2U
 } RTC_Store;
@@ -40,7 +40,7 @@ uint32_t calculateCRC32(const uint8_t *data, size_t length)
 }
 uint32_t calculateWiFiQuickConnectCRC32()
 {
-    return calculateCRC32(((uint8_t*)&rtcStore) + 4, 7);
+    return calculateCRC32(((uint8_t*)&rtcStore) + 4, 79);
 }
 
 bool readFromRTC()

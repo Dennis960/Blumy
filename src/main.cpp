@@ -55,6 +55,22 @@ void setup()
   sensor.requestLight(); // reqeust light before wifi setup to have enough time to measure
   unsigned int water = sensor.readCapacitance(); // has a 550 ms delay
 
+  unsigned int sun = sensor.readLight(); // has a 550 ms delay
+  sensor.chirpIfDry();
+  // by now 1500 - 1600 ms have passed
+  disableSensor(); // disable sensor pin to maybe save tiny amounts of power for the next 2 seconds
+
+  if (!plantFi.waitUntilWifiConnected()) // after getting all sensor data, wait for the wifi connection to finish
+  {
+    
+    startPlantServer(); // this should set ssid and password
+    plantFi.startWifiConnection();
+    plantFi.waitUntilWifiConnected();
+    if (!isPlantIdInit) {
+        rtcStore.plant_id = plantFi.initPlantId();
+    }
+  }
+  
   if (isDoubleReset)
   {
     Serial.println("Calibration reset");
@@ -66,13 +82,6 @@ void setup()
   {
     Serial.println("Deep sleep reset");
   }
-
-  unsigned int sun = sensor.readLight(); // has a 550 ms delay
-  sensor.chirpIfDry();
-  // by now 1500 - 1600 ms have passed
-  disableSensor(); // disable sensor pin to maybe save tiny amounts of power for the next 2 seconds
-
-  plantFi.waitUntilWifiConnected(); // after getting all sensor data, wait for the wifi connection to finish
 
   plantFi.sendMeasurement(water, sun, getVoltage());
 
