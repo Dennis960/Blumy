@@ -67,15 +67,6 @@ public:
     lastCapacitance = readI2CRegister16bit(0);
     return lastCapacitance;
   }
-  void requestCapacitance()
-  {
-    requestI2CRead(0);
-  }
-  unsigned int getRequestedCapacitance()
-  {
-    lastCapacitance = readI2CRequestedRegister();
-    return lastCapacitance;
-  }
 
   void requestLight()
   {
@@ -113,6 +104,7 @@ public:
   void chirpHappy()
   {
     writeI2CRegister8bit(8);
+    delay(100);
   }
 
   void blinkLed()
@@ -131,6 +123,7 @@ public:
       if (lastLight < LIGHT_THRESHOLD)
       {
         chirp();
+        delay(100);
       }
       else
       {
@@ -151,15 +144,14 @@ public:
     }
   }
 
-  unsigned int setReferenceCapacitance()
+  void setLastCapacitanceAsReference()
   {
     Serial.println("Calibrating");
-    readCapacitance();
     rtcStore.referenceCapacitance = lastCapacitance;
     rtcStore.isHappy = false;
     writeToRTC();
+    Serial.print("Reference capacitance: ");
     Serial.println(rtcStore.referenceCapacitance);
-    return lastCapacitance;
   }
 
   unsigned long long getSleepDuration()

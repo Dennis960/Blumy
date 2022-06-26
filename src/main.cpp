@@ -36,6 +36,7 @@ void disableSensor()
 void setup()
 {
   unsigned long startTime = millis();
+  enableSensor(); // enable as early as possible to have as little delay as possible
   Serial.begin(115200); // Serial connection
 
   readFromRTC();
@@ -45,29 +46,33 @@ void setup()
 
   Serial.println(rtcStore.plant_id);
   Serial.println("");
-  enableSensor();
-
+  PlantFi plantFi; // this will start to setup a WiFi connection, it takes at least 1.5 seconds async before wifi is connected, init method takes 4 ms
   Sensor sensor(sensor_address);
-  delay(80); // Sensor takes 70 ms to boot after getting power
+  while (millis() - startTime < 80) // Sensor takes 70 ms to boot after getting power
+  {
+    delay(1);
+  }
   sensor.requestLight(); // reqeust light before wifi setup to have enough time to measure
-  sensor.requestCapacitance(); // request capacitance before wifi to have enough time to measure
-  PlantFi plantFi; // this will block any further setup if WiFi is not setup
+  unsigned int water = sensor.readCapacitance(); // has a 550 ms delay
 
   if (isDoubleReset)
   {
     Serial.println("Calibration reset");
-    unsigned int referenceCapacitance = sensor.setReferenceCapacitance();
+    sensor.setLastCapacitanceAsReference();
     sensor.chirpTwice(); // chirp twice to show that reference capacitance is measured
-    plantFi.sendReferenceCapacitance(referenceCapacitance);
+    plantFi.sendReferenceCapacitance(water);
   }
   else
   {
     Serial.println("Deep sleep reset");
   }
 
-  unsigned int water = sensor.getRequestedCapacitance();
-  unsigned int sun = sensor.readLight();
+  unsigned int sun = sensor.readLight(); // has a 550 ms delay
   sensor.chirpIfDry();
+  // by now 1500 - 1600 ms have passed
+  disableSensor(); // disable sensor pin to maybe save tiny amounts of power for the next 2 seconds
+
+  plantFi.waitUntilWifiConnected(); // after getting all sensor data, wait for the wifi connection to finish
 
   plantFi.sendMeasurement(water, sun, getVoltage());
 

@@ -66,7 +66,14 @@ void startPlantServer()
     });
     
     server.begin();
+    unsigned long startTime = millis();
+    unsigned long maxAPUpTime = 5 * 60 * 1000;
     while(!wifiSet) { // block any further code from running until wifi is setup
         delay(1);
+        if (maxAPUpTime < millis() - startTime)
+        {
+            Serial.println("Access point was not accessed in 5 minutes, timing out.");
+            break;
+        }
     }
 }

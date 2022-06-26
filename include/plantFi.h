@@ -22,43 +22,21 @@ public:
     {
         Serial.print("Last SSID: ");
         Serial.println(rtcStore.ssid);
-        if (!connectWifi())
-        {
-            startPlantServer(); // this should set ssid and password
-            if (connectWifi())
-            {
-                if (!isPlantIdInit) {
-                    rtcStore.plant_id = initPlantId();
-                }
-            }
-        }
-        writeToRTC();
+        startWifiConnection();
     }
 
-    // Returns true if success and false if failed
-    boolean connectWifi()
+    bool isWifiConnected()
     {
-        unsigned long connectionStartTime = millis();
-        Serial.print("Current connection: ");
-        Serial.println(WiFi.SSID());
         if (WiFi.status() == WL_CONNECTED && WiFi.SSID() == rtcStore.ssid) {
-            Serial.println("WiFi already connected");
+            Serial.println("WiFi connected");
             return true;
         }
-        wifiClient.setInsecure();
-        Serial.print("Connecting to: ");
-        Serial.println(rtcStore.ssid);
-        bool rtcValid = isRtcValid();
-        if (rtcValid)
-        {
-            Serial.println("Rtc is valid, using channel and bssid");
-            WiFi.begin(rtcStore.ssid, rtcStore.password, rtcStore.channel, rtcStore.bssid); // WiFi connection quick connect
-        }
-        else
-        {
-            Serial.println("Rtc is not valid, establishing new WiFi connection");
-            WiFi.begin(rtcStore.ssid, rtcStore.password); // WiFi connection without quick connect
-        }
+        Serial.println("Wifi not connected");
+        return false;
+    }
+
+    bool waitUntilWifiConnected()
+    {
         unsigned long startTime = millis();
         wl_status_t wifiStatus = WiFi.status();
         while (wifiStatus != WL_CONNECTED) // Wait for the WiFI connection completion
@@ -67,23 +45,44 @@ public:
             if (millis()-startTime > 30000 || wifiStatus == WL_IDLE_STATUS || wifiStatus == WL_CONNECT_FAILED) // timeout after 30 seconds or on no connection found
             {
                 Serial.println("Connection failed");
-                return false;
+                startPlantServer(); // this should set ssid and password
+                if (isWifiConnected())
+                {
+                    if (!isPlantIdInit) {
+                        rtcStore.plant_id = initPlantId();
+                    }
+                }
+                else
+                {
+                    Serial.println("Access point setup unsuccessful");
+                }
             }
-            delay(500);
+            delay(1); // delay to prevent esp watchdog errors
         }
+        Serial.print("Waiting for connection took: ");
+        Serial.println(millis() - startTime);
+        return true;
+    }
 
-        if (!rtcValid) // need to save new channel and bssid
+    void startWifiConnection() // takes 4731 ms to connect without quick connect and 2007 with quick connect
+    {
+        wifiClient.setInsecure();
+        Serial.print("Connecting to: ");
+        Serial.println(rtcStore.ssid);
+        if (isRtcValid())
         {
+            Serial.println("Rtc is valid, using channel and bssid");
+            WiFi.begin(rtcStore.ssid, rtcStore.password, rtcStore.channel, rtcStore.bssid); // WiFi connection quick connect
+        }
+        else
+        {
+            Serial.println("Rtc is not valid, establishing new WiFi connection");
+            WiFi.begin(rtcStore.ssid, rtcStore.password); // WiFi connection without quick connect
+            waitUntilWifiConnected();
             Serial.println("Saving channel and bssid");
             rtcStore.channel = WiFi.channel();
-            setBssid(WiFi.BSSID());
+            setBssid(WiFi.BSSID()); // already writes current rtc, so no need to do it again
         }
-
-        Serial.print("IP address: ");
-        Serial.println(WiFi.localIP());
-        Serial.print("Connection successful in: ");
-        Serial.println(millis() - connectionStartTime); // takes 4731 ms to connect without quick connect and 2007 with quick connect
-        return true;
     }
 
     int initPlantId()
