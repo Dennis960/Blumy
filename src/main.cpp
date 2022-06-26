@@ -28,6 +28,11 @@ void enableSensor()
   digitalWrite(SENSOR_ENABLE_PIN, HIGH); // enable sensor
 }
 
+void disableSensor()
+{
+  digitalWrite(SENSOR_ENABLE_PIN, LOW); // disable sensor
+}
+
 void setup()
 {
   unsigned long startTime = millis();
@@ -43,7 +48,9 @@ void setup()
   enableSensor();
 
   Sensor sensor(sensor_address);
+  delay(80); // Sensor takes 70 ms to boot after getting power
   sensor.requestLight(); // reqeust light before wifi setup to have enough time to measure
+  sensor.requestCapacitance(); // request capacitance before wifi to have enough time to measure
   PlantFi plantFi; // this will block any further setup if WiFi is not setup
 
   if (isDoubleReset)
@@ -58,7 +65,7 @@ void setup()
     Serial.println("Deep sleep reset");
   }
 
-  unsigned int water = sensor.readCapacitance();
+  unsigned int water = sensor.getRequestedCapacitance();
   unsigned int sun = sensor.readLight();
   sensor.chirpIfDry();
 
@@ -67,6 +74,7 @@ void setup()
   rtcStore.isDoubleReset = false;
   writeToRTC();
 
+  Serial.print("Cycle took: ");
   Serial.println(millis() - startTime);
   startDeepSleep(sensor.getSleepDuration());
 }

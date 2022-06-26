@@ -17,33 +17,9 @@ private:
 
     String plants_url = "https://plants.hoppingadventure.com/api/plants";
     String measure_url = "https://plants.hoppingadventure.com/api/plants/%d/measures";
-
-    // boolean doesSSIDExist(String ssid) {
-    //     int n = WiFi.scanNetworks();
-    //     Serial.println("scan done");
-    //     if (n == 0) {
-    //         Serial.println("no networks found");
-    //         return false;
-    //     }
-    //     else
-    //     {
-    //         Serial.print(n);
-    //         Serial.println(" networks found");
-    //         for (int i = 0; i < n; ++i)
-    //         {
-    //             if(WiFi.SSID(i) == rtcStore.ssid)
-    //             {
-    //                 return true;
-    //             }
-    //         }
-    //     }
-    //     return false;
-    // }
-
 public:
     PlantFi()
     {
-        readFromRTC();
         Serial.print("Last SSID: ");
         Serial.println(rtcStore.ssid);
         if (!connectWifi())
@@ -72,8 +48,17 @@ public:
         wifiClient.setInsecure();
         Serial.print("Connecting to: ");
         Serial.println(rtcStore.ssid);
-        WiFi.config( IPAddress(192, 168, 2, 190), gateway, subnet );
-        WiFi.begin(rtcStore.ssid, rtcStore.password); // WiFi connection
+        bool rtcValid = isRtcValid();
+        if (rtcValid)
+        {
+            Serial.println("Rtc is valid, using channel and bssid");
+            WiFi.begin(rtcStore.ssid, rtcStore.password, rtcStore.channel, rtcStore.bssid); // WiFi connection quick connect
+        }
+        else
+        {
+            Serial.println("Rtc is not valid, establishing new WiFi connection");
+            WiFi.begin(rtcStore.ssid, rtcStore.password); // WiFi connection without quick connect
+        }
         unsigned long startTime = millis();
         wl_status_t wifiStatus = WiFi.status();
         while (wifiStatus != WL_CONNECTED) // Wait for the WiFI connection completion
@@ -87,10 +72,17 @@ public:
             delay(500);
         }
 
+        if (!rtcValid) // need to save new channel and bssid
+        {
+            Serial.println("Saving channel and bssid");
+            rtcStore.channel = WiFi.channel();
+            setBssid(WiFi.BSSID());
+        }
+
         Serial.print("IP address: ");
         Serial.println(WiFi.localIP());
         Serial.print("Connection successful in: ");
-        Serial.println(millis() - connectionStartTime);
+        Serial.println(millis() - connectionStartTime); // takes 4731 ms to connect without quick connect and 2007 with quick connect
         return true;
     }
 

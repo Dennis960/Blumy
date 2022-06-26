@@ -14,6 +14,20 @@ private:
   unsigned long long defaultSleepDuration = 30 * 60 * 1000000; // default value: 30 minutes
   unsigned long long alertSleepDuration = 10 * 1000000; // alert value: 10 seconds, when plant is dry
 
+  void requestI2CRead(int reg)
+  {
+    Wire.beginTransmission(address);
+    Wire.write(reg);
+    Wire.endTransmission();
+  }
+  unsigned int readI2CRequestedRegister()
+  {
+    Wire.requestFrom(address, 2);
+    unsigned int t = Wire.read() << 8;
+    t = t | Wire.read();
+    return t;
+  }
+
   void writeI2CRegister8bit(int value)
   {
     Wire.beginTransmission(address);
@@ -23,14 +37,9 @@ private:
 
   unsigned int readI2CRegister16bit(int reg)
   {
-    Wire.beginTransmission(address);
-    Wire.write(reg);
-    Wire.endTransmission();
-    delay(1100);
-    Wire.requestFrom(address, 2);
-    unsigned int t = Wire.read() << 8;
-    t = t | Wire.read();
-    return t;
+    requestI2CRead(reg);
+    delay(550); // Sensor takes 518 ms to make value available after request
+    return readI2CRequestedRegister();
   }
 
   void initWire()
@@ -44,20 +53,27 @@ public:
   {
     this->address = address;
     initWire();
-    readFromRTC();
     Serial.println("sensor init");
   }
   Sensor()
   {
     this->address = 0x20;
     initWire();
-    readFromRTC();
     Serial.println("sensor init");
   }
 
   unsigned int readCapacitance()
   {
     lastCapacitance = readI2CRegister16bit(0);
+    return lastCapacitance;
+  }
+  void requestCapacitance()
+  {
+    requestI2CRead(0);
+  }
+  unsigned int getRequestedCapacitance()
+  {
+    lastCapacitance = readI2CRequestedRegister();
     return lastCapacitance;
   }
 
@@ -112,7 +128,6 @@ public:
     if (capacitanceDifference < 3)
     {
       rtcStore.isHappy = false;
-      writeToRTC();
       if (lastLight < LIGHT_THRESHOLD)
       {
         chirp();
@@ -125,7 +140,6 @@ public:
     else if (!rtcStore.isHappy)
     {
       rtcStore.isHappy = true;
-      writeToRTC();
       if (lastLight < LIGHT_THRESHOLD)
       {
         chirpHappy();
