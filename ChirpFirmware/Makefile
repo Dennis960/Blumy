@@ -11,7 +11,7 @@ DEVICE  = attiny44
 F_CPU   = 1000000	# in Hz
 FUSE_L  = 0xE2# see below for fuse values for particular devices
 FUSE_H  = 0xD6
-AVRDUDE = avrdude -c avrisp -P COM9 -p $(DEVICE) -b 19200 # edit this line for your programmer
+AVRDUDE = avrdude -c avrisp -P COM3 -p $(DEVICE) -b 19200 # edit this line for your programmer
 
 CFLAGS  = -Iusbdrv -I. -DDEBUG_LEVEL=0  -Os 
 CFLAGS += -ffunction-sections -fdata-sections -save-temps 
