@@ -44,7 +44,13 @@ private:
 
   void initWire()
   {
+    #ifdef ESP_01
+    Wire.begin(0, 2);
+    Serial.println("ESP_01 Wire settings");
+    #else
     Wire.begin();
+    Serial.println("Standard Wire settings");
+    #endif
     Wire.setClockStretchLimit(4000); // probably not neccessary but I don't know
   }
 

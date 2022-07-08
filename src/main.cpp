@@ -1,7 +1,11 @@
 #include <plantFi.h>
 #include <sensor.h>
 
+#ifdef ESP_01
+#define SENSOR_ENABLE_PIN 3
+#else
 #define SENSOR_ENABLE_PIN 0
+#endif
 
 ADC_MODE(ADC_VCC);
 
