@@ -35,15 +35,6 @@ void startPlantServer()
         Serial.println("main page accessed");
         request->send(LittleFS, "/index.html");
     });
-    server.on("/main.css", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send(LittleFS, "/main.css");
-    });
-    server.on("/main.js", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send(LittleFS, "/main.js");
-    });
-    server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send(LittleFS, "/favicon.ico");
-    });
     server.on("/setWiFi", HTTP_GET, [](AsyncWebServerRequest *request){
         Serial.println("wifi credentials entered");
         int paramsCount = request->params();
