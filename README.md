@@ -14,8 +14,10 @@ to programm the esp_01 connect:
 
 to use i2c with chirp:
 
-- GPIO 0 to SDA
-- GPIO 2 to SCL
+- esp_01 GPIO 0 to Chirp SDA
+- esp_01 GPIO 2 to Chirp SCL
+- (esp_01 GND to Chirp GND)
+- (Chirp VCC to some kind of power source [see next section])
 
 to prevent voltage drop on chirp:
 
