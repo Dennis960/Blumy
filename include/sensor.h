@@ -1,25 +1,32 @@
 #include <Wire.h>
-#include <rtcStore.h>
-
-#define LIGHT_THRESHOLD 20000
 
 class Sensor
 {
 private:
   int address;
+public:
+  /**
+   * Creates a new sensor object with the given i2c address
+  */
+  Sensor(int address)
+  {
+    this->address = address;
+  }
 
-  unsigned int lastCapacitance;
-  unsigned int lastLight;
-  
-  unsigned long long defaultSleepDuration = 30 * 60 * 1000000; // default value: 30 minutes
-  unsigned long long alertSleepDuration = 10 * 1000000; // alert value: 10 seconds, when plant is dry
-
-  void requestI2CRead(int reg)
+  /**
+   * Writes a value to the sensor
+   * @param value The value to write
+  */
+  void writeI2C(uint8_t value)
   {
     Wire.beginTransmission(address);
-    Wire.write(reg);
+    Wire.write(value);
     Wire.endTransmission();
   }
+  /**
+   * Reads the value of the last requested register
+   * @return The value of the register
+  */
   unsigned int readI2CRequestedRegister()
   {
     Wire.requestFrom(address, 2);
@@ -27,148 +34,82 @@ private:
     t = t | Wire.read();
     return t;
   }
-
-  void writeI2CRegister8bit(int value)
+  /**
+   * Reads a value from the sensor
+   * @param reg The register to read from
+   * @return The value of the register
+  */
+  unsigned int readI2C(uint8_t reg)
   {
-    Wire.beginTransmission(address);
-    Wire.write(value);
-    Wire.endTransmission();
-  }
-
-  unsigned int readI2CRegister16bit(int reg)
-  {
-    requestI2CRead(reg);
+    writeI2C(reg);
     delay(550); // Sensor takes 518 ms to make value available after request
     return readI2CRequestedRegister();
   }
-
-  void initWire()
-  {
-    #ifdef ESP_01
-    Wire.begin(0, 2);
-    Serial.println("ESP_01 Wire settings");
-    #else
-    Wire.begin();
-    Serial.println("Standard Wire settings");
-    #endif
-    Wire.setClockStretchLimit(4000); // probably not neccessary but I don't know
-  }
-
-public:
-  Sensor(int address)
-  {
-    this->address = address;
-    initWire();
-    Serial.println("sensor init");
-  }
-  Sensor()
-  {
-    this->address = 0x20;
-    initWire();
-    Serial.println("sensor init");
-  }
-
+  /**
+   * Reads the humidity value of the soil the sensor is in
+   * @return The humidity value between ~250 and ~1000
+  */
   unsigned int readCapacitance()
   {
-    lastCapacitance = readI2CRegister16bit(0);
-    return lastCapacitance;
+    return readI2C(0);
   }
-
+  void setAddress(uint8_t newAddress)
+  {
+    // Writing to 0x01 initiates a change of the address
+    writeI2C(0x01);
+    // Writing newAddress via i2c
+    writeI2C(newAddress);
+    chirp();
+    reset();
+  }
+  /**
+   * Requests a light measurement from the sensor
+   * @see readLight()
+  */
   void requestLight()
   {
-    writeI2CRegister8bit(3); // request light measurement
+    writeI2C(3); // request light measurement
   }
 
+  /**
+   * Reads the light value from the sensor (sunlight), has to be requested first
+   * @see requestLight()
+   * @return The light value between 0 and 65535
+  */
   unsigned int readLight()
   {
-    lastLight = readI2CRegister16bit(4); // read light register
-    return lastLight;
+    return readI2C(4); // read light register
   }
 
+  /**
+   * Makes the sensor emit a short beep
+  */
   void chirp()
   {
-    writeI2CRegister8bit(9);
+    writeI2C(9);
     delay(20);
   }
 
+  /**
+   * Turns on the LED on the sensor
+  */
   void ledOn()
   {
-    writeI2CRegister8bit(10);
+    writeI2C(10);
   }
+  /**
+   * Turns off the LED on the sensor
+  */
   void ledOff()
   {
-    writeI2CRegister8bit(11);
+    writeI2C(11);
   }
 
-  void chirpTwice()
+  /**
+   * Resets the sensor
+  */
+  void reset()
   {
-    chirp();
-    delay(100);
-    chirp();
-  }
-
-  void chirpHappy()
-  {
-    writeI2CRegister8bit(8);
-    delay(100);
-  }
-
-  void blinkLed()
-  {
-    ledOn();
-    delay(20);
-    ledOff();
-  }
-
-  void chirpIfDry()
-  {
-    int16_t capacitanceDifference = lastCapacitance - rtcStore.referenceCapacitance;
-    if (capacitanceDifference < 3)
-    {
-      rtcStore.isHappy = false;
-      if (lastLight < LIGHT_THRESHOLD)
-      {
-        chirp();
-        delay(100);
-      }
-      else
-      {
-        blinkLed();
-      }
-    }
-    else if (!rtcStore.isHappy)
-    {
-      rtcStore.isHappy = true;
-      if (lastLight < LIGHT_THRESHOLD)
-      {
-        chirpHappy();
-      }
-      else
-      {
-        blinkLed();
-      }
-    }
-  }
-
-  void setLastCapacitanceAsReference()
-  {
-    Serial.println("Calibrating");
-    rtcStore.referenceCapacitance = lastCapacitance;
-    rtcStore.isHappy = false;
-    writeToRTC();
-    Serial.print("Reference capacitance: ");
-    Serial.println(rtcStore.referenceCapacitance);
-  }
-
-  unsigned long long getSleepDuration()
-  {
-    if (rtcStore.isHappy)
-    {
-      return defaultSleepDuration;
-    }
-    else
-    {
-      return alertSleepDuration;
-    }
+    writeI2C(0x06);
   }
 };
