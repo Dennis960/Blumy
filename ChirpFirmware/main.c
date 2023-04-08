@@ -288,7 +288,7 @@ static inline void loopSensorMode()
             else if (I2C_SET_ADDRESS == usiRx)
             {
                 uint8_t newAddress = usiTwiReceiveByte();
-                if (newAddress > 1 && newAddress < 127)
+                if (newAddress >= 0 && newAddress <= 127)
                 {
                     eeprom_write_byte((uint8_t *)0x01, newAddress);
                 }
@@ -353,7 +353,7 @@ static inline void loopSensorMode()
 //-----------------------------------------------------------------
 
 #define I2C_ADDRESS_EEPROM_LOCATION (uint8_t *)0x01
-#define I2C_ADDRESS_DEFAULT 0x20
+#define I2C_ADDRESS_DEFAULT 127
 
 int main(void)
 {
@@ -363,7 +363,7 @@ int main(void)
     initADC();
 
     uint8_t address = eeprom_read_byte(I2C_ADDRESS_EEPROM_LOCATION);
-    if (0 == address || 255 == address)
+    if (address < 0 || address > 127)
     {
         address = I2C_ADDRESS_DEFAULT;
     }
