@@ -589,7 +589,7 @@ static inline void loopSensorMode()
             else if (0x01 == usiRx)
             {
                 uint8_t newAddress = usiTwiReceiveByte();
-                if (newAddress > 1 && newAddress < 127)
+                if (newAddress >= 0 && newAddress <= 127)
                 {
                     __eewr_byte_tn44((uint8_t *)0x01, newAddress);
                 }
@@ -664,9 +664,9 @@ int main(void)
     initADC();
 
     uint8_t address = __eerd_byte_tn44((uint8_t *)0x01);
-    if (0 == address || 255 == address)
+    if (address < 0 || address > 127)
     {
-        address = 0x20;
+        address = 127;
     }
     usiTwiSlaveInit(address);
 
