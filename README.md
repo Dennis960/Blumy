@@ -1,34 +1,10 @@
 # First Setup
 
-follow the Chirp Firmware README to install the chirp firmware  
-to programm the esp_01 connect:
-
-- esp_01 GND to Arduino GND
-- esp_01 VCC to Arduino 3.3 V
-- esp_01 TX to Arduino TX
-- esp_01 RX to Arduino RX
-- esp_01 GPIO 0 to Arduino GND
-- esp_01 RST to Arduino GND if neccessary (only for a short time and than disconnect)
-- esp_01 CH_EN to Arduino 3.3 V
-- Arduino Reset to Arduino GND (I don't know if this is neccessary but it worked so far)
-
 to use i2c with chirp:
 
-- esp_01 GPIO 0 to Chirp SDA
-- esp_01 GPIO 2 to Chirp SCL
-- (esp_01 GND to Chirp GND)
-- (Chirp VCC to some kind of power source [see next section])
+- nodemcu D1 to Chirp SDA
+- nodemcu D2 to Chirp SCL
+- GND and VCC (5 Volts or 3.3 Volts)
 
-to prevent voltage drop on chirp:
-
-- Chirp VCC to 3.3 V
-- Chirp GND to 2222A Emitter
-- esp_01 GPIO 3 to 2222A Base
-- 2222A Collector to GND
-- 100 uF Capacitor minus to 2222A Emitter / Chirp GND
-- 100 uF Capacitor plus to 3.3 V
-
-for debugging:
-
-- esp_01 TX to Arduino TX
-- esp_01 GND to Arduino GND
+Chirp uses ~1.5 mA on idle and ~5 mA on measurement.
+NodeMCU uses ~5 mA in deep sleep mode and ~70 mA when connected to wifi.
