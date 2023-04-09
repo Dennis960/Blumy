@@ -11,8 +11,8 @@ const config = {
     adapter: adapter({
       // default options are shown. On some platforms
       // these options are set automatically — see below
-      pages: "../backend/app",
-      assets: "../backend/app",
+      pages: "../app/app",
+      assets: "../app/app",
       fallback: null,
       precompress: false,
       strict: true,

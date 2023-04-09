@@ -1,6 +1,6 @@
 import cors from 'cors';
 import { json, Router } from 'express';
-import { addData, createSensor, getSensor, getSensors, getData, deleteDataBySensorAddress, deleteSensor, deleteDataById } from './database.js';
+import { addData, createSensor, getSensor, getSensors, getData, deleteDataBySensorAddress, deleteSensor, deleteDataById, updateSensor } from './database.js';
 
 const router = Router();
 router.use(json());
@@ -95,6 +95,37 @@ router.get('/sensors/:sensorAddress/data', async (req, res) => {
   return res.status(200).send({
     message: 'data found',
     data,
+  });
+});
+
+// PUT /api/sensors/:sensorAddress
+// {
+//   "name": "new name"
+// }
+// -> 404 message: sensor not found, data: {}
+// -> 400 message: name is required, data: {}
+// -> 200 message: sensor updated, data: sensor
+router.put('/sensors/:sensorAddress', async (req, res) => {
+  const { sensorAddress } = req.params;
+  const { name } = req.body;
+  if (!name) {
+    return res.status(400).send({
+      message: 'name is required',
+      data: {},
+    });
+  }
+  const sensor = await getSensor(Number(sensorAddress));
+  if (!sensor) {
+    return res.status(404).send({
+      message: 'sensor not found',
+      data: {},
+    });
+  }
+
+  await updateSensor(Number(sensorAddress), name);
+  return res.status(200).send({
+    message: 'sensor updated',
+    data: await getSensor(Number(sensorAddress)),
   });
 });
 

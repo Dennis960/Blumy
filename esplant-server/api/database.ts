@@ -173,6 +173,10 @@ export function getData(sensorAddress: number) {
   return dbAll<Data>('SELECT * FROM data WHERE sensor_address = ?', [sensorAddress]);
 }
 
+export function updateSensor(sensorAddress: number, name: string) {
+  return dbRun('UPDATE sensor SET name = ? WHERE sensor_address = ?', [name, sensorAddress]);
+}
+
 /**
  * Delete data by sensor address.
  * @param sensorAddress The address of the sensor.
