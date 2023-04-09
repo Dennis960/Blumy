@@ -72,13 +72,13 @@ function dbGet<T extends DatabaseObject>(query: string, params: unknown[]): Prom
  * Execute a query and return all rows.
  * @param query The query to execute.
  * @param params The parameters to use in the query.
- * @returns List of rows or empty list if query fails.
+ * @returns List of rows or error if query fails.
  */
 function dbAll<T extends DatabaseObject>(query: string, params: unknown[]): Promise<T[]> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     db.all(query, params, (err, rows) => {
       if (err) {
-        resolve([]);
+        reject(err);
       } else {
         resolve(rows as T[]);
       }
@@ -167,7 +167,7 @@ export function addData(sensorAddress: number, water: number) {
 /**
  * Get data by sensor address.
  * @param sensorAddress The address of the sensor.
- * @returns The data or throws an error if the sensor does not exist.
+ * @returns The data or an empty list if sensor does not exist.
  */
 export function getData(sensorAddress: number) {
   return dbAll<Data>('SELECT * FROM data WHERE sensor_address = ?', [sensorAddress]);

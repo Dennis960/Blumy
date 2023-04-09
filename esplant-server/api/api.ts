@@ -73,10 +73,18 @@ router.get('/sensors', async (req, res) => {
 });
 
 // GET /api/sensors/:sensorAddress/data
+// -> 404 message: sensor not found, data: {}
 // -> 404 message: data not found, data: {}
 // -> 200 message: data found, data: data
 router.get('/sensors/:sensorAddress/data', async (req, res) => {
   const { sensorAddress } = req.params;
+  const sensor = await getSensor(Number(sensorAddress));
+  if (!sensor) {
+    return res.status(404).send({
+      message: 'sensor not found',
+      data: {},
+    });
+  }
   const data = await getData(Number(sensorAddress));
   if (!data) {
     return res.status(404).send({
