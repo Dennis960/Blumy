@@ -353,7 +353,7 @@ static inline void loopSensorMode()
 //-----------------------------------------------------------------
 
 #define I2C_ADDRESS_EEPROM_LOCATION (uint8_t *)0x01
-#define I2C_ADDRESS_DEFAULT 127
+#define I2C_ADDRESS_DEFAULT 4
 
 int main(void)
 {
@@ -363,7 +363,7 @@ int main(void)
     initADC();
 
     uint8_t address = eeprom_read_byte(I2C_ADDRESS_EEPROM_LOCATION);
-    if (address < 0 || address > 127)
+    if (address <= 0 || address >= 127) // if eeprom address is 127 or 0, use default address
     {
         address = I2C_ADDRESS_DEFAULT;
     }

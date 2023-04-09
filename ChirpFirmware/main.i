@@ -664,9 +664,9 @@ int main(void)
     initADC();
 
     uint8_t address = __eerd_byte_tn44((uint8_t *)0x01);
-    if (address < 0 || address > 127)
+    if (address <= 0 || address >= 127)
     {
-        address = 127;
+        address = 4;
     }
     usiTwiSlaveInit(address);
 

@@ -373,9 +373,13 @@ main:
 	ldi r24,lo8(1)
 	ldi r25,hi8(1)
 	rcall __eerd_byte_tn44
-	sbrc r24,7
-	ldi r24,lo8(127)
+	mov r25,r24
+	subi r24,lo8(-(-1))
+	cpi r24,lo8(126)
+	brlo .L30
+	ldi r25,lo8(4)
 .L30:
+	mov r24,r25
 	rcall usiTwiSlaveInit
 	ldi r24,lo8(-128)
 	out 70-32,r24
