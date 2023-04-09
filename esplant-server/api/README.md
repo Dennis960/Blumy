@@ -1,53 +1,92 @@
-# Template-Express-Ts
+## REST API for Sensor Data
 
-This is a template for a Node.js Express server with Typescript.
+This REST API provides endpoints for managing sensor data and sensor devices. The following endpoints are available:
 
-## Getting Started
+### Create Sensor Data
 
-### Prerequisites
+`POST /api/data`
 
-- Node.js
-- NPM
+Create a new entry of sensor data. The following fields are required in the request body:
 
-### Installing
+- `sensorAddress` - the address of the sensor device
+- `water` - the amount of water detected by the sensor
 
-1. Clone the repo
-2. Install NPM packages
+#### Response
 
-```sh
-npm install
-```
+- `400` - If sensorAddress and water are not provided in the request body, a `400 Bad Request` response is returned. The response body contains an error message and an empty data object.
 
-3. Run the server
+- `500` - If the sensor device cannot be created, a `500 Internal Server Error` response is returned. The response body contains an error message and an empty data object.
 
-```sh
-npm run dev
-```
+- `200` - If the sensor data is created successfully, a `200 OK` response is returned. The response body contains a success message and the created data object.
 
-4. Enjoy Express with Typescript!
+### Get Sensor
 
-### Deployment
+`GET /api/sensor/:sensorAddress`
 
-1. Build the project
+Get details of a specific sensor device. The following path parameter is required:
 
-```sh
-npm run build
-```
+- `sensorAddress` - the address of the sensor device
 
-2. Copy the `dist` folder to your server
+#### Response
 
-3. Run the server with node
+- `404` - If the sensor device is not found, a `404 Not Found` response is returned. The response body contains an error message and an empty data object.
 
-```sh
-node dist/index.js
-```
+- `200` - If the sensor device is found, a `200 OK` response is returned. The response body contains a success message and the sensor object.
 
-## Built With
+### Get Sensors
 
-- [Express](https://expressjs.com/) - The web framework used
-- [Typescript](https://www.typescriptlang.org/) - The language used
-- [NPM](https://www.npmjs.com/) - Dependency Management
+`GET /api/sensor`
 
-## License
+Get a list of all sensor devices.
 
-Distributed under the MIT License. See `LICENSE` for more information.
+#### Response
+
+- `200` - If the sensor devices are found, a `200 OK` response is returned. The response body contains a success message and an array of sensor objects.
+
+### Get Sensor Data
+
+`GET /api/data/:sensorAddress`
+
+Get a list of sensor data for a specific sensor device. The following path parameter is required:
+
+- `sensorAddress` - the address of the sensor device
+
+#### Response
+
+- `404` - If the sensor data is not found, a `404 Not Found` response is returned. The response body contains an error message and an empty data object.
+
+- `200` - If the sensor data is found, a `200 OK` response is returned. The response body contains a success message and an array of data objects.
+
+### Delete Sensor Data
+
+`DELETE /api/data/:sensorAddress`
+
+Delete all sensor data for a specific sensor device. The following path parameter is required:
+
+- `sensorAddress` - the address of the sensor device
+
+#### Response
+
+- `404` - If the sensor data is not found, a `404 Not Found` response is returned. The response body contains an error message and an empty data object.
+
+- `200` - If the sensor data is deleted successfully, a `200 OK` response is returned. The response body contains a success message and an empty data object.
+
+### Delete Sensor
+
+`DELETE /api/sensor/:sensorAddress`
+
+Delete a specific sensor device. The following path parameter is required:
+
+- `sensorAddress` - the address of the sensor device
+
+#### Response
+
+- `404` - If the sensor device is not found, a `404 Not Found` response is returned. The response body contains an error message and an empty data object.
+
+- `200` - If the sensor device is deleted successfully, a `200 OK` response is returned. The response body contains a success message and an empty data object.
+
+### Error Response
+
+`404`
+
+If the requested endpoint is not found, a `404 Not Found` response is returned. The response body contains an error message and an empty data object.
