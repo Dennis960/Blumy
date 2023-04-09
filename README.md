@@ -22,3 +22,9 @@ POST /api/data
   "water": 428
 }
 ```
+
+# ESPlant Server
+
+The ESPlant server is a Node.js server. It is responsible for receiving sensor data from the sensor devices and storing it in a database. It also provides an API for the ESPlant app to retrieve sensor data. Currently running at https://esplant.hoppingadventure.com.
+
+For more information about the API, see the [ESPlant Server Documentation](esplant-server/README.md).

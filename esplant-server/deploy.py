@@ -54,6 +54,8 @@ with pysftp.Connection('hoppingadventure.com', username='hopping', private_key="
         npm_build(backend_name)
         upload_folder(sftp, backend_name + '/dist', backend_name)
         install_node_modules(sftp, backend_name)
+        print("Creating data folder if it doesn't exist")
+        try_mkdir(sftp, remote_path + '/data')
         print('Restarting esplant service')
         restart_esplant_service(sftp)
     else:
