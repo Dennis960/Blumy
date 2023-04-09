@@ -128,7 +128,7 @@ function dbRun(query: string, params: unknown[]): Promise<void> {
  * @param sensorAddress The address of the sensor.
  * @returns The sensor or throws an error if the sensor does not exist.
  */
-export function getSensor(sensorAddress: number) {
+export function getSensorById(sensorAddress: number) {
   return dbGet<Sensor>('SELECT * FROM sensor WHERE sensor_address = ?', [sensorAddress]);
 }
 
@@ -146,8 +146,8 @@ export function getSensors() {
  * @param name The name of the sensor.
  * @returns The row id or throws an error if the sensor already exists.
  */
-export async function createSensor(sensorAddress: number, name = 'new sensor') {
-  const sensor = await getSensor(sensorAddress);
+export async function createSensorWithId(sensorAddress: number, name = 'new sensor') {
+  const sensor = await getSensorById(sensorAddress);
   if (sensor) {
     return Promise.reject('Sensor already exists');
   }
@@ -160,7 +160,7 @@ export async function createSensor(sensorAddress: number, name = 'new sensor') {
  * @param water The water level.
  * @returns The id of the inserted data or throws an error if the sensor does not exist.
  */
-export function addData(sensorAddress: number, water: number) {
+export function addDataBySensorId(sensorAddress: number, water: number) {
   return dbInsert('INSERT INTO data (sensor_address, water) VALUES (?, ?)', [sensorAddress, water]);
 }
 
@@ -169,11 +169,11 @@ export function addData(sensorAddress: number, water: number) {
  * @param sensorAddress The address of the sensor.
  * @returns The data or an empty list if sensor does not exist.
  */
-export function getData(sensorAddress: number) {
+export function getDataBySensorId(sensorAddress: number) {
   return dbAll<Data>('SELECT * FROM data WHERE sensor_address = ?', [sensorAddress]);
 }
 
-export function updateSensor(sensorAddress: number, name: string) {
+export function updateSensorById(sensorAddress: number, name: string) {
   return dbRun('UPDATE sensor SET name = ? WHERE sensor_address = ?', [name, sensorAddress]);
 }
 
@@ -181,7 +181,7 @@ export function updateSensor(sensorAddress: number, name: string) {
  * Delete data by sensor address.
  * @param sensorAddress The address of the sensor.
  */
-export function deleteDataBySensorAddress(sensorAddress: number) {
+export function deleteDataBySensorId(sensorAddress: number) {
   dbRun('DELETE FROM data WHERE sensor_address = ?', [sensorAddress]).catch((err) => {
     console.log(err.message);
   });
@@ -201,7 +201,7 @@ export function deleteDataById(id: number) {
  * Delete sensor by sensor address.
  * @param sensorAddress The address of the sensor.
  */
-export function deleteSensor(sensorAddress: number) {
+export function deleteSensorById(sensorAddress: number) {
   dbRun('DELETE FROM sensor WHERE sensor_address = ?', [sensorAddress]).catch((err) => {
     console.log(err.message);
   });

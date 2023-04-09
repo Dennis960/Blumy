@@ -1,6 +1,6 @@
 import cors from 'cors';
 import { json, Router } from 'express';
-import { addData, createSensor, getSensor, getSensors, getData, deleteDataBySensorAddress, deleteSensor, deleteDataById, updateSensor } from './database.js';
+import { addDataBySensorId, createSensorWithId, getSensorById, getSensors, getDataBySensorId, deleteDataBySensorId, deleteSensorById, deleteDataById, updateSensorById } from './database.js';
 
 const router = Router();
 router.use(json());
@@ -24,11 +24,11 @@ router.post('/data', async (req, res) => {
   }
   // check if sensor exists
   let sensorExists = true;
-  const sensor = await getSensor(sensorAddress);
+  const sensor = await getSensorById(sensorAddress);
   if (!sensor) {
     sensorExists = false;
     // create sensor
-    const createdSensor = await createSensor(sensorAddress);
+    const createdSensor = await createSensorWithId(sensorAddress);
     if (!createdSensor) {
       return res.status(500).send({
         message: 'could not create sensor',
@@ -37,7 +37,7 @@ router.post('/data', async (req, res) => {
     }
   }
   // add data
-  const data = await addData(sensorAddress, water);
+  const data = await addDataBySensorId(sensorAddress, water);
   return res.status(200).send({
     message: sensorExists ? 'data added' : 'sensor created and data added',
     data
@@ -49,7 +49,7 @@ router.post('/data', async (req, res) => {
 // -> 200 message: sensor found, data: sensor
 router.get('/sensors/:sensorAddress', async (req, res) => {
   const { sensorAddress } = req.params;
-  const sensor = await getSensor(Number(sensorAddress));
+  const sensor = await getSensorById(Number(sensorAddress));
   if (!sensor) {
     return res.status(404).send({
       message: 'sensor not found',
@@ -78,14 +78,14 @@ router.get('/sensors', async (req, res) => {
 // -> 200 message: data found, data: data
 router.get('/sensors/:sensorAddress/data', async (req, res) => {
   const { sensorAddress } = req.params;
-  const sensor = await getSensor(Number(sensorAddress));
+  const sensor = await getSensorById(Number(sensorAddress));
   if (!sensor) {
     return res.status(404).send({
       message: 'sensor not found',
       data: {},
     });
   }
-  const data = await getData(Number(sensorAddress));
+  const data = await getDataBySensorId(Number(sensorAddress));
   if (!data) {
     return res.status(404).send({
       message: 'data not found',
@@ -114,7 +114,7 @@ router.put('/sensors/:sensorAddress', async (req, res) => {
       data: {},
     });
   }
-  const sensor = await getSensor(Number(sensorAddress));
+  const sensor = await getSensorById(Number(sensorAddress));
   if (!sensor) {
     return res.status(404).send({
       message: 'sensor not found',
@@ -122,10 +122,10 @@ router.put('/sensors/:sensorAddress', async (req, res) => {
     });
   }
 
-  await updateSensor(Number(sensorAddress), name);
+  await updateSensorById(Number(sensorAddress), name);
   return res.status(200).send({
     message: 'sensor updated',
-    data: await getSensor(Number(sensorAddress)),
+    data: await getSensorById(Number(sensorAddress)),
   });
 });
 
@@ -134,14 +134,14 @@ router.put('/sensors/:sensorAddress', async (req, res) => {
 // -> 200 message: data deleted, data: {}
 router.delete('/sensors/:sensorAddress/data', async (req, res) => {
   const { sensorAddress } = req.params;
-  const data = await getData(Number(sensorAddress));
+  const data = await getDataBySensorId(Number(sensorAddress));
   if (!data) {
     return res.status(404).send({
       message: 'data not found',
       data: {},
     });
   }
-  deleteDataBySensorAddress(Number(sensorAddress));
+  deleteDataBySensorId(Number(sensorAddress));
   return res.status(200).send({
     message: 'data deleted',
     data: {},
@@ -153,14 +153,14 @@ router.delete('/sensors/:sensorAddress/data', async (req, res) => {
 // -> 200 message: sensor deleted, data: {}
 router.delete('/sensors/:sensorAddress', async (req, res) => {
   const { sensorAddress } = req.params;
-  const sensor = await getSensor(Number(sensorAddress));
+  const sensor = await getSensorById(Number(sensorAddress));
   if (!sensor) {
     return res.status(404).send({
       message: 'sensor not found',
       data: {},
     });
   }
-  deleteSensor(Number(sensorAddress));
+  deleteSensorById(Number(sensorAddress));
   return res.status(200).send({
     message: 'sensor deleted',
     data: {},
@@ -172,7 +172,7 @@ router.delete('/sensors/:sensorAddress', async (req, res) => {
 // -> 200 message: data deleted, data: {}
 router.delete('/data/:dataId', async (req, res) => {
   const { dataId } = req.params;
-  const data = await getData(Number(dataId));
+  const data = await getDataBySensorId(Number(dataId));
   if (!data) {
     return res.status(404).send({
       message: 'data not found',
