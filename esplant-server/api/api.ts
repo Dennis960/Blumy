@@ -1,6 +1,6 @@
 import cors from 'cors';
 import { json, Router } from 'express';
-import { addData, createSensor, getSensor, getSensors, getData, deleteData, deleteSensor } from './database.js';
+import { addData, createSensor, getSensor, getSensors, getData, deleteDataBySensorAddress, deleteSensor, deleteDataById } from './database.js';
 
 const router = Router();
 router.use(json());
@@ -23,8 +23,10 @@ router.post('/data', async (req, res) => {
     });
   }
   // check if sensor exists
+  let sensorExists = true;
   const sensor = await getSensor(sensorAddress);
   if (!sensor) {
+    sensorExists = false;
     // create sensor
     const createdSensor = await createSensor(sensorAddress);
     if (!createdSensor) {
@@ -37,15 +39,15 @@ router.post('/data', async (req, res) => {
   // add data
   const data = await addData(sensorAddress, water);
   return res.status(200).send({
-    message: 'data added',
+    message: sensorExists ? 'data added' : 'sensor created and data added',
     data
   });
 });
 
-// GET /api/sensor/:sensorAddress
+// GET /api/sensors/:sensorAddress
 // -> 404 message: sensor not found, data: {}
 // -> 200 message: sensor found, data: sensor
-router.get('/sensor/:sensorAddress', async (req, res) => {
+router.get('/sensors/:sensorAddress', async (req, res) => {
   const { sensorAddress } = req.params;
   const sensor = await getSensor(Number(sensorAddress));
   if (!sensor) {
@@ -60,9 +62,9 @@ router.get('/sensor/:sensorAddress', async (req, res) => {
   });
 });
 
-// GET /api/sensor
+// GET /api/sensors
 // -> 200 message: sensors found, data: sensors
-router.get('/sensor', async (req, res) => {
+router.get('/sensors', async (req, res) => {
   const sensors = await getSensors();
   return res.status(200).send({
     message: 'sensors found',
@@ -70,10 +72,10 @@ router.get('/sensor', async (req, res) => {
   });
 });
 
-// GET /api/data/:sensorAddress
+// GET /api/sensors/:sensorAddress/data
 // -> 404 message: data not found, data: {}
 // -> 200 message: data found, data: data
-router.get('/data/:sensorAddress', async (req, res) => {
+router.get('/sensors/:sensorAddress/data', async (req, res) => {
   const { sensorAddress } = req.params;
   const data = await getData(Number(sensorAddress));
   if (!data) {
@@ -88,10 +90,10 @@ router.get('/data/:sensorAddress', async (req, res) => {
   });
 });
 
-// DELETE /api/data/:sensorAddress
+// DELETE /api/sensors/:sensorAddress/data
 // -> 404 message: data not found, data: {}
 // -> 200 message: data deleted, data: {}
-router.delete('/data/:sensorAddress', async (req, res) => {
+router.delete('/sensors/:sensorAddress/data', async (req, res) => {
   const { sensorAddress } = req.params;
   const data = await getData(Number(sensorAddress));
   if (!data) {
@@ -100,17 +102,17 @@ router.delete('/data/:sensorAddress', async (req, res) => {
       data: {},
     });
   }
-  deleteData(Number(sensorAddress));
+  deleteDataBySensorAddress(Number(sensorAddress));
   return res.status(200).send({
     message: 'data deleted',
     data: {},
   });
 });
 
-// DELETE /api/sensor/:sensorAddress
+// DELETE /api/sensors/:sensorAddress
 // -> 404 message: sensor not found, data: {}
 // -> 200 message: sensor deleted, data: {}
-router.delete('/sensor/:sensorAddress', async (req, res) => {
+router.delete('/sensors/:sensorAddress', async (req, res) => {
   const { sensorAddress } = req.params;
   const sensor = await getSensor(Number(sensorAddress));
   if (!sensor) {
@@ -122,6 +124,25 @@ router.delete('/sensor/:sensorAddress', async (req, res) => {
   deleteSensor(Number(sensorAddress));
   return res.status(200).send({
     message: 'sensor deleted',
+    data: {},
+  });
+});
+
+// DELETE /api/data/:dataId
+// -> 404 message: data not found, data: {}
+// -> 200 message: data deleted, data: {}
+router.delete('/data/:dataId', async (req, res) => {
+  const { dataId } = req.params;
+  const data = await getData(Number(dataId));
+  if (!data) {
+    return res.status(404).send({
+      message: 'data not found',
+      data: {},
+    });
+  }
+  deleteDataById(Number(dataId));
+  return res.status(200).send({
+    message: 'data deleted',
     data: {},
   });
 });

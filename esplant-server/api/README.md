@@ -21,7 +21,7 @@ Create a new entry of sensor data. The following fields are required in the requ
 
 ### Get Sensor
 
-`GET /api/sensor/:sensorAddress`
+`GET /api/sensors/:sensorAddress`
 
 Get details of a specific sensor device. The following path parameter is required:
 
@@ -35,7 +35,7 @@ Get details of a specific sensor device. The following path parameter is require
 
 ### Get Sensors
 
-`GET /api/sensor`
+`GET /api/sensors`
 
 Get a list of all sensor devices.
 
@@ -45,7 +45,7 @@ Get a list of all sensor devices.
 
 ### Get Sensor Data
 
-`GET /api/data/:sensorAddress`
+`GET /api/sensors/:sensorAddress/data`
 
 Get a list of sensor data for a specific sensor device. The following path parameter is required:
 
@@ -57,9 +57,9 @@ Get a list of sensor data for a specific sensor device. The following path param
 
 - `200` - If the sensor data is found, a `200 OK` response is returned. The response body contains a success message and an array of data objects.
 
-### Delete Sensor Data
+### Delete Sensor Data for Sensor
 
-`DELETE /api/data/:sensorAddress`
+`DELETE /api/sensors/:sensorAddress/data`
 
 Delete all sensor data for a specific sensor device. The following path parameter is required:
 
@@ -71,9 +71,23 @@ Delete all sensor data for a specific sensor device. The following path paramete
 
 - `200` - If the sensor data is deleted successfully, a `200 OK` response is returned. The response body contains a success message and an empty data object.
 
+### Delete Sensor Data by DataId
+
+`DELETE /api/data/:dataId`
+
+Delete a specific sensor data entry. The following path parameter is required:
+
+- `dataId` - the id of the sensor data entry
+
+#### Response
+
+- `404` - If the sensor data is not found, a `404 Not Found` response is returned. The response body contains an error message and an empty data object.
+
+- `200` - If the sensor data is deleted successfully, a `200 OK` response is returned. The response body contains a success message and an empty data object.
+
 ### Delete Sensor
 
-`DELETE /api/sensor/:sensorAddress`
+`DELETE /api/sensors/:sensorAddress`
 
 Delete a specific sensor device. The following path parameter is required:
 

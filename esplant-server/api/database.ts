@@ -144,14 +144,14 @@ export function getSensors() {
  * 
  * @param sensorAddress The address of the sensor.
  * @param name The name of the sensor.
- * @returns The sensor address or throws an error if the sensor already exists.
+ * @returns The row id or throws an error if the sensor already exists.
  */
 export async function createSensor(sensorAddress: number, name = 'new sensor') {
   const sensor = await getSensor(sensorAddress);
   if (sensor) {
     return Promise.reject('Sensor already exists');
   }
-  return await dbInsert('SET IDENTITY_INSERT sensor ON; INSERT INTO sensor (sensor_address, name) VALUES (?, ?); SET IDENTITY_INSERT sensor OFF;', [sensorAddress, name]);
+  return await dbInsert('INSERT INTO sensor (sensor_address, name) VALUES (?, ?)', [sensorAddress, name]);
 }
 
 /**
@@ -177,8 +177,18 @@ export function getData(sensorAddress: number) {
  * Delete data by sensor address.
  * @param sensorAddress The address of the sensor.
  */
-export function deleteData(sensorAddress: number) {
+export function deleteDataBySensorAddress(sensorAddress: number) {
   dbRun('DELETE FROM data WHERE sensor_address = ?', [sensorAddress]).catch((err) => {
+    console.log(err.message);
+  });
+}
+
+/**
+ * Delete data by id.
+ * @param id The id of the data.
+ */
+export function deleteDataById(id: number) {
+  dbRun('DELETE FROM data WHERE id = ?', [id]).catch((err) => {
     console.log(err.message);
   });
 }
