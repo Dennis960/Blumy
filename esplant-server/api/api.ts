@@ -160,6 +160,7 @@ router.delete('/sensors/:sensorAddress', async (req, res) => {
       data: {},
     });
   }
+  deleteDataBySensorId(Number(sensorAddress));
   deleteSensorById(Number(sensorAddress));
   return res.status(200).send({
     message: 'sensor deleted',
