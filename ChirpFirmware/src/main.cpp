@@ -1,13 +1,11 @@
+#include <Arduino.h>
 #include <inttypes.h>
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
 #include <avr/sleep.h>
-#include <avr/eeprom.h>
 #include "usiTwiSlave.h"
-
-#define FIRMWARE_VERSION 0x21 // 2.1
 
 //------------ peripherals ----------------
 
@@ -74,7 +72,7 @@ static inline void playUnhappy()
 
 //------------------- initialization/setup-------------------
 
-static inline void inline setupGPIO()
+static inline void setupGPIO()
 {
     PORTA |= _BV(PA0); // nothing
     PORTA &= ~_BV(PA0);
@@ -119,9 +117,10 @@ static inline void startExcitationSignal()
     TCCR0B = _BV(CS00);
 }
 
-void stopExcitationSignal() {
-	TCCR0B = 0;
-	TCCR0A = 0;
+void stopExcitationSignal()
+{
+    TCCR0B = 0;
+    TCCR0A = 0;
     PORTB &= ~_BV(PB2);
 }
 
@@ -146,14 +145,15 @@ static inline uint16_t getADC1()
     return 1023 - result;
 }
 
-uint16_t getCapacitance() {    
+uint16_t getCapacitance()
+{
     PRR &= ~_BV(PRTIM0);
-	startExcitationSignal();
+    startExcitationSignal();
 
     getADC1();
     _delay_ms(1000); // stabilize delay
     uint16_t result = getADC1();
-    
+
     stopExcitationSignal();
     PORTB &= ~_BV(PB2);
     PRR |= _BV(PRTIM0);
@@ -161,105 +161,14 @@ uint16_t getCapacitance() {
     return result;
 }
 
-// ------------------ temperature measurement ------------------
-
-uint16_t getADC8()
-{
-    ADMUX = 0b10100010; // select ADC8 as input, internal 1.1V Vref
-
-    ADCSRA |= _BV(ADSC); // start conversion
-
-    sleepWhileADC();
-
-    uint16_t result = ADCL;
-    result |= ADCH << 8;
-
-    return result;
-}
-
-static inline uint16_t getTemperature()
-{
-    getADC8(); // discard the first measurement
-    return getADC8();
-}
-
-//--------------------- light measurement --------------------
-
-volatile uint16_t light = 0;
-volatile uint16_t lightCounter = 0;
-volatile uint8_t lightCycleOver = 1;
-
-static inline stopLightMeaseurement()
-{
-    GIMSK &= ~_BV(PCIE1);
-    TCCR1B = 0;
-    PCMSK1 &= ~_BV(PCINT8);
-    TIMSK1 &= ~_BV(TOIE1);
-
-    lightCycleOver = 1;
-}
-
-ISR(PCINT1_vect)
-{
-    GIMSK &= ~_BV(PCIE1); // disable pin change interrupts
-    TCCR1B = 0;           // stop timer
-    lightCounter = TCNT1;
-    light = lightCounter;
-
-    stopLightMeaseurement();
-}
-
-ISR(TIM1_OVF_vect)
-{
-    lightCounter = 65535;
-    light = lightCounter;
-
-    stopLightMeaseurement();
-}
-
-static inline uint16_t getLight()
-{
-    TIMSK1 |= _BV(TOIE1); // enable timer overflow interrupt
-
-    DDRB |= _BV(LED_A) | _BV(LED_K); // forward bias the LED
-    PORTB &= ~_BV(LED_K);            // flash it to discharge the PN junction capacitance
-    PORTB |= _BV(LED_A);
-
-    PORTB |= _BV(LED_K); // reverse bias LED to charge capacitance in it
-    PORTB &= ~_BV(LED_A);
-
-    DDRB &= ~_BV(LED_K);                 // make Cathode input
-    PORTB &= ~(_BV(LED_A) | _BV(LED_K)); // disable pullups
-
-    TCNT1 = 0;
-    TCCR1A = 0;
-    TCCR1B = _BV(CS11) | _BV(CS10); // start timer1 with prescaler clk/64
-
-    PCMSK1 |= _BV(PCINT8); // enable pin change interrupt on LED_K
-    GIMSK |= _BV(PCIE1);
-
-    lightCycleOver = 0;
-}
-
-static inline uint8_t lightMeasurementInProgress()
-{
-    return !lightCycleOver;
-}
-
 // ----------------- sensor mode loop ---------------------
 
 #define I2C_GET_CAPACITANCE 0x00
-#define I2C_SET_ADDRESS 0x01
-#define I2C_GET_ADDRESS 0x02
-#define I2C_MEASURE_LIGHT 0x03
-#define I2C_GET_LIGHT 0x04
-#define I2C_GET_TEMPERATURE 0x05
-#define I2C_RESET 0x06
-#define I2C_GET_VERSION 0x07
-#define I2C_CHIRP_HAPPY 0x08
-#define I2C_CHIRP_UNHAPPY 0x09
-#define I2C_LED_ON 0x0A
-#define I2C_LED_OFF 0x0B
+#define I2C_RESET 0x01
+#define I2C_CHIRP_HAPPY 0x02
+#define I2C_CHIRP_UNHAPPY 0x03
+#define I2C_LED_ON 0x04
+#define I2C_LED_OFF 0x05
 
 #define reset()            \
     wdt_enable(WDTO_15MS); \
@@ -271,64 +180,21 @@ static inline void loopSensorMode()
 {
     startExcitationSignal();
     uint16_t currCapacitance = 0;
-    uint16_t temperature = 0;
 
     while (1)
     {
         if (usiTwiDataInReceiveBuffer())
         {
             uint8_t usiRx = usiTwiReceiveByte();
-
             if (I2C_GET_CAPACITANCE == usiRx)
             {
                 currCapacitance = getCapacitance();
                 usiTwiTransmitByte(currCapacitance >> 8);
                 usiTwiTransmitByte(currCapacitance & 0x00FF);
             }
-            else if (I2C_SET_ADDRESS == usiRx)
-            {
-                uint8_t newAddress = usiTwiReceiveByte();
-                if (newAddress >= 0 && newAddress <= 127)
-                {
-                    eeprom_write_byte((uint8_t *)0x01, newAddress);
-                }
-            }
-            else if (I2C_GET_ADDRESS == usiRx)
-            {
-                uint8_t newAddress = eeprom_read_byte((uint8_t *)0x01);
-                usiTwiTransmitByte(newAddress);
-            }
-            else if (I2C_MEASURE_LIGHT == usiRx)
-            {
-                if (!lightMeasurementInProgress())
-                {
-                    getLight();
-                }
-            }
-            else if (I2C_GET_LIGHT == usiRx)
-            {
-                GIMSK &= ~_BV(PCIE1); // disable pin change interrupts
-                TCCR1B = 0;           // stop timer
-
-                usiTwiTransmitByte(light >> 8);
-                usiTwiTransmitByte(light & 0x00FF);
-
-                GIMSK |= _BV(PCIE1);
-                TCCR1B = _BV(CS11) | _BV(CS10); // start timer1 with prescaler clk/64
-            }
-            else if (I2C_GET_TEMPERATURE == usiRx)
-            {
-                temperature = getTemperature();
-                usiTwiTransmitByte(temperature >> 8);
-                usiTwiTransmitByte(temperature & 0x00FF);
-            }
             else if (I2C_RESET == usiRx)
             {
                 reset();
-            }
-            else if (I2C_GET_VERSION == usiRx)
-            {
-                usiTwiTransmitByte(FIRMWARE_VERSION);
             }
             else if (I2C_CHIRP_HAPPY == usiRx)
             {
@@ -352,22 +218,16 @@ static inline void loopSensorMode()
 
 //-----------------------------------------------------------------
 
-#define I2C_ADDRESS_EEPROM_LOCATION (uint8_t *)0x01
-#define I2C_ADDRESS_DEFAULT 4
+#define I2C_ADDRESS_DEFAULT 1
 
-int main(void)
+void setup()
 {
     MCUSR = 0;
     wdt_disable();
     setupGPIO();
     initADC();
 
-    uint8_t address = eeprom_read_byte(I2C_ADDRESS_EEPROM_LOCATION);
-    if (address <= 0 || address >= 127) // if eeprom address is 127 or 0, use default address
-    {
-        address = I2C_ADDRESS_DEFAULT;
-    }
-    usiTwiSlaveInit(address);
+    usiTwiSlaveInit(I2C_ADDRESS_DEFAULT);
 
     CLKPR = _BV(CLKPCE);
     CLKPR = _BV(CLKPS1); // clock speed = clk/4 = 2Mhz
@@ -375,4 +235,7 @@ int main(void)
     sei();
 
     loopSensorMode();
+}
+void loop()
+{
 }

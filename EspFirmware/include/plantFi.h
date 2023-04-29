@@ -11,6 +11,7 @@ private:
     WiFiClientSecure wifiClient;
 
     String dataUrl = "https://esplant.hoppingadventure.com/api/data";
+
 public:
     PlantFi()
     {
@@ -20,7 +21,7 @@ public:
     /**
      * Waits until the wifi connection is established or a timeout occurs.
      * @return True if the connection was established, false if a timeout occurred.
-    */
+     */
     bool waitUntilWifiConnected()
     {
         unsigned long startTime = millis();
@@ -28,7 +29,7 @@ public:
         while (wifiStatus != WL_CONNECTED) // Wait for the WiFI connection completion
         {
             wifiStatus = WiFi.status();
-            if (millis()-startTime > 30000 || wifiStatus == WL_IDLE_STATUS || wifiStatus == WL_CONNECT_FAILED) // timeout after 30 seconds or on no connection found
+            if (millis() - startTime > 6000 || wifiStatus == WL_IDLE_STATUS || wifiStatus == WL_CONNECT_FAILED) // timeout after 6 seconds or on no connection found
             {
                 return false;
             }
@@ -40,13 +41,13 @@ public:
     /**
      * Starts the wifi connection and waits until it is connected.
      * Uses the SSID and PASSWORD defined in system environment variables as PIO_PASSWORD and PIO_SSID.
-    */
+     */
     void startWifiConnection()
     {
         wifiClient.setInsecure();
         const char *ssid = WIFI_SSID;
         const char *password = WIFI_PASSWORD;
-        WiFi.begin(ssid, password); // ssid and password are defined in secrets.h
+        WiFi.begin(ssid, password); // ssid and password are defined in system environment variables as PIO_PASSWORD and PIO_SSID
         waitUntilWifiConnected();
     }
 
@@ -54,7 +55,7 @@ public:
      * Sends the sensor data to the api
      * @param sensorAddress The address of the sensor
      * @param water The water value of the sensor
-    */
+     */
     void sendData(int sensorAddress, int water)
     {
         http.begin(wifiClient, dataUrl);
