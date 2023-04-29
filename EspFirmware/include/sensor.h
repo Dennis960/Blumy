@@ -50,7 +50,7 @@ public:
     unsigned int readI2C(uint8_t reg)
     {
         writeI2C(reg);
-        delay(550); // Sensor takes 518 ms to make value available after request
+        delay(700); // Sensor takes 518 ms to make value available after request
         return readI2CRequestedRegister();
     }
     /**
