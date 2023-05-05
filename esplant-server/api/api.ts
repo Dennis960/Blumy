@@ -10,6 +10,12 @@ router.use(cors());
 
 function formatDateData(data: Data[]): FormattedData[] {
   return data.map((data) => {
+    if (!data.date) {
+      return {
+        ...data,
+        date: 'unknown',
+      }
+    }
     const date = new Date(data.date);
     const formattedDate = dateFormat(date, 'dd.mm.yyyy HH:MM:ss');
     return {
@@ -28,7 +34,7 @@ router.use((req, res, next) => {
       if (data.data) {
         if (Array.isArray(data.data)) {
           data.data = formatDateData(data.data);
-        } else {
+        } else if (data.data.date) {
           data.data = formatDateData([data.data])[0];
         }
       }
