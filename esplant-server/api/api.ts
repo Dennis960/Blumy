@@ -50,13 +50,15 @@ router.use((req, res, next) => {
 // POST /api/data
 // {
 //   "sensorAddress": 1,
-//   "water": 428
+//   "water": 428,
+//   "voltage": 3.234,
+//   "duration": 2450,
 // }
 // -> 400 message: sensorAddress and water are required, data: {}
 // -> 500 message: could not create sensor, data: {}
 // -> 200 message: data added, data: data
 router.post('/data', async (req, res) => {
-  const { sensorAddress, water } = req.body;
+  const { sensorAddress, water, voltage, duration } = req.body;
   if (!sensorAddress || !water) {
     return res.status(400).send({
       message: 'sensorAddress and water are required',
@@ -78,7 +80,7 @@ router.post('/data', async (req, res) => {
     }
   }
   // add data
-  const data = await addDataBySensorId(sensorAddress, water);
+  const data = await addDataBySensorId(sensorAddress, water, voltage, duration);
   return res.status(200).send({
     message: sensorExists ? 'data added' : 'sensor created and data added',
     data

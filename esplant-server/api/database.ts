@@ -238,11 +238,13 @@ export async function createSensorWithId(sensorAddress: number, name = 'new sens
  * Add data to the database.
  * @param sensorAddress The address of the sensor.
  * @param water The water level.
+ * @param voltage The battery voltage.
+ * @param duration The duration of the measurement.
  * @returns The id of the inserted data or throws an error if the sensor does not exist.
  */
-export function addDataBySensorId(sensorAddress: number, water: number) {
+export function addDataBySensorId(sensorAddress: number, water: number, voltage: number, duration: number) {
   const nowMs = Date.now();
-  return dbInsert('INSERT INTO data (sensor_address, water, date) VALUES (?, ?, ?)', [sensorAddress, water, nowMs]);
+  return dbInsert('INSERT INTO data (sensor_address, water, voltage, duration, date) VALUES (?, ?, ?, ?, ?)', [sensorAddress, water, voltage, duration, nowMs]);
 }
 
 /**
