@@ -13,4 +13,4 @@ export const DEFAULT_GRAPH_COLORS = [
   '#FF4136',
 ]
 
-export const DEFAULT_DURATION = durations["1 h"];
+export const DEFAULT_DURATION = durations["1 d"];
