@@ -1,11 +1,10 @@
 <script lang="ts">
-  import type { ChartData } from "$lib/graph";
   import { DEFAULT_MAX_DATA_POINTS } from "$lib/constants";
-  import { deepSpread, defaultGraphOptions } from "$lib/graph";
   import { DataClient } from "$lib/data-client";
+  import { defaultGraphOptions } from "$lib/graph";
+  import type { RequestData } from "$types/api";
   import { onMount } from "svelte";
   import ApexChart from "./apex-chart.svelte";
-  import type { RequestData } from "$types/api";
 
   let chart: any;
   onMount(async () => {
@@ -15,6 +14,8 @@
 
   export let duration: number;
   export let maxDataPoints = DEFAULT_MAX_DATA_POINTS;
+  export let sensorAddress: number;
+  export let property: string;
 
   let runtimeDataClient = new DataClient();
   let dataStore = runtimeDataClient.dataStore;
@@ -23,26 +24,66 @@
   let options = {};
 
   function updateSeries() {
-    series = [
-      {
-        name: "Water",
-        data: $dataStore.map((data) => {
-          return {
-            x: new Date(data.date),
-            y: data.water,
-          };
-        }),
-      },
-    ];
-    options = {
-      ...defaultGraphOptions,
-      series: series,
-    };
+    if (property == "Water") {
+      series = [
+        {
+          name: "Water",
+          data: $dataStore.map((data) => {
+            return {
+              x: new Date(data.date),
+              y: data.water,
+            };
+          }),
+          color: "#00FFFF",
+        },
+      ];
+      options = {
+        ...defaultGraphOptions,
+        series: series,
+      };
+      return;
+    } else if (property == "Power") {
+      series = [
+        {
+          name: "Power",
+          data: $dataStore.map((data) => {
+            return {
+              x: new Date(data.date),
+              y: data.voltage * 100,
+            };
+          }),
+          color: "#FF0000",
+        },
+      ];
+      options = {
+        ...defaultGraphOptions,
+        series: series,
+      };
+      return;
+    } else if (property == "Duration") {
+      series = [
+        {
+          name: "Duration",
+          data: $dataStore.map((data) => {
+            return {
+              x: new Date(data.date),
+              y: data.duration,
+            };
+          }),
+          color: "#00FF00",
+        },
+      ];
+      options = {
+        ...defaultGraphOptions,
+        series: series,
+      };
+      return;
+    }
   }
 
   function updateData() {
     let runtimeDataRequest: RequestData = {
-      sensorAddress: 4,
+      sensorAddress: sensorAddress,
       maxDataPoints: maxDataPoints,
       startDate: Date.now() - duration,
       endDate: Date.now(),
@@ -53,8 +94,16 @@
   $: if (duration) {
     updateData();
   }
+  
+    $: if (sensorAddress) {
+      updateData();
+    }
 
   $: if ($dataStore) {
+    updateSeries();
+  }
+
+  $: if (property) {
     updateSeries();
   }
 </script>
