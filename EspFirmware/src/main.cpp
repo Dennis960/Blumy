@@ -54,19 +54,22 @@ void setup()
 const unsigned long QUICK_CONNECT_TIMEOUT = 2000; // 2 seconds
 const unsigned long WIFI_TIMEOUT = 7000;         // 7 seconds
 const unsigned long SENSOR_TIMEOUT = 5000;       // 5 seconds (enough for 10 tries)
+const unsigned long TOTAL_TIMEOUT = 10000;       // 10 seconds
 
-unsigned int water = 0;
+const unsigned int INVALID_WATER = 65535;
+
+unsigned int water = INVALID_WATER;
 
 void loop()
 {
     // Sensor capacitance
-    if (water == 0 && sensor.isCapacitanceAvailable())
+    if (water == INVALID_WATER && sensor.isCapacitanceAvailable())
     {
         water = sensor.getRequestedCapacitance();
         serialPrintf("Water: %u\n", water);
-        if (water >= 65535)
+        if (water >= INVALID_WATER)
         {
-            water = 0;
+            water = INVALID_WATER;
         }
         else
         {
@@ -82,6 +85,14 @@ void loop()
         sensor.requestCapacitance();
     }
 
+    // Sensor timeout
+    if (sensor.isActive() && millis() - sensor.sensorEnableTime > SENSOR_TIMEOUT)
+    {
+        serialPrintf("Sensor timeout\n");
+        sensor.disable();
+        water = 1; // 1 means no water measured (can't be 0 because 0 is falsy in JavaScript)
+    }
+
     // Check wifi connection
     if (plantFi.isWifiConnected())
     {
@@ -89,8 +100,9 @@ void loop()
         {
             serialPrintf("Saving connection\n");
             plantFi.saveConnection();
+            plantFi.rtcValid = true;
         }
-        if (water != 0)
+        if (water != INVALID_WATER)
         {
             serialPrintf("Sending data\n");
             plantFi.sendData(sensorAddress, water, ESP.getVcc());
@@ -115,5 +127,12 @@ void loop()
                 startDeepSleep(SLEEP_DURATION);
             }
         }
+    }
+
+    // Total timeout
+    if (millis() - plantFi.connectionStartTime > TOTAL_TIMEOUT)
+    {
+        serialPrintf("Total timeout\n");
+        startDeepSleep(SLEEP_DURATION);
     }
 }

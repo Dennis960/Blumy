@@ -13,7 +13,6 @@ private:
     int address;
     unsigned long capacitanceRequestTime = 0;
     int pin;
-    unsigned long sensorEnableTime = 0;
 
     /**
      * Writes a value to the sensor
@@ -40,6 +39,7 @@ private:
 public:
     bool isMeasuring = false;
     bool isEnabled = false;
+    unsigned long sensorEnableTime = 0;
 
     /**
      * Creates a new sensor object with the given i2c address.
@@ -69,7 +69,7 @@ public:
     */
     bool isActive()
     {
-        return millis() - sensorEnableTime < 80 && isEnabled;
+        return millis() - sensorEnableTime > 80 && isEnabled;
     }
 
     /**

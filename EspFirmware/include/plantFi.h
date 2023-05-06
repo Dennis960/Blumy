@@ -132,7 +132,7 @@ public:
 
     /**
      * Saves the WiFi connection data to the RTC memory
-    */
+     */
     void saveConnection()
     {
         rtcData.channel = WiFi.channel();
@@ -153,14 +153,7 @@ public:
         http.addHeader("Content-Type", "application/json");
         StaticJsonDocument<200> doc;
         doc["sensorAddress"] = sensorAddress;
-        if (water >= 65535)
-        {
-            doc["water"] = -1;
-        }
-        else
-        {
-            doc["water"] = water;
-        }
+        doc["water"] = water;
         doc["duration"] = millis();
         doc["voltage"] = voltage;
         String payload;
