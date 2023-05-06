@@ -13,23 +13,7 @@ private:
     int address;
     unsigned long capacitanceRequestTime = 0;
     int pin;
-
-public:
-    /**
-     * Creates a new sensor object with the given i2c address.
-     * Enables the sensor by setting the enable pin to high
-     * Starts a request for the capacitance value
-     */
-    Sensor(int address, int enablePin)
-    {
-        this->address = address;
-        this->pin = enablePin;
-        // enable sensor
-        pinMode(pin, OUTPUT);
-        digitalWrite(pin, HIGH);
-        delay(80);
-        requestCapacitance();
-    }
+    unsigned long sensorEnableTime = 0;
 
     /**
      * Writes a value to the sensor
@@ -52,24 +36,40 @@ public:
         t = t | Wire.read();
         return t;
     }
+
+public:
+    bool isMeasuring = false;
+    bool isEnabled = false;
+
     /**
-     * Reads a value from the sensor
-     * @param reg The register to read from
-     * @return The value of the register
+     * Creates a new sensor object with the given i2c address.
+     * Enables the sensor by setting the enable pin to high
+     * Starts a request for the capacitance value
      */
-    unsigned int readI2C(uint8_t reg)
+    Sensor(int address, int enablePin)
     {
-        writeI2C(reg);
-        delay(550); // Sensor takes 518 ms to make value available after request
-        return readI2CRequestedRegister();
+        this->address = address;
+        this->pin = enablePin;
     }
+
     /**
-     * Reads the humidity value of the soil the sensor is in
-     * @return The humidity value between ~250 and ~1000
-     */
-    unsigned int readCapacitance()
+     * Enables the sensor by setting the enable pin to high
+    */
+    void enable()
     {
-        return readI2C(I2C_GET_CAPACITANCE);
+        pinMode(pin, OUTPUT);
+        digitalWrite(pin, HIGH);
+        sensorEnableTime = millis();
+        isEnabled = true;
+    }
+
+    /**
+     * Checks if the sensor is active (meaning 80 ms have passed since it was enabled)
+     * @return True if the sensor is active
+    */
+    bool isActive()
+    {
+        return millis() - sensorEnableTime < 80 && isEnabled;
     }
 
     /**
@@ -77,6 +77,7 @@ public:
     */
     void requestCapacitance()
     {
+        isMeasuring = true;
         writeI2C(I2C_GET_CAPACITANCE);
         this->capacitanceRequestTime = millis();
     }
@@ -86,11 +87,17 @@ public:
     */
     unsigned int getRequestedCapacitance()
     {
-        while (millis() - capacitanceRequestTime < 550)
-        {
-            delay(1);
-        }
+        isMeasuring = false;
         return readI2CRequestedRegister();
+    }
+
+    /**
+     * Checks if the capacitance value is available
+     * @return True if the value is available, false otherwise
+    */
+    bool isCapacitanceAvailable()
+    {
+        return millis() - capacitanceRequestTime > 550;
     }
 
     /**
@@ -130,6 +137,7 @@ public:
     */
     void disable()
     {
+        isEnabled = false;
         digitalWrite(pin, LOW);
     }
 };

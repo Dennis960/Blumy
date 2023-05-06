@@ -4,7 +4,6 @@
 
 #include <ArduinoJson.h>
 #include "config.h"
-#include "myserial.h"
 
 #define SSID "OpenWrt"
 
@@ -49,77 +48,97 @@ class PlantFi
 private:
     HTTPClient http;
     WiFiClientSecure wifiClient;
-public:
-    PlantFi()
-    {
-    }
 
     /**
-     * @return True if the connection was established, false if a timeout occurred.
+     * Checks if the RTC data is valid
+     * @return True if the RTC data is valid, false otherwise
      */
-    bool startWifiConnection()
+    bool isRtcValid()
     {
         // Try to read WiFi settings from RTC memory
-        bool rtcValid = false;
         if (ESP.rtcUserMemoryRead(0, (uint32_t *)&rtcData, sizeof(rtcData)))
         {
             // Calculate the CRC of what we just read from RTC memory, but skip the first 4 bytes as that's the checksum itself.
             uint32_t crc = calculateCRC32(((uint8_t *)&rtcData) + 4, sizeof(rtcData) - 4);
             if (crc == rtcData.crc32)
             {
-                rtcValid = true;
+                return true;
             }
         }
-        if (rtcValid)
+        return false;
+    }
+
+public:
+    unsigned long connectionStartTime = 0;
+    bool rtcValid = false;
+
+    PlantFi()
+    {
+    }
+
+    /**
+     * Checks if the RTC data is valid
+     * Sets rtcValid to true if the RTC data is valid, false otherwise
+     */
+    void checkRtcValdity()
+    {
+        rtcValid = isRtcValid();
+    }
+
+    /**
+     * Connects to the WiFi network
+     * @param quickConnect If true, tries to connect using the RTC data
+     * If false, tries to connect without using the RTC data
+     */
+    void connectWifi(bool quickConnect = true)
+    {
+        if (quickConnect)
         {
-            serialPrintf("RTC data was good, make a quick connection\n");
-            // The RTC data was good, make a quick connection
             WiFi.begin(SSID, NULL, rtcData.channel, rtcData.bssid, true);
         }
         else
         {
-            serialPrintf("RTC data was bad, make a regular connection\n");
-            // The RTC data was not valid, so make a regular connection
             WiFi.begin(SSID, NULL);
         }
+        connectionStartTime = millis();
+    }
 
-        int retries = 0;
-        int wifiStatus = WiFi.status();
-        while (wifiStatus != WL_CONNECTED)
-        {
-            retries++;
-            if (retries == 100)
-            {
-                serialPrintf("Could not connect to the network, resetting WiFi\n");
-                // Quick connect is not working, reset WiFi and try regular connection
-                WiFi.disconnect();
-                delay(10);
-                WiFi.forceSleepBegin();
-                delay(10);
-                WiFi.forceSleepWake();
-                delay(10);
-                WiFi.begin(SSID);
-            }
-            if (retries == 600)
-            {
-                serialPrintf("Could not connect to the network, resetting ESP\n");
-                // Giving up after 30 seconds
-                return false;
-            }
-            delay(50);
-            wifiStatus = WiFi.status();
-        }
+    /**
+     * Resets the WiFi connection
+     * After resetting, tries to make a regular connection with connectWifi()
+     * Sets rtcValid to false
+     */
+    void resetWifi()
+    {
+        // Quick connect is not working, reset WiFi and try regular connection
+        WiFi.disconnect();
+        delay(10);
+        WiFi.forceSleepBegin();
+        delay(10);
+        WiFi.forceSleepWake();
+        delay(10);
+        connectWifi(false);
+        rtcValid = false;
+    }
 
-        // Write current connection info back to RTC
-        if (!rtcValid)
-        {
-            serialPrintf("Writing RTC data\n");
-            rtcData.channel = WiFi.channel();
-            memcpy(rtcData.bssid, WiFi.BSSID(), 6); // Copy 6 bytes of BSSID (AP's MAC address)
-            rtcData.crc32 = calculateCRC32(((uint8_t *)&rtcData) + 4, sizeof(rtcData) - 4);
-            ESP.rtcUserMemoryWrite(0, (uint32_t *)&rtcData, sizeof(rtcData));
-        }
-        return true;
+    /**
+     * Checks if the WiFi connection is established
+     * @return True if the WiFi connection is established, false otherwise
+     */
+    bool isWifiConnected()
+    {
+        return WiFi.status() == WL_CONNECTED;
+    }
+
+    /**
+     * Saves the WiFi connection data to the RTC memory
+    */
+    void saveConnection()
+    {
+        rtcData.channel = WiFi.channel();
+        memcpy(rtcData.bssid, WiFi.BSSID(), 6); // Copy 6 bytes of BSSID (AP's MAC address)
+        rtcData.crc32 = calculateCRC32(((uint8_t *)&rtcData) + 4, sizeof(rtcData) - 4);
+        ESP.rtcUserMemoryWrite(0, (uint32_t *)&rtcData, sizeof(rtcData));
     }
 
     /**
@@ -127,7 +146,7 @@ public:
      * @param sensorAddress The address of the sensor
      * @param water The water value of the sensor
      */
-    void sendData(int sensorAddress, unsigned int water, uint16_t voltage, int tries)
+    void sendData(int sensorAddress, unsigned int water, uint16_t voltage)
     {
         wifiClient.setInsecure();
         http.begin(wifiClient, "https://esplant.hoppingadventure.com/api/data");
@@ -144,7 +163,6 @@ public:
         }
         doc["duration"] = millis();
         doc["voltage"] = voltage;
-        doc["tries"] = tries;
         String payload;
         serializeJson(doc, payload);
         http.POST(payload);
