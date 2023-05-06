@@ -4,10 +4,9 @@
 
 #include <ArduinoJson.h>
 #include "config.h"
+#include "myserial.h"
 
 #define SSID "OpenWrt"
-
-#define URL "https://esplant.hoppingadventure.com/api/data"
 
 // The ESP8266 RTC memory is arranged into blocks of 4 bytes. The access methods read and write 4 bytes at a time,
 // so the RTC data structure should be padded to a 4-byte multiple.
@@ -50,9 +49,6 @@ class PlantFi
 private:
     HTTPClient http;
     WiFiClientSecure wifiClient;
-
-    String dataUrl = URL;
-
 public:
     PlantFi()
     {
@@ -76,11 +72,13 @@ public:
         }
         if (rtcValid)
         {
+            serialPrintf("RTC data was good, make a quick connection\n");
             // The RTC data was good, make a quick connection
             WiFi.begin(SSID, NULL, rtcData.channel, rtcData.bssid, true);
         }
         else
         {
+            serialPrintf("RTC data was bad, make a regular connection\n");
             // The RTC data was not valid, so make a regular connection
             WiFi.begin(SSID, NULL);
         }
@@ -92,6 +90,7 @@ public:
             retries++;
             if (retries == 100)
             {
+                serialPrintf("Could not connect to the network, resetting WiFi\n");
                 // Quick connect is not working, reset WiFi and try regular connection
                 WiFi.disconnect();
                 delay(10);
@@ -103,10 +102,8 @@ public:
             }
             if (retries == 600)
             {
+                serialPrintf("Could not connect to the network, resetting ESP\n");
                 // Giving up after 30 seconds
-                WiFi.disconnect(true);
-                delay(1);
-                WiFi.mode(WIFI_OFF);
                 return false;
             }
             delay(50);
@@ -114,10 +111,14 @@ public:
         }
 
         // Write current connection info back to RTC
-        rtcData.channel = WiFi.channel();
-        memcpy(rtcData.bssid, WiFi.BSSID(), 6); // Copy 6 bytes of BSSID (AP's MAC address)
-        rtcData.crc32 = calculateCRC32(((uint8_t *)&rtcData) + 4, sizeof(rtcData) - 4);
-        ESP.rtcUserMemoryWrite(0, (uint32_t *)&rtcData, sizeof(rtcData));
+        if (!rtcValid)
+        {
+            serialPrintf("Writing RTC data\n");
+            rtcData.channel = WiFi.channel();
+            memcpy(rtcData.bssid, WiFi.BSSID(), 6); // Copy 6 bytes of BSSID (AP's MAC address)
+            rtcData.crc32 = calculateCRC32(((uint8_t *)&rtcData) + 4, sizeof(rtcData) - 4);
+            ESP.rtcUserMemoryWrite(0, (uint32_t *)&rtcData, sizeof(rtcData));
+        }
         return true;
     }
 
@@ -126,16 +127,24 @@ public:
      * @param sensorAddress The address of the sensor
      * @param water The water value of the sensor
      */
-    void sendData(int sensorAddress, int water, unsigned long start, uint16_t voltage)
+    void sendData(int sensorAddress, unsigned int water, uint16_t voltage, int tries)
     {
         wifiClient.setInsecure();
-        http.begin(wifiClient, dataUrl);
+        http.begin(wifiClient, "https://esplant.hoppingadventure.com/api/data");
         http.addHeader("Content-Type", "application/json");
         StaticJsonDocument<200> doc;
         doc["sensorAddress"] = sensorAddress;
-        doc["water"] = water;
-        doc["duration"] = millis() - start;
+        if (water >= 65535)
+        {
+            doc["water"] = -1;
+        }
+        else
+        {
+            doc["water"] = water;
+        }
+        doc["duration"] = millis();
         doc["voltage"] = voltage;
+        doc["tries"] = tries;
         String payload;
         serializeJson(doc, payload);
         http.POST(payload);

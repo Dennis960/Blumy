@@ -11,14 +11,24 @@ class Sensor
 {
 private:
     int address;
+    unsigned long capacitanceRequestTime = 0;
+    int pin;
 
 public:
     /**
-     * Creates a new sensor object with the given i2c address
+     * Creates a new sensor object with the given i2c address.
+     * Enables the sensor by setting the enable pin to high
+     * Starts a request for the capacitance value
      */
-    Sensor(int address)
+    Sensor(int address, int enablePin)
     {
         this->address = address;
+        this->pin = enablePin;
+        // enable sensor
+        pinMode(pin, OUTPUT);
+        digitalWrite(pin, HIGH);
+        delay(80);
+        requestCapacitance();
     }
 
     /**
@@ -63,6 +73,27 @@ public:
     }
 
     /**
+     * Requests the sensor to send the capacitance value. This value can be read with getRequestedCapacitance()
+    */
+    void requestCapacitance()
+    {
+        writeI2C(I2C_GET_CAPACITANCE);
+        this->capacitanceRequestTime = millis();
+    }
+    /**
+     * Reads the capacitance value that was requested with requestCapacitance()
+     * Needs to be called after requestCapacitance() with a 550 ms delay
+    */
+    unsigned int getRequestedCapacitance()
+    {
+        while (millis() - capacitanceRequestTime < 550)
+        {
+            delay(1);
+        }
+        return readI2CRequestedRegister();
+    }
+
+    /**
      * Makes the sensor emit a short beep
      */
     void chirp()
@@ -92,5 +123,13 @@ public:
     void reset()
     {
         writeI2C(I2C_RESET);
+    }
+
+    /**
+     * Disables the sensor by setting the enable pin to LOW
+    */
+    void disable()
+    {
+        digitalWrite(pin, LOW);
     }
 };
