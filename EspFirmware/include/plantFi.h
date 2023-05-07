@@ -6,6 +6,7 @@
 #include "config.h"
 
 #define SSID "OpenWrt"
+#define PASSWORD NULL
 
 // The ESP8266 RTC memory is arranged into blocks of 4 bytes. The access methods read and write 4 bytes at a time,
 // so the RTC data structure should be padded to a 4-byte multiple.
@@ -94,11 +95,11 @@ public:
     {
         if (quickConnect)
         {
-            WiFi.begin(SSID, NULL, rtcData.channel, rtcData.bssid, true);
+            WiFi.begin(SSID, PASSWORD, rtcData.channel, rtcData.bssid, true);
         }
         else
         {
-            WiFi.begin(SSID, NULL);
+            WiFi.begin(SSID, PASSWORD);
         }
         connectionStartTime = millis();
     }
