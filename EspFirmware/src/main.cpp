@@ -30,13 +30,7 @@ void startDeepSleep(uint64_t duration)
 
 void setup()
 {
-#ifdef DEBUG
-    Serial.begin(74880);
-    Serial.println();
-    Serial.println();
-    // print current vcc
     serialPrintf("VCC: %d\n", ESP.getVcc());
-#endif
     serialPrintf("Enabling sensor\n");
     sensor.enable();
     serialPrintf("Initializing plantFi\n");
@@ -52,13 +46,15 @@ void setup()
 }
 
 const unsigned long QUICK_CONNECT_TIMEOUT = 2000; // 2 seconds
-const unsigned long WIFI_TIMEOUT = 7000;         // 7 seconds
-const unsigned long SENSOR_TIMEOUT = 5000;       // 5 seconds (enough for 10 tries)
-const unsigned long TOTAL_TIMEOUT = 10000;       // 10 seconds
+const unsigned long WIFI_TIMEOUT = 7000;          // 7 seconds
+const unsigned long SENSOR_TIMEOUT = 5000;        // 5 seconds (enough for 10 tries)
+const unsigned long TOTAL_TIMEOUT = 10000;        // 10 seconds
 
 const unsigned int INVALID_WATER = 65535;
 
 unsigned int water = INVALID_WATER;
+
+bool wasWifiConnectedLastCycle = false;
 
 void loop()
 {
@@ -96,6 +92,11 @@ void loop()
     // Check wifi connection
     if (plantFi.isWifiConnected())
     {
+        if (!wasWifiConnectedLastCycle)
+        {
+            serialPrintf("Wifi connected\n");
+            wasWifiConnectedLastCycle = true;
+        }
         if (!plantFi.rtcValid)
         {
             serialPrintf("Saving connection\n");
