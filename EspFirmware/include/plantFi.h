@@ -2,8 +2,8 @@
 #include <WiFiClient.h>
 #include <ESP8266WiFi.h>
 
-#include <ArduinoJson.h>
 #include "config.h"
+#include "myserial.h"
 
 #define SSID "OpenWrt"
 #define PASSWORD NULL
@@ -48,7 +48,7 @@ class PlantFi
 {
 private:
     HTTPClient http;
-    WiFiClientSecure wifiClient;
+    WiFiClient wifiClient;
 
     /**
      * Checks if the RTC data is valid
@@ -149,17 +149,11 @@ public:
      */
     void sendData(int sensorAddress, unsigned int water, uint16_t voltage)
     {
-        wifiClient.setInsecure();
-        http.begin(wifiClient, "https://esplant.hoppingadventure.com/api/data");
+        http.begin(wifiClient, "http://esplant.hoppingadventure.com/api/data");
         http.addHeader("Content-Type", "application/json");
-        StaticJsonDocument<200> doc;
-        doc["sensorAddress"] = sensorAddress;
-        doc["water"] = water;
-        doc["duration"] = millis();
-        doc["voltage"] = voltage;
-        String payload;
-        serializeJson(doc, payload);
-        http.POST(payload);
+        char buffer[200];
+        sprintf(buffer, "{\"sensorAddress\":%d,\"water\":%u,\"duration\":%lu,\"voltage\":%d}", sensorAddress, water, millis(), voltage);
+        http.POST(buffer);
         http.end();
     }
 };

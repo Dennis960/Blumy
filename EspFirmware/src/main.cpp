@@ -2,19 +2,15 @@
 #include <plantFi.h>
 #include <sensor.h>
 #include <ESP8266WiFi.h>
+
 #include "myserial.h"
-
-// this is the address that should be changed for each sensor
-const int sensorAddress = 1;
-
-#define DEBUG
+#include "config.h"
 
 const int sensorI2CAddress = 1;
 
 const int sensorEnablePin = 3; // RX
 const int sdaPin = 2;
 const int sclPin = 0;
-const uint64_t SLEEP_DURATION = 10000000; // 10 seconds
 
 Sensor sensor = Sensor(sensorI2CAddress, sensorEnablePin);
 PlantFi plantFi = PlantFi();
@@ -24,12 +20,17 @@ ADC_MODE(ADC_VCC);
 void startDeepSleep(uint64_t duration)
 {
     serialPrintf("Going to sleep for %llu us\n", duration);
-    ESP.deepSleep(duration);
+    ESP.deepSleep(duration, WAKE_RF_DISABLED);
     yield();
 }
 
 void setup()
 {
+    WiFi.persistent(false);
+    WiFi.forceSleepBegin();
+    delay(1);
+    WiFi.mode(WIFI_OFF);
+    delay(1);
     serialPrintf("VCC: %d\n", ESP.getVcc());
     serialPrintf("Enabling sensor\n");
     sensor.enable();
@@ -44,11 +45,6 @@ void setup()
     serialPrintf("Starting wifi connection\n");
     plantFi.connectWifi(plantFi.rtcValid);
 }
-
-const unsigned long QUICK_CONNECT_TIMEOUT = 2000; // 2 seconds
-const unsigned long WIFI_TIMEOUT = 7000;          // 7 seconds
-const unsigned long SENSOR_TIMEOUT = 5000;        // 5 seconds (enough for 10 tries)
-const unsigned long TOTAL_TIMEOUT = 10000;        // 10 seconds
 
 const unsigned int INVALID_WATER = 65535;
 
