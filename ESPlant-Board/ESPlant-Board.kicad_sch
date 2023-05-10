@@ -1997,7 +1997,7 @@
     (property "Reference" "R9" (at 262.89 66.04 90)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "5k" (at 262.89 68.58 90)
+    (property "Value" "5.1k" (at 262.89 68.58 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "Resistor_SMD:R_0402_1005Metric" (at 262.89 70.358 90)
