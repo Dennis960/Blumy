@@ -1,4 +1,4 @@
-21670506644513617
+21670506929935633
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -51421,6 +51421,20 @@ SMD SMT ceramic resonator filter filter hand-soldering
 0
 3
 3
+CustomFootprints
+BAT_2468
+
+
+0
+2
+2
+CustomFootprints
+SW_Push_1P1T_XKB_TS-1187A
+SMD Tactile Switch, http://www.helloxkb.com/public/images/pdf/TS-1187A-X-X-X.pdf
+SPST Tactile Switch
+0
+4
+4
 Diode_SMD
 D_0201_0603Metric
 Diode SMD 0201 (0603 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: https://www.vishay.com/docs/20052/crcw0201e3.pdf), generated with kicad-footprint-generator
@@ -59492,20 +59506,6 @@ THT
 0
 4
 2
-JLC2KiCad_lib
-BAT-SMD_BH-AAA-B5AA001
-BAT-SMD_BH-AAA-B5AA001 footprint
-BAT-SMD_BH-AAA-B5AA001 footprint
-0
-4
-4
-JLC2KiCad_lib
-SW-SMD_4P-L6.0-W6.4-P4.50-LS8.4
-SW-SMD_4P-L6.0-W6.4-P4.50-LS8.4 footprint
-SW-SMD_4P-L6.0-W6.4-P4.50-LS8.4 footprint
-0
-4
-4
 Jumper
 SolderJumper-2_P1.3mm_Bridged2Bar_Pad1.0x1.5mm
 SMD Solder Jumper, 1x1.5mm Pads, 0.3mm gap, bridged with 2 copper strips

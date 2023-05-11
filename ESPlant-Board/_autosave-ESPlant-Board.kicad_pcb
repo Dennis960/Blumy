@@ -1343,6 +1343,7 @@
     (at 140.8 67.830484 -90)
     (descr "Wi-Fi Module, http://wiki.ai-thinker.com/_media/esp8266/docs/aithinker_esp_12f_datasheet_en.pdf")
     (tags "Wi-Fi Module")
+    (property "JLCPCB Position Offset" "4.1,0")
     (property "JLCPCB Rotation Offset" "-90")
     (property "LCSC" "C82891")
     (property "MPN" "C82891")
