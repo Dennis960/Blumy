@@ -1412,7 +1412,7 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid aa42803b-d2b4-4b87-97eb-e6c7a65a1ffe)
   )
-  (text "pull down for flash mode" (at 179.07 96.52 0)
+  (text "pull down for flash mode" (at 175.26 77.47 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid aaa3995a-f959-4132-9154-9564f1cd957f)
   )
