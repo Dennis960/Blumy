@@ -4,6 +4,12 @@
 
   (paper "A4")
 
+  (title_block
+    (title "ES-Plant")
+    (date "2023-05-12")
+    (rev "1.0")
+  )
+
   (lib_symbols
     (symbol "Connector_Generic:Conn_02x03_Counter_Clockwise" (pin_names (offset 1.016) hide) (in_bom yes) (on_board yes)
       (property "Reference" "J" (at 1.27 5.08 0)
@@ -842,7 +848,6 @@
       )
     )
   )
-
 
   (junction (at 154.94 77.47) (diameter 0) (color 0 0 0 0)
     (uuid 02e46297-55e6-4c21-9846-306d99a4b57c)
