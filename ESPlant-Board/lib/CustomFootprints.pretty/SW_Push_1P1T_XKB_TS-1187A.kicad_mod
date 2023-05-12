@@ -152,9 +152,9 @@
 
     (stroke (width 0.1) (type solid)) (fill none) (layer "F.Fab") (tstamp bc77dbbd-56d3-4c6c-aa13-ea19fc3167c2))
   (pad "1" smd rect (at -3 -1.875) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 2fdf9f96-3bc8-4370-a497-47cf413d8eb6))
-  (pad "2" smd rect (at 3 -1.875) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp ef152499-9140-4e95-9a81-89d58a4473ba))
-  (pad "3" smd rect (at -3 1.875) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp c0f8e203-3d85-4d5e-bbf8-0a1cf32bcf1b))
-  (pad "4" smd rect (at 3 1.875) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 0320eeb2-6a91-4d2d-9032-8bc9cc0cb72d))
+  (pad "1" smd rect (at 3 -1.875) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp ef152499-9140-4e95-9a81-89d58a4473ba))
+  (pad "2" smd rect (at -3 1.875) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp c0f8e203-3d85-4d5e-bbf8-0a1cf32bcf1b))
+  (pad "2" smd rect (at 3 1.875) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 0320eeb2-6a91-4d2d-9032-8bc9cc0cb72d))
   (model "${KIPRJMOD}/lib/footprint/packages3d/SW-SMD_4P-L5.1-W5.1-P3.70-LS6.5-TL-2.wrl"
     (offset (xyz 0 0 0))
     (scale (xyz 1 1 1))
