@@ -147,12 +147,12 @@ public:
      * @param sensorAddress The address of the sensor
      * @param water The water value of the sensor
      */
-    void sendData(int sensorAddress, unsigned int water, uint16_t voltage)
+    void sendData(int sensorAddress, int water, uint16_t voltage)
     {
         http.begin(wifiClient, "http://esplant.hoppingadventure.com/api/data");
         http.addHeader("Content-Type", "application/json");
         char buffer[200];
-        sprintf(buffer, "{\"sensorAddress\":%d,\"water\":%u,\"duration\":%lu,\"voltage\":%d}", sensorAddress, water, millis(), voltage);
+        sprintf(buffer, "{\"sensorAddress\":%d,\"water\":%d,\"duration\":%lu,\"voltage\":%d}", sensorAddress, water, millis(), voltage);
         http.POST(buffer);
         http.end();
     }

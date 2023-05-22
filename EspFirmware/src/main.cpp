@@ -1,90 +1,53 @@
 #include <Arduino.h>
+#include <ESP8266WiFi.h>
 #include <plantFi.h>
 #include <sensor.h>
-#include <ESP8266WiFi.h>
 
-#include "myserial.h"
-#include "config.h"
+#include <config.h>
 
-const int sensorI2CAddress = 1;
+#define RESET_REMEMBER_PIN 4
 
-const int sensorEnablePin = 3; // RX
-const int sdaPin = 2;
-const int sclPin = 0;
-
-Sensor sensor = Sensor(sensorI2CAddress, sensorEnablePin);
+Sensor sensor = Sensor();
 PlantFi plantFi = PlantFi();
-
-ADC_MODE(ADC_VCC);
 
 void startDeepSleep(uint64_t duration)
 {
-    serialPrintf("Going to sleep for %llu us\n", duration);
+    Serial.println("Going to sleep");
     ESP.deepSleep(duration, WAKE_RF_DISABLED);
     yield();
 }
 
 void setup()
 {
+    // Reset button check
+    pinMode(4, INPUT);
+    bool isButtonReset = digitalRead(RESET_REMEMBER_PIN);
+    Serial.begin(74880);
+    serialPrintf("Starting\n");
+    serialPrintf("Reset mode: %s\n", isButtonReset ? "Button" : "Deep sleep");
+
+    // WiFi
     WiFi.persistent(false);
     WiFi.forceSleepBegin();
     delay(1);
     WiFi.mode(WIFI_OFF);
     delay(1);
-    serialPrintf("VCC: %d\n", ESP.getVcc());
-    serialPrintf("Enabling sensor\n");
-    sensor.enable();
-    serialPrintf("Initializing plantFi\n");
     plantFi.checkRtcValdity();
-
-    serialPrintf("Initializing I2C\n");
-    Wire.begin(sdaPin, sclPin);
-    Wire.setTimeout(1000);
-    Wire.setClockStretchLimit(100000);
 
     serialPrintf("Starting wifi connection\n");
     plantFi.connectWifi(plantFi.rtcValid);
 }
 
-const unsigned int INVALID_WATER = 65535;
-
-unsigned int water = INVALID_WATER;
+int value = -1;
 
 bool wasWifiConnectedLastCycle = false;
 
 void loop()
 {
-    // Sensor capacitance
-    if (water == INVALID_WATER && sensor.isCapacitanceAvailable())
+    if (value == -1)
     {
-        water = sensor.getRequestedCapacitance();
-        serialPrintf("Water: %u\n", water);
-        if (water >= INVALID_WATER)
-        {
-            water = INVALID_WATER;
-        }
-        else
-        {
-            serialPrintf("Disabling sensor\n");
-            sensor.disable();
-        }
+        value = sensor.measure();
     }
-
-    // Start measurement if sensor is not measuring and active
-    if (sensor.isActive() && !sensor.isMeasuring)
-    {
-        serialPrintf("Requesting capacitance\n");
-        sensor.requestCapacitance();
-    }
-
-    // Sensor timeout
-    if (sensor.isActive() && millis() - sensor.sensorEnableTime > SENSOR_TIMEOUT)
-    {
-        serialPrintf("Sensor timeout\n");
-        sensor.disable();
-        water = 1; // 1 means no water measured (can't be 0 because 0 is falsy in JavaScript)
-    }
-
     // Check wifi connection
     if (plantFi.isWifiConnected())
     {
@@ -99,10 +62,11 @@ void loop()
             plantFi.saveConnection();
             plantFi.rtcValid = true;
         }
-        if (water != INVALID_WATER)
+        if (value != -1)
         {
+            serialPrintf("Measured value: %d\n", value);
             serialPrintf("Sending data\n");
-            plantFi.sendData(sensorAddress, water, ESP.getVcc());
+            plantFi.sendData(sensorAddress, value, ESP.getVcc());
             startDeepSleep(SLEEP_DURATION);
         }
     }
