@@ -85,7 +85,31 @@ const migrations = [
       // rename new table
       'ALTER TABLE data_new RENAME TO data;'
     ]
-  }
+  },
+  {
+    name: 'data_add_rssi_integer',
+    statements: [
+      // migrate data table add rssi column
+      // create new table
+      `CREATE TABLE IF NOT EXISTS data_new (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sensor_address INTEGER NOT NULL,
+      date INTEGER NOT NULL,
+      water INTEGER NOT NULL,
+      voltage INTEGER,
+      duration INTEGER,
+      rssi INTEGER,
+      FOREIGN KEY (sensor_address) REFERENCES sensor(sensor_address)
+      );`,
+      // copy data to new table
+      `INSERT INTO data_new (id, sensor_address, date, water, voltage, duration)
+      SELECT id, sensor_address, date, water, voltage, duration FROM data;`,
+      // drop old table
+      'DROP TABLE data;',
+      // rename new table
+      'ALTER TABLE data_new RENAME TO data;'
+    ]
+  },
 ];
 
 const DB_SOURCE = '../data/sensor.sqlite';
@@ -242,9 +266,9 @@ export async function createSensorWithId(sensorAddress: number, name = 'new sens
  * @param duration The duration of the measurement.
  * @returns The id of the inserted data or throws an error if the sensor does not exist.
  */
-export function addDataBySensorId(sensorAddress: number, water: number, voltage: number, duration: number) {
+export function addDataBySensorId(sensorAddress: number, water: number, voltage: number, duration: number, rssi: number) {
   const nowMs = Date.now();
-  return dbInsert('INSERT INTO data (sensor_address, water, voltage, duration, date) VALUES (?, ?, ?, ?, ?)', [sensorAddress, water, voltage, duration, nowMs]);
+  return dbInsert('INSERT INTO data (sensor_address, water, voltage, duration, date, rssi) VALUES (?, ?, ?, ?, ?, ?)', [sensorAddress, water, voltage, duration, nowMs, rssi]);
 }
 
 /**

@@ -78,6 +78,24 @@
         series: series,
       };
       return;
+    } else if (property == "Rssi") {
+      series = [
+        {
+          name: "Rssi",
+          data: $dataStore.map((data) => {
+            return {
+              x: new Date(data.date),
+              y: Math.abs(data.rssi),
+            };
+          }),
+          color: "#FFFF00",
+        },
+      ];
+      options = {
+        ...defaultGraphOptions,
+        series: series,
+      };
+      return;
     }
   }
 

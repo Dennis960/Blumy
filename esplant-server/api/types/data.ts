@@ -9,6 +9,7 @@ export type Data = {
   water: number;
   voltage: number;
   duration: number;
+  rssi: number;
 };
 
 export type FormattedData = {
@@ -18,6 +19,7 @@ export type FormattedData = {
   water: number;
   voltage: number;
   duration: number;
+  rssi: number;
 }
 
 export type DatabaseObject = Sensor | Data;

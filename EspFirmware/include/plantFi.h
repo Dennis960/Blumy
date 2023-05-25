@@ -152,7 +152,7 @@ public:
         http.begin(wifiClient, "http://esplant.hoppingadventure.com/api/data");
         http.addHeader("Content-Type", "application/json");
         char buffer[200];
-        sprintf(buffer, "{\"sensorAddress\":%d,\"water\":%d,\"duration\":%lu,\"voltage\":%d}", sensorAddress, water, millis(), voltage);
+        sprintf(buffer, "{\"sensorAddress\":%d,\"water\":%d,\"duration\":%lu,\"voltage\":%d,\"rssi\":%d}", sensorAddress, water, millis(), voltage, WiFi.RSSI());
         http.POST(buffer);
         http.end();
     }

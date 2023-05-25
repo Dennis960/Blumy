@@ -2,7 +2,7 @@
   import Picker from "$lib/components/picker/picker.svelte";
 
   export let property = "Water";
-  let values = ["Water", "Power", "Duration"];
+  let values = ["Water", "Power", "Duration", "Rssi"];
   let valueDescriptions = values;
 </script>
 

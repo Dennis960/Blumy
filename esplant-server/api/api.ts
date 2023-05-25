@@ -58,7 +58,7 @@ router.use((req, res, next) => {
 // -> 500 message: could not create sensor, data: {}
 // -> 200 message: data added, data: data
 router.post('/data', async (req, res) => {
-  const { sensorAddress, water, voltage, duration } = req.body;
+  const { sensorAddress, water, voltage, duration, rssi } = req.body;
   if (!sensorAddress || !water) {
     return res.status(400).send({
       message: 'sensorAddress and water are required',
@@ -80,7 +80,7 @@ router.post('/data', async (req, res) => {
     }
   }
   // add data
-  const data = await addDataBySensorId(sensorAddress, water, voltage, duration);
+  const data = await addDataBySensorId(sensorAddress, water, voltage, duration, rssi);
   return res.status(200).send({
     message: sensorExists ? 'data added' : 'sensor created and data added',
     data
