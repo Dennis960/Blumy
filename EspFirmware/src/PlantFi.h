@@ -8,15 +8,12 @@
 #include "Config.h"
 #include "Utils.h"
 
-#define HARD_SSID "OpenWrt"
-#define PASSWORD NULL
-
 /**
  * The data structure to store the WiFi settings in the RTC memory.
- * 
+ *
  * The ESP8266 RTC memory is arranged into blocks of 4 bytes. The access methods read and write 4 bytes at a time,
  * so the RTC data structure should be padded to a 4-byte multiple.
-*/
+ */
 struct RtcData
 {
     uint32_t crc32;   // 4 bytes
@@ -27,19 +24,20 @@ struct RtcData
 
 /**
  * Function to calculate the CRC32 of the data in the RTC memory.
- * 
+ *
  * @param data The data to calculate the CRC32 of
  * @param length The length of the data
-*/
+ */
 uint32_t calculateCRC32(const uint8_t *data, size_t length);
 
 /**
  * The PlantFi class.
- * 
+ *
  * This class contains all the functions to connect to the WiFi network.
  * Uses rtcData to store the WiFi settings in the RTC memory.
-*/
-class PlantFi {
+ */
+class PlantFi
+{
 private:
     HTTPClient http;
     WiFiClient wifiClient;
@@ -48,12 +46,14 @@ private:
      * @return True if the RTC data is valid, false otherwise
      */
     bool isRtcValid();
+    String _ssid;
+    String _password;
 
 public:
     unsigned long connectionStartTime = 0;
     bool rtcValid = false;
 
-    PlantFi();
+    PlantFi(String ssid, String password);
 
     /**
      * Checks if the RTC data is valid.
@@ -63,7 +63,7 @@ public:
 
     /**
      * Connects to the WiFi network.
-     * 
+     *
      * @param quickConnect If true, tries to connect using the RTC data
      * If false, tries to connect without using the RTC data
      */
@@ -78,7 +78,7 @@ public:
 
     /**
      * Checks if the WiFi connection is established.
-     * 
+     *
      * @return True if the WiFi connection is established, false otherwise
      */
     bool isWifiConnected();
@@ -90,7 +90,7 @@ public:
 
     /**
      * Sends the sensor data to the api.
-     * 
+     *
      * @param sensorAddress The address of the sensor
      * @param water The water value of the sensor
      */

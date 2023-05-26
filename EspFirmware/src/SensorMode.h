@@ -8,6 +8,7 @@
 #include "Sensor.h"
 #include "Config.h"
 #include "Utils.h"
+#include "MyEeprom.h"
 
 extern Sensor sensor;
 extern PlantFi plantFi;
@@ -17,12 +18,12 @@ extern bool wasWifiConnectedLastCycle;
 
 /**
  * Setup function for the sensor mode
-*/
+ */
 void sensorSetup();
 
 /**
  * Loop function for the sensor mode
-*/
+ */
 void sensorLoop();
 
 #endif

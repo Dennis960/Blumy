@@ -1,7 +1,7 @@
 #include "SensorMode.h"
 
 Sensor sensor = Sensor();
-PlantFi plantFi = PlantFi();
+PlantFi plantFi = PlantFi("", "");
 
 int sensorValue = -1;
 bool wasWifiConnectedLastCycle = false;
@@ -14,6 +14,19 @@ void sensorSetup()
     delay(1);
     WiFi.mode(WIFI_OFF);
     delay(1);
+
+    if (!isEEPROMValid())
+    {
+        serialPrintf("EEPROM not valid, starting configuration mode\n");
+        startConfigurationMode();
+    }
+
+    String ssid;
+    String password;
+
+    loadWiFiCredentials(ssid, password);
+
+    plantFi = PlantFi(ssid, password);
     plantFi.checkRtcValidity();
 
     serialPrintf("Starting wifi connection\n");

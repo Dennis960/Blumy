@@ -1,10 +1,13 @@
 #include "ConfigurationMode.h"
 
 AsyncWebServer server(80);
-bool shouldScanWifi = false;
 String networksJson = "";
 unsigned long lastNetworkScan = -5000;
 const unsigned long networkScanInterval = 5000;
+
+bool shouldConnectToWifi = false;
+String ssid = "";
+String password = "";
 
 void configurationSetup()
 {
@@ -57,6 +60,31 @@ void configurationLoop()
         }
         networksJson += "]";
     }
+
+    // TODO: make this async
+    if (shouldConnectToWifi)
+    {
+        shouldConnectToWifi = false;
+        serialPrintf("Connecting to wifi\n");
+        WiFi.begin(ssid.c_str(), password.c_str());
+        int retries = 0;
+        while (WiFi.status() != WL_CONNECTED)
+        {
+            retries++;
+            delay(500);
+            serialPrintf("Retrying to connect to wifi\n");
+            if (retries > 10)
+            {
+                serialPrintf("Failed to connect to wifi\n");
+                break;
+            }
+        }
+        if (WiFi.status() == WL_CONNECTED)
+        {
+            serialPrintf("Connected to wifi\n");
+            saveWiFiCredentials(ssid, password);
+        }
+    }
 }
 
 void reset()
@@ -90,25 +118,18 @@ void handleConnect(AsyncWebServerRequest *request)
     serialPrintf("Received request for /connect\n");
     if (request->hasParam("ssid", true) && request->hasParam("password", true))
     {
-        AsyncWebParameter *ssid = request->getParam("ssid", true);
-        AsyncWebParameter *password = request->getParam("password", true);
+        AsyncWebParameter *newSsid = request->getParam("ssid", true);
+        AsyncWebParameter *newPassword = request->getParam("password", true);
 
-        serialPrintf("Received ssid: %s\n", ssid->value().c_str());
-        serialPrintf("Received password: %s\n", password->value().c_str());
-        
-        // try to connect to the wifi
-        WiFi.begin(ssid->value().c_str(), password->value().c_str());
-        int8_t state = WiFi.waitForConnectResult();
-        if (state == WL_CONNECTED)
-        {
-            serialPrintf("Connected to wifi\n");
-            request->send(200, "text/plain", "OK");
-        }
-        else
-        {
-            serialPrintf("Failed to connect to wifi\n");
-            request->send(400, "text/plain", "Bad request");
-        }
+        serialPrintf("Received ssid: %s\n", newSsid->value().c_str());
+        serialPrintf("Received password: %s\n", newPassword->value().c_str());
+
+        ssid = newSsid->value();
+        password = newPassword->value();
+        shouldConnectToWifi = true;
+
+        serialPrintf("Connected to wifi\n");
+        request->send(200, "text/plain", "OK");
     }
     else
     {

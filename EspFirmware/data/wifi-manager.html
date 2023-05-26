@@ -56,16 +56,14 @@
             const data = { ssid, password };
             // show loading screen
             loadingScreen.style.display = "flex";
-            fetch("/connect", {
+            fetch(`/connect`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/x-www-form-urlencoded",
                 },
-                body: JSON.stringify(data),
+                body: `ssid=${ssid}&password=${password}`,
             })
-                .then((res) => res.json())
-                .then((data) => {
-                    console.log(data);
+                .then(() => {
                     // redirect to home page
                     window.location.href = "/";
                 })
@@ -120,6 +118,22 @@
                 });
         }, 5000);
 
+        // fetch /isConnected every 3 seconds
+        setInterval(() => {
+            fetch("/isConnected")
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(data);
+                    if (data === 1) {
+                        // redirect to home page
+                        window.location.href = "/";
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }, 3000);
+
         let dots = 0;
         setInterval(() => {
             if (dots < 3) {
@@ -127,9 +141,9 @@
             } else {
                 dots = 0;
             }
-            document.getElementById(
-                "loader"
-            ).innerHTML = `${".".repeat(dots)}Scanning for networks${".".repeat(dots)}`;
+            document.getElementById("loader").innerHTML = `${".".repeat(
+                dots
+            )}Scanning for networks${".".repeat(dots)}`;
         }, 1000);
 
         // if parameter debug = 1, add some test networks

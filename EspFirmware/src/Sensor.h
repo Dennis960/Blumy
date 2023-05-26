@@ -22,10 +22,10 @@ public:
      * Measures the soil moisture.
      * Has to be called at least 50 times before the first valid measurement is available.
      * Function calls should be as fast as possible.
-     * 
+     *
      * @return The soil moisture value or -1 if the measurement is not valid.
      * The soil moisture is in the range of 0 to 1024, where 0 is dry and 1024 is wet.
-    */
+     */
     int measure();
 };
 

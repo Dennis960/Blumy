@@ -1,4 +1,5 @@
 #include "Utils.h"
+#include "Config.h"
 
 bool isSerialInitialized = false;
 
@@ -30,8 +31,49 @@ void startDeepSleep(uint64_t duration, bool disableRfAtBoot)
         // Setting this flag will disable RF at boot
         // resulting in less interference when measuring moisture
         ESP.deepSleep(duration, WAKE_RF_DISABLED);
-    } else {
+    }
+    else
+    {
         ESP.deepSleep(duration);
     }
     yield();
+}
+
+uint32_t calculateCRC32(const uint8_t *data, size_t length)
+{
+    uint32_t crc = 0xffffffff;
+    while (length--)
+    {
+        uint8_t c = *data++;
+        for (uint32_t i = 0x80; i > 0; i >>= 1)
+        {
+            bool bit = crc & 0x80000000;
+            if (c & i)
+            {
+                bit = !bit;
+            }
+
+            crc <<= 1;
+            if (bit)
+            {
+                crc ^= 0x04c11db7;
+            }
+        }
+    }
+
+    return crc;
+}
+
+uint32_t calculateCRC32(const String &data, size_t length)
+{
+    return calculateCRC32((const uint8_t *)data.c_str(), length);
+}
+
+void startConfigurationMode()
+{
+    serialPrintf("Starting configuration mode\n");
+    pinMode(RESET_INPUT_PIN, OUTPUT);
+    digitalWrite(RESET_INPUT_PIN, HIGH);
+    delay(100);
+    startDeepSleep(0, false);
 }
