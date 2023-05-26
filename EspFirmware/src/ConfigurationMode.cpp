@@ -1,0 +1,7 @@
+void configurationSetup()
+{
+}
+
+void configurationLoop()
+{
+}

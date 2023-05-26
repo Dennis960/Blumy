@@ -1,4 +1,4 @@
-#include "MySerial.h"
+#include "Utils.h"
 
 bool isSerialInitialized = false;
 
@@ -20,4 +20,11 @@ void serialPrintf(const char *format, ...)
     Serial.printf("%04lu: ", millis());
     Serial.print(buf);
 #endif
+}
+
+void startDeepSleep(uint64_t duration)
+{
+    Serial.println("Going to sleep");
+    ESP.deepSleep(duration, WAKE_RF_DISABLED);
+    yield();
 }
