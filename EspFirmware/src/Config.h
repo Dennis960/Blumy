@@ -36,4 +36,14 @@ const unsigned long WIFI_TIMEOUT = 7000;
  */
 const unsigned long TOTAL_TIMEOUT = 10000;
 
+//----------------- Reset flags -----------------
+/**
+ * No flag
+*/
+const uint32_t NO_FLAG = 0;
+/**
+ * The flag to indicate that the esp should reset
+ */
+const uint32_t DOUBLE_RESET_FLAG = 1;
+
 #endif

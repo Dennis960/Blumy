@@ -13,6 +13,13 @@ bool shouldReset = false;
 
 void configurationSetup()
 {
+    if (loadResetFlag() == DOUBLE_RESET_FLAG)
+    {
+        serialPrintf("Double reset detected, resetting\n");
+        reset();
+    }
+    saveResetFlag(DOUBLE_RESET_FLAG);
+
     serialPrintf("Enabling led\n");
     pinMode(RESET_INPUT_PIN, OUTPUT);
     analogWrite(RESET_INPUT_PIN, 60);
@@ -99,7 +106,9 @@ void reset()
     analogWrite(RESET_INPUT_PIN, 0);
     delay(100);
 
-    startDeepSleep(1000000, false);
+    saveResetFlag(NO_FLAG);
+
+    ESP.restart();
 }
 
 void handleRoot(AsyncWebServerRequest *request)

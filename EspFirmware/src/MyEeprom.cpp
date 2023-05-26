@@ -13,7 +13,7 @@ bool isEEPROMValid()
     String password = readStringFromEEPROM(PASSWORD_ADDRESS);
     uint32_t checksum = readUint32_tFromEEPROM(CHECKSUM_ADDRESS);
     uint32_t calculatedChecksum = calculateCRC32(ssid + password, ssid.length() + password.length());
-    serialPrintf("Checksum: %u\n", checksum);
+    serialPrintf("Checksum:            %u\n", checksum);
     serialPrintf("Calculated checksum: %u\n", calculatedChecksum);
     return checksum == calculatedChecksum;
 }
@@ -74,4 +74,16 @@ void loadWiFiCredentials(String &ssid, String &password)
     ssid = readStringFromEEPROM(SSID_ADDRESS);
     password = readStringFromEEPROM(PASSWORD_ADDRESS);
     serialPrintf("SSID: %s\n", ssid.c_str());
+}
+
+void saveResetFlag(uint32_t resetFlag)
+{
+    serialPrintf("Saving reset flag\n");
+    writeUint32_tToEEPROM(RESET_FLAG_ADDRESS, resetFlag);
+}
+
+uint32_t loadResetFlag()
+{
+    serialPrintf("Loading reset flag\n");
+    return readUint32_tFromEEPROM(RESET_FLAG_ADDRESS);
 }

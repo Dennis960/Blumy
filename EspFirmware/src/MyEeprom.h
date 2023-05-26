@@ -9,6 +9,7 @@
 #define SSID_ADDRESS 0
 #define PASSWORD_ADDRESS 32
 #define CHECKSUM_ADDRESS 64
+#define RESET_FLAG_ADDRESS 96
 
 /**
  * Initialize the EEPROM
@@ -62,5 +63,17 @@ void saveWiFiCredentials(const String &ssid, const String &password);
  * @param password String to store the password in
  */
 void loadWiFiCredentials(String &ssid, String &password);
+
+/**
+ * Save the reset flag to the EEPROM
+ * @param flag The flag to save
+*/
+void saveResetFlag(uint32_t flag);
+
+/**
+ * Load the reset flag from the EEPROM
+ * @return The reset flag
+ */
+uint32_t loadResetFlag();
 
 #endif

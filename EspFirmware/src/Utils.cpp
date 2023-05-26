@@ -75,5 +75,5 @@ void startConfigurationMode()
     pinMode(RESET_INPUT_PIN, OUTPUT);
     digitalWrite(RESET_INPUT_PIN, HIGH);
     delay(100);
-    startDeepSleep(0, false);
+    ESP.restart();
 }
