@@ -14,7 +14,7 @@
                 Click <a href="./wifi-manager.html">here</a> to manually connect
                 to a WiFi network.
             </p>
-            <button id="reset">Reset</button>
+            <button id="reset" onclick="reset()">Reset</button>
         </div>
         <script>
             // fetch /isConnected and redirect to wifi-manager if not connected
@@ -37,9 +37,11 @@
                 });
 
             // post to /reset when reset button is pressed
-            fetch("/reset", {
-                method: "POST",
-            });
+            function reset() {
+                fetch("/reset", {
+                    method: "POST",
+                });
+            }
         </script>
     </body>
 </html>
