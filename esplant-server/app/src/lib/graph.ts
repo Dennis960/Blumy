@@ -82,7 +82,7 @@ export const defaultGraphOptions: ApexOptions = {
     }
   },
   stroke: {
-    curve: 'smooth',
+    curve: 'straight',
     width: 1
   },
   xaxis: {
@@ -97,12 +97,14 @@ export const defaultGraphOptions: ApexOptions = {
   yaxis: {
     labels: {
       formatter(val) {
-        return val.toFixed(2).replace(/\.?0+$/, '');
+        return Math.round(val).toString();
       },
       style: {
         colors: 'var(--primary)'
       }
-    }
+    },
+    min: 0,
+    forceNiceScale: true
   }
 }
 
