@@ -9,6 +9,8 @@ bool shouldConnectToWifi = false;
 String ssid = "";
 String password = "";
 
+bool shouldReset = false;
+
 void configurationSetup()
 {
     serialPrintf("Enabling led\n");
@@ -85,6 +87,10 @@ void configurationLoop()
             saveWiFiCredentials(ssid, password);
         }
     }
+
+    if (shouldReset) {
+        reset();
+    }
 }
 
 void reset()
@@ -140,7 +146,8 @@ void handleConnect(AsyncWebServerRequest *request)
 void handleReset(AsyncWebServerRequest *request)
 {
     serialPrintf("Received request for /reset\n");
-    reset();
+    shouldReset = true;
+    request->send(200, "application/json", "OK");
 }
 
 void handleNetworks(AsyncWebServerRequest *request)

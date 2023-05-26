@@ -13,6 +13,15 @@
 #define AP_SSID "PlantFi"
 
 extern AsyncWebServer server;
+extern String networksJson;
+extern unsigned long lastNetworkScan;
+extern const unsigned long networkScanInterval;
+
+extern bool shouldConnectToWifi;
+extern String ssid;
+extern String password;
+
+extern bool shouldReset;
 
 /**
  * Setup function for the configuration mode
