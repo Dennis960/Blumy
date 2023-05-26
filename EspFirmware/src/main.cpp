@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include <plantFi.h>
-#include <sensor.h>
+#include <plantFi.cpp>
+#include <sensor.cpp>
 
-#include <config.h>
+#include <config.cpp>
 
 #define RESET_REMEMBER_PIN 4
 

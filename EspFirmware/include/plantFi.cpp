@@ -2,8 +2,8 @@
 #include <WiFiClient.h>
 #include <ESP8266WiFi.h>
 
-#include "config.h"
-#include "myserial.h"
+#include "config.cpp"
+#include "myserial.cpp"
 
 #define SSID "OpenWrt"
 #define PASSWORD NULL
