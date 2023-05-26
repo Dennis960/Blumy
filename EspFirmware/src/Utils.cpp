@@ -24,7 +24,7 @@ void serialPrintf(const char *format, ...)
 
 void startDeepSleep(uint64_t duration, bool disableRfAtBoot)
 {
-    Serial.println("Going to sleep");
+    serialPrintf("Going to sleep for %llu microseconds\n", duration);
     if (disableRfAtBoot)
     {
         // Setting this flag will disable RF at boot

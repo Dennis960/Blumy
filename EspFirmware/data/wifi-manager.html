@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>PlantFi Configurator</title>
+    </head>
+    <body>
+        <div id="wifi-manager">
+            <h1>Enter WiFi credentials</h1>
+            <form id="wifi-form">
+                <label for="ssid">SSID</label>
+                <input type="text" name="ssid" id="ssid" placeholder="SSID" />
+                <label for="password">Password</label>
+                <!-- password input with eye icon -->
+                <div class="password-toggle">
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Password"
+                    />
+                    <span
+                        class="toggle-icon"
+                        onclick="togglePasswordVisibility()"
+                        >&#128065;</span
+                    >
+                </div>
+                <div>
+                    <input type="submit" value="Connect" />
+                </div>
+            </form>
+            <div id="networks">
+                <h2>Available networks</h2>
+                <button id="scan">Scan for networks</button>
+                <ul id="network-list"></ul>
+            </div>
+        </div>
+        <div id="loading-screen">
+            <h1>Connecting to WiFi</h1>
+            <p>Please wait while the device connects to your WiFi network.</p>
+        </div>
+    </body>
+    <script>
+        const scanButton = document.getElementById("scan");
+        const networksList = document.getElementById("network-list");
+        const wifiForm = document.getElementById("wifi-form");
+        const loadingScreen = document.getElementById("loading-screen");
+        const passwordInput = document.getElementById("password");
+        const toggleIcon = document.querySelector(".toggle-icon");
+
+        wifiForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const ssid = document.getElementById("ssid").value;
+            const password = document.getElementById("password").value;
+            const data = { ssid, password };
+            // show loading screen
+            loadingScreen.style.display = "flex";
+            fetch("/connect", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(data);
+                    // redirect to home page
+                    window.location.href = "/";
+                })
+                .catch((err) => {
+                    console.log(err);
+                    // hide loading screen
+                    loadingScreen.style.display = "none";
+                });
+        });
+
+        function addWifiToList(ssid, rssi) {
+            const listItem = document.createElement("li");
+            listItem.innerText = `${ssid} (${rssi})`;
+            networksList.appendChild(listItem);
+            // on click insert ssid into form
+            listItem.addEventListener("click", () => {
+                document.getElementById("ssid").value = ssid;
+            });
+        }
+        function clearWifiList() {
+            networksList.innerHTML = "";
+        }
+
+        function togglePasswordVisibility() {
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.innerHTML = "&#128064;";
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.innerHTML = "&#128065;";
+            }
+        }
+
+        scanButton.addEventListener("click", async () => {
+            // send post to /scan
+            const res = await fetch("/scan", {
+                method: "POST",
+            });
+            // wait 2 seconds
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            // fetch /networks
+            const data = await fetch("/networks");
+            const networks = await data.json();
+            // clear list
+            clearWifiList();
+            // add networks to list
+            networks.forEach((network) => {
+                addWifiToList(network.ssid, network.rssi);
+            });
+        });
+        // if parameter debug = 1, add some test networks
+        if (window.location.search.includes("debug=1")) {
+            addWifiToList("Test", "60");
+            addWifiToList("Test2", "60");
+            addWifiToList("Test3", "60");
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #wifi-manager,
+        #wifi-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            margin: 1rem 0;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 0.5rem;
+        }
+
+        input[type="submit"] {
+            margin-top: 10px;
+            padding: 0.5rem 1rem;
+            background-color: #ccc;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button#scan {
+            margin-top: 20px;
+            padding: 0.5rem 1rem;
+            background-color: #ccc;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        div#networks {
+            margin-top: 20px;
+            text-align: center;
+            width: 95%;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            margin-top: 20px;
+        }
+
+        li {
+            padding: 10px;
+            margin-bottom: 5px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            list-style-type: none;
+        }
+
+        li:hover {
+            background-color: #e0e0e0;
+        }
+
+        div#loading-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #fff;
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle .toggle-icon {
+            position: absolute;
+            top: 50%;
+            right: 5px;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+    </style>
+</html>

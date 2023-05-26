@@ -8,7 +8,7 @@
 #include "Config.h"
 #include "Utils.h"
 
-#define SSID "OpenWrt"
+#define HARD_SSID "OpenWrt"
 #define PASSWORD NULL
 
 /**

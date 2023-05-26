@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlantFi</title>
+</head>
+<body>
+    <div id="status">
+        <h1>PlantFi</h1>
+        <p>PlantFi is currently <span id="status-text">offline</span>.</p>
+        <p>Click <a href="./wifi-manager.html">here</a> to manually connect to a WiFi network.</p>
+    </div>
+    <script>
+        // fetch /isConnected and redirect to wifi-manager if not connected
+        // return is text/plain and 1 or 0
+        fetch("/isConnected")
+            .then((res) => res.text())
+            .then((data) => {
+                console.log(data);
+                if (data !== "1") {
+                    window.location.href = "./wifi-manager.html";
+                }
+            }).catch((err) => {
+                window.location.href = "./wifi-manager.html";
+            })
+    </script>
+</body>
+</html>

@@ -55,11 +55,11 @@ void PlantFi::connectWifi(bool quickConnect)
 {
     if (quickConnect)
     {
-        WiFi.begin(SSID, PASSWORD, rtcData.channel, rtcData.bssid, true);
+        WiFi.begin(HARD_SSID, PASSWORD, rtcData.channel, rtcData.bssid, true);
     }
     else
     {
-        WiFi.begin(SSID, PASSWORD);
+        WiFi.begin(HARD_SSID, PASSWORD);
     }
     connectionStartTime = millis();
 }
