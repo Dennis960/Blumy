@@ -38,12 +38,6 @@ void configurationSetup()
     server.on("/isConnected", HTTP_GET, handleIsConnected);
     server.begin();
 
-    // disable wifi
-    WiFi.forceSleepBegin();
-    delay(1);
-    WiFi.mode(WIFI_OFF);
-    delay(1);
-
     // start the access point
     WiFi.softAP(AP_SSID);
     serialPrintf("Started access point at ip %s\n", WiFi.softAPIP().toString().c_str());

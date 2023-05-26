@@ -17,6 +17,14 @@ void setup()
     serialPrintf("Starting\n");
     serialPrintf("Reset mode: %s\n", wasButtonPressed ? "Button" : "Automatic");
     initEEPROM();
+
+    // disable wifi
+    WiFi.persistent(false);
+    WiFi.forceSleepBegin();
+    delay(1);
+    WiFi.mode(WIFI_OFF);
+    delay(1);
+
     if (wasButtonPressed)
     {
         // button press should always result in configuration mode

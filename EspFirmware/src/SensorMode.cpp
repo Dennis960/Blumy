@@ -8,13 +8,6 @@ bool wasWifiConnectedLastCycle = false;
 
 void sensorSetup()
 {
-    // WiFi
-    WiFi.persistent(false);
-    WiFi.forceSleepBegin();
-    delay(1);
-    WiFi.mode(WIFI_OFF);
-    delay(1);
-
     if (!isEEPROMValid())
     {
         serialPrintf("EEPROM not valid, starting configuration mode\n");
