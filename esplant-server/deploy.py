@@ -52,7 +52,7 @@ args = ''.join(sys.argv[1:])
 cnopts = pysftp.CnOpts()
 cnopts.hostkeys = None
 
-with pysftp.Connection('hoppingadventure.com', username='hopping', private_key="C:/Users/simps/.ssh/hopping.key", cnopts=cnopts) as sftp:
+with pysftp.Connection('hoppingadventure.com', username='hopping', private_key="~/.ssh/hopping.key", cnopts=cnopts) as sftp:
     if backend_param in args:
         print('Deploying ' + backend_name)
         npm_build(backend_name)
