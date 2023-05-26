@@ -1,9 +1,11 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include <plantFi.cpp>
-#include <sensor.cpp>
+#include <ESP8266HTTPClient.h>
 
-#include <config.cpp>
+#include "PlantFi.h"
+#include "Sensor.h"
+#include "Config.h"
+#include "MySerial.h"
 
 #define RESET_REMEMBER_PIN 4
 
@@ -32,7 +34,7 @@ void setup()
     delay(1);
     WiFi.mode(WIFI_OFF);
     delay(1);
-    plantFi.checkRtcValdity();
+    plantFi.checkRtcValidity();
 
     serialPrintf("Starting wifi connection\n");
     plantFi.connectWifi(plantFi.rtcValid);

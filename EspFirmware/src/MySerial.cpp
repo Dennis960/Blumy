@@ -1,13 +1,8 @@
-#include <Arduino.h>
-
-#define DEBUG
-
-#ifndef MY_SERIAL_H
-#define MY_SERIAL_H
+#include "MySerial.h"
 
 bool isSerialInitialized = false;
 
-void inline serialPrintf(const char *format, ...)
+void serialPrintf(const char *format, ...)
 {
 #ifdef DEBUG
     if (!isSerialInitialized)
@@ -26,4 +21,3 @@ void inline serialPrintf(const char *format, ...)
     Serial.print(buf);
 #endif
 }
-#endif
