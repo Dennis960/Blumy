@@ -55,11 +55,6 @@ void handleConnect(AsyncWebServerRequest *request);
 void handleReset(AsyncWebServerRequest *request);
 
 /**
- * Handle the scan request
-*/
-void handleScan(AsyncWebServerRequest *request);
-
-/**
  * Handle the networks request. This will return a json array of all the networks
 */
 void handleNetworks(AsyncWebServerRequest *request);

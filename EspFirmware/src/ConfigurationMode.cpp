@@ -3,6 +3,8 @@
 AsyncWebServer server(80);
 bool shouldScanWifi = false;
 String networksJson = "";
+unsigned long lastNetworkScan = -5000;
+const unsigned long networkScanInterval = 5000;
 
 void configurationSetup()
 {
@@ -19,7 +21,6 @@ void configurationSetup()
     server.on("/wifi-manager.html", HTTP_GET, handleWifiManager);
     server.on("/connect", HTTP_POST, handleConnect);
     server.on("/reset", HTTP_POST, handleReset);
-    server.on("/scan", HTTP_POST, handleScan);
     server.on("/networks", HTTP_GET, handleNetworks);
     server.on("/isConnected", HTTP_GET, handleIsConnected);
     server.begin();
@@ -37,8 +38,10 @@ void configurationSetup()
 
 void configurationLoop()
 {
-    if (shouldScanWifi)
+    // scan for wifis every 10 seconds
+    if (millis() - lastNetworkScan > networkScanInterval)
     {
+        lastNetworkScan = millis();
         // scan for wifis, print them
         serialPrintf("Scanning for wifis\n");
         int n = WiFi.scanNetworks();
@@ -53,7 +56,6 @@ void configurationLoop()
             }
         }
         networksJson += "]";
-        shouldScanWifi = false;
     }
 }
 
@@ -118,13 +120,6 @@ void handleReset(AsyncWebServerRequest *request)
 {
     serialPrintf("Received request for /reset\n");
     reset();
-}
-
-void handleScan(AsyncWebServerRequest *request)
-{
-    serialPrintf("Received request for /scan\n");
-    shouldScanWifi = true;
-    request->send(200, "application/json", "");
 }
 
 void handleNetworks(AsyncWebServerRequest *request)

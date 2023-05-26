@@ -32,8 +32,8 @@
             </form>
             <div id="networks">
                 <h2>Available networks</h2>
-                <button id="scan">Scan for networks</button>
                 <ul id="network-list"></ul>
+                <div id="loader">Scanning for networks...</div>
             </div>
         </div>
         <div id="loading-screen">
@@ -42,12 +42,12 @@
         </div>
     </body>
     <script>
-        const scanButton = document.getElementById("scan");
         const networksList = document.getElementById("network-list");
         const wifiForm = document.getElementById("wifi-form");
         const loadingScreen = document.getElementById("loading-screen");
         const passwordInput = document.getElementById("password");
         const toggleIcon = document.querySelector(".toggle-icon");
+        const loader = document.getElementById("loader");
 
         wifiForm.addEventListener("submit", (e) => {
             e.preventDefault();
@@ -77,6 +77,7 @@
         });
 
         function addWifiToList(ssid, rssi) {
+            loader.style.display = "none";
             const listItem = document.createElement("li");
             listItem.innerText = `${ssid} (${rssi})`;
             networksList.appendChild(listItem);
@@ -87,6 +88,7 @@
         }
         function clearWifiList() {
             networksList.innerHTML = "";
+            loader.style.display = "block";
         }
 
         function togglePasswordVisibility() {
@@ -99,23 +101,37 @@
             }
         }
 
-        scanButton.addEventListener("click", async () => {
-            // send post to /scan
-            const res = await fetch("/scan", {
-                method: "POST",
-            });
-            // wait 2 seconds
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-            // fetch /networks
-            const data = await fetch("/networks");
-            const networks = await data.json();
-            // clear list
-            clearWifiList();
-            // add networks to list
-            networks.forEach((network) => {
-                addWifiToList(network.ssid, network.rssi);
-            });
-        });
+        // fetch /networks every 5 seconds
+        setInterval(() => {
+            fetch("/networks")
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(data);
+                    clearWifiList();
+                    // sort data by rssi
+                    data.sort((a, b) => b.rssi - a.rssi);
+                    data.forEach((network) => {
+                        addWifiToList(network.ssid, network.rssi);
+                    });
+                })
+                .catch((err) => {
+                    console.log(err);
+                    clearWifiList();
+                });
+        }, 5000);
+
+        let dots = 0;
+        setInterval(() => {
+            if (dots < 3) {
+                dots++;
+            } else {
+                dots = 0;
+            }
+            document.getElementById(
+                "loader"
+            ).innerHTML = `${".".repeat(dots)}Scanning for networks${".".repeat(dots)}`;
+        }, 1000);
+
         // if parameter debug = 1, add some test networks
         if (window.location.search.includes("debug=1")) {
             addWifiToList("Test", "60");
@@ -148,16 +164,6 @@
 
         input[type="submit"] {
             margin-top: 10px;
-            padding: 0.5rem 1rem;
-            background-color: #ccc;
-            border: none;
-            border-radius: 0.5rem;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        button#scan {
-            margin-top: 20px;
             padding: 0.5rem 1rem;
             background-color: #ccc;
             border: none;
