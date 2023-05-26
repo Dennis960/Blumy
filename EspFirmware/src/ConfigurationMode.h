@@ -35,8 +35,9 @@ void configurationLoop();
 
 /**
  * Reset the device
+ * @param resetFlag The reset flag to set
  */
-void reset();
+void reset(uint32_t resetFlag);
 
 /**
  * Handle the root request

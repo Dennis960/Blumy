@@ -2,36 +2,57 @@
 #include "Utils.h"
 #include "ConfigurationMode.h"
 #include "SensorMode.h"
+#include "OtherTheAirMode.h"
 #include "MyEeprom.h"
 
-bool isConfigurationMode;
+bool wasButtonPressed;
+
+uint32_t resetFlag;
 
 void setup()
 {
     // Reset button check
     pinMode(RESET_INPUT_PIN, INPUT);
-    isConfigurationMode = digitalRead(RESET_INPUT_PIN);
+    wasButtonPressed = digitalRead(RESET_INPUT_PIN);
     serialPrintf("Starting\n");
-    serialPrintf("Reset mode: %s\n", isConfigurationMode ? "Button" : "Deep sleep");
+    serialPrintf("Reset mode: %s\n", wasButtonPressed ? "Button" : "Automatic");
     initEEPROM();
-    if (isConfigurationMode)
+    if (wasButtonPressed)
     {
-        configurationSetup();
+        // button press should always result in configuration mode
+        resetFlag = CONFIGURATION_FLAG;
     }
     else
     {
+        resetFlag = loadResetFlag();
+    }
+    serialPrintf("Reset flag: %d\n", resetFlag);
+    if (resetFlag == SENSOR_FLAG)
+    {
         sensorSetup();
+    }
+    else if (resetFlag == CONFIGURATION_FLAG)
+    {
+        configurationSetup();
+    }
+    else if (resetFlag == OTA_FLAG)
+    {
+        otaSetup();
     }
 }
 
 void loop()
 {
-    if (isConfigurationMode)
+    if (resetFlag == SENSOR_FLAG)
+    {
+        sensorLoop();
+    }
+    else if (resetFlag == CONFIGURATION_FLAG)
     {
         configurationLoop();
     }
-    else
+    else if (resetFlag == OTA_FLAG)
     {
-        sensorLoop();
+        otaLoop();
     }
 }

@@ -13,12 +13,13 @@ bool shouldReset = false;
 
 void configurationSetup()
 {
-    if (loadResetFlag() == DOUBLE_RESET_FLAG)
+    uint32_t resetFlag = loadResetFlag();
+    if (resetFlag == CONFIGURATION_FLAG || resetFlag == OTA_FLAG)
     {
         serialPrintf("Double reset detected, resetting\n");
-        reset();
+        reset(SENSOR_FLAG);
     }
-    saveResetFlag(DOUBLE_RESET_FLAG);
+    saveResetFlag(CONFIGURATION_FLAG);
 
     serialPrintf("Enabling led\n");
     pinMode(RESET_INPUT_PIN, OUTPUT);
@@ -61,7 +62,14 @@ void configurationLoop()
         networksJson = "[";
         for (int i = 0; i < n; i++)
         {
-            networksJson += "{\"ssid\":\"" + WiFi.SSID(i) + "\",\"rssi\":" + WiFi.RSSI(i) + "}";
+            String ssid = WiFi.SSID(i);
+            // if ssid equals OTA_SSID set ota flag and reset
+            if (ssid == OTA_SSID)
+            {
+                reset(OTA_FLAG);
+            }
+
+            networksJson += "{\"ssid\":\"" + ssid + "\",\"rssi\":" + WiFi.RSSI(i) + "}";
             if (i < n - 1)
             {
                 networksJson += ",";
@@ -95,19 +103,19 @@ void configurationLoop()
         }
     }
 
-    if (shouldReset) {
-        reset();
+    if (shouldReset)
+    {
+        reset(SENSOR_FLAG);
     }
 }
 
-void reset()
+void reset(uint32_t resetFlag)
 {
     serialPrintf("Disabling led\n");
     analogWrite(RESET_INPUT_PIN, 0);
     delay(100);
 
-    saveResetFlag(NO_FLAG);
-
+    saveResetFlag(resetFlag);
     ESP.restart();
 }
 

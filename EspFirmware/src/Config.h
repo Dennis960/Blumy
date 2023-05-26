@@ -1,6 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <Arduino.h>
+
 #define RESET_INPUT_PIN 4
 
 //----------------- Sensor Address -----------------
@@ -38,12 +40,24 @@ const unsigned long TOTAL_TIMEOUT = 10000;
 
 //----------------- Reset flags -----------------
 /**
- * No flag
-*/
-const uint32_t NO_FLAG = 0;
-/**
- * The flag to indicate that the esp should reset
+ * The flag to indicate that the esp should reset into sensor mode
  */
-const uint32_t DOUBLE_RESET_FLAG = 1;
+const uint32_t SENSOR_FLAG = 0;
+/**
+ * The flag to indicate that the esp should reset into configuration mode
+ */
+const uint32_t CONFIGURATION_FLAG = 1;
+/**
+ * The flag to indicate that the esp should reset into OTA mode
+ */
+const uint32_t OTA_FLAG = 2;
+
+//----------------- OTA -----------------
+/**
+ * The SSID of the OTA network.
+ * If the esp is in configuration mode and finds a network with this SSID,
+ * it will connect to it and wait for an OTA update
+ */
+#define OTA_SSID "PlantFi-OTA"
 
 #endif
