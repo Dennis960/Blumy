@@ -27,6 +27,8 @@ void startDeepSleep(uint64_t duration, bool disableRfAtBoot)
     Serial.println("Going to sleep");
     if (disableRfAtBoot)
     {
+        // Setting this flag will disable RF at boot
+        // resulting in less interference when measuring moisture
         ESP.deepSleep(duration, WAKE_RF_DISABLED);
     } else {
         ESP.deepSleep(duration);
