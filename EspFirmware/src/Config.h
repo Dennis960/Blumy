@@ -13,7 +13,7 @@ const int sensorAddress = 2;
 /**
  * The sleep duration between measurements in seconds
 */
-const uint64_t SLEEP_DURATION_SECONDS = 10;
+const uint64_t SLEEP_DURATION_SECONDS = 3;
 /**
  * The sleep duration between measurements in microseconds
 */

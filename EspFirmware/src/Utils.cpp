@@ -22,9 +22,14 @@ void serialPrintf(const char *format, ...)
 #endif
 }
 
-void startDeepSleep(uint64_t duration)
+void startDeepSleep(uint64_t duration, bool disableRfAtBoot)
 {
     Serial.println("Going to sleep");
-    ESP.deepSleep(duration, WAKE_RF_DISABLED);
+    if (disableRfAtBoot)
+    {
+        ESP.deepSleep(duration, WAKE_RF_DISABLED);
+    } else {
+        ESP.deepSleep(duration);
+    }
     yield();
 }
