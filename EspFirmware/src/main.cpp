@@ -47,6 +47,11 @@ void setup()
     {
         otaSetup();
     }
+    else
+    {
+        serialPrintf("Unknown reset flag, resetting\n");
+        reset(SENSOR_FLAG);
+    }
 }
 
 void loop()
