@@ -59,7 +59,7 @@ router.use((req, res, next) => {
 // -> 200 message: data added, data: data
 router.post('/data', async (req, res) => {
   const { sensorAddress, water, voltage, duration, rssi } = req.body;
-  if (!sensorAddress || !water) {
+  if (sensorAddress == undefined || water == undefined) {
     return res.status(400).send({
       message: 'sensorAddress and water are required',
       data: {},
