@@ -1,6 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#define RESET_INPUT_PIN 4
+
 //----------------- Sensor Address -----------------
 /**
  * The sensorAddress value used to identify the sensor
