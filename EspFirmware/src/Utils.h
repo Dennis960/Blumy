@@ -2,6 +2,7 @@
 #define UTILS_H
 
 #include <Arduino.h>
+#include "Reset.h"
 
 #define DEBUG
 
