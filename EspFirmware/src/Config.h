@@ -24,7 +24,7 @@ const uint64_t SLEEP_DURATION = SLEEP_DURATION_SECONDS * 1000000;
  * The time to wait for a connection to be established using the quick connect method (bssid and channel)
  * Unit: milliseconds
  */
-const unsigned long QUICK_CONNECT_TIMEOUT = 2000;
+const unsigned long QUICK_CONNECT_TIMEOUT = 4000;
 /**
  * The time to wait for a connection to be established using the regular connect method (only ssid and password)
  * Unit: milliseconds
