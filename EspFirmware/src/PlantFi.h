@@ -1,7 +1,7 @@
 #ifndef PLANTFI_H
 #define PLANTFI_H
 
-#include <ESP8266HTTPClient.h>
+#include <PubSubClient.h>
 #include <WiFiClient.h>
 #include <ESP8266WiFi.h>
 
@@ -39,8 +39,8 @@ uint32_t calculateCRC32(const uint8_t *data, size_t length);
 class PlantFi
 {
 private:
-    HTTPClient http;
     WiFiClient wifiClient;
+    PubSubClient mqttClient;
     /**
      * Checks if the RTC data is valid
      * @return True if the RTC data is valid, false otherwise
@@ -48,12 +48,27 @@ private:
     bool isRtcValid();
     String _ssid;
     String _password;
+    String _mqttServer;
+    int _mqttPort;
+    String _mqttUser;
+    String _mqttPassword;
+    String _mqttTopic;
+    String _mqttClientId;
 
 public:
     unsigned long connectionStartTime = 0;
     bool rtcValid = false;
 
-    PlantFi(String ssid, String password);
+    PlantFi(
+        String ssid,
+        String password,
+        String mqttServer,
+        int mqttPort,
+        String mqttUser,
+        String mqttPassword,
+        String mqttTopic,
+        String mqttClientId
+    );
 
     /**
      * Checks if the RTC data is valid.
@@ -62,26 +77,28 @@ public:
     void checkRtcValidity();
 
     /**
-     * Connects to the WiFi network.
+     * Connects to the WiFi network and MQTT broker.
      *
      * @param quickConnect If true, tries to connect using the RTC data
      * If false, tries to connect without using the RTC data
      */
-    void connectWifi(bool quickConnect = true);
+    void connect(bool quickConnect = true);
+
+    void disconnect();
 
     /**
-     * Resets the WiFi connection.
-     * After resetting, tries to make a regular connection with connectWifi()
+     * Resets the connection.
+     * After resetting, tries to make a regular connection with connect()
      * Sets rtcValid to false
      */
-    void resetWifi();
+    void reset();
 
     /**
-     * Checks if the WiFi connection is established.
+     * Checks if the connection is established.
      *
-     * @return True if the WiFi connection is established, false otherwise
+     * @return True if the connection is established, false otherwise
      */
-    bool isWifiConnected();
+    bool isConnected();
 
     /**
      * Saves the WiFi connection data to the RTC memory.

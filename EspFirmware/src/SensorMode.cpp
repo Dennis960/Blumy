@@ -1,10 +1,10 @@
 #include "SensorMode.h"
 
 Sensor sensor = Sensor();
-PlantFi plantFi = PlantFi("", "");
+PlantFi plantFi = PlantFi("", "", "", 0, "", "", "", "");
 
 int sensorValue = -1;
-bool wasWifiConnectedLastCycle = false;
+bool wasConnectedLastCycle = false;
 
 void sensorSetup()
 {
@@ -19,11 +19,11 @@ void sensorSetup()
 
     loadWiFiCredentials(ssid, password);
 
-    plantFi = PlantFi(ssid, password);
+    plantFi = PlantFi(ssid, password, "schneefux.xyz", 1883, "esplant", "Ma9BdqVcKyxTgJm3", "esplant", "sensor-1");
     plantFi.checkRtcValidity();
 
-    serialPrintf("Starting wifi connection\n");
-    plantFi.connectWifi(plantFi.rtcValid);
+    serialPrintf("Starting connection\n");
+    plantFi.connect(plantFi.rtcValid);
 }
 
 void sensorLoop()
@@ -32,13 +32,13 @@ void sensorLoop()
     {
         sensorValue = sensor.measure();
     }
-    // Check wifi connection
-    if (plantFi.isWifiConnected())
+    // Check connection
+    if (plantFi.isConnected())
     {
-        if (!wasWifiConnectedLastCycle)
+        if (!wasConnectedLastCycle)
         {
-            serialPrintf("Wifi connected\n");
-            wasWifiConnectedLastCycle = true;
+            serialPrintf("Connected\n");
+            wasConnectedLastCycle = true;
         }
         if (!plantFi.rtcValid)
         {
@@ -51,6 +51,7 @@ void sensorLoop()
             serialPrintf("Measured value: %d\n", sensorValue);
             serialPrintf("Sending data\n");
             plantFi.sendData(sensorAddress, sensorValue, ESP.getVcc());
+            plantFi.disconnect();
             startDeepSleep(SLEEP_DURATION);
         }
     }
@@ -61,7 +62,7 @@ void sensorLoop()
             if (millis() - plantFi.connectionStartTime > QUICK_CONNECT_TIMEOUT)
             {
                 serialPrintf("Quick connect failed, resetting wifi\n");
-                plantFi.resetWifi(); // sets rtcValid to false
+                plantFi.reset(); // sets rtcValid to false
             }
         }
         else
