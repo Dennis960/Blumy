@@ -1,12 +1,12 @@
 import sqlite3 from 'sqlite3';
 import { Data, DatabaseObject, Sensor } from './types/data';
 
-const create_sensor_table_statement = `CREATE TABLE IF NOT EXISTS sensor (
+const createSensorTableStatement = `CREATE TABLE IF NOT EXISTS sensor (
   sensor_address INTEGER PRIMARY KEY NOT NULL,
   name TEXT NOT NULL DEFAULT "new sensor"
   );`;
 
-const create_data_table_statement = `CREATE TABLE IF NOT EXISTS data (
+const createDataTableStatement = `CREATE TABLE IF NOT EXISTS data (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   sensor_address INTEGER NOT NULL,
   date INTEGER NOT NULL,
@@ -14,7 +14,7 @@ const create_data_table_statement = `CREATE TABLE IF NOT EXISTS data (
   FOREIGN KEY (sensor_address) REFERENCES sensor(sensor_address)
   );`;
 
-const create_migration_table_statement = `CREATE TABLE IF NOT EXISTS migration (
+const createMigrationTableStatement = `CREATE TABLE IF NOT EXISTS migration (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   date INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -135,6 +135,44 @@ const migrations = [
       'ALTER TABLE data_new RENAME TO data;'
     ]
   },
+  {
+    name: 'all_change_snake_case_to_camel_case',
+    statements: [
+      // migrate sensor table change snake_case to camelCase
+      // create new table
+      `CREATE TABLE IF NOT EXISTS sensor_new (
+      sensorAddress INTEGER PRIMARY KEY NOT NULL,
+      name TEXT NOT NULL DEFAULT "new sensor"
+      );`,
+      // copy data to new table
+      `INSERT INTO sensor_new (sensorAddress, name)
+      SELECT sensor_address, name FROM sensor;`,
+      // drop old table
+      'DROP TABLE sensor;',
+      // rename new table
+      'ALTER TABLE sensor_new RENAME TO sensor;',
+      // migrate data table change snake_case to camelCase
+      // create new table
+      `CREATE TABLE IF NOT EXISTS data_new (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sensorAddress INTEGER NOT NULL,
+      date INTEGER NOT NULL,
+      water INTEGER NOT NULL,
+      voltage INTEGER,
+      duration INTEGER,
+      rssi INTEGER,
+      measurementDuration INTEGER,
+      FOREIGN KEY (sensorAddress) REFERENCES sensor(sensorAddress)
+      );`,
+      // copy data to new table
+      `INSERT INTO data_new (id, sensorAddress, date, water, voltage, duration, rssi, measurementDuration)
+      SELECT id, sensor_address, date, water, voltage, duration, rssi, measurement_duration FROM data;`,
+      // drop old table
+      'DROP TABLE data;',
+      // rename new table
+      'ALTER TABLE data_new RENAME TO data;'
+    ]
+  }
 ];
 
 const DB_SOURCE = '../data/sensor.sqlite';
@@ -150,15 +188,15 @@ const db = new sqlite3.Database(DB_SOURCE, async (err) => {
   } else {
     console.log('Connected to SQLite database');
     // create sensor table if not exists
-    dbRun(create_sensor_table_statement, []).catch((err) => {
+    dbRun(createSensorTableStatement, []).catch((err) => {
       console.log(err.message);
     });
     // create data table if not exists
-    dbRun(create_data_table_statement, []).catch((err) => {
+    dbRun(createDataTableStatement, []).catch((err) => {
       console.log(err.message);
     });
     // create migration table if not exists
-    dbRun(create_migration_table_statement, []).catch((err) => {
+    dbRun(createMigrationTableStatement, []).catch((err) => {
       console.log(err.message);
     });
     console.log('Created tables');
@@ -258,7 +296,7 @@ function dbRun(query: string, params: unknown[]): Promise<void> {
  * @returns The sensor or throws an error if the sensor does not exist.
  */
 export function getSensorById(sensorAddress: number) {
-  return dbGet<Sensor>('SELECT * FROM sensor WHERE sensor_address = ?', [sensorAddress]);
+  return dbGet<Sensor>('SELECT * FROM sensor WHERE sensorAddress = ?', [sensorAddress]);
 }
 
 /**
@@ -280,7 +318,7 @@ export async function createSensorWithId(sensorAddress: number, name = 'new sens
   if (sensor) {
     return Promise.reject('Sensor already exists');
   }
-  return await dbInsert('INSERT INTO sensor (sensor_address, name) VALUES (?, ?)', [sensorAddress, name]);
+  return await dbInsert('INSERT INTO sensor (sensorAddress, name) VALUES (?, ?)', [sensorAddress, name]);
 }
 
 /**
@@ -293,7 +331,7 @@ export async function createSensorWithId(sensorAddress: number, name = 'new sens
  */
 export function addDataBySensorId(sensorAddress: number, water: number, voltage: number, duration: number, rssi: number, measurementDuration: number) {
   const nowMs = Date.now();
-  return dbInsert('INSERT INTO data (sensor_address, water, voltage, duration, date, rssi, measurement_duration) VALUES (?, ?, ?, ?, ?, ?, ?)', [sensorAddress, water, voltage, duration, nowMs, rssi, measurementDuration]);
+  return dbInsert('INSERT INTO data (sensorAddress, water, voltage, duration, date, rssi, measurementDuration) VALUES (?, ?, ?, ?, ?, ?, ?)', [sensorAddress, water, voltage, duration, nowMs, rssi, measurementDuration]);
 }
 
 /**
@@ -334,32 +372,32 @@ function dataToAverage(data: Data[], limit: number) {
 export async function getDataBySensorId(sensorAddress: number, startDate?: number, endDate?: number, maxDataPoints?: number): Promise<Data[]> {
   // if maxDataPoints and startDate and endDate, return maxDataPoints averaged data points between startDate and endDate
   if (maxDataPoints && startDate && endDate) {
-    const data = await dbAll<Data>('SELECT * FROM data WHERE sensor_address = ? AND date >= ? AND date <= ? ORDER BY date DESC', [sensorAddress, startDate, endDate]);
+    const data = await dbAll<Data>('SELECT * FROM data WHERE sensorAddress = ? AND date >= ? AND date <= ? ORDER BY date DESC', [sensorAddress, startDate, endDate]);
     return dataToAverage(data, maxDataPoints);
   }
   // if maxDataPoints and startDate, return maxDataPoints averaged data points after startDate
   if (maxDataPoints && startDate) {
-    const data = await dbAll<Data>('SELECT * FROM data WHERE sensor_address = ? AND date >= ? ORDER BY date DESC', [sensorAddress, startDate]);
+    const data = await dbAll<Data>('SELECT * FROM data WHERE sensorAddress = ? AND date >= ? ORDER BY date DESC', [sensorAddress, startDate]);
     return dataToAverage(data, maxDataPoints);
   }
   // if maxDataPoints and endDate, return maxDataPoints before endDate
   if (maxDataPoints && endDate) {
-    return await dbAll<Data>('SELECT * FROM data WHERE sensor_address = ? AND date <= ? ORDER BY date DESC LIMIT ?', [sensorAddress, endDate, maxDataPoints]);
+    return await dbAll<Data>('SELECT * FROM data WHERE sensorAddress = ? AND date <= ? ORDER BY date DESC LIMIT ?', [sensorAddress, endDate, maxDataPoints]);
   }
   // if only maxDataPoints, return the last maxDataPoints
   if (maxDataPoints) {
-    return await dbAll<Data>('SELECT * FROM data WHERE sensor_address = ? ORDER BY date DESC LIMIT ?', [sensorAddress, maxDataPoints]);
+    return await dbAll<Data>('SELECT * FROM data WHERE sensorAddress = ? ORDER BY date DESC LIMIT ?', [sensorAddress, maxDataPoints]);
   }
   // if only startDate, return all data points after startDate
   if (startDate) {
-    return await dbAll<Data>('SELECT * FROM data WHERE sensor_address = ? AND date >= ? ORDER BY date DESC', [sensorAddress, startDate]);
+    return await dbAll<Data>('SELECT * FROM data WHERE sensorAddress = ? AND date >= ? ORDER BY date DESC', [sensorAddress, startDate]);
   }
   // else return last 100 data points
-  return await dbAll<Data>('SELECT * FROM data WHERE sensor_address = ? ORDER BY date DESC LIMIT 100', [sensorAddress]);
+  return await dbAll<Data>('SELECT * FROM data WHERE sensorAddress = ? ORDER BY date DESC LIMIT 100', [sensorAddress]);
 }
 
 export function updateSensorById(sensorAddress: number, name: string) {
-  return dbRun('UPDATE sensor SET name = ? WHERE sensor_address = ?', [name, sensorAddress]);
+  return dbRun('UPDATE sensor SET name = ? WHERE sensorAddress = ?', [name, sensorAddress]);
 }
 
 /**
@@ -367,7 +405,7 @@ export function updateSensorById(sensorAddress: number, name: string) {
  * @param sensorAddress The address of the sensor.
  */
 export function deleteDataBySensorId(sensorAddress: number) {
-  dbRun('DELETE FROM data WHERE sensor_address = ?', [sensorAddress]).catch((err) => {
+  dbRun('DELETE FROM data WHERE sensorAddress = ?', [sensorAddress]).catch((err) => {
     console.log(err.message);
   });
 }
@@ -387,7 +425,7 @@ export function deleteDataById(id: number) {
  * @param sensorAddress The address of the sensor.
  */
 export function deleteSensorById(sensorAddress: number) {
-  dbRun('DELETE FROM sensor WHERE sensor_address = ?', [sensorAddress]).catch((err) => {
+  dbRun('DELETE FROM sensor WHERE sensorAddress = ?', [sensorAddress]).catch((err) => {
     console.log(err.message);
   });
 }

@@ -103,7 +103,7 @@
           data: $dataStore.map((data) => {
             return {
               x: new Date(data.date),
-              y: Math.abs(data.measurement_duration),
+              y: Math.abs(data.measurementDuration),
             };
           }),
           color: "#FFFF00",
