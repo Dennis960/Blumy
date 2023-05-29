@@ -43,7 +43,7 @@ export const dataSchema: Property[] = [
   {
     name: "water",
     type: ["number"],
-    color: "#0000ff",
+    color: "#00ffff",
     label: "Water",
     required: true,
   },
