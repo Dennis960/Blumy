@@ -61,8 +61,8 @@ client.on('connect', () => {
 // same format as the POST API
 client.on('message', async (topic, message) => {
   const body = message.toString();
-  const { sensorAddress, water, voltage, duration, rssi } = JSON.parse(body);
-  await addDataBySensorId(sensorAddress, water, voltage, duration, rssi);
+  const { sensorAddress, water, voltage, duration, rssi, measurementDuration } = JSON.parse(body);
+  await addDataBySensorId(sensorAddress, water, voltage, duration, rssi, measurementDuration);
 });
 
 // POST /api/data
@@ -71,12 +71,14 @@ client.on('message', async (topic, message) => {
 //   "water": 428,
 //   "voltage": 3.234,
 //   "duration": 2450,
+//   "rssi": -45
+//   "measurementDuration": 5000,
 // }
 // -> 400 message: sensorAddress and water are required, data: {}
 // -> 500 message: could not create sensor, data: {}
 // -> 200 message: data added, data: data
 router.post('/data', async (req, res) => {
-  const { sensorAddress, water, voltage, duration, rssi } = req.body;
+  const { sensorAddress, water, voltage, duration, rssi, measurementDuration } = req.body;
   if (sensorAddress == undefined || water == undefined) {
     return res.status(400).send({
       message: 'sensorAddress and water are required',
@@ -98,7 +100,7 @@ router.post('/data', async (req, res) => {
     }
   }
   // add data
-  const data = await addDataBySensorId(sensorAddress, water, voltage, duration, rssi);
+  const data = await addDataBySensorId(sensorAddress, water, voltage, duration, rssi, measurementDuration);
   return res.status(200).send({
     message: sensorExists ? 'data added' : 'sensor created and data added',
     data

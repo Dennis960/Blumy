@@ -14,6 +14,8 @@ private:
     long sum = 0;
     int counter = 0;
     int value = 0;
+    unsigned long measurmementStartTime = 0;
+    unsigned long measurementEndTime = 0;
 
 public:
     Sensor();
@@ -27,6 +29,16 @@ public:
      * The soil moisture is in the range of 0 to 1024, where 0 is dry and 1024 is wet.
      */
     int measure();
+
+    /**
+     * Calculates the time it took for the measurement to stabilize.
+     * 
+     * @return The duration of the measurement in milliseconds.
+    */
+    unsigned long getMeasurementDuration()
+    {
+        return measurementEndTime - measurmementStartTime;
+    }
 };
 
 #endif

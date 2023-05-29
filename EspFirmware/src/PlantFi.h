@@ -110,8 +110,9 @@ public:
      *
      * @param sensorAddress The address of the sensor
      * @param water The water value of the sensor
+     * @param measurementDuration The duration of the measurement
      */
-    void sendData(int sensorAddress, int water, uint16_t voltage);
+    void sendData(int sensorAddress, int water, unsigned long measurementDuration);
 };
 
 #endif

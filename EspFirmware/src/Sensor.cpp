@@ -6,6 +6,7 @@ Sensor::Sensor()
     pinMode(CLOCK_PIN, OUTPUT);
     pinMode(ANALOG_PIN, INPUT);
     analogWrite(CLOCK_PIN, 1);
+    measurmementStartTime = millis();
 }
 
 int Sensor::measure()
@@ -27,6 +28,7 @@ int Sensor::measure()
     if (standardDeviation < 50 && values[numberOfValues - 1] != 0)
     {
         analogWrite(CLOCK_PIN, 0);
+        measurementEndTime = millis();
         return 1024 - value; // invert -> now 0 is dry and 1024 is wet
     }
     return -1;

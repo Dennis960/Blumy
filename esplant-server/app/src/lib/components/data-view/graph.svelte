@@ -88,6 +88,24 @@
               y: Math.abs(data.rssi),
             };
           }),
+          color: "#00FF00",
+        },
+      ];
+      options = {
+        ...defaultGraphOptions,
+        series: series,
+      };
+      return;
+    } else if (property == "Measurement Duration") {
+      series = [
+        {
+          name: "Measurement Duration",
+          data: $dataStore.map((data) => {
+            return {
+              x: new Date(data.date),
+              y: Math.abs(data.measurement_duration),
+            };
+          }),
           color: "#FFFF00",
         },
       ];
