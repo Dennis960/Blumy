@@ -1,5 +1,6 @@
 import mqtt from 'mqtt';
 import { addDataBySensorId } from './database.js';
+import { Data } from './types/data.js';
 
 const client = mqtt.connect(process.env.MQTT_URL || 'mqtt://localhost:1883');
 client.on('connect', () => {
@@ -14,6 +15,6 @@ client.on('connect', () => {
 // same format as the POST API
 client.on('message', async (topic, message) => {
   const body = message.toString();
-  const { sensorAddress, water, voltage, duration, rssi, measurementDuration } = JSON.parse(body);
-  await addDataBySensorId(sensorAddress, water, voltage, duration, rssi, measurementDuration);
+  const data: Data = JSON.parse(body);
+  await addDataBySensorId(data);
 });

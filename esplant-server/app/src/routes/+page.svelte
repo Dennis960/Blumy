@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Data, DataKey } from "$api/types/data";
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
   import Graph from "$lib/components/data-view/graph.svelte";
@@ -23,8 +24,8 @@
     goto($page.url);
   }
 
-  const propertyParam = $page.url.searchParams.get("property");
-  let property = propertyParam ? propertyParam : "Water";
+  const propertyParam = $page.url.searchParams.get("property") as DataKey;
+  let property: DataKey = propertyParam ? propertyParam : "water";
   $: if (property) {
     $page.url.searchParams.set("property", property);
     goto($page.url);

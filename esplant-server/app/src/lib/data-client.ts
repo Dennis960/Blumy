@@ -1,6 +1,6 @@
 import type { ApiResponse, RequestData } from "$types/api";
-import type { Data, DatabaseObject, Sensor } from "$api/types/types/data";
-import { type Writable, writable, get } from "svelte/store";
+import type { Data } from "../../../api/types/data";
+import { type Writable, writable } from "svelte/store";
 
 export class DataClient {
   dataStore: Writable<Data[]>;
