@@ -60,16 +60,9 @@ router.use((req, res, next) => {
 // -> 500 message: could not create sensor, data: {}
 // -> 200 message: data added, data: data
 router.post('/data', async (req, res) => {
-  console.log(req.body);
   const dataObj: Data = req.body;
-  console.log(dataObj);
-  console.log(dataObj.measurementDuration);
-  console.log(dataObj.date);
-  console.log(dataObj.rssi);
   
-  
-  const { sensorAddress, water, voltage, duration, rssi, measurementDuration } = req.body;
-  if (sensorAddress == undefined || water == undefined) {
+  if (dataObj.sensorAddress == undefined || dataObj.water == undefined) {
     return res.status(400).send({
       message: 'sensorAddress and water are required',
       data: {},
@@ -77,11 +70,11 @@ router.post('/data', async (req, res) => {
   }
   // check if sensor exists
   let sensorExists = true;
-  const sensor = await getSensorById(sensorAddress);
+  const sensor = await getSensorById(dataObj.sensorAddress);
   if (!sensor) {
     sensorExists = false;
     // create sensor
-    const createdSensor = await createSensorWithId(sensorAddress);
+    const createdSensor = await createSensorWithId(dataObj.sensorAddress);
     if (!createdSensor) {
       return res.status(500).send({
         message: 'could not create sensor',
@@ -90,7 +83,7 @@ router.post('/data', async (req, res) => {
     }
   }
   // add data
-  const data = await addDataBySensorId(sensorAddress, water, voltage, duration, rssi, measurementDuration);
+  const data = await addDataBySensorId(dataObj);
   return res.status(200).send({
     message: sensorExists ? 'data added' : 'sensor created and data added',
     data

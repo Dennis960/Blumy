@@ -29,8 +29,8 @@
       "$lib/*": ["src/lib/*"],
       "$types": ["src/types"],
       "$types/*": ["src/types/*"],
-      "$api/types": ["../api"],
-      "$api/types/*": ["../api/*"]
+      "$api/types": ["../api/types"],
+      "$api/types/*": ["../api/types/*"]
     }
   }
 }

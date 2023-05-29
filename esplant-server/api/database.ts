@@ -1,5 +1,5 @@
 import sqlite3 from 'sqlite3';
-import { Data, DatabaseObject, Sensor } from './types/data';
+import { Data, DatabaseObject, Sensor, dataSchema } from './types/data.js';
 
 const createSensorTableStatement = `CREATE TABLE IF NOT EXISTS sensor (
   sensor_address INTEGER PRIMARY KEY NOT NULL,
@@ -323,15 +323,25 @@ export async function createSensorWithId(sensorAddress: number, name = 'new sens
 
 /**
  * Add data to the database.
- * @param sensorAddress The address of the sensor.
- * @param water The water level.
- * @param voltage The battery voltage.
- * @param duration The duration of the measurement.
+ * @param data The data to add.
  * @returns The id of the inserted data or throws an error if the sensor does not exist.
  */
-export function addDataBySensorId(sensorAddress: number, water: number, voltage: number, duration: number, rssi: number, measurementDuration: number) {
-  const nowMs = Date.now();
-  return dbInsert('INSERT INTO data (sensorAddress, water, voltage, duration, date, rssi, measurementDuration) VALUES (?, ?, ?, ?, ?, ?, ?)', [sensorAddress, water, voltage, duration, nowMs, rssi, measurementDuration]);
+export function addDataBySensorId(data: Data) {
+  data.date = Date.now();
+
+  let cleanData: any = {};
+  // remove any keys that are not in dataSchema
+  for (const dataProperty of dataSchema) {
+    if (data[dataProperty.name]) {
+      cleanData[dataProperty.name] = data[dataProperty.name];
+    }
+  }
+
+  const keys = Object.keys(cleanData).join(', ');
+  const questionMarks = Object.values(cleanData).map(() => '?').join(', ');
+  const values = Object.values(cleanData);
+
+  return dbInsert(`INSERT INTO data (${keys}) VALUES (${questionMarks})`, values);
 }
 
 /**
@@ -352,8 +362,8 @@ function dataToAverage(data: Data[], limit: number) {
   for (let i = 0; i < data.length; i += step) {
     const dataSlice = data.slice(i, i + step);
     const water = dataSlice.reduce((acc, cur) => acc + cur.water, 0) / dataSlice.length;
-    const voltage = dataSlice.reduce((acc, cur) => acc + cur.voltage, 0) / dataSlice.length;
-    const duration = dataSlice.reduce((acc, cur) => acc + cur.duration, 0) / dataSlice.length;
+    const voltage = dataSlice.reduce((acc, cur) => acc + (cur.voltage ?? 0), 0) / dataSlice.length;
+    const duration = dataSlice.reduce((acc, cur) => acc + (cur.duration ?? 0), 0) / dataSlice.length;
     // make a copy of the last data point and change the values
     const averagedDataPoint: Data = { ...dataSlice[dataSlice.length - 1], water, voltage, duration };
     averagedData.push(averagedDataPoint);
