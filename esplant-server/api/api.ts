@@ -1,8 +1,9 @@
 import cors from 'cors';
-import { json, response, Router } from 'express';
+import { json, Router } from 'express';
 import { addDataBySensorId, createSensorWithId, getSensorById, getSensors, getDataBySensorId, deleteDataBySensorId, deleteSensorById, deleteDataById, updateSensorById } from './database.js';
 import { Data, FormattedData } from './types/data.js';
 import dateFormat from 'dateformat';
+import mqtt from 'mqtt';
 
 const router = Router();
 router.use(json());
@@ -45,6 +46,23 @@ router.use((req, res, next) => {
     };
   }
   next();
+});
+
+const client = mqtt.connect(process.env.MQTT_URL || 'mqtt://localhost:1883');
+client.on('connect', () => {
+  console.log('connected to mqtt broker');
+  client.subscribe('esplant/#', (err) => {
+    if (err) {
+      console.error('error subscribing to mqtt topic', err);
+    }
+  });
+});
+
+// same format as the POST API
+client.on('message', async (topic, message) => {
+  const body = message.toString();
+  const { sensorAddress, water, voltage, duration, rssi } = JSON.parse(body);
+  await addDataBySensorId(sensorAddress, water, voltage, duration, rssi);
 });
 
 // POST /api/data

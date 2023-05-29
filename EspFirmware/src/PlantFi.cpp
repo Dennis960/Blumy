@@ -2,10 +2,25 @@
 
 RtcData rtcData;
 
-PlantFi::PlantFi(String ssid, String password)
+PlantFi::PlantFi(
+    String ssid,
+    String password,
+    String mqttServer,
+    int mqttPort,
+    String mqttUser,
+    String mqttPassword,
+    String mqttTopic,
+    String mqttClientId
+)
 {
     _ssid = ssid;
     _password = password;
+    _mqttServer = mqttServer;
+    _mqttPort = mqttPort;
+    _mqttUser = mqttUser;
+    _mqttPassword = mqttPassword;
+    _mqttTopic = mqttTopic;
+    _mqttClientId = mqttClientId;
 }
 
 bool PlantFi::isRtcValid()
@@ -28,7 +43,7 @@ void PlantFi::checkRtcValidity()
     rtcValid = isRtcValid();
 }
 
-void PlantFi::connectWifi(bool quickConnect)
+void PlantFi::connect(bool quickConnect)
 {
     if (quickConnect)
     {
@@ -39,9 +54,20 @@ void PlantFi::connectWifi(bool quickConnect)
         WiFi.begin(_ssid, _password);
     }
     connectionStartTime = millis();
+    mqttClient.setClient(wifiClient);
+    mqttClient.setServer(_mqttServer.c_str(), _mqttPort);
+    if (!mqttClient.connect(_mqttClientId.c_str(), _mqttUser.c_str(), _mqttPassword.c_str())) {
+        // TODO handle connection error
+        serialPrintf("MQTT Connection error\n");
+    }
 }
 
-void PlantFi::resetWifi()
+void PlantFi::disconnect()
+{
+    mqttClient.disconnect();
+}
+
+void PlantFi::reset()
 {
     // Quick connect is not working, reset WiFi and try regular connection
     WiFi.disconnect();
@@ -50,13 +76,13 @@ void PlantFi::resetWifi()
     delay(10);
     WiFi.forceSleepWake();
     delay(10);
-    connectWifi(false);
+    connect(false);
     rtcValid = false;
 }
 
-bool PlantFi::isWifiConnected()
+bool PlantFi::isConnected()
 {
-    return WiFi.status() == WL_CONNECTED;
+    return WiFi.status() == WL_CONNECTED && mqttClient.connected();
 }
 
 void PlantFi::saveConnection()
@@ -69,10 +95,7 @@ void PlantFi::saveConnection()
 
 void PlantFi::sendData(int sensorAddress, int water, uint16_t voltage)
 {
-    http.begin(wifiClient, "http://esplant.hoppingadventure.com/api/data");
-    http.addHeader("Content-Type", "application/json");
     char buffer[200];
     sprintf(buffer, "{\"sensorAddress\":%d,\"water\":%d,\"duration\":%lu,\"voltage\":%d,\"rssi\":%d}", sensorAddress, water, millis(), voltage, WiFi.RSSI());
-    http.POST(buffer);
-    http.end();
+    mqttClient.publish(_mqttTopic.c_str(), buffer);
 }
