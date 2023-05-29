@@ -87,7 +87,7 @@ void PlantFi::saveConnection()
     ESP.rtcUserMemoryWrite(0, (uint32_t *)&rtcData, sizeof(rtcData));
 }
 
-void PlantFi::sendData(int sensorAddress, int water, uint16_t voltage)
+void PlantFi::sendData(int sensorAddress, int water, unsigned long measurementDuration)
 {
     mqttClient.setClient(wifiClient);
     mqttClient.setServer(_mqttServer.c_str(), _mqttPort);
@@ -96,6 +96,6 @@ void PlantFi::sendData(int sensorAddress, int water, uint16_t voltage)
         serialPrintf("MQTT Connection error\n");
     }
     char buffer[200];
-    sprintf(buffer, "{\"sensorAddress\":%d,\"water\":%d,\"duration\":%lu,\"voltage\":%d,\"rssi\":%d}", sensorAddress, water, millis(), voltage, WiFi.RSSI());
+    sprintf(buffer, "{\"sensorAddress\":%d,\"water\":%d,\"duration\":%lu,\"measurementDuration\":%lu,\"rssi\":%d}", sensorAddress, water, millis(), measurementDuration, WiFi.RSSI());
     mqttClient.publish(_mqttTopic.c_str(), buffer);
 }

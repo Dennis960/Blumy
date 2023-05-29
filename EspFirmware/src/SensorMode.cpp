@@ -50,7 +50,7 @@ void sensorLoop()
         {
             serialPrintf("Measured value: %d\n", sensorValue);
             serialPrintf("Sending data\n");
-            plantFi.sendData(sensorAddress, sensorValue, ESP.getVcc());
+            plantFi.sendData(sensorAddress, sensorValue, sensor.getMeasurementDuration());
             plantFi.disconnect();
             startDeepSleep(SLEEP_DURATION);
         }

@@ -10,6 +10,7 @@ export type Data = {
   voltage: number;
   duration: number;
   rssi: number;
+  measurement_duration: number;
 };
 
 export type FormattedData = {
@@ -20,6 +21,7 @@ export type FormattedData = {
   voltage: number;
   duration: number;
   rssi: number;
+  measurement_duration: number;
 }
 
 export type DatabaseObject = Sensor | Data;
