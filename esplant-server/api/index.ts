@@ -5,6 +5,9 @@ const app = express();
 
 const PORT = 4803;
 
+// use mqtt-listener
+import './mqtt-listener.js';
+
 // serve api
 app.use('/api', api);
 
