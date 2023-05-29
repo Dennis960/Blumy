@@ -1,14 +1,14 @@
 import cors from 'cors';
 import { json, Router } from 'express';
 import { addDataBySensorId, createSensorWithId, getSensorById, getSensors, getDataBySensorId, deleteDataBySensorId, deleteSensorById, deleteDataById, updateSensorById } from './database.js';
-import { Data, FormattedData } from './types/data.js';
+import { Data } from './types/data.js';
 import dateFormat from 'dateformat';
 
 const router = Router();
 router.use(json());
 router.use(cors());
 
-function formatDateData(data: Data[]): FormattedData[] {
+function formatDateData(data: Data[]): Data[] {
   return data.map((data) => {
     if (!data.date) {
       return {
@@ -63,6 +63,9 @@ router.post('/data', async (req, res) => {
   console.log(req.body);
   const dataObj: Data = req.body;
   console.log(dataObj);
+  console.log(dataObj.measurementDuration);
+  console.log(dataObj.date);
+  console.log(dataObj.rssi);
   
   
   const { sensorAddress, water, voltage, duration, rssi, measurementDuration } = req.body;
