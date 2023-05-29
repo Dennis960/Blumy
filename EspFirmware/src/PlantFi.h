@@ -82,7 +82,7 @@ public:
      * @param quickConnect If true, tries to connect using the RTC data
      * If false, tries to connect without using the RTC data
      */
-    void connect(bool quickConnect = true);
+    void connectWifi(bool quickConnect = true);
 
     void disconnect();
 
@@ -91,14 +91,14 @@ public:
      * After resetting, tries to make a regular connection with connect()
      * Sets rtcValid to false
      */
-    void reset();
+    void resetWifi();
 
     /**
      * Checks if the connection is established.
      *
      * @return True if the connection is established, false otherwise
      */
-    bool isConnected();
+    bool isWifiConnected();
 
     /**
      * Saves the WiFi connection data to the RTC memory.

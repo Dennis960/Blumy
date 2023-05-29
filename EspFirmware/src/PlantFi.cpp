@@ -43,7 +43,7 @@ void PlantFi::checkRtcValidity()
     rtcValid = isRtcValid();
 }
 
-void PlantFi::connect(bool quickConnect)
+void PlantFi::connectWifi(bool quickConnect)
 {
     if (quickConnect)
     {
@@ -54,12 +54,6 @@ void PlantFi::connect(bool quickConnect)
         WiFi.begin(_ssid, _password);
     }
     connectionStartTime = millis();
-    mqttClient.setClient(wifiClient);
-    mqttClient.setServer(_mqttServer.c_str(), _mqttPort);
-    if (!mqttClient.connect(_mqttClientId.c_str(), _mqttUser.c_str(), _mqttPassword.c_str())) {
-        // TODO handle connection error
-        serialPrintf("MQTT Connection error\n");
-    }
 }
 
 void PlantFi::disconnect()
@@ -67,7 +61,7 @@ void PlantFi::disconnect()
     mqttClient.disconnect();
 }
 
-void PlantFi::reset()
+void PlantFi::resetWifi()
 {
     // Quick connect is not working, reset WiFi and try regular connection
     WiFi.disconnect();
@@ -76,13 +70,13 @@ void PlantFi::reset()
     delay(10);
     WiFi.forceSleepWake();
     delay(10);
-    connect(false);
+    connectWifi(false);
     rtcValid = false;
 }
 
-bool PlantFi::isConnected()
+bool PlantFi::isWifiConnected()
 {
-    return WiFi.status() == WL_CONNECTED && mqttClient.connected();
+    return WiFi.status() == WL_CONNECTED;
 }
 
 void PlantFi::saveConnection()
@@ -95,6 +89,12 @@ void PlantFi::saveConnection()
 
 void PlantFi::sendData(int sensorAddress, int water, uint16_t voltage)
 {
+    mqttClient.setClient(wifiClient);
+    mqttClient.setServer(_mqttServer.c_str(), _mqttPort);
+    if (!mqttClient.connect(_mqttClientId.c_str(), _mqttUser.c_str(), _mqttPassword.c_str())) {
+        // TODO handle connection error
+        serialPrintf("MQTT Connection error\n");
+    }
     char buffer[200];
     sprintf(buffer, "{\"sensorAddress\":%d,\"water\":%d,\"duration\":%lu,\"voltage\":%d,\"rssi\":%d}", sensorAddress, water, millis(), voltage, WiFi.RSSI());
     mqttClient.publish(_mqttTopic.c_str(), buffer);
