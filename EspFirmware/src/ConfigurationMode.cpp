@@ -1,15 +1,35 @@
 #include "ConfigurationMode.h"
 
 AsyncWebServer server(80);
+DNSServer dnsServer;
 String networksJson = "";
 unsigned long lastNetworkScan = -5000;
 const unsigned long networkScanInterval = 5000;
+IPAddress apIP(8,8,4,4); // Default (Google) DNS server
 
 bool shouldConnectToWifi = false;
 String ssid = "";
 String password = "";
 
 bool shouldReset = false;
+
+class CaptiveRequestHandler : public AsyncWebHandler
+{
+public:
+    CaptiveRequestHandler() {}
+    virtual ~CaptiveRequestHandler() {}
+
+    bool canHandle(AsyncWebServerRequest *request)
+    {
+        return true;
+    }
+
+    void handleRequest(AsyncWebServerRequest *request)
+    {
+        serialPrintf("Redirecting to captive portal\n");
+        request->send(LittleFS, "/index.html", "text/html");
+    }
+};
 
 void configurationSetup()
 {
@@ -26,9 +46,22 @@ void configurationSetup()
     analogWrite(RESET_INPUT_PIN, 60);
 
     // start the filesystem
+    serialPrintf("Starting filesystem\n");
     LittleFS.begin();
 
+    // start the access point
+    serialPrintf("Starting access point\n");
+    WiFi.mode(WIFI_AP);
+    WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+    WiFi.softAP(String(AP_SSID) + "#" + String(SENSOR_ID));
+    serialPrintf("Started access point at ip %s\n", WiFi.softAPIP().toString().c_str());
+
+    // start the dns server
+    serialPrintf("Starting dns server\n");
+    dnsServer.start(53, "*", WiFi.softAPIP());
+
     // start the webserver
+    serialPrintf("Starting webserver\n");
     server.onNotFound(handleNotFound);
     server.on("/", HTTP_GET, handleRoot);
     server.on("/wifi-manager.html", HTTP_GET, handleWifiManager);
@@ -36,15 +69,14 @@ void configurationSetup()
     server.on("/reset", HTTP_POST, handleReset);
     server.on("/networks", HTTP_GET, handleNetworks);
     server.on("/isConnected", HTTP_GET, handleIsConnected);
+    server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER); // only when requested from AP
     server.begin();
-
-    // start the access point
-    WiFi.softAP(AP_SSID);
-    serialPrintf("Started access point at ip %s\n", WiFi.softAPIP().toString().c_str());
 }
 
 void configurationLoop()
 {
+    dnsServer.processNextRequest(); // used for auto-redirecting to captive portal
+
     // scan for wifis every 10 seconds
     if (millis() - lastNetworkScan > networkScanInterval)
     {

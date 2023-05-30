@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <ESPAsyncWebServer.h>
+#include <DNSServer.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
 
@@ -13,6 +14,7 @@
 #define AP_SSID "PlantFi"
 
 extern AsyncWebServer server;
+extern DNSServer dnsServer;
 extern String networksJson;
 extern unsigned long lastNetworkScan;
 extern const unsigned long networkScanInterval;
