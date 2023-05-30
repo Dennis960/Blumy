@@ -9,7 +9,7 @@
 /**
  * The sensorAddress value used to identify the sensor
  */
-const int sensorAddress = 2;
+const int sensorAddress = SENSOR_ID;
 
 //----------------- Measurement delays -----------------
 /**
