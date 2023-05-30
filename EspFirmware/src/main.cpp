@@ -14,7 +14,7 @@ void setup()
     // Reset button check
     pinMode(RESET_INPUT_PIN, INPUT);
     wasButtonPressed = digitalRead(RESET_INPUT_PIN);
-    serialPrintf("Starting\n");
+    serialPrintf("Starting sensor id %d\n", sensorAddress);
     serialPrintf("Reset mode: %s\n", wasButtonPressed ? "Button" : "Automatic");
     initEEPROM();
 
