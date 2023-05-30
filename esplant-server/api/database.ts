@@ -332,7 +332,7 @@ export function addDataBySensorId(data: Data) {
   let cleanData: any = {};
   // remove any keys that are not in dataSchema
   for (const dataProperty of dataSchema) {
-    if (data[dataProperty.name]) {
+    if (data[dataProperty.name] !== undefined) {
       cleanData[dataProperty.name] = data[dataProperty.name];
     }
   }
