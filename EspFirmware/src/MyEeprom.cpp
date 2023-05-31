@@ -54,8 +54,9 @@ uint32_t calculateWifiChecksum()
     return calculateCRC32(ssid + password, ssid.length() + password.length());
 }
 
-bool isWifiCredentialsValid()
+bool isWifiChecksumValid()
 {
+    serialPrintf("Checking if WiFi checksum is valid\n");
     uint32_t checksum = readUint32_tFromEEPROM(WIFI_CHECKSUM_ADDRESS);
     uint32_t calculatedChecksum = calculateWifiChecksum();
     serialPrintf("Checksum:            %d\n", checksum);
@@ -112,8 +113,9 @@ uint32_t calculateMqttChecksum()
     return calculateCRC32(mqttServer + String(mqttPort) + mqttUser + mqttPassword, mqttServer.length() + mqttUser.length() + mqttPassword.length() + 4);
 }
 
-bool isMqttCredentialsValid()
+bool isMqttChecksumValid()
 {
+    serialPrintf("Checking if MQTT checksum is valid\n");
     uint32_t checksum = readUint32_tFromEEPROM(MQTT_CHECKSUM_ADDRESS);
     uint32_t calculatedChecksum = calculateMqttChecksum();
     serialPrintf("Checksum:            %d\n", checksum);
