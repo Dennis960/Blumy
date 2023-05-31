@@ -57,7 +57,10 @@ uint32_t calculateWifiChecksum()
 bool isWifiCredentialsValid()
 {
     uint32_t checksum = readUint32_tFromEEPROM(WIFI_CHECKSUM_ADDRESS);
-    return checksum == calculateWifiChecksum();
+    uint32_t calculatedChecksum = calculateWifiChecksum();
+    serialPrintf("Checksum:            %d\n", checksum);
+    serialPrintf("Calculated checksum: %d\n", calculatedChecksum);
+    return checksum == calculatedChecksum;
 }
 
 void saveWiFiCredentials(const String &ssid, const String &password)
@@ -112,7 +115,10 @@ uint32_t calculateMqttChecksum()
 bool isMqttCredentialsValid()
 {
     uint32_t checksum = readUint32_tFromEEPROM(MQTT_CHECKSUM_ADDRESS);
-    return checksum == calculateMqttChecksum();
+    uint32_t calculatedChecksum = calculateMqttChecksum();
+    serialPrintf("Checksum:            %d\n", checksum);
+    serialPrintf("Calculated checksum: %d\n", calculatedChecksum);
+    return checksum == calculatedChecksum;
 }
 
 void saveMqttCredentials(String mqttServer, int mqttPort, String mqttUser, String mqttPassword)

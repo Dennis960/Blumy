@@ -24,10 +24,11 @@ void sensorSetup()
     String mqttUser;
     String mqttPassword;
 
-    if (isMqttCredentialsValid)
+    if (isMqttCredentialsValid())
     {
         loadMqttCredentials(mqttServer, mqttPort, mqttUser, mqttPassword);
     } else {
+        serialPrintf("EEPROM MQTT not valid, using defaults\n");
         // use defaults
         mqttServer = "schneefux.xyz";
         mqttPort = 1883;
