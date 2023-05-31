@@ -100,10 +100,19 @@ void configurationLoop()
 {
     dnsServer.processNextRequest(); // used for auto-redirecting to captive portal
 
-    if (shouldConnectToWifi && WiFi.status() == WL_CONNECTED)
+    if (shouldConnectToWifi)
     {
-        shouldConnectToWifi = false;
-        saveWiFiCredentials(ssid, password);
+        if (WiFi.status() == WL_CONNECTED)
+        {
+            serialPrintf("Connected to wifi %s\n", ssid.c_str());
+            shouldConnectToWifi = false;
+            saveWiFiCredentials(ssid, password);
+        }
+        else if (WiFi.status() == WL_CONNECT_FAILED || WiFi.status() == WL_NO_SSID_AVAIL)
+        {
+            serialPrintf("Failed to connect to wifi %s\n", ssid.c_str());
+            shouldConnectToWifi = false;
+        }
     }
 
     if (shouldReset)
@@ -142,6 +151,7 @@ void handlePostConnect(AsyncWebServerRequest *request)
 
     ssid = newSsid->value();
     password = newPassword->value();
+    shouldConnectToWifi = true;
     WiFi.begin(ssid.c_str(), password.c_str());
 
     request->send(200, "text/plain", "OK");
