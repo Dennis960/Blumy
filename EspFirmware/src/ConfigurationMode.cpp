@@ -3,15 +3,24 @@
 AsyncWebServer server(80);
 DNSServer dnsServer;
 String networksJson = "";
-unsigned long lastNetworkScan = -5000;
-const unsigned long networkScanInterval = 5000;
-IPAddress apIP(8,8,4,4); // Default (Google) DNS server
+IPAddress apIP(8, 8, 4, 4); // Default (Google) DNS server
 
 bool shouldConnectToWifi = false;
 String ssid = "";
 String password = "";
 
 bool shouldReset = false;
+
+/**
+ * Macro to print the name of the function that is being called
+ * for every request. Just wrap the function in this macro.
+ */
+#define DEBUG_REQUEST(function)                    \
+    [](AsyncWebServerRequest *request)             \
+    {                                              \
+        serialPrintf("Calling %s()\n", #function); \
+        function(request);                         \
+    }
 
 class CaptiveRequestHandler : public AsyncWebHandler
 {
@@ -62,71 +71,39 @@ void configurationSetup()
 
     // start the webserver
     serialPrintf("Starting webserver\n");
-    server.onNotFound(handleNotFound);
-    server.on("/", HTTP_GET, handleRoot);
-    server.on("/wifi-manager.html", HTTP_GET, handleWifiManager);
-    server.on("/connect", HTTP_POST, handleConnect);
-    server.on("/reset", HTTP_POST, handleReset);
-    server.on("/networks", HTTP_GET, handleNetworks);
-    server.on("/isConnected", HTTP_GET, handleIsConnected);
+    server.onNotFound(DEBUG_REQUEST(handleGetNotFound));
+    server.on("/", HTTP_GET, DEBUG_REQUEST(handleGetIndex));
+    server.on("/wifi-manager.html", HTTP_GET, DEBUG_REQUEST(handleGetWifiManager));
+    server.on("/connect", HTTP_POST, DEBUG_REQUEST(handlePostConnect));
+    server.on("/reset", HTTP_POST, DEBUG_REQUEST(handlePostReset));
+    server.on("/networks", HTTP_GET, DEBUG_REQUEST(handleGetNetworks));
+    server.on("/isConnected", HTTP_GET, DEBUG_REQUEST(handleGetIsConnected));
+    server.on("/mqttSetup", HTTP_POST, DEBUG_REQUEST(handlePostMqttSetup));
+    server.on("/sensorId", HTTP_POST, DEBUG_REQUEST(handlePostSensorId));
     server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER); // only when requested from AP
     server.begin();
+
+    // start wifi connection if eeprom is valid
+    if (isWifiCredentialsValid())
+    {
+        loadWiFiCredentials(ssid, password);
+        serialPrintf("Connecting to wifi %s\n", ssid.c_str());
+        WiFi.begin(ssid, password);
+    }
+    else
+    {
+        serialPrintf("EEPROM is invalid\n");
+    }
 }
 
 void configurationLoop()
 {
     dnsServer.processNextRequest(); // used for auto-redirecting to captive portal
 
-    // scan for wifis every 10 seconds
-    if (millis() - lastNetworkScan > networkScanInterval)
-    {
-        lastNetworkScan = millis();
-        // scan for wifis, print them
-        serialPrintf("Scanning for wifis\n");
-        int n = WiFi.scanNetworks();
-        serialPrintf("Found %d wifis\n", n);
-        networksJson = "[";
-        for (int i = 0; i < n; i++)
-        {
-            String ssid = WiFi.SSID(i);
-            // if ssid equals OTA_SSID set ota flag and reset
-            if (ssid == OTA_SSID)
-            {
-                reset(OTA_FLAG);
-            }
-
-            networksJson += "{\"ssid\":\"" + ssid + "\",\"rssi\":" + WiFi.RSSI(i) + "}";
-            if (i < n - 1)
-            {
-                networksJson += ",";
-            }
-        }
-        networksJson += "]";
-    }
-
-    // TODO: make this async
-    if (shouldConnectToWifi)
+    if (shouldConnectToWifi && WiFi.status() == WL_CONNECTED)
     {
         shouldConnectToWifi = false;
-        serialPrintf("Connecting to wifi\n");
-        WiFi.begin(ssid.c_str(), password.c_str());
-        int retries = 0;
-        while (WiFi.status() != WL_CONNECTED)
-        {
-            retries++;
-            delay(500);
-            serialPrintf("Retrying to connect to wifi\n");
-            if (retries > 10)
-            {
-                serialPrintf("Failed to connect to wifi\n");
-                break;
-            }
-        }
-        if (WiFi.status() == WL_CONNECTED)
-        {
-            serialPrintf("Connected to wifi\n");
-            saveWiFiCredentials(ssid, password);
-        }
+        saveWiFiCredentials(ssid, password);
     }
 
     if (shouldReset)
@@ -135,71 +112,138 @@ void configurationLoop()
     }
 }
 
-void handleRoot(AsyncWebServerRequest *request)
+void handleGetIndex(AsyncWebServerRequest *request)
 {
-    serialPrintf("Received request for /\n");
     request->send(LittleFS, "/index.html", "text/html");
 }
-void handleWifiManager(AsyncWebServerRequest *request)
+
+void handleGetWifiManager(AsyncWebServerRequest *request)
 {
-    serialPrintf("Received request for /wifi-manager\n");
     request->send(LittleFS, "/wifi-manager.html", "text/html");
 }
 
-void handleNotFound(AsyncWebServerRequest *request)
+void handleGetNotFound(AsyncWebServerRequest *request)
 {
-    serialPrintf("Received request for %s, but no handler was found\n", request->url().c_str());
-    request->send(404, "text/plain", "Not found");
+    request->send(LittleFS, "/404.html", "text/html");
 }
 
-void handleConnect(AsyncWebServerRequest *request)
+void handlePostConnect(AsyncWebServerRequest *request)
 {
-    serialPrintf("Received request for /connect\n");
-    if (request->hasParam("ssid", true) && request->hasParam("password", true))
-    {
-        AsyncWebParameter *newSsid = request->getParam("ssid", true);
-        AsyncWebParameter *newPassword = request->getParam("password", true);
-
-        serialPrintf("Received ssid: %s\n", newSsid->value().c_str());
-        serialPrintf("Received password: %s\n", newPassword->value().c_str());
-
-        ssid = newSsid->value();
-        password = newPassword->value();
-        shouldConnectToWifi = true;
-
-        serialPrintf("Connected to wifi\n");
-        request->send(200, "text/plain", "OK");
-    }
-    else
+    if (!request->hasParam("ssid", true) || !request->hasParam("password", true))
     {
         request->send(400, "text/plain", "Bad request");
+        return;
     }
+    AsyncWebParameter *newSsid = request->getParam("ssid", true);
+    AsyncWebParameter *newPassword = request->getParam("password", true);
+
+    serialPrintf("Received ssid: %s\n", newSsid->value().c_str());
+    serialPrintf("Received password: %s\n", newPassword->value().c_str());
+
+    ssid = newSsid->value();
+    password = newPassword->value();
+    WiFi.begin(ssid.c_str(), password.c_str());
+
+    request->send(200, "text/plain", "OK");
 }
 
-void handleReset(AsyncWebServerRequest *request)
+void handlePostReset(AsyncWebServerRequest *request)
 {
-    serialPrintf("Received request for /reset\n");
     shouldReset = true;
-    request->send(200, "application/json", "OK");
+    request->send(200, "text/plain", "OK");
 }
 
-void handleNetworks(AsyncWebServerRequest *request)
+void handleGetNetworks(AsyncWebServerRequest *request)
 {
-    serialPrintf("Received request for /networks\n");
-    request->send(200, "application/json", networksJson);
+    String json = "[";
+    int n = WiFi.scanComplete();
+    if (n == -2)
+    {
+        WiFi.scanNetworks(true);
+    }
+    else if (n)
+    {
+        for (int i = 0; i < n; ++i)
+        {
+            if (i)
+                json += ",";
+            json += "{";
+            json += "\"rssi\":" + String(WiFi.RSSI(i));
+            json += ",\"ssid\":\"" + WiFi.SSID(i) + "\"";
+            json += ",\"bssid\":\"" + WiFi.BSSIDstr(i) + "\"";
+            json += ",\"channel\":" + String(WiFi.channel(i));
+            json += ",\"secure\":" + String(WiFi.encryptionType(i));
+            json += ",\"hidden\":" + String(WiFi.isHidden(i) ? "true" : "false");
+            json += "}";
+        }
+        WiFi.scanDelete();
+        if (WiFi.scanComplete() == -2)
+        {
+            WiFi.scanNetworks(true);
+        }
+    }
+    json += "]";
+    request->send(200, "application/json", json);
+    json = String();
 }
 
-void handleIsConnected(AsyncWebServerRequest *request)
+void handleGetIsConnected(AsyncWebServerRequest *request)
 {
-    serialPrintf("Received request for /isConnected\n");
-    if (WiFi.status() == WL_CONNECTED)
+    request->send(200, "text/plain", String(WiFi.status()));
+}
+
+void handlePostMqttSetup(AsyncWebServerRequest *request)
+{
+    if (!request->hasParam("mqttServer", true) || !request->hasParam("mqttPort", true) || !request->hasParam("mqttUser", true) || !request->hasParam("mqttPassword", true))
     {
-        serialPrintf("Connected to wifi\n");
-        request->send(200, "text/plain", "1");
+        request->send(400, "text/plain", "Bad request");
+        return;
     }
-    else
+    AsyncWebParameter *newMqttServer = request->getParam("mqttServer", true);
+    AsyncWebParameter *newMqttPort = request->getParam("mqttPort", true);
+    AsyncWebParameter *newMqttUser = request->getParam("mqttUser", true);
+    AsyncWebParameter *newMqttPassword = request->getParam("mqttPassword", true);
+
+    serialPrintf("Received mqttServer: %s\n", newMqttServer->value().c_str());
+    serialPrintf("Received mqttPort: %s\n", newMqttPort->value().c_str());
+    serialPrintf("Received mqttUser: %s\n", newMqttUser->value().c_str());
+    serialPrintf("Received mqttPassword: %s\n", newMqttPassword->value().c_str());
+
+    String mqttServer = newMqttServer->value();
+    int mqttPort = newMqttPort->value().toInt();
+    String mqttUser = newMqttUser->value();
+    String mqttPassword = newMqttPassword->value();
+
+    saveMqttCredentials(mqttServer, mqttPort, mqttUser, mqttPassword);
+
+    request->send(200, "text/plain", "OK");
+}
+
+void handlePostSensorId(AsyncWebServerRequest *request)
+{
+    if (!request->hasParam("sensorId", true))
     {
-        serialPrintf("Not connected to wifi\n");
-        request->send(200, "text/plain", "0");
+        request->send(400, "text/plain", "Bad request");
+        return;
     }
+    AsyncWebParameter *newSensorId = request->getParam("sensorId", true);
+
+    serialPrintf("Received sensorId: %s\n", newSensorId->value().c_str());
+
+    uint32_t sensorId = atol(newSensorId->value().c_str());
+
+    if (sensorId == 0)
+    {
+        request->send(400, "text/plain", "Bad request");
+        return;
+    }
+
+    saveSensorId(sensorId);
+
+    request->send(200, "text/plain", "OK");
+}
+
+void handleGetSensorId(AsyncWebServerRequest *request)
+{
+    request->send(200, "text/plain", String(loadSensorId()));
 }

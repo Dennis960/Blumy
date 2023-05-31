@@ -8,9 +8,9 @@ bool wasWifiConnectedLastCycle = false;
 
 void sensorSetup()
 {
-    if (!isEEPROMValid())
+    if (!isWifiCredentialsValid())
     {
-        serialPrintf("EEPROM not valid, starting configuration mode\n");
+        serialPrintf("EEPROM Wifi not valid, starting configuration mode\n");
         startConfigurationMode();
     }
 
@@ -19,7 +19,23 @@ void sensorSetup()
 
     loadWiFiCredentials(ssid, password);
 
-    plantFi = PlantFi(ssid, password, "schneefux.xyz", 1883, "esplant", "Ma9BdqVcKyxTgJm3", "esplant", "sensor-1");
+    String mqttServer;
+    int mqttPort;
+    String mqttUser;
+    String mqttPassword;
+
+    if (isMqttCredentialsValid)
+    {
+        loadMqttCredentials(mqttServer, mqttPort, mqttUser, mqttPassword);
+    } else {
+        // use defaults
+        mqttServer = "schneefux.xyz";
+        mqttPort = 1883;
+        mqttUser = "esplant";
+        mqttPassword = "Ma9BdqVcKyxTgJm3";
+    }
+
+    plantFi = PlantFi(ssid, password, mqttServer, mqttPort, mqttUser, mqttPassword, "esplant", "sensor-1");
     plantFi.checkRtcValidity();
 
     serialPrintf("Starting wifi connection\n");
