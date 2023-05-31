@@ -62,7 +62,7 @@ uint32_t calculateWifiChecksum();
  * Check if the WiFi credentials are correctly stored in the EEPROM
  * @return True if the credentials are valid, false otherwise
  */
-bool isWifiCredentialsValid();
+bool isWifiChecksumValid();
 
 /**
  * Save the WiFi credentials to the EEPROM
@@ -112,7 +112,7 @@ uint32_t calculateMqttChecksum();
  * Check if the MQTT credentials are correctly stored in the EEPROM
  * @return True if the credentials are valid, false otherwise
  */
-bool isMqttCredentialsValid();
+bool isMqttChecksumValid();
 
 /**
  * Save the MQTT credentials to the EEPROM

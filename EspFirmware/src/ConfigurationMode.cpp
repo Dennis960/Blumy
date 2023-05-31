@@ -84,7 +84,7 @@ void configurationSetup()
     server.begin();
 
     // start wifi connection if eeprom is valid
-    if (isWifiCredentialsValid())
+    if (isWifiChecksumValid())
     {
         loadWiFiCredentials(ssid, password);
         serialPrintf("Connecting to wifi %s\n", ssid.c_str());
@@ -94,6 +94,9 @@ void configurationSetup()
     {
         serialPrintf("EEPROM is invalid\n");
     }
+
+    // start wifi scan
+    WiFi.scanNetworks(true);
 }
 
 void configurationLoop()

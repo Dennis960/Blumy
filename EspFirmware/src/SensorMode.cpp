@@ -8,7 +8,7 @@ bool wasWifiConnectedLastCycle = false;
 
 void sensorSetup()
 {
-    if (!isWifiCredentialsValid())
+    if (!isWifiChecksumValid())
     {
         serialPrintf("EEPROM Wifi not valid, starting configuration mode\n");
         startConfigurationMode();
@@ -24,7 +24,7 @@ void sensorSetup()
     String mqttUser;
     String mqttPassword;
 
-    if (isMqttCredentialsValid())
+    if (isMqttChecksumValid())
     {
         loadMqttCredentials(mqttServer, mqttPort, mqttUser, mqttPassword);
     } else {
