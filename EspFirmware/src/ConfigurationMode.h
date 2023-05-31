@@ -16,8 +16,6 @@
 extern AsyncWebServer server;
 extern DNSServer dnsServer;
 extern String networksJson;
-extern unsigned long lastNetworkScan;
-extern const unsigned long networkScanInterval;
 
 extern bool shouldConnectToWifi;
 extern String ssid;
@@ -42,37 +40,74 @@ void configurationLoop();
 void reset(uint32_t resetFlag);
 
 /**
- * Handle the root request
- */
-void handleRoot(AsyncWebServerRequest *request);
+ * Function descriptions:
+ * 
+ * Needs <Type> <Name> parameters
+ * Triggers <Action>
+ * Sends <File> | <Type> response with <Content>
+*/
 
 /**
- * Handle the wifi manager request
+ * Sends 404.html
  */
-void handleWifiManager(AsyncWebServerRequest *request);
+void handleGetNotFound(AsyncWebServerRequest *request);
 
 /**
- * Handle the not found request
+ * Sends index.html
  */
-void handleNotFound(AsyncWebServerRequest *request);
+void handleGetIndex(AsyncWebServerRequest *request);
 
 /**
- * Handle the wifi request
+ * Sends wifi-manager.html
  */
-void handleConnect(AsyncWebServerRequest *request);
+void handleGetWifiManager(AsyncWebServerRequest *request);
 
 /**
- * Handle the reset request
+ * Needs String ssid, String password
+ * Triggers shouldConnectToWifi = true
+ * Sends application/json response with "1"
  */
-void handleReset(AsyncWebServerRequest *request);
+void handlePostConnect(AsyncWebServerRequest *request);
 
 /**
- * Handle the networks request. This will return a json array of all the networks
+ * Triggers shouldReset = true
  */
-void handleNetworks(AsyncWebServerRequest *request);
+void handlePostReset(AsyncWebServerRequest *request);
 
 /**
- * Handle the isConnected request
+ * Triggers WiFi.scanNetworks
+ * Sends application/json response with the networks
+ * 
+ * First call returns an empty array
  */
-void handleIsConnected(AsyncWebServerRequest *request);
+void handleGetNetworks(AsyncWebServerRequest *request);
+
+/**
+ * Sends text/plain response with the wifi status
+ * 
+ * 0 : WL_IDLE_STATUS when Wi-Fi is in process of changing between statuses
+ * 1 : WL_NO_SSID_AVAILin case configured SSID cannot be reached
+ * 3 : WL_CONNECTED after successful connection is established
+ * 4 : WL_CONNECT_FAILED if connection failed
+ * 6 : WL_CONNECT_WRONG_PASSWORD if password is incorrect
+ * 7 : WL_DISCONNECTED if module is not configured in station mode
+ */
+void handleGetIsConnected(AsyncWebServerRequest *request);
+
+/**
+ * Needs String mqttServer, int mqttPort, String mqttUsername, String mqttPassword
+ * Triggers saves the mqtt settings to EEPROM
+*/
+void handlePostMqttSetup(AsyncWebServerRequest *request);
+
+/**
+ * Needs int sensorId
+ * Triggers saves the sensorId to EEPROM
+*/
+void handlePostSensorId(AsyncWebServerRequest *request);
+
+/**
+ * Sends text/plain response with the sensorId
+*/
+void handleGetSensorId(AsyncWebServerRequest *request);
 #endif
