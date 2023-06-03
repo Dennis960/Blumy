@@ -236,8 +236,9 @@ function renderNetwork(network) {
     node.querySelector(".secure").style.display = "none";
   }
 
-  // RSSI is between -50 (strongest) and -100 (weakest)
-  const rssiFraction = (network.rssi + 100) / 50;
+  // RSSI is between more than -30 (strongest) and less than -100 (weakest)
+  const rssiClamped = Math.max(-100, Math.min(network.rssi, -30));
+  const rssiFraction = 1 - (rssiClamped + 100) / 70;
   node.querySelectorAll(".wave").forEach((el, index) => {
     if (index + 1 > rssiFraction * 4) {
       el.classList.add("wifi__wave--active");
@@ -262,6 +263,7 @@ async function updateNetworksList() {
   errorEl.style.display = "none";
   try {
     const res = await getNearbyNetworks();
+    res.sort((a, b) => b.rssi - a.rssi);
     renderNetworkList(res.map(renderNetwork));
   } catch (e) {
     errorEl.innerText = e.message;
