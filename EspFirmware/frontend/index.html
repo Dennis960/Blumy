@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>PlantFi</title>
+    </head>
+    <body>
+        <div id="status">
+            <h1>PlantFi</h1>
+            <p>PlantFi is currently <span id="status-text">offline</span>.</p>
+            <p id="manual-connect">
+                Click <a href="./wifi-manager.html">here</a> to manually connect
+                to a WiFi network.
+            </p>
+            <button id="reset" onclick="reset()">Reset</button>
+        </div>
+        <script>
+            // fetch /isConnected and redirect to wifi-manager if not connected
+            fetch("/isConnected")
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(data);
+                    if (data !== 3) {
+                        window.location.href = "./wifi-manager.html";
+                    } else if (data === 3) {
+                        document.getElementById("status-text").innerText =
+                            "online";
+                        document.getElementById(
+                            "manual-connect"
+                        ).style.display = "none";
+                    }
+                })
+                .catch((err) => {
+                    window.location.href = "./wifi-manager.html";
+                });
+
+            // post to /reset when reset button is pressed
+            function reset() {
+                fetch("/reset", {
+                    method: "POST",
+                });
+            }
+        </script>
+    </body>
+</html>
