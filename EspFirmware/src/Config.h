@@ -47,17 +47,5 @@ const uint32_t SENSOR_FLAG = 0;
  * The flag to indicate that the esp should reset into configuration mode
  */
 const uint32_t CONFIGURATION_FLAG = 1;
-/**
- * The flag to indicate that the esp should reset into OTA mode
- */
-const uint32_t OTA_FLAG = 2;
-
-//----------------- OTA -----------------
-/**
- * The SSID of the OTA network.
- * If the esp is in configuration mode and finds a network with this SSID,
- * it will connect to it and wait for an OTA update
- */
-#define OTA_SSID "PlantFi-OTA"
 
 #endif

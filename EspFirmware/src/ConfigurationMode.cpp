@@ -38,7 +38,7 @@ public:
 void configurationSetup()
 {
     uint32_t resetFlag = loadResetFlag();
-    if (resetFlag == CONFIGURATION_FLAG || resetFlag == OTA_FLAG)
+    if (resetFlag == CONFIGURATION_FLAG)
     {
         serialPrintf("Double reset detected, resetting\n");
         reset(SENSOR_FLAG);
