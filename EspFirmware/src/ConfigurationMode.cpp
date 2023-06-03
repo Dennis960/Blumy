@@ -1,26 +1,21 @@
 #include "ConfigurationMode.h"
+#include <AsyncElegantOTA.h>
 
 AsyncWebServer server(80);
 DNSServer dnsServer;
 String networksJson = "";
-IPAddress apIP(8, 8, 4, 4); // Default (Google) DNS server
+IPAddress apIP(192, 168, 4, 1); // Captive portal only works with non private ip addresses such as 8.8.4.4 (google dns)
+                                // Loading index.html only works with private ip addresses such as 192.168.4.1
+IPAddress mask(255, 255, 255, 0);
 
 bool shouldConnectToWifi = false;
 String ssid = "";
 String password = "";
+String networkJson = "";
+unsigned long wifiScanInterval = 3000;
+unsigned long lastWifiScan = -wifiScanInterval; // force a scan on first run
 
 bool shouldReset = false;
-
-/**
- * Macro to print the name of the function that is being called
- * for every request. Just wrap the function in this macro.
- */
-#define DEBUG_REQUEST(function)                    \
-    [](AsyncWebServerRequest *request)             \
-    {                                              \
-        serialPrintf("Calling %s()\n", #function); \
-        function(request);                         \
-    }
 
 class CaptiveRequestHandler : public AsyncWebHandler
 {
@@ -61,7 +56,7 @@ void configurationSetup()
     // start the access point
     serialPrintf("Starting access point\n");
     WiFi.mode(WIFI_AP);
-    WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+    WiFi.softAPConfig(apIP, apIP, mask);
     WiFi.softAP(String(AP_SSID) + "#" + String(SENSOR_ID));
     serialPrintf("Started access point at ip %s\n", WiFi.softAPIP().toString().c_str());
 
@@ -71,15 +66,21 @@ void configurationSetup()
 
     // start the webserver
     serialPrintf("Starting webserver\n");
-    server.onNotFound(DEBUG_REQUEST(handleGetNotFound));
-    server.on("/", HTTP_GET, DEBUG_REQUEST(handleGetIndex));
-    server.on("/wifi-manager.html", HTTP_GET, DEBUG_REQUEST(handleGetWifiManager));
-    server.on("/connect", HTTP_POST, DEBUG_REQUEST(handlePostConnect));
-    server.on("/reset", HTTP_POST, DEBUG_REQUEST(handlePostReset));
-    server.on("/networks", HTTP_GET, DEBUG_REQUEST(handleGetNetworks));
-    server.on("/isConnected", HTTP_GET, DEBUG_REQUEST(handleGetIsConnected));
-    server.on("/mqttSetup", HTTP_POST, DEBUG_REQUEST(handlePostMqttSetup));
-    server.on("/sensorId", HTTP_POST, DEBUG_REQUEST(handlePostSensorId));
+    server.onNotFound(handleGetNotFound);
+    server.on("/connect", HTTP_POST, handlePostConnect);
+    server.on("/reset", HTTP_POST, handlePostReset);
+    server.on("/networks", HTTP_GET, handleGetNetworks);
+    server.on("/isConnected", HTTP_GET, handleGetIsConnected);
+    server.on("/mqttSetup", HTTP_POST, handlePostMqttSetup);
+    server.on("/sensorId", HTTP_POST, handlePostSensorId);
+
+    // Add OTA
+    AsyncElegantOTA.begin(&server);
+
+    // Send files from LittleFS
+    server.serveStatic("/", LittleFS, "/");
+
+    // Captive portal
     server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER); // only when requested from AP
     server.begin();
 
@@ -122,21 +123,19 @@ void configurationLoop()
     {
         reset(SENSOR_FLAG);
     }
-}
 
-void handleGetIndex(AsyncWebServerRequest *request)
-{
-    request->send(LittleFS, "/index.html", "text/html");
-}
-
-void handleGetWifiManager(AsyncWebServerRequest *request)
-{
-    request->send(LittleFS, "/wifi-manager.html", "text/html");
+    // scan wifi networks every 3 seconds
+    if (millis() - lastWifiScan > wifiScanInterval)
+    {
+        lastWifiScan = millis();
+        scanNetworks();
+    }
 }
 
 void handleGetNotFound(AsyncWebServerRequest *request)
 {
-    request->send(LittleFS, "/404.html", "text/html");
+    request->send(200, "text/plain", "Not found");
+    // request->send(LittleFS, "/404.html", "text/html");
 }
 
 void handlePostConnect(AsyncWebServerRequest *request)
@@ -166,9 +165,10 @@ void handlePostReset(AsyncWebServerRequest *request)
     request->send(200, "text/plain", "OK");
 }
 
-void handleGetNetworks(AsyncWebServerRequest *request)
+void scanNetworks()
 {
-    String json = "[";
+    networkJson = String();
+    networkJson = "[";
     int n = WiFi.scanComplete();
     if (n == -2)
     {
@@ -179,15 +179,15 @@ void handleGetNetworks(AsyncWebServerRequest *request)
         for (int i = 0; i < n; ++i)
         {
             if (i)
-                json += ",";
-            json += "{";
-            json += "\"rssi\":" + String(WiFi.RSSI(i));
-            json += ",\"ssid\":\"" + WiFi.SSID(i) + "\"";
-            json += ",\"bssid\":\"" + WiFi.BSSIDstr(i) + "\"";
-            json += ",\"channel\":" + String(WiFi.channel(i));
-            json += ",\"secure\":" + String(WiFi.encryptionType(i));
-            json += ",\"hidden\":" + String(WiFi.isHidden(i) ? "true" : "false");
-            json += "}";
+                networkJson += ",";
+            networkJson += "{";
+            networkJson += "\"rssi\":" + String(WiFi.RSSI(i));
+            networkJson += ",\"ssid\":\"" + WiFi.SSID(i) + "\"";
+            networkJson += ",\"bssid\":\"" + WiFi.BSSIDstr(i) + "\"";
+            networkJson += ",\"channel\":" + String(WiFi.channel(i));
+            networkJson += ",\"secure\":" + String(WiFi.encryptionType(i));
+            networkJson += ",\"hidden\":" + String(WiFi.isHidden(i) ? "true" : "false");
+            networkJson += "}";
         }
         WiFi.scanDelete();
         if (WiFi.scanComplete() == -2)
@@ -195,9 +195,12 @@ void handleGetNetworks(AsyncWebServerRequest *request)
             WiFi.scanNetworks(true);
         }
     }
-    json += "]";
-    request->send(200, "application/json", json);
-    json = String();
+    networkJson += "]";
+}
+
+void handleGetNetworks(AsyncWebServerRequest *request)
+{
+    request->send(200, "application/json", networkJson);
 }
 
 void handleGetIsConnected(AsyncWebServerRequest *request)

@@ -16,6 +16,8 @@
 extern AsyncWebServer server;
 extern DNSServer dnsServer;
 extern String networksJson;
+extern IPAddress apiIP;
+extern IPAddress mask;
 
 extern bool shouldConnectToWifi;
 extern String ssid;
@@ -41,26 +43,15 @@ void reset(uint32_t resetFlag);
 
 /**
  * Function descriptions:
- * 
+ *
  * Needs <Type> <Name> parameters
  * Triggers <Action>
- * Sends <File> | <Type> response with <Content>
-*/
+ */
 
 /**
  * Sends 404.html
  */
 void handleGetNotFound(AsyncWebServerRequest *request);
-
-/**
- * Sends index.html
- */
-void handleGetIndex(AsyncWebServerRequest *request);
-
-/**
- * Sends wifi-manager.html
- */
-void handleGetWifiManager(AsyncWebServerRequest *request);
 
 /**
  * Needs String ssid, String password
@@ -75,16 +66,22 @@ void handlePostConnect(AsyncWebServerRequest *request);
 void handlePostReset(AsyncWebServerRequest *request);
 
 /**
+ * Scans for wifi networks.
+ * After running at least once, the networksJson variable will be populated with the networks
+ */
+void scanNetworks();
+
+/**
  * Triggers WiFi.scanNetworks
  * Sends application/json response with the networks
- * 
+ *
  * First call returns an empty array
  */
 void handleGetNetworks(AsyncWebServerRequest *request);
 
 /**
  * Sends text/plain response with the wifi status
- * 
+ *
  * 0 : WL_IDLE_STATUS when Wi-Fi is in process of changing between statuses
  * 1 : WL_NO_SSID_AVAILin case configured SSID cannot be reached
  * 3 : WL_CONNECTED after successful connection is established
@@ -97,17 +94,18 @@ void handleGetIsConnected(AsyncWebServerRequest *request);
 /**
  * Needs String mqttServer, int mqttPort, String mqttUsername, String mqttPassword
  * Triggers saves the mqtt settings to EEPROM
-*/
+ */
 void handlePostMqttSetup(AsyncWebServerRequest *request);
 
 /**
  * Needs int sensorId
  * Triggers saves the sensorId to EEPROM
-*/
+ */
 void handlePostSensorId(AsyncWebServerRequest *request);
 
 /**
  * Sends text/plain response with the sensorId
-*/
+ */
 void handleGetSensorId(AsyncWebServerRequest *request);
+
 #endif
