@@ -207,15 +207,15 @@ void handleGetIsConnected(AsyncWebServerRequest *request)
 
 void handlePostMqttSetup(AsyncWebServerRequest *request)
 {
-    if (!request->hasParam("mqttServer", true) || !request->hasParam("mqttPort", true) || !request->hasParam("mqttUser", true) || !request->hasParam("mqttPassword", true))
+    if (!request->hasParam("server", true) || !request->hasParam("port", true))
     {
         request->send(400, "text/plain", "Bad request");
         return;
     }
-    AsyncWebParameter *newMqttServer = request->getParam("mqttServer", true);
-    AsyncWebParameter *newMqttPort = request->getParam("mqttPort", true);
-    AsyncWebParameter *newMqttUser = request->getParam("mqttUser", true);
-    AsyncWebParameter *newMqttPassword = request->getParam("mqttPassword", true);
+    AsyncWebParameter *newMqttServer = request->getParam("server", true);
+    AsyncWebParameter *newMqttPort = request->getParam("port", true);
+    AsyncWebParameter *newMqttUser = request->getParam("user", true);
+    AsyncWebParameter *newMqttPassword = request->getParam("password", true);
 
     serialPrintf("Received mqttServer: %s\n", newMqttServer->value().c_str());
     serialPrintf("Received mqttPort: %s\n", newMqttPort->value().c_str());
