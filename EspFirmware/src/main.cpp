@@ -2,7 +2,6 @@
 #include "Utils.h"
 #include "ConfigurationMode.h"
 #include "SensorMode.h"
-#include "OtherTheAirMode.h"
 #include "MyEeprom.h"
 
 bool wasButtonPressed;
@@ -43,10 +42,6 @@ void setup()
     {
         configurationSetup();
     }
-    else if (resetFlag == OTA_FLAG)
-    {
-        otaSetup();
-    }
     else
     {
         serialPrintf("Unknown reset flag, resetting\n");
@@ -63,9 +58,5 @@ void loop()
     else if (resetFlag == CONFIGURATION_FLAG)
     {
         configurationLoop();
-    }
-    else if (resetFlag == OTA_FLAG)
-    {
-        otaLoop();
     }
 }
