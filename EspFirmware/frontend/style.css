@@ -266,3 +266,20 @@ body {
   right: 0;
   font-size: 0.5rem;
 }
+
+.reboot {
+  display: flex;
+  flex-direction: column;
+}
+
+.reboot__reboot {
+  margin-left: auto;
+}
+
+.reboot__text {
+  margin-top: 0.75rem;
+}
+
+.reboot__error {
+  color: var(--error);
+}
