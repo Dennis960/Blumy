@@ -85,6 +85,10 @@ function onPageNavigate(page) {
   pageNavigationListeners.forEach((callback) => callback(page));
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  gotoPage(1);
+});
+
 /* navigation API */
 function gotoPage(page) {
   app.setAttribute("data-current", page);
@@ -104,7 +108,8 @@ function nextPage() {
 /* stepper component */
 document.getElementById("stepper").addEventListener("click", (e) => {
   const targetPage = parseInt(e.target.getAttribute("data-step"));
-  if (targetPage && targetPage < getCurrentPage()) {
+  const currentPage = parseInt(app.getAttribute("data-current"));
+  if (targetPage && targetPage < currentPage) {
     gotoPage(targetPage);
   }
 });
