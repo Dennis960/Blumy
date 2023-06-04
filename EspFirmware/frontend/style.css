@@ -71,13 +71,13 @@ body {
   font-size: 1.5rem;
 }
 
-.app--loading {
+.loading .app__header {
   position: relative;
 }
 
-.app--loading:before {
+.loading .app__header:before {
   position: absolute;
-  top: 4.75rem;
+  bottom: -0.25rem;
   left: 0;
   background-color: var(--secondary-light);
   height: 0.25rem;
