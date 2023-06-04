@@ -57,6 +57,22 @@ async function getNearbyNetworks() {
   return await res.json();
 }
 
+async function submitReboot() {
+  const res = await fetchWithProgress(`/reset`, {
+    method: "POST",
+  });
+
+  if (!res.ok) {
+    return {
+      error: "Error rebooting: " + res.statusText,
+    };
+  } else {
+    return {
+      error: null,
+    };
+  }
+}
+
 /* fetch loading state indicator */
 const fetch = new Proxy(window.fetch, {
   apply: async (target, thisArg, args) => {
@@ -207,6 +223,20 @@ document.getElementById("mqtt-form").addEventListener("submit", async (e) => {
   }
 
   nextPage();
+});
+
+document.getElementById("reboot-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const res = await submitReboot();
+  const errorEl = document.getElementById("reboot-error");
+  if (res.error) {
+    errorEl.innerText = e.error;
+    errorEl.style.display = "";
+    return;
+  }
+
+  gotoPage(1);
 });
 
 /* password input toggle */
