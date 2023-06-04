@@ -58,7 +58,7 @@ async function getNearbyNetworks() {
 }
 
 async function submitReboot() {
-  const res = await fetchWithProgress(`/reset`, {
+  const res = await fetch(`/reset`, {
     method: "POST",
   });
 
@@ -84,11 +84,11 @@ const fetch = new Proxy(window.fetch, {
 });
 
 function startLoading() {
-  app.classList.add("app--loading");
+  app.classList.add("loading");
 }
 
 function stopLoading() {
-  app.classList.remove("app--loading");
+  app.classList.remove("loading");
 }
 
 /* navigation state event bus */
@@ -311,13 +311,22 @@ hookOnPageNavigate((page) => {
   }
 });
 
-// fetch /isConnected every 3 seconds
-setInterval(async () => {
+/* online status */
+async function updateOnlineStatus() {
   const res = await fetch("/isConnected");
   const data = await res.json();
-  console.log(data);
+  const onlineStatusEl = document.getElementById("status-online");
+  const offlineStatusEl = document.getElementById("status-offline");
   if (data === 1) {
-    // redirect to home page
-    window.location.href = "/";
+    onlineStatusEl.style.display = "";
+    offlineStatusEl.style.display = "none";
+  } else {
+    onlineStatusEl.style.display = "none";
+    offlineStatusEl.style.display = "";
   }
-}, 3000);
+}
+hookOnPageNavigate((page) => {
+  if (page == 2) {
+    updateOnlineStatus();
+  }
+});

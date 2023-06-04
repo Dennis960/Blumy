@@ -23,13 +23,17 @@
       </ol>
     </nav>
 
-    <main data-page="1" class="app__shell">
+    <main data-page="1" class="app__shell" style="display: none;">
       <h2 class="app__heading">1. Welcome</h2>
       <form class="status" id="status-form">
-        <p class="status__text">
+        <p id="status-offline" class="status__text">
           PlantFi is currently
-          <span id="status" class="status__message">offline</span>. Start the
+          <span class="status__message">offline</span>. Start the
           setup to connect it to a WiFi network.
+        </p>
+        <p id="status-online" class="status__text" style="display: none;">
+          PlantFi is currently
+          <span class="status__message">online</span>.
         </p>
         <button class="status__start button button--secondary" type="submit">
           Start Setup
