@@ -294,6 +294,7 @@ void handlePostUpdate(AsyncWebServerRequest *request, const String &filename, si
     lastUpdatePost = millis();
     if (index == 0)
     {
+        LittleFS.end();
         if (Update.isRunning())
         {
             Update.end();
@@ -307,7 +308,7 @@ void handlePostUpdate(AsyncWebServerRequest *request, const String &filename, si
         Update.runAsync(true);
         if (!Update.begin(content_len, cmd))
         {
-            serialPrintf("Update.begin failed! %s\n", Update.getErrorString());
+            Update.printError(Serial);
             ledOn();
         }
     }
@@ -316,7 +317,7 @@ void handlePostUpdate(AsyncWebServerRequest *request, const String &filename, si
     {
         if (Update.hasError())
         {
-            serialPrintf("Update.write failed! %s\n", Update.getErrorString());
+            Update.printError(Serial);
             ledOn();
         }
     }
@@ -333,7 +334,7 @@ void handlePostUpdate(AsyncWebServerRequest *request, const String &filename, si
         request->send(response);
         if (!Update.end(true))
         {
-            serialPrintf("Update.end failed! %s\n", Update.getErrorString());
+            Update.printError(Serial);
             ledOn();
         }
         else
