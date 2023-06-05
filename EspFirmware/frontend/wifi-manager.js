@@ -57,6 +57,22 @@ async function getNearbyNetworks() {
   return await res.json();
 }
 
+async function submitReboot() {
+  const res = await fetch(`/reset`, {
+    method: "POST",
+  });
+
+  if (!res.ok) {
+    return {
+      error: "Error rebooting: " + res.statusText,
+    };
+  } else {
+    return {
+      error: null,
+    };
+  }
+}
+
 /* fetch loading state indicator */
 const fetch = new Proxy(window.fetch, {
   apply: async (target, thisArg, args) => {
@@ -68,11 +84,11 @@ const fetch = new Proxy(window.fetch, {
 });
 
 function startLoading() {
-  app.classList.add("app--loading");
+  app.classList.add("loading");
 }
 
 function stopLoading() {
-  app.classList.remove("app--loading");
+  app.classList.remove("loading");
 }
 
 /* navigation state event bus */
@@ -84,6 +100,10 @@ function hookOnPageNavigate(callback) {
 function onPageNavigate(page) {
   pageNavigationListeners.forEach((callback) => callback(page));
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  gotoPage(1);
+});
 
 /* navigation API */
 function gotoPage(page) {
@@ -104,7 +124,8 @@ function nextPage() {
 /* stepper component */
 document.getElementById("stepper").addEventListener("click", (e) => {
   const targetPage = parseInt(e.target.getAttribute("data-step"));
-  if (targetPage && targetPage < getCurrentPage()) {
+  const currentPage = parseInt(app.getAttribute("data-current"));
+  if (targetPage && targetPage < currentPage) {
     gotoPage(targetPage);
   }
 });
@@ -204,6 +225,20 @@ document.getElementById("mqtt-form").addEventListener("submit", async (e) => {
   nextPage();
 });
 
+document.getElementById("reboot-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const res = await submitReboot();
+  const errorEl = document.getElementById("reboot-error");
+  if (res.error) {
+    errorEl.innerText = e.error;
+    errorEl.style.display = "";
+    return;
+  }
+
+  gotoPage(1);
+});
+
 /* password input toggle */
 for (const node of document.getElementsByClassName("password-visibility")) {
   node.addEventListener("click", (e) => {
@@ -276,13 +311,22 @@ hookOnPageNavigate((page) => {
   }
 });
 
-// fetch /isConnected every 3 seconds
-setInterval(async () => {
+/* online status */
+async function updateOnlineStatus() {
   const res = await fetch("/isConnected");
   const data = await res.json();
-  console.log(data);
+  const onlineStatusEl = document.getElementById("status-online");
+  const offlineStatusEl = document.getElementById("status-offline");
   if (data === 1) {
-    // redirect to home page
-    window.location.href = "/";
+    onlineStatusEl.style.display = "";
+    offlineStatusEl.style.display = "none";
+  } else {
+    onlineStatusEl.style.display = "none";
+    offlineStatusEl.style.display = "";
   }
-}, 3000);
+}
+hookOnPageNavigate((page) => {
+  if (page == 2) {
+    updateOnlineStatus();
+  }
+});

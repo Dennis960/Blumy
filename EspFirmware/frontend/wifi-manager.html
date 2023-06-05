@@ -15,21 +15,25 @@
 
     <nav class="app__stepper">
       <ol class="stepper" id="stepper">
-        <li class="stepper__item active" data-step="1"></li>
-        <li class="stepper__item" data-step="2"></li>
-        <li class="stepper__item" data-step="3"></li>
-        <li class="stepper__item" data-step="4"></li>
-        <li class="stepper__item" data-step="5"></li>
+        <li><button class="stepper__item" data-step="1"></button></li>
+        <li><button class="stepper__item" data-step="2"></button></li>
+        <li><button class="stepper__item" data-step="3"></button></li>
+        <li><button class="stepper__item" data-step="4"></button></li>
+        <li><button class="stepper__item" data-step="5"></button></li>
       </ol>
     </nav>
 
-    <main data-page="1" class="app__shell">
+    <main data-page="1" class="app__shell" style="display: none;">
       <h2 class="app__heading">1. Welcome</h2>
       <form class="status" id="status-form">
-        <p class="status__text">
+        <p id="status-offline" class="status__text">
           PlantFi is currently
-          <span id="status" class="status__message">offline</span>. Start the
+          <span class="status__message">offline</span>. Start the
           setup to connect it to a WiFi network.
+        </p>
+        <p id="status-online" class="status__text" style="display: none;">
+          PlantFi is currently
+          <span class="status__message">online</span>.
         </p>
         <button class="status__start button button--secondary" type="submit">
           Start Setup
@@ -199,8 +203,21 @@
     </main>
 
     <main data-page="5" class="app__shell" style="display: none">
-      <h2 class="app__heading">4. Setup Complete!</h2>
-      <p>Please wait while PlantFi reboots.</p>
+      <h2 class="app__heading">5. Setup Complete!</h2>
+      <form class="reboot" id="reboot-form">
+        <p class="reboot__text">
+          Setup complete.
+          To re-enter setup mode after reboot, press the button on the device.
+        </p>
+        <p
+          class="reboot__error"
+          id="reboot-error"
+          style="display: none"
+        ></p>
+        <button class="reboot__reboot button button--secondary" type="submit">
+          Reboot
+        </button>
+      </form>
     </main>
 
     <script src="./wifi-manager.js" type="module"></script>
