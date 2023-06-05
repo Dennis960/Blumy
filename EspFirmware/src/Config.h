@@ -38,6 +38,12 @@ const unsigned long WIFI_TIMEOUT = 7000;
  */
 const unsigned long TOTAL_TIMEOUT = 10000;
 
+/**
+ * The timeout for ota updates.
+ * If the update process takes longer than this timeout, the update gets cancelled.
+*/
+const unsigned long UPDATE_TIMEOUT = 10000;
+
 //----------------- Reset flags -----------------
 /**
  * The flag to indicate that the esp should reset into sensor mode

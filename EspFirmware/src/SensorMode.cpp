@@ -11,7 +11,7 @@ void sensorSetup()
     if (!isWifiChecksumValid())
     {
         serialPrintf("EEPROM Wifi not valid, starting configuration mode\n");
-        startConfigurationMode();
+        reset(CONFIGURATION_FLAG);
     }
 
     String ssid;
@@ -27,7 +27,9 @@ void sensorSetup()
     if (isMqttChecksumValid())
     {
         loadMqttCredentials(mqttServer, mqttPort, mqttUser, mqttPassword);
-    } else {
+    }
+    else
+    {
         serialPrintf("EEPROM MQTT not valid, using defaults\n");
         // use defaults
         mqttServer = "schneefux.xyz";
