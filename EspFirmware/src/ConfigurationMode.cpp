@@ -1,11 +1,9 @@
 #include "ConfigurationMode.h"
-#include <AsyncElegantOTA.h>
 
 AsyncWebServer server(80);
 DNSServer dnsServer;
 String networksJson = "";
-IPAddress apIP(192, 168, 4, 1); // Captive portal only works with non private ip addresses such as 8.8.4.4 (google dns)
-                                // Loading index.html only works with private ip addresses such as 192.168.4.1
+IPAddress apIP(192, 168, 4, 1);
 IPAddress mask(255, 255, 255, 0);
 
 bool shouldConnectToWifi = false;
@@ -16,6 +14,11 @@ unsigned long wifiScanInterval = 3000;
 unsigned long lastWifiScan = -wifiScanInterval; // force a scan on first run
 
 bool shouldReset = false;
+
+size_t content_len = 1;
+
+unsigned long lastUpdatePost = -1;
+bool isLedOn = true;
 
 class CaptiveRequestHandler : public AsyncWebHandler
 {
@@ -37,17 +40,8 @@ public:
 
 void configurationSetup()
 {
-    uint32_t resetFlag = loadResetFlag();
-    if (resetFlag == CONFIGURATION_FLAG)
-    {
-        serialPrintf("Double reset detected, resetting\n");
-        reset(SENSOR_FLAG);
-    }
-    saveResetFlag(CONFIGURATION_FLAG);
-
     serialPrintf("Enabling led\n");
-    pinMode(RESET_INPUT_PIN, OUTPUT);
-    analogWrite(RESET_INPUT_PIN, 60);
+    ledOn();
 
     // start the filesystem
     serialPrintf("Starting filesystem\n");
@@ -74,8 +68,13 @@ void configurationSetup()
     server.on("/mqttSetup", HTTP_POST, handlePostMqttSetup);
     server.on("/sensorId", HTTP_POST, handlePostSensorId);
 
-    // Add OTA
-    AsyncElegantOTA.begin(&server);
+    // OTA
+    server.on("/update", HTTP_GET, handleGetUpdate);
+    server.on(
+        "/update", HTTP_POST, [](AsyncWebServerRequest *request) {},
+        [](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data,
+           size_t len, bool final)
+        { handlePostUpdate(request, filename, index, data, len, final); });
 
     // Send files from LittleFS
     server.serveStatic("/", LittleFS, "/");
@@ -130,12 +129,18 @@ void configurationLoop()
         lastWifiScan = millis();
         scanNetworks();
     }
+
+    // ota timeout
+    if (Update.isRunning() && millis() - lastUpdatePost > UPDATE_TIMEOUT)
+    {
+        serialPrintf("No upload received in the last %lu milliseconds. Cancelling update\n", UPDATE_TIMEOUT);
+        Update.end();
+    }
 }
 
 void handleGetNotFound(AsyncWebServerRequest *request)
 {
-    request->send(200, "text/plain", "Not found");
-    // request->send(LittleFS, "/404.html", "text/html");
+    request->redirect("/");
 }
 
 void handlePostConnect(AsyncWebServerRequest *request)
@@ -262,4 +267,80 @@ void handlePostSensorId(AsyncWebServerRequest *request)
 void handleGetSensorId(AsyncWebServerRequest *request)
 {
     request->send(200, "text/plain", String(loadSensorId()));
+}
+
+void handleGetUpdate(AsyncWebServerRequest *request)
+{
+    request->send(200, "text/html", "<form method='POST' action='/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>");
+}
+
+void handlePostUpdate(AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final)
+{
+    int updatePercentage = 100;
+    if (Update.size() != 0)
+    {
+        updatePercentage = (int)((Update.progress() * 100) / Update.size());
+    }
+    if (updatePercentage % 2 == 0 && isLedOn)
+    {
+        ledOff();
+        isLedOn = false;
+    }
+    else if (updatePercentage % 2 == 1 && !isLedOn)
+    {
+        ledOn();
+        isLedOn = true;
+    }
+    lastUpdatePost = millis();
+    if (index == 0)
+    {
+        if (Update.isRunning())
+        {
+            Update.end();
+            serialPrintf("Ending running update\n");
+        }
+        serialPrintf("Update Start: %s\n", filename.c_str());
+        content_len = request->contentLength();
+        // TODO here is the place where we can define whether to upload firmware or filesystem
+        int cmd = (filename.indexOf("fs") > -1) ? U_FS : U_FLASH;
+        serialPrintf("Updating: %s\n", cmd == U_FS ? "filesystem" : "flash");
+        Update.runAsync(true);
+        if (!Update.begin(content_len, cmd))
+        {
+            serialPrintf("Update.begin failed! %s\n", Update.getErrorString());
+            ledOn();
+        }
+    }
+
+    if (Update.write(data, len) != len)
+    {
+        if (Update.hasError())
+        {
+            serialPrintf("Update.write failed! %s\n", Update.getErrorString());
+            ledOn();
+        }
+    }
+    else
+    {
+        serialPrintf("Progress: %d%%\n", updatePercentage);
+    }
+
+    if (final)
+    {
+        AsyncWebServerResponse *response = request->beginResponse(302, "text/plain", "Please wait while the device reboots");
+        response->addHeader("Refresh", "20");
+        response->addHeader("Location", "/");
+        request->send(response);
+        if (!Update.end(true))
+        {
+            serialPrintf("Update.end failed! %s\n", Update.getErrorString());
+            ledOn();
+        }
+        else
+        {
+            serialPrintf("Update complete\n");
+            Serial.flush();
+            reset(CONFIGURATION_FLAG);
+        }
+    }
 }

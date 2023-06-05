@@ -40,8 +40,13 @@ uint32_t calculateCRC32(const uint8_t *data, size_t length);
 uint32_t calculateCRC32(const String &data, size_t length);
 
 /**
- * Starts the configuration mode by imitating pressing the reset button.
+ * Turns on the led.
  */
-void startConfigurationMode();
+void ledOn();
+
+/**
+ * Turns off the led.
+ */
+void ledOff();
 
 #endif

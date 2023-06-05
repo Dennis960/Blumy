@@ -69,11 +69,14 @@ uint32_t calculateCRC32(const String &data, size_t length)
     return calculateCRC32((const uint8_t *)data.c_str(), length);
 }
 
-void startConfigurationMode()
+void ledOn()
 {
-    serialPrintf("Starting configuration mode\n");
     pinMode(RESET_INPUT_PIN, OUTPUT);
-    digitalWrite(RESET_INPUT_PIN, HIGH);
-    delay(100);
-    ESP.restart();
+    analogWrite(RESET_INPUT_PIN, 60);
+}
+
+void ledOff()
+{
+    pinMode(RESET_INPUT_PIN, OUTPUT);
+    analogWrite(RESET_INPUT_PIN, 0);
 }

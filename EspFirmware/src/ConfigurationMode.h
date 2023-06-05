@@ -6,6 +6,7 @@
 #include <DNSServer.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
+#include <Updater.h>
 
 #include "Config.h"
 #include "Utils.h"
@@ -24,6 +25,7 @@ extern String ssid;
 extern String password;
 
 extern bool shouldReset;
+extern size_t content_len;
 
 /**
  * Setup function for the configuration mode
@@ -49,7 +51,7 @@ void reset(uint32_t resetFlag);
  */
 
 /**
- * Sends 404.html
+ * Triggers redirect to /
  */
 void handleGetNotFound(AsyncWebServerRequest *request);
 
@@ -107,5 +109,22 @@ void handlePostSensorId(AsyncWebServerRequest *request);
  * Sends text/plain response with the sensorId
  */
 void handleGetSensorId(AsyncWebServerRequest *request);
+
+/**
+ * Sends update.html
+*/
+void handleGetUpdate(AsyncWebServerRequest *request);
+
+/**
+ * Needs a file to upload
+ * Triggers the update process
+ * Sends text/plain response when done
+*/
+void handlePostUpdate(AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final);
+
+/**
+ * Prints the update progress to serial on esp32
+*/
+void printProgress(size_t prg, size_t sz);
 
 #endif

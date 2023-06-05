@@ -24,14 +24,17 @@ void setup()
     WiFi.mode(WIFI_OFF);
     delay(1);
 
+    resetFlag = loadResetFlag();
     if (wasButtonPressed)
     {
-        // button press should always result in configuration mode
-        resetFlag = CONFIGURATION_FLAG;
-    }
-    else
-    {
-        resetFlag = loadResetFlag();
+        if (resetFlag == SENSOR_FLAG) {
+            resetFlag = CONFIGURATION_FLAG;
+        } else if (resetFlag == CONFIGURATION_FLAG) {
+            serialPrintf("Double reset detected, setting to sensor mode\n");
+            resetFlag = SENSOR_FLAG;
+            ledOff();
+        }
+        saveResetFlag(resetFlag);
     }
     serialPrintf("Reset flag: %d\n", resetFlag);
     if (resetFlag == SENSOR_FLAG)
