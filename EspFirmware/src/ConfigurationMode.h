@@ -59,12 +59,18 @@ void handleGetNotFound(AsyncWebServerRequest *request);
 /**
  * Needs String ssid, String password
  * Triggers shouldConnectToWifi = true
- * Sends application/json response with "1"
+ * Sends application/json response with "OK"
  */
 void handlePostConnect(AsyncWebServerRequest *request);
 
 /**
  * Triggers shouldReset = true
+ * Needs resetFlag (Optional) to specify which mode to reset to
+ * Default mode is CONFIGURATION_FLAG
+ * Available modes:
+ * 0 : SENSOR_FLAG
+ * 1 : CONFIGURATION_FLAG
+ * Sends application/json response with "OK"
  */
 void handlePostReset(AsyncWebServerRequest *request);
 

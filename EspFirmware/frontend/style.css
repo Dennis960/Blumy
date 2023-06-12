@@ -169,6 +169,17 @@ body {
   font-weight: 800;
 }
 
+.firmware__progress {
+  grid-column: 1 / -1;
+  display: none;
+}
+
+.firmware__progress-bar {
+  width: 0%;
+  height: 0.25rem;
+  background-color: var(--primary-base);
+}
+
 .firmware__error {
   color: var(--error);
 }

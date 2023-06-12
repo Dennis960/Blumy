@@ -9,16 +9,41 @@ async function fetchOnlineStatus() {
   return data;
 }
 
-async function uploadFile(file, endpoint) {
+async function uploadFile(file, endpoint, progressBarId) {
   const formData = new FormData();
   formData.append("file", file);
 
-  const res = await fetch(endpoint, {
+  const progressBarEl = document.getElementById(progressBarId);
+  progressBarEl.style.width = "0%";
+  progressBarEl.parentElement.style.display = "block";
+
+  let uploadFinished = false;
+
+  async function showProgress() {
+    const res = await fetch(`/update/percentage`);
+    const progress = await res.json();
+    progressBarEl.style.width = `${progress}%`;
+    if (!uploadFinished) {
+      setTimeout(showProgress, 100);
+    }
+  }
+  showProgress();
+
+  let res = fetch(endpoint, {
     method: "POST",
     body: formData,
+  })
+  res.then((res) => {
+    uploadFinished = true;
+    return res;
+  }).catch((res) => {
+    uploadFinished = true;
+    return res;
   });
+  res = await res;
 
   if (!res.ok) {
+    progressBarEl.parentElement.style.display = "none";
     return {
       error: "Error uploading file: " + res.statusText,
     };
@@ -225,7 +250,7 @@ document
     const errorEl = document.getElementById("firmware-error");
     errorEl.style.display = "none";
     if (littleFsFile) {
-      const res = await uploadFile(littleFsFile, "/update/littlefs");
+      const res = await uploadFile(littleFsFile, "/update/littlefs", "littlefs-progress");
       if (res.error) {
         errorEl.innerText = e.error;
         errorEl.style.display = "";
@@ -234,7 +259,7 @@ document
       }
     }
     if (firmwareFile) {
-      const res = await uploadFile(firmwareFile, "/update/firmware");
+      const res = await uploadFile(firmwareFile, "/update/firmware", "firmware-progress");
       if (res.error) {
         errorEl.innerText = e.error;
         errorEl.style.display = "";
