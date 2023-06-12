@@ -15,7 +15,7 @@ unsigned long lastWifiScan = -wifiScanInterval; // force a scan on first run
 
 bool shouldReset = false;
 
-size_t content_len = 1;
+size_t contentLength = 1;
 
 unsigned long lastUpdatePost = -1;
 bool isLedOn = true;
@@ -301,12 +301,18 @@ void handlePostUpdate(AsyncWebServerRequest *request, const String &filename, si
             serialPrintf("Ending running update\n");
         }
         serialPrintf("Update Start: %s\n", filename.c_str());
-        content_len = request->contentLength();
+        contentLength = request->contentLength();
+        // TODO figure out why the content length is ~202 bit larger than the file size
+        uint32_t maxContentLength = FS_end - FS_start;
+        if (contentLength > maxContentLength)
+        {
+            contentLength = maxContentLength;
+        }
         // TODO here is the place where we can define whether to upload firmware or filesystem
         int cmd = (filename.indexOf("fs") > -1) ? U_FS : U_FLASH;
         serialPrintf("Updating: %s\n", cmd == U_FS ? "filesystem" : "flash");
         Update.runAsync(true);
-        if (!Update.begin(content_len, cmd))
+        if (!Update.begin(contentLength, cmd))
         {
             Update.printError(Serial);
             ledOn();
