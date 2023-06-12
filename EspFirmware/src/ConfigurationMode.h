@@ -25,7 +25,7 @@ extern String ssid;
 extern String password;
 
 extern bool shouldReset;
-extern size_t content_len;
+extern size_t contentLength;
 
 /**
  * Setup function for the configuration mode
