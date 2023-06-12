@@ -20,6 +20,8 @@ int updatePercentage = 0;
 unsigned long lastUpdatePost = -1;
 bool isLedOn = true;
 
+int resetFlag = CONFIGURATION_FLAG;
+
 class CaptiveRequestHandler : public AsyncWebHandler
 {
 public:
@@ -176,6 +178,10 @@ void handlePostConnect(AsyncWebServerRequest *request)
 void handlePostReset(AsyncWebServerRequest *request)
 {
     shouldReset = true;
+    if (request->hasParam("resetFlag", true))
+    {
+        resetFlag = request->getParam("resetFlag", true)->value().toInt();
+    }
     request->send(200, "text/plain", "OK");
 }
 
@@ -352,7 +358,6 @@ void handleUpdate(uint8_t *data, size_t len)
 
 void endUpdate(AsyncWebServerRequest *request, int cmd)
 {
-    request->send(200, "text/plain", "OK");
     if (!Update.end(true))
     {
         Update.printError(Serial);
@@ -366,10 +371,8 @@ void endUpdate(AsyncWebServerRequest *request, int cmd)
     {
         LittleFS.begin();
     }
-    else
-    {
-        reset(CONFIGURATION_FLAG);
-    }
+    updatePercentage = 100;
+    request->send(200, "text/plain", "OK");
 }
 
 void blinkUpdateLed()
