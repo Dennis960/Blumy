@@ -3,6 +3,32 @@ const debug = window.location.hostname === "localhost";
 const app = document.querySelector(".app");
 
 /* business logic */
+async function fetchOnlineStatus() {
+  const res = await fetch("/isConnected");
+  const data = await res.json();
+  return data;
+}
+
+async function uploadFirmware(file) {
+  const formData = new FormData();
+  formData.append("update", file);
+
+  const res = await fetch("/update", {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    return {
+      error: "Error uploading firmware: " + res.statusText,
+    };
+  } else {
+    return {
+      error: null,
+    };
+  }
+}
+
 async function submitCredentials(ssid, password) {
   const credentials = new URLSearchParams();
   credentials.append("ssid", ssid);
@@ -158,15 +184,70 @@ document.querySelectorAll(".back").forEach((el) => {
   });
 });
 
+document.querySelectorAll(".skip").forEach((el) => {
+  el.addEventListener("click", (e) => {
+    nextPage();
+  });
+});
+
 document.getElementById("status-form").addEventListener("submit", (e) => {
   e.preventDefault();
   nextPage();
 });
 
-document.getElementById("networks-form").addEventListener("submit", (e) => {
-  e.preventDefault();
-  nextPage();
-});
+document
+  .getElementById("firmware-form")
+  .addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const firmwareFile = e.target.firmware.files[0];
+    const littleFsFile = e.target.littlefs.files[0];
+    const files = [firmwareFile, littleFsFile].filter((f) => f);
+
+    if (files.length == 0) {
+      nextPage();
+      return;
+    }
+
+    function disableButtons() {
+      e.target.querySelectorAll("button").forEach((el) => {
+        el.disabled = true;
+      });
+    }
+
+    function enableButtons() {
+      e.target.querySelectorAll("button").forEach((el) => {
+        el.disabled = false;
+      });
+    }
+
+    disableButtons();
+
+    for (const file of files) {
+      const errorEl = document.getElementById("firmware-error");
+      errorEl.style.display = "none";
+
+      const res = await uploadFirmware(file);
+      if (res.error) {
+        errorEl.innerText = e.error;
+        errorEl.style.display = "";
+        enableButtons();
+        return;
+      }
+    }
+
+    errorEl.innerText =
+      "Firmware uploaded successfully. Rebooting. The site will refresh automatically.";
+    while (true) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      try {
+        // break when we can reach the device again
+        await getOnlineStatus();
+        break;
+      } catch (e) {}
+    }
+    window.location.reload();
+  });
 
 document
   .getElementById("credentials-form")
@@ -261,10 +342,10 @@ function renderNetwork(network) {
 
   const button = node.querySelector(".button");
   button.value = network.ssid;
-  button.addEventListener(
-    "click",
-    () => (document.getElementById("ssid").value = network.ssid)
-  );
+  button.addEventListener("click", () => {
+    document.getElementById("ssid").value = network.ssid;
+    nextPage();
+  });
 
   node.querySelector(".ssid").textContent = network.ssid;
   if (network.secure == 7) {
@@ -313,11 +394,10 @@ hookOnPageNavigate((page) => {
 
 /* online status */
 async function updateOnlineStatus() {
-  const res = await fetch("/isConnected");
-  const data = await res.json();
+  const onlineStatus = await fetchOnlineStatus();
   const onlineStatusEl = document.getElementById("status-online");
   const offlineStatusEl = document.getElementById("status-offline");
-  if (data === 1) {
+  if (onlineStatus === 1) {
     onlineStatusEl.style.display = "";
     offlineStatusEl.style.display = "none";
   } else {
