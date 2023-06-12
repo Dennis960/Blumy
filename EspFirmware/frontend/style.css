@@ -169,6 +169,10 @@ body {
   font-weight: 800;
 }
 
+.firmware__error {
+  color: var(--error);
+}
+
 .credentials {
   margin-top: 1.5rem;
 }

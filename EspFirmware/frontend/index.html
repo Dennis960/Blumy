@@ -1,47 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PlantFi</title>
-    </head>
-    <body>
-        <div id="status">
-            <h1>PlantFi</h1>
-            <p>PlantFi is currently <span id="status-text">offline</span>.</p>
-            <p id="manual-connect">
-                Click <a href="./wifi-manager.html">here</a> to manually connect
-                to a WiFi network.
-            </p>
-            <button id="reset" onclick="reset()">Reset</button>
-        </div>
-        <script>
-            // fetch /isConnected and redirect to wifi-manager if not connected
-            fetch("/isConnected")
-                .then((res) => res.json())
-                .then((data) => {
-                    console.log(data);
-                    if (data !== 3) {
-                        window.location.href = "./wifi-manager.html";
-                    } else if (data === 3) {
-                        document.getElementById("status-text").innerText =
-                            "online";
-                        document.getElementById(
-                            "manual-connect"
-                        ).style.display = "none";
-                    }
-                })
-                .catch((err) => {
-                    window.location.href = "./wifi-manager.html";
-                });
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PlantFi Configurator</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="app" data-current="1">
+    <header class="app__header">
+      <span class="app__icon" id="icon">&#127793;</span>
+      <h1 class="app__title">PlantFi</h1>
+    </header>
 
-            // post to /reset when reset button is pressed
-            function reset() {
-                fetch("/reset", {
-                    method: "POST",
-                });
-            }
-        </script>
-    </body>
+    <nav class="app__stepper">
+      <ol class="stepper" id="stepper">
+        <li><button class="stepper__item" data-step="1"></button></li>
+        <li><button class="stepper__item" data-step="2"></button></li>
+        <li><button class="stepper__item" data-step="3"></button></li>
+        <li><button class="stepper__item" data-step="4"></button></li>
+        <li><button class="stepper__item" data-step="5"></button></li>
+        <li><button class="stepper__item" data-step="6"></button></li>
+      </ol>
+    </nav>
+
+    <main data-page="1" class="app__shell" style="display: none">
+      <h2 class="app__heading">1. Welcome</h2>
+      <form class="status" id="status-form">
+        <p id="status-offline" class="status__text">
+          PlantFi is currently
+          <span class="status__message">offline</span>. Start the setup to
+          connect it to a WiFi network.
+        </p>
+        <p id="status-online" class="status__text" style="display: none">
+          PlantFi is currently
+          <span class="status__message">online</span>.
+        </p>
+        <button class="status__start button button--secondary" type="submit">
+          Start Setup
+        </button>
+      </form>
+    </main>
+
+    <main data-page="2" class="app__shell" style="display: none">
+      <h2 class="app__heading">2. Update Firmware</h2>
+      <form id="firmware-form">
+        <div class="firmware form">
+          <label class="firmware__label" for="littlefs">littlefs.bin</label>
+          <input
+            class="firmware__input input"
+            type="file"
+            name="littlefs"
+            id="littlefs"
+            placeholder="littlefs.bin"
+            accept=".bin"
+          />
+          <label class="firmware__label" for="firmware">firmware.bin</label>
+          <input
+            class="firmware__input input"
+            type="file"
+            name="firmware"
+            id="firmware"
+            placeholder="firmware.bin"
+            accept=".bin"
+          />
+          <p
+            class="firmware__error"
+            id="firmware-error"
+            style="display: none"
+          ></p>
+        </div>
+        <div class="app__nav">
+          <button class="button back" type="button">Back</button>
+          <button class="button" type="submit">Upload</button>
+          <button class="button skip button--secondary" type="button">
+            Skip
+          </button>
+        </div>
+      </form>
+    </main>
+
+    <main data-page="3" class="app__shell" style="display: none">
+      <h2 class="app__heading">3. Select WiFi Network</h2>
+      <div class="networks" id="networks-form">
+        <div class="networks">
+          <h3 class="networks__title">Available networks:</h3>
+          <button id="refresh-networks" class="networks__refresh button">
+            Refresh
+          </button>
+          <ul class="networks__list" id="networks-list"></ul>
+          <p
+            class="networks__error"
+            id="networks-error"
+            style="display: none"
+          ></p>
+        </div>
+        <div class="app__nav">
+          <button class="button back">Back</button>
+          <button class="button skip button--secondary">Enter Manually</button>
+        </div>
+      </div>
+    </main>
+
+    <template id="wifi-template">
+      <li class="networks__item">
+        <button
+          type="submit"
+          name="ssid"
+          value="{ssid}"
+          class="networks__button button"
+        >
+          <div class="wifi">
+            <div class="wifi__wave wave">
+              <div class="wifi__wave wave">
+                <div class="wifi__wave wave">
+                  <div class="wifi__wave wave"></div>
+                </div>
+              </div>
+            </div>
+            <span class="secure wifi__secure">🔒</span>
+          </div>
+          <span class="ssid">{ssid}</span>
+        </button>
+      </li>
+    </template>
+
+    <main data-page="4" class="app__shell" style="display: none">
+      <h2 class="app__heading">4. Enter WiFi Credentials</h2>
+      <form id="credentials-form">
+        <div class="credentials form">
+          <label class="credentials__label" for="ssid">SSID</label>
+          <input
+            class="credentials__input input"
+            type="text"
+            name="ssid"
+            id="ssid"
+            placeholder="SSID"
+            required
+          />
+          <label class="credentials__label" for="password">Password</label>
+          <div class="credentials__group">
+            <input
+              type="password"
+              class="credentials__input input"
+              id="credentials-password"
+              name="password"
+              placeholder="Password"
+            />
+            <button
+              class="credentials__icon password-visibility"
+              data-target="credentials-password"
+              type="button"
+            >
+              &#128065;
+            </button>
+          </div>
+          <p
+            class="credentials__error"
+            id="credentials-error"
+            style="display: none"
+          ></p>
+        </div>
+        <div class="app__nav">
+          <button class="button back" type="button">Back</button>
+          <button class="button button--secondary" type="submit">
+            Connect
+          </button>
+        </div>
+      </form>
+    </main>
+
+    <main data-page="5" class="app__shell" style="display: none">
+      <h2 class="app__heading">5. MQTT Configuration (optional)</h2>
+      <form id="mqtt-form">
+        <div class="mqtt form">
+          <label class="mqtt__label" for="mqtt-server">Server</label>
+          <input
+            class="mqtt__input input"
+            type="text"
+            name="server"
+            id="mqtt-server"
+            placeholder="example.test"
+          />
+          <label class="mqtt__label" for="mqtt-port">Port</label>
+          <input
+            class="mqtt__input input"
+            type="number"
+            name="port"
+            id="mqtt-port"
+            value="1883"
+          />
+          <label class="mqtt__label" for="mqtt-user">User</label>
+          <input
+            class="mqtt__input input"
+            type="text"
+            name="user"
+            id="mqtt-user"
+          />
+          <label class="mqtt__label" for="mqtt-password">Password</label>
+          <input
+            class="mqtt__input input"
+            type="text"
+            name="password"
+            id="mqtt-password"
+          />
+          <label class="mqtt__label" for="mqtt-topic">Topic</label>
+          <input
+            class="mqtt__input input"
+            type="text"
+            name="topic"
+            id="mqtt-topic"
+          />
+          <label class="mqtt__label nowrap" for="mqtt-clientid"
+            >Client-ID</label
+          >
+          <input
+            class="mqtt__input input"
+            type="text"
+            name="clientid"
+            id="mqtt-clientid"
+            value="plantfi"
+          />
+
+          <p
+            class="credentials__error"
+            id="mqtt-error"
+            style="display: none"
+          ></p>
+        </div>
+        <div class="app__nav">
+          <button class="button back" type="button">Back</button>
+          <button class="button button--secondary" type="submit">Save</button>
+        </div>
+      </form>
+    </main>
+
+    <main data-page="6" class="app__shell" style="display: none">
+      <h2 class="app__heading">6. Setup Complete!</h2>
+      <form class="reboot" id="reboot-form">
+        <p class="reboot__text">
+          Setup complete. To re-enter setup mode after reboot, press the button
+          on the device.
+        </p>
+        <p class="reboot__error" id="reboot-error" style="display: none"></p>
+        <button class="reboot__reboot button button--secondary" type="submit">
+          Reboot
+        </button>
+      </form>
+    </main>
+
+    <script src="./wifi-manager.js" type="module"></script>
+  </body>
 </html>
