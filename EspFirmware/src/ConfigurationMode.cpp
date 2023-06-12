@@ -15,7 +15,7 @@ unsigned long lastWifiScan = -wifiScanInterval; // force a scan on first run
 
 bool shouldReset = false;
 
-size_t contentLength = 1;
+int updatePercentage = 0;
 
 unsigned long lastUpdatePost = -1;
 bool isLedOn = true;
@@ -51,7 +51,7 @@ void configurationSetup()
     serialPrintf("Starting access point\n");
     WiFi.mode(WIFI_AP);
     WiFi.softAPConfig(apIP, apIP, mask);
-    WiFi.softAP(String(AP_SSID) + "#" + String(SENSOR_ID));
+    WiFi.softAP(String(AP_SSID));
     serialPrintf("Started access point at ip %s\n", WiFi.softAPIP().toString().c_str());
 
     // start the dns server
@@ -67,14 +67,20 @@ void configurationSetup()
     server.on("/isConnected", HTTP_GET, handleGetIsConnected);
     server.on("/mqttSetup", HTTP_POST, handlePostMqttSetup);
     server.on("/sensorId", HTTP_POST, handlePostSensorId);
+    server.on("/update/percentage", HTTP_GET, handleGetUpdatePercentage);
 
     // OTA
-    server.on("/update", HTTP_GET, handleGetUpdate);
+    server.on("/update/rescue", HTTP_GET, handleGetUpdateRescue);
     server.on(
-        "/update", HTTP_POST, [](AsyncWebServerRequest *request) {},
+        "/update/firmware", HTTP_POST, [](AsyncWebServerRequest *request) {},
         [](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data,
            size_t len, bool final)
-        { handlePostUpdate(request, filename, index, data, len, final); });
+        { handlePostUpdate(request, filename, index, data, len, final, U_FLASH); });
+    server.on(
+        "/update/littlefs", HTTP_POST, [](AsyncWebServerRequest *request) {},
+        [](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data,
+           size_t len, bool final)
+        { handlePostUpdate(request, filename, index, data, len, final, U_FS); });
 
     // Send files from LittleFS
     server.serveStatic("/", LittleFS, "/");
@@ -101,40 +107,43 @@ void configurationSetup()
 
 void configurationLoop()
 {
-    dnsServer.processNextRequest(); // used for auto-redirecting to captive portal
-
-    if (shouldConnectToWifi)
+    if (!Update.isRunning())
     {
-        if (WiFi.status() == WL_CONNECTED)
+        dnsServer.processNextRequest(); // used for auto-redirecting to captive portal
+
+        if (shouldConnectToWifi)
         {
-            serialPrintf("Connected to wifi %s\n", ssid.c_str());
-            shouldConnectToWifi = false;
-            saveWiFiCredentials(ssid, password);
+            if (WiFi.status() == WL_CONNECTED)
+            {
+                serialPrintf("Connected to wifi %s\n", ssid.c_str());
+                shouldConnectToWifi = false;
+                saveWiFiCredentials(ssid, password);
+            }
+            else if (WiFi.status() == WL_CONNECT_FAILED || WiFi.status() == WL_NO_SSID_AVAIL)
+            {
+                serialPrintf("Failed to connect to wifi %s\n", ssid.c_str());
+                shouldConnectToWifi = false;
+            }
         }
-        else if (WiFi.status() == WL_CONNECT_FAILED || WiFi.status() == WL_NO_SSID_AVAIL)
+
+        if (shouldReset)
         {
-            serialPrintf("Failed to connect to wifi %s\n", ssid.c_str());
-            shouldConnectToWifi = false;
+            reset(SENSOR_FLAG);
+        }
+
+        // scan wifi networks every 3 seconds
+        if (millis() - lastWifiScan > wifiScanInterval)
+        {
+            lastWifiScan = millis();
+            scanNetworks();
         }
     }
-
-    if (shouldReset)
-    {
-        reset(SENSOR_FLAG);
-    }
-
-    // scan wifi networks every 3 seconds
-    if (millis() - lastWifiScan > wifiScanInterval)
-    {
-        lastWifiScan = millis();
-        scanNetworks();
-    }
-
     // ota timeout
-    if (Update.isRunning() && millis() - lastUpdatePost > UPDATE_TIMEOUT)
+    else if (millis() - lastUpdatePost > UPDATE_TIMEOUT)
     {
         serialPrintf("No upload received in the last %lu milliseconds. Cancelling update\n", UPDATE_TIMEOUT);
         Update.end();
+        ledOn();
     }
 }
 
@@ -269,18 +278,102 @@ void handleGetSensorId(AsyncWebServerRequest *request)
     request->send(200, "text/plain", String(loadSensorId()));
 }
 
-void handleGetUpdate(AsyncWebServerRequest *request)
+void handleGetUpdateRescue(AsyncWebServerRequest *request)
 {
-    request->send(200, "text/html", "<form method='POST' action='/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>");
+    request->send(200, "text/html", "<form method='POST' action='/update/firmware' enctype='multipart/form-data' style='margin-bottom: 10px;'><input type='file' name='update' style='padding: 5px; border: 1px solid #ccc; border-radius: 3px;'><input type='submit' value='Update firmware' style='padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;'></form><form method='POST' action='/update/littlefs' enctype='multipart/form-data' style='margin-bottom: 10px;'><input type='file' name='update' style='padding: 5px; border: 1px solid #ccc; border-radius: 3px;'><input type='submit' value='Update LittleFs' style='padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;'></form>");
 }
 
-void handlePostUpdate(AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final)
+void handleGetUpdatePercentage(AsyncWebServerRequest *request)
 {
-    int updatePercentage = 100;
+    request->send(200, "text/plain", String(updatePercentage));
+}
+
+void handlePostUpdate(AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final, int cmd)
+{
+    if (index == 0)
+    {
+        beginUpdate(request, filename, cmd);
+    }
+    handleUpdate(data, len);
+    if (final)
+    {
+        endUpdate(request, cmd);
+    }
+}
+
+void beginUpdate(AsyncWebServerRequest *request, const String &filename, int cmd)
+{
+    if (cmd == U_FS)
+    {
+        LittleFS.end();
+    }
+    if (Update.isRunning())
+    {
+        Update.end();
+        serialPrintf("Ending running update\n");
+    }
+    serialPrintf("Update for %s started with file: %s\n", cmd == U_FS ? "filesystem" : "flash", filename.c_str());
+    size_t contentLength = request->contentLength();
+    if (cmd == U_FS)
+    {
+        // TODO figure out why the content length is ~202 bit larger than the file size
+        uint32_t maxContentLength = FS_end - FS_start;
+        if (contentLength > maxContentLength)
+        {
+            contentLength = maxContentLength;
+        }
+    }
+    Update.runAsync(true);
+    if (!Update.begin(contentLength, cmd))
+    {
+        Update.printError(Serial);
+        ledOn();
+    }
+}
+
+void handleUpdate(uint8_t *data, size_t len)
+{
     if (Update.size() != 0)
     {
         updatePercentage = (int)((Update.progress() * 100) / Update.size());
     }
+    blinkUpdateLed();
+    lastUpdatePost = millis();
+    if (Update.write(data, len) != len && Update.hasError())
+    {
+        Update.printError(Serial);
+        ledOn();
+    }
+    else
+    {
+        serialPrintf("Progress: %d%%\n", updatePercentage);
+    }
+}
+
+void endUpdate(AsyncWebServerRequest *request, int cmd)
+{
+    request->send(200, "text/plain", "OK");
+    if (!Update.end(true))
+    {
+        Update.printError(Serial);
+        ledOn();
+        return;
+    }
+    serialPrintf("Update complete\n");
+    Serial.flush();
+
+    if (cmd == U_FS)
+    {
+        LittleFS.begin();
+    }
+    else
+    {
+        reset(CONFIGURATION_FLAG);
+    }
+}
+
+void blinkUpdateLed()
+{
     if (updatePercentage % 2 == 0 && isLedOn)
     {
         ledOff();
@@ -290,64 +383,5 @@ void handlePostUpdate(AsyncWebServerRequest *request, const String &filename, si
     {
         ledOn();
         isLedOn = true;
-    }
-    lastUpdatePost = millis();
-    if (index == 0)
-    {
-        LittleFS.end();
-        if (Update.isRunning())
-        {
-            Update.end();
-            serialPrintf("Ending running update\n");
-        }
-        serialPrintf("Update Start: %s\n", filename.c_str());
-        contentLength = request->contentLength();
-        // TODO figure out why the content length is ~202 bit larger than the file size
-        uint32_t maxContentLength = FS_end - FS_start;
-        if (contentLength > maxContentLength)
-        {
-            contentLength = maxContentLength;
-        }
-        // TODO here is the place where we can define whether to upload firmware or filesystem
-        int cmd = (filename.indexOf("fs") > -1) ? U_FS : U_FLASH;
-        serialPrintf("Updating: %s\n", cmd == U_FS ? "filesystem" : "flash");
-        Update.runAsync(true);
-        if (!Update.begin(contentLength, cmd))
-        {
-            Update.printError(Serial);
-            ledOn();
-        }
-    }
-
-    if (Update.write(data, len) != len)
-    {
-        if (Update.hasError())
-        {
-            Update.printError(Serial);
-            ledOn();
-        }
-    }
-    else
-    {
-        serialPrintf("Progress: %d%%\n", updatePercentage);
-    }
-
-    if (final)
-    {
-        AsyncWebServerResponse *response = request->beginResponse(302, "text/plain", "Please wait while the device reboots");
-        response->addHeader("Refresh", "20");
-        response->addHeader("Location", "/");
-        request->send(response);
-        if (!Update.end(true))
-        {
-            Update.printError(Serial);
-            ledOn();
-        }
-        else
-        {
-            serialPrintf("Update complete\n");
-            Serial.flush();
-            reset(CONFIGURATION_FLAG);
-        }
     }
 }

@@ -9,18 +9,18 @@ async function fetchOnlineStatus() {
   return data;
 }
 
-async function uploadFirmware(file) {
+async function uploadFile(file, endpoint) {
   const formData = new FormData();
-  formData.append("update", file);
+  formData.append("file", file);
 
-  const res = await fetch("/update", {
+  const res = await fetch(endpoint, {
     method: "POST",
     body: formData,
   });
 
   if (!res.ok) {
     return {
-      error: "Error uploading firmware: " + res.statusText,
+      error: "Error uploading file: " + res.statusText,
     };
   } else {
     return {
@@ -202,9 +202,8 @@ document
 
     const firmwareFile = e.target.firmware.files[0];
     const littleFsFile = e.target.littlefs.files[0];
-    const files = [firmwareFile, littleFsFile].filter((f) => f);
 
-    if (files.length == 0) {
+    if (!firmwareFile && !littleFsFile) {
       nextPage();
       return;
     }
@@ -223,11 +222,19 @@ document
 
     disableButtons();
 
-    for (const file of files) {
-      const errorEl = document.getElementById("firmware-error");
-      errorEl.style.display = "none";
-
-      const res = await uploadFirmware(file);
+    const errorEl = document.getElementById("firmware-error");
+    errorEl.style.display = "none";
+    if (littleFsFile) {
+      const res = await uploadFile(littleFsFile, "/update/littlefs");
+      if (res.error) {
+        errorEl.innerText = e.error;
+        errorEl.style.display = "";
+        enableButtons();
+        return;
+      }
+    }
+    if (firmwareFile) {
+      const res = await uploadFile(firmwareFile, "/update/firmware");
       if (res.error) {
         errorEl.innerText = e.error;
         errorEl.style.display = "";
@@ -242,7 +249,7 @@ document
       await new Promise((resolve) => setTimeout(resolve, 1000));
       try {
         // break when we can reach the device again
-        await getOnlineStatus();
+        await fetchOnlineStatus();
         break;
       } catch (e) {}
     }
