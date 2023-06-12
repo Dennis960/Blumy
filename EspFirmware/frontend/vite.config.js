@@ -6,7 +6,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: resolve(__dirname, "index.html"),
-        wifiManager: resolve(__dirname, "wifi-manager.html"),
       },
       output: {
         entryFileNames: "assets/[name].js",

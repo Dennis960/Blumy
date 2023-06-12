@@ -25,7 +25,8 @@ extern String ssid;
 extern String password;
 
 extern bool shouldReset;
-extern size_t contentLength;
+
+extern int updatePercentage;
 
 /**
  * Setup function for the configuration mode
@@ -113,18 +114,40 @@ void handleGetSensorId(AsyncWebServerRequest *request);
 /**
  * Sends update.html
 */
-void handleGetUpdate(AsyncWebServerRequest *request);
+void handleGetUpdateRescue(AsyncWebServerRequest *request);
+
+/**
+ * Sends the percentage of an update as integer between 0 and 100
+*/
+void handleGetUpdatePercentage(AsyncWebServerRequest *request);
 
 /**
  * Needs a file to upload
  * Triggers the update process
  * Sends text/plain response when done
+ * 
+ * cmd specifies the type of update (FLASH or FS)
 */
-void handlePostUpdate(AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final);
+void handlePostUpdate(AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final, int cmd);
 
 /**
- * Prints the update progress to serial on esp32
+ * Begins the update
 */
-void printProgress(size_t prg, size_t sz);
+void beginUpdate(AsyncWebServerRequest *request, const String &filename, int cmd);
+
+/**
+ * Handles the update
+*/
+void handleUpdate(uint8_t *data, size_t len);
+
+/**
+ * Ends the update
+*/
+void endUpdate(AsyncWebServerRequest *request, int cmd);
+
+/**
+ * Blinks the led when doing an update
+*/
+void blinkUpdateLed();
 
 #endif
