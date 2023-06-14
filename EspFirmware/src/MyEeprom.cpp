@@ -144,3 +144,19 @@ void loadMqttCredentials(String &mqttServer, int &mqttPort, String &mqttUser, St
     serialPrintf("MQTT port: %d\n", mqttPort);
     serialPrintf("MQTT user: %s\n", mqttUser.c_str());
 }
+
+void savePlantName(String plantName)
+{
+    serialPrintf("Saving plant name\n");
+    writeStringToEEPROM(PLANT_NAME_ADDRESS, plantName);
+}
+
+/**
+ * Load the plant name from the EEPROM
+ * @return The plant name
+ */
+String loadPlantName()
+{
+    serialPrintf("Loading plant name\n");
+    return readStringFromEEPROM(PLANT_NAME_ADDRESS);
+}

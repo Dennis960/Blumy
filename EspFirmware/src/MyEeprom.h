@@ -16,6 +16,7 @@
 #define MQTT_USER_ADDRESS 144     // char[32] (32 bytes) may overflow
 #define MQTT_PASSWORD_ADDRESS 176 // char[32] (32 bytes) may overflow
 #define MQTT_CHECKSUM_ADDRESS 208 // uint32_t (4 bytes) exact
+#define PLANT_NAME_ADDRESS 212    // char[32] (32 bytes) max
 
 #define EEPROM_SIZE 512
 
@@ -132,4 +133,15 @@ void saveMqttCredentials(String mqttServer, int mqttPort, String mqttUser, Strin
  */
 void loadMqttCredentials(String &mqttServer, int &mqttPort, String &mqttUser, String &mqttPassword);
 
+/**
+ * Save the plant name to the EEPROM
+ * @param plantName The plant name to save
+ */
+void savePlantName(String plantName);
+
+/**
+ * Load the plant name from the EEPROM
+ * @return The plant name
+ */
+String loadPlantName();
 #endif

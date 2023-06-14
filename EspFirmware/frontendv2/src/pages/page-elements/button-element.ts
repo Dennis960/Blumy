@@ -1,0 +1,33 @@
+import { css, html } from "lit";
+import { LitElement, customElement } from "lit-element";
+import { property } from "lit/decorators.js";
+import { classMap } from "lit/directives/class-map.js";
+
+@customElement("button-element")
+export class ButtonElement extends LitElement {
+    @property({ type: Boolean }) secondary: boolean;
+    @property({ type: String }) name: string;
+
+    static styles = [
+        css`
+            button {
+                border: 1px solid var(--grey);
+                border-radius: 0.25rem;
+                padding: 0.5rem 0.75rem;
+                margin: 0.25rem 0;
+                cursor: pointer;
+                font-size: 100%;
+            }
+            button.secondary {
+                background-color: var(--secondary-base);
+                color: var(--text-light);
+            }
+        `,
+    ];
+    render() {
+        const classes = {
+            secondary: this.secondary,
+        };
+        return html`<button class=${classMap(classes)}>${this.name}</button>`;
+    }
+}

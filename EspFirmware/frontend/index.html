@@ -43,7 +43,18 @@
     </main>
 
     <main data-page="2" class="app__shell" style="display: none">
-      <h2 class="app__heading">2. Update Firmware</h2>
+      <h2 class="app__heading">2. Choose a name for your plant</h2>
+      <div id="name-form">
+        <div class="app__nav">
+          <button class="button back">Back</button>
+          <button class="button skip button--secondary">Skip</button>
+          <button class="button submit button--secondary" type="submit">Submit</button>
+        </div>
+      </div>
+    </main>
+
+    <main data-page="3" class="app__shell" style="display: none">
+      <h2 class="app__heading">3. Update Firmware</h2>
       <form id="firmware-form">
         <div class="firmware form">
           <label class="firmware__label" for="littlefs">littlefs.bin</label>
@@ -86,8 +97,8 @@
       </form>
     </main>
 
-    <main data-page="3" class="app__shell" style="display: none">
-      <h2 class="app__heading">3. Select WiFi Network</h2>
+    <main data-page="4" class="app__shell" style="display: none">
+      <h2 class="app__heading">4. Select WiFi Network</h2>
       <div class="networks" id="networks-form">
         <div class="networks">
           <h3 class="networks__title">Available networks:</h3>
@@ -131,8 +142,8 @@
       </li>
     </template>
 
-    <main data-page="4" class="app__shell" style="display: none">
-      <h2 class="app__heading">4. Enter WiFi Credentials</h2>
+    <main data-page="5" class="app__shell" style="display: none">
+      <h2 class="app__heading">5. Enter WiFi Credentials</h2>
       <form id="credentials-form">
         <div class="credentials form">
           <label class="credentials__label" for="ssid">SSID</label>
@@ -176,8 +187,8 @@
       </form>
     </main>
 
-    <main data-page="5" class="app__shell" style="display: none">
-      <h2 class="app__heading">5. MQTT Configuration (optional)</h2>
+    <main data-page="6" class="app__shell" style="display: none">
+      <h2 class="app__heading">6. MQTT Configuration (optional)</h2>
       <form id="mqtt-form">
         <div class="mqtt form">
           <label class="mqtt__label" for="mqtt-server">Server</label>
@@ -241,8 +252,8 @@
       </form>
     </main>
 
-    <main data-page="6" class="app__shell" style="display: none">
-      <h2 class="app__heading">6. Setup Complete!</h2>
+    <main data-page="7" class="app__shell" style="display: none">
+      <h2 class="app__heading">7. Setup Complete!</h2>
       <form class="reboot" id="reboot-form">
         <p class="reboot__text">
           Setup complete. To re-enter setup mode after reboot, press the button
