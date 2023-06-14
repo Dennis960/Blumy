@@ -8,6 +8,7 @@ import "./page-elements/progress-bar-element";
 import "./page-elements/title-element";
 import "./page-elements/wifi-list-element";
 import "./page-elements/wifi-logo-element";
+import "./page-elements/input-element-grid";
 
 export class BasePage extends LitElement {
     /**

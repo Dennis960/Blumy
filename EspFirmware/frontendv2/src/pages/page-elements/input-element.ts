@@ -7,15 +7,9 @@ export class InputElement extends LitElement {
     static styles = [
         css`
             :host {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                column-gap: 1rem;
-                width: 100%;
-                margin-bottom: 0.75rem;
+                display: contents;
             }
             input {
-                flex-grow: 1;
                 border: 1px solid var(--grey);
                 border-radius: 0.25rem;
                 padding: 0.5rem;

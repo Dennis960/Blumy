@@ -16,6 +16,8 @@ import "./loader-bar-element";
 export class FirstSetupScreen extends LitElement {
     static styles = css`
         :host {
+            display: flex;
+            flex-direction: column;
             align-items: center;
             row-gap: 1rem;
             width: 100%;
