@@ -14,6 +14,7 @@ export enum WifiStatus {
     CONNECT_FAILED = 4,
     CONNECT_WRONG_PASSWORD = 6,
     DISCONNECTED = 7,
+    ERROR = 8,
 }
 
 async function postDataToEsp(url: string, params?: URLSearchParams) {
@@ -57,7 +58,11 @@ export async function resetEsp() {
 }
 
 export async function isEspConnected(): Promise<WifiStatus> {
-    return Number(await getDataFromEsp("/isConnected"));
+    const res = await getDataFromEsp("/isConnected");
+    if (res == null) {
+        return WifiStatus.ERROR;
+    }
+    return Number(res);
 }
 
 export async function setMqttCredentials(

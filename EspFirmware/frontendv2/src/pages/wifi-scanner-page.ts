@@ -11,21 +11,34 @@ export class WifiScannerPage extends BasePage {
     @state() errorText: string = "";
     @state() networks: Network[] = [];
 
+    async updateNetworks() {
+        const networks = await getNetworks();
+        if (networks === undefined || networks === null) {
+            this.errorText = "Error getting networks";
+            return;
+        }
+        this.networks = networks;
+    }
+
+    interval = setInterval(() => {
+        this.updateNetworks();
+    }, 5000);
+
     constructor() {
         super();
-        (async () => {
-            const networks = await getNetworks();
-            if (networks === undefined || networks === null) {
-                this.errorText = "Error getting networks";
-                return;
-            }
-            this.networks = networks;
-        })();
+        this.updateNetworks();
+        this.addEventListener("page-destroy", () => {});
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+
+        clearInterval(this.interval);
     }
 
     onNetworkClick(e: CustomEvent) {
-        const ssid = e.detail;
-        this.next({ssid: ssid});
+        const network: Network = e.detail;
+        this.next({network: network})
     }
 
     render() {
@@ -35,7 +48,10 @@ export class WifiScannerPage extends BasePage {
                 description="Available WiFi Networks:"
             ></description-element>
             <error-text-element text="${this.errorText}"></error-text-element>
-            <wifi-list-element .wifis="${this.networks}" @networkClick="${this.onNetworkClick}"></wifi-list-element>
+            <wifi-list-element
+                .wifis="${this.networks}"
+                @networkClick="${this.onNetworkClick}"
+            ></wifi-list-element>
             <button-nav-element>
                 <button-element
                     name="Back"

@@ -19,8 +19,8 @@ export class WifiListElement extends LitElement {
     ];
     @property({ type: Array }) wifis: Network[] = [];
 
-    onClick(ssid: string) {
-        this.dispatchEvent(new CustomEvent("networkClick", { detail: ssid }));
+    onClick(network: Network) {
+        this.dispatchEvent(new CustomEvent("networkClick", { detail: network }));
     }
 
     render() {
@@ -30,11 +30,10 @@ export class WifiListElement extends LitElement {
                     (wifi) => html`
                         <li>
                             <button-element
-                                @click="${() => this.onClick(wifi.ssid)}"
+                                @click="${() => this.onClick(wifi)}"
                             >
-                                <wifi-logo-element rssi="${wifi.rssi}" ?isSecure="${wifi.secure == 7}"></wifi-logo-element>
+                                <wifi-logo-element rssi="${wifi.rssi}" ?isSecure="${wifi.secure != 7}"></wifi-logo-element>
                                 <span>${wifi.ssid}</span>
-                                <span>${wifi.rssi}</span>
                             </button-element>
                         </li>
                     `
