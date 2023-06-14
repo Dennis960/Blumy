@@ -1,9 +1,22 @@
 import { Network } from "api";
-import { html, LitElement } from "lit";
+import { css, html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
 @customElement("wifi-list-element")
 export class WifiListElement extends LitElement {
+    static styles = [
+        css`
+            ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+                margin-bottom: 0.75rem;
+            }
+            button-element {
+                width: 100%;
+            }
+        `,
+    ];
     @property({ type: Array }) wifis: Network[] = [];
 
     onClick(ssid: string) {
@@ -13,15 +26,16 @@ export class WifiListElement extends LitElement {
     render() {
         return html`
             <ul>
-                ${this.wifis.map(
+                ${this.wifis.sort((a,b) => b.rssi - a.rssi).map(
                     (wifi) => html`
                         <li>
-                            <button @click="${() => this.onClick(wifi.ssid)}">
-                                <div class="wifi-icon"></div>
+                            <button-element
+                                @click="${() => this.onClick(wifi.ssid)}"
+                            >
+                                <wifi-logo-element rssi="${wifi.rssi}" ?isSecure="${wifi.secure == 7}"></wifi-logo-element>
                                 <span>${wifi.ssid}</span>
                                 <span>${wifi.rssi}</span>
-                            </button>
-                            ${wifi.secure == 7 ? html`<span>🔒</span>` : html``}
+                            </button-element>
                         </li>
                     `
                 )}
