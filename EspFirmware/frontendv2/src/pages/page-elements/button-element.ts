@@ -11,12 +11,14 @@ export class ButtonElement extends LitElement {
     static styles = [
         css`
             button {
+                width: 100%;
                 border: 1px solid var(--grey);
                 border-radius: 0.25rem;
                 padding: 0.5rem 0.75rem;
-                margin: 0.25rem 0;
+                margin: 0.5rem 0;
                 cursor: pointer;
                 font-size: 100%;
+                display: flex;
             }
             button.secondary {
                 background-color: var(--secondary-base);
@@ -28,6 +30,10 @@ export class ButtonElement extends LitElement {
         const classes = {
             secondary: this.secondary,
         };
-        return html`<button class=${classMap(classes)}>${this.name}</button>`;
+        return html`
+            <button class=${classMap(classes)}>
+                <slot></slot>${this.name}
+            </button>
+        `;
     }
 }

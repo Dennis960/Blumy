@@ -86,8 +86,25 @@ export class FirstSetupScreen extends LitElement {
         ];
     }
 
+    updated() {
+        // set url param page
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set("page", this.currentDot.toString());
+        window.history.replaceState(
+            {},
+            "",
+            `${window.location.pathname}?${urlParams}`
+        );
+    }
+
     constructor() {
         super();
+        // get url param page
+        const urlParams = new URLSearchParams(window.location.search);
+        const page = urlParams.get("page");
+        if (page) {
+            this.currentDot = parseInt(page);
+        }
         this.updatePageElements();
     }
 

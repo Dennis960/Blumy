@@ -4,9 +4,10 @@ import "./page-elements/button-nav-element";
 import "./page-elements/description-element";
 import "./page-elements/error-text-element";
 import "./page-elements/input-element";
-import "./page-elements/title-element";
 import "./page-elements/progress-bar-element";
+import "./page-elements/title-element";
 import "./page-elements/wifi-list-element";
+import "./page-elements/wifi-logo-element";
 
 export class BasePage extends LitElement {
     /**
