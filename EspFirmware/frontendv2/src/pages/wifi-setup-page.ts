@@ -1,5 +1,5 @@
 import { html } from "lit";
-import { customElement, query } from "lit";
+import { customElement, query } from "lit-element";
 import { property, state } from "lit/decorators.js";
 import { connectToNetwork, isEspConnected, WifiStatus } from "../api";
 import { BasePage } from "./base-page";
