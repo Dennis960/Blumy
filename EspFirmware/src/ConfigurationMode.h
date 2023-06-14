@@ -156,4 +156,10 @@ void endUpdate(AsyncWebServerRequest *request, int cmd);
 */
 void blinkUpdateLed();
 
+/**
+ * Needs String name
+ * Triggers saves the plantName to EEPROM
+ */
+void handlePostPlantName(AsyncWebServerRequest *request);
+
 #endif

@@ -70,6 +70,7 @@ void configurationSetup()
     server.on("/mqttSetup", HTTP_POST, handlePostMqttSetup);
     server.on("/sensorId", HTTP_POST, handlePostSensorId);
     server.on("/update/percentage", HTTP_GET, handleGetUpdatePercentage);
+    server.on("/plantName", HTTP_POST, handlePostPlantName);
 
     // OTA
     server.on("/update/rescue", HTTP_GET, handleGetUpdateRescue);
@@ -387,4 +388,20 @@ void blinkUpdateLed()
         ledOn();
         isLedOn = true;
     }
+}
+
+void handlePostPlantName(AsyncWebServerRequest *request)
+{
+    if (!request->hasParam("name", true))
+    {
+        request->send(400, "text/plain", "Bad request");
+        return;
+    }
+    AsyncWebParameter *newPlantName = request->getParam("plantName", true);
+
+    serialPrintf("Received plantName: %s\n", newPlantName->value().c_str());
+
+    savePlantName(newPlantName->value());
+
+    request->send(200, "text/plain", "OK");
 }
