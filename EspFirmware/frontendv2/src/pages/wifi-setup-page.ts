@@ -1,7 +1,7 @@
-import { connectToNetwork, isEspConnected, WifiStatus } from "../api";
 import { html } from "lit";
-import { customElement, query } from "lit-element";
+import { customElement, query } from "lit";
 import { property, state } from "lit/decorators.js";
+import { connectToNetwork, isEspConnected, WifiStatus } from "../api";
 import { BasePage } from "./base-page";
 
 @customElement("wifi-setup-page")
@@ -26,7 +26,7 @@ export class WifiSetupPage extends BasePage {
         }
         for (let i = 0; i < 10; i++) {
             const wifiStatus = await isEspConnected();
-            
+
             if (wifiStatus == WifiStatus.ERROR) {
                 this.errorText = "Error, device not responding";
                 return;
@@ -50,17 +50,19 @@ export class WifiSetupPage extends BasePage {
     render() {
         return html`
             <title-element title="Enter WiFi Credentials"></title-element>
-            <input-element
-                id="ssid"
-                type="text"
-                label="SSID"
-                value="${this.ssid}"
-            ></input-element>
-            <input-element
-                id="password"
-                type="password"
-                label="Password"
-            ></input-element>
+            <input-element-grid>
+                <input-element
+                    id="ssid"
+                    type="text"
+                    label="SSID"
+                    value="${this.ssid}"
+                ></input-element>
+                <input-element
+                    id="password"
+                    type="password"
+                    label="Password"
+                ></input-element>
+            </input-element-grid>
             <error-text-element text="${this.errorText}"></error-text-element>
             <button-nav-element>
                 <button-element

@@ -62,22 +62,30 @@ export class UpdatePage extends BasePage {
     render() {
         return html`
             <title-element title="Update Firmware"></title-element>
-            <input-element
-                id="littlefs"
-                label="littlefs.bin"
-                type="file"
-            ></input-element>
-            <progress-bar-element
-                progress="${this.littlefsProgress}"
-            ></progress-bar-element>
-            <input-element
-                id="firmware"
-                label="firmware.bin"
-                type="file"
-            ></input-element>
-            <progress-bar-element
-                progress="${this.firmwareProgress}"
-            ></progress-bar-element>
+            <input-element-grid>
+                <input-element
+                    id="littlefs"
+                    label="littlefs.bin"
+                    type="file"
+                ></input-element>
+                <progress-bar-element
+                    progress="${this.littlefsProgress}"
+                ></progress-bar-element>
+                <progress-bar-element
+                    progress="${this.littlefsProgress}"
+                ></progress-bar-element>
+                <input-element
+                    id="firmware"
+                    label="firmware.bin"
+                    type="file"
+                ></input-element>
+                <progress-bar-element
+                    progress="${this.firmwareProgress}"
+                ></progress-bar-element>
+                <progress-bar-element
+                    progress="${this.firmwareProgress}"
+                ></progress-bar-element>
+            </input-element-grid>
             <error-text-element text="${this.errorText}"></error-text-element>
             <button-nav-element>
                 <button-element
@@ -86,9 +94,9 @@ export class UpdatePage extends BasePage {
                     ?secondary="${false}"
                 ></button-element>
                 <button-element
-                name="Skip"
-                @click="${this.next}"
-                ?secondary="${true}"
+                    name="Skip"
+                    @click="${this.next}"
+                    ?secondary="${true}"
                 ></button-element>
                 <button-element
                     name="Upload"

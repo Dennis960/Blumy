@@ -15,7 +15,6 @@ export class ButtonElement extends LitElement {
                 border: 1px solid var(--grey);
                 border-radius: 0.25rem;
                 padding: 0.5rem 0.75rem;
-                margin: 0.5rem 0;
                 cursor: pointer;
                 font-size: 100%;
                 display: flex;
