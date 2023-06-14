@@ -19,6 +19,8 @@ export class ButtonElement extends LitElement {
                 cursor: pointer;
                 font-size: 100%;
                 display: flex;
+                align-items: center;
+                gap: 0.5rem;
             }
             button.secondary {
                 background-color: var(--secondary-base);

@@ -19,6 +19,7 @@ export class WifiLogoElement extends LitElement {
         css`
             :host {
                 position: relative;
+                transform: translateY(25%)
             }
             div {
                 border: 2px solid transparent;
