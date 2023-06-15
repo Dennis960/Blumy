@@ -43,6 +43,16 @@
         }),
         color: schemaProperty.color,
       },
+      {
+        name: "zero",
+        data: $dataStore.map((data) => {
+          return {
+            x: new Date(data.date || 0),
+            y: 0,
+          };
+        }),
+        color: "transparent",
+      },
     ];
     options = {
       ...defaultGraphOptions,
