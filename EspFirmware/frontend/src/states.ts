@@ -14,4 +14,10 @@ export const networkState = new CustomState<{
     isConnected: boolean;
 }>({} as any);
 
-export const loadingState = new CustomState<boolean>();
+/**
+ * numberOfLoaders specifies the number of things that are currently loading.
+ * If set to 0, nothing is loading
+ */
+export const loadingState = new CustomState<{ numberOfLoaders: number }>({
+    numberOfLoaders: 0,
+});

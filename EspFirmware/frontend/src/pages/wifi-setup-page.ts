@@ -47,9 +47,9 @@ export class WifiSetupPage extends BasePage {
             } else if (wifiStatus == WifiStatus.NO_SSID_AVAIL) {
                 this.errorText = "The specified SSID cannot be reached";
             } else {
-                loadingState.state = true;
+                loadingState.state.numberOfLoaders++;;
                 await new Promise((resolve) => setTimeout(resolve, 1000));
-                loadingState.state = false;
+                loadingState.state.numberOfLoaders--;
                 continue;
             }
             return;
