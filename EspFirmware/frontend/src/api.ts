@@ -18,6 +18,11 @@ export enum WifiStatus {
     ERROR = 8,
 }
 
+export enum ResetFlag {
+    SENSOR_FLAG = 0,
+    CONFIGURATION_FLAG = 1,
+}
+
 /* fetch loading state indicator */
 const fetch = new Proxy(window.fetch, {
     apply: async (target, thisArg, args) => {
@@ -68,8 +73,10 @@ export async function connectToNetwork(ssid: string, password: string) {
     return await postDataToEsp("/connect", params);
 }
 
-export async function resetEsp() {
-    return await postDataToEsp("/reset");
+export async function resetEsp(resetFlag: ResetFlag) {
+    const params = new URLSearchParams();
+    params.append("resetFlag", String(resetFlag));
+    return await postDataToEsp("/reset", params);
 }
 
 /**
