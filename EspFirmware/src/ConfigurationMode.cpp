@@ -14,6 +14,7 @@ unsigned long wifiScanInterval = 3000;
 unsigned long lastWifiScan = -wifiScanInterval; // force a scan on first run
 
 bool shouldReset = false;
+uint32_t targetResetFlag = 0;
 
 int updatePercentage = 0;
 
@@ -43,7 +44,7 @@ void configurationSetup()
     serialPrintf("Enabling led\n");
     ledOn();
 
-    resetFlag = CONFIGURATION_FLAG;
+    targetResetFlag = CONFIGURATION_FLAG;
 
     // start the filesystem
     serialPrintf("Starting filesystem\n");
@@ -136,7 +137,7 @@ void configurationLoop()
 
         if (shouldReset)
         {
-            reset(resetFlag);
+            reset(targetResetFlag);
         }
 
         // scan wifi networks every 3 seconds
@@ -186,7 +187,7 @@ void handlePostReset(AsyncWebServerRequest *request)
     shouldReset = true;
     if (request->hasParam("resetFlag", true))
     {
-        resetFlag = request->getParam("resetFlag", true)->value().toInt();
+        targetResetFlag = request->getParam("resetFlag", true)->value().toInt();
     }
     request->send(200, "text/plain", "OK");
 }
