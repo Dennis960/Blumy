@@ -1,4 +1,4 @@
-import { networkState } from '../states/network-state';
+import { networkState } from "../states/network-state";
 import { getNetworks, Network } from "../states/api";
 import { html } from "lit";
 import { customElement, state } from "lit-element";
@@ -40,15 +40,13 @@ export class WifiScannerPage extends BasePage {
     onNetworkClick(e: CustomEvent) {
         const network: Network = e.detail;
         networkState.network = network;
-        this.next()
+        this.next();
     }
 
     render() {
         return html`
-            <title-element title="Select WiFi Network"></title-element>
-            <description-element
-                description="Available WiFi Networks:"
-            ></description-element>
+            <title-element>Select WiFi Network</title-element>
+            <description-element>Available WiFi Networks</description-element>
             <error-text-element text="${this.errorText}"></error-text-element>
             <wifi-list-element
                 .wifis="${this.networks}"

@@ -1,4 +1,4 @@
-import { InputElement } from './page-elements/input-element';
+import { InputElement } from "./page-elements/input-element";
 import { html } from "lit";
 import { customElement, query, state } from "lit-element";
 import { setMqttCredentials } from "../states/api";
@@ -29,9 +29,7 @@ export class MqttPage extends BasePage {
 
     render() {
         return html`
-            <title-element
-                title="MQTT Configuration (optional)"
-            ></title-element>
+            <title-element>MQTT Configuration (optional)</title-element>
             <input-element-grid>
                 <input-element
                     id="server"

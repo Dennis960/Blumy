@@ -28,7 +28,7 @@ export class NamePage extends BasePage {
 
     render() {
         return html`
-            <title-element title="Choose a name for your plant"></title-element>
+            <title-element>Choose a name for your plant</title-element>
             <input-element-grid>
                 <input-element id="name" label="Plant Name"></input-element>
             </input-element-grid>

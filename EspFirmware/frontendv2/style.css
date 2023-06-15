@@ -10,6 +10,7 @@ body {
     --secondary-light: rgb(var(--secondary) / 0.9);
     --grey: #ddd;
     --error: #dd1111;
+    --success: #11dd11;
     --text: #333;
     --text-light: #fff;
 }
