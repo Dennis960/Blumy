@@ -419,7 +419,7 @@ void handleGetConnectedNetwork(AsyncWebServerRequest *request)
     connectedNetworkJson += "\"rssi\": \"" + String(WiFi.RSSI()) + "\",";
     connectedNetworkJson += "\"ssid\": \"" + WiFi.SSID() + "\",";
     connectedNetworkJson += "\"bssid\": \"" + WiFi.BSSIDstr() + "\",";
-    connectedNetworkJson += "\"channel\": \"" + String(WiFi.channel()) + "\",";
+    connectedNetworkJson += "\"channel\": \"" + String(WiFi.channel()) + "\"";
     connectedNetworkJson += "}";
     request->send(200, "text/plain", connectedNetworkJson);
 }
