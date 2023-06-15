@@ -1,3 +1,4 @@
+import { InputElement } from './page-elements/input-element';
 import { html } from "lit";
 import { customElement, query } from "lit-element";
 import { state } from "lit/decorators.js";
@@ -7,16 +8,16 @@ import { BasePage } from "./base-page";
 
 @customElement("wifi-setup-page")
 export class WifiSetupPage extends BasePage {
-    @query("#ssid") ssidElement: HTMLInputElement;
-    @query("#password") passwordElement: HTMLInputElement;
+    @query("#ssid") ssidElement: InputElement;
+    @query("#password") passwordElement: InputElement;
 
     @state() errorText: string = "";
 
     async connect() {
         this.errorText = "";
         const res = await connectToNetwork(
-            this.ssidElement.value,
-            this.passwordElement.value
+            this.ssidElement.input.value,
+            this.passwordElement.input.value
         );
         if (!res.ok) {
             this.errorText = "Error, device not responding";
@@ -59,7 +60,7 @@ export class WifiSetupPage extends BasePage {
                     id="ssid"
                     type="text"
                     label="SSID"
-                    value="${networkState.network?.ssid}"
+                    initialValue="${networkState.network?.ssid}"
                 ></input-element>
                 <input-element
                     id="password"
