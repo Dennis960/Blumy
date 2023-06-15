@@ -1,7 +1,7 @@
 import { html } from "lit";
 import { customElement, query, state } from "lit/decorators.js";
 import { connectToNetwork, isEspConnected, Network, WifiStatus } from "../api";
-import { networkState } from "../states";
+import { loadingState, networkState } from "../states";
 import { BasePage } from "./base-page";
 import { InputElement } from "./page-elements/input-element";
 
@@ -50,7 +50,9 @@ export class WifiSetupPage extends BasePage {
             } else if (wifiStatus == WifiStatus.NO_SSID_AVAIL) {
                 this.errorText = "The specified SSID cannot be reached";
             } else {
+                loadingState.state = true;
                 await new Promise((resolve) => setTimeout(resolve, 1000));
+                loadingState.state = false;
                 continue;
             }
             return;

@@ -23,7 +23,6 @@ export class WelcomePage extends BasePage {
     constructor() {
         super();
         (async () => {
-            loadingState.state = true;
             const wifiStatus = await isEspConnected();
             if (wifiStatus == WifiStatus.CONNECTED) {
                 const network = await getConnectedNetwork();
@@ -31,8 +30,6 @@ export class WelcomePage extends BasePage {
                     isConnected: true,
                     network: network,
                 };
-            } else {
-                loadingState.state = false;
             }
         })();
     }
