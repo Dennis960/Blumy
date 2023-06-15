@@ -11,6 +11,7 @@
 #include "Config.h"
 #include "Utils.h"
 #include "MyEeprom.h"
+#include "Reset.h"
 
 #define AP_SSID "PlantFi"
 
@@ -161,5 +162,15 @@ void blinkUpdateLed();
  * Triggers saves the plantName to EEPROM
  */
 void handlePostPlantName(AsyncWebServerRequest *request);
+
+/**
+ * Sends text/plain response with the plantName
+ */
+void handleGetPlantName(AsyncWebServerRequest *request);
+
+/**
+ * Sends text/plain response with the currently connected network
+ */
+void handleGetConnectedNetwork(AsyncWebServerRequest *request);
 
 #endif

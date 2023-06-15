@@ -15,7 +15,7 @@ export class MqttPage extends BasePage {
     @query("#client-id") clientIdInput: InputElement;
     @state() errorText: string = "";
 
-    async connect() {
+    async submit() {
         const res = await setMqttCredentials(
             this.serverInput.input.value,
             this.portInput.input.value,
@@ -76,8 +76,8 @@ export class MqttPage extends BasePage {
                     ?secondary="${true}"
                 ></button-element>
                 <button-element
-                    name="Connect"
-                    @click="${this.connect}"
+                    name="Submit"
+                    @click="${this.submit}"
                     ?secondary="${true}"
                 ></button-element>
             </button-nav-element>

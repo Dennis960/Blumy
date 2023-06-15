@@ -20,8 +20,6 @@ int updatePercentage = 0;
 unsigned long lastUpdatePost = -1;
 bool isLedOn = true;
 
-int resetFlag = CONFIGURATION_FLAG;
-
 class CaptiveRequestHandler : public AsyncWebHandler
 {
 public:
@@ -44,6 +42,8 @@ void configurationSetup()
 {
     serialPrintf("Enabling led\n");
     ledOn();
+
+    resetFlag = CONFIGURATION_FLAG;
 
     // start the filesystem
     serialPrintf("Starting filesystem\n");
@@ -71,6 +71,8 @@ void configurationSetup()
     server.on("/sensorId", HTTP_POST, handlePostSensorId);
     server.on("/update/percentage", HTTP_GET, handleGetUpdatePercentage);
     server.on("/plantName", HTTP_POST, handlePostPlantName);
+    server.on("/plantName", HTTP_GET, handleGetPlantName);
+    server.on("/connectedNetwork", HTTP_GET, handleGetConnectedNetwork);
 
     // OTA
     server.on("/update/rescue", HTTP_GET, handleGetUpdateRescue);
@@ -131,7 +133,7 @@ void configurationLoop()
 
         if (shouldReset)
         {
-            reset(SENSOR_FLAG);
+            reset(resetFlag);
         }
 
         // scan wifi networks every 3 seconds
@@ -397,11 +399,27 @@ void handlePostPlantName(AsyncWebServerRequest *request)
         request->send(400, "text/plain", "Bad request");
         return;
     }
-    AsyncWebParameter *newPlantName = request->getParam("plantName", true);
+    AsyncWebParameter *newPlantName = request->getParam("name", true);
 
     serialPrintf("Received plantName: %s\n", newPlantName->value().c_str());
 
     savePlantName(newPlantName->value());
 
     request->send(200, "text/plain", "OK");
+}
+
+void handleGetPlantName(AsyncWebServerRequest *request)
+{
+    request->send(200, "text/plain", loadPlantName());
+}
+
+void handleGetConnectedNetwork(AsyncWebServerRequest *request)
+{
+    String connectedNetworkJson = "{";
+    connectedNetworkJson += "\"rssi\": \"" + String(WiFi.RSSI()) + "\",";
+    connectedNetworkJson += "\"ssid\": \"" + WiFi.SSID() + "\",";
+    connectedNetworkJson += "\"bssid\": \"" + WiFi.BSSIDstr() + "\",";
+    connectedNetworkJson += "\"channel\": \"" + String(WiFi.channel()) + "\",";
+    connectedNetworkJson += "}";
+    request->send(200, "text/plain", connectedNetworkJson);
 }
