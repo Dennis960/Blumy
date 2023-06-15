@@ -1,19 +1,18 @@
 import { css, html } from "lit";
-import { LitElement, customElement } from "lit-element";
-import { property } from "lit/decorators.js";
+import { customElement, LitElement } from "lit-element";
 
 @customElement("title-element")
 export class TitleElement extends LitElement {
-    @property({ type: String }) title: string;
     static styles = [
         css`
-            .title {
+            :host {
+                display: block;
                 font-size: 1.25rem;
                 margin-bottom: 0.75rem;
             }
         `,
     ];
     render() {
-        return html`<div class="title">${this.title}</div>`;
+        return html` <slot></slot>`;
     }
 }

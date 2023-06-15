@@ -73,7 +73,7 @@ export class UpdatePage extends BasePage {
 
     render() {
         return html`
-            <title-element title="Update Firmware"></title-element>
+            <title-element>Update Firmware</title-element>
             <input-element-grid>
                 <input-element
                     id="littlefs"

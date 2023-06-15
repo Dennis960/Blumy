@@ -1,4 +1,5 @@
-import { InputElement } from './page-elements/input-element';
+import { Network } from "./../states/api";
+import { InputElement } from "./page-elements/input-element";
 import { html } from "lit";
 import { customElement, query } from "lit-element";
 import { state } from "lit/decorators.js";
@@ -23,19 +24,30 @@ export class WifiSetupPage extends BasePage {
             this.errorText = "Error, device not responding";
             return;
         }
+        // wait 500 ms for the device to connect to the network
+        await new Promise((resolve) => setTimeout(resolve, 500));
         for (let i = 0; i < 10; i++) {
             const wifiStatus = await isEspConnected();
 
             if (wifiStatus == WifiStatus.ERROR) {
                 this.errorText = "Error, device not responding";
             } else if (wifiStatus == WifiStatus.CONNECTED) {
+                networkState.isConnected = true;
+                if (
+                    networkState.network?.ssid != this.ssidElement.input.value
+                ) {
+                    networkState.network = {
+                        ssid: this.ssidElement.input.value,
+                    } as Network;
+                }
                 this.next();
             } else if (wifiStatus == WifiStatus.CONNECT_FAILED) {
                 this.errorText = "Could not connect to WiFi";
             } else if (wifiStatus == WifiStatus.CONNECT_WRONG_PASSWORD) {
                 this.errorText = "Wrong password";
             } else if (wifiStatus == WifiStatus.DISCONNECTED) {
-                this.errorText = "The WiFi module is not connected, try resetting the device";
+                this.errorText =
+                    "The WiFi module is not connected, try resetting the device";
             } else if (wifiStatus == WifiStatus.NO_SSID_AVAIL) {
                 this.errorText = "The specified SSID cannot be reached";
             } else {
@@ -46,15 +58,17 @@ export class WifiSetupPage extends BasePage {
         }
     }
 
-    firstUpdated() {
-        if (networkState.network?.secure == 7) {
+    async painted() {
+        if (networkState.network?.secure != 7) {
+            this.passwordElement.input.focus();
+        } else if (!networkState.isConnected) {
             this.connect();
         }
     }
 
     render() {
         return html`
-            <title-element title="Enter WiFi Credentials"></title-element>
+            <title-element>Enter WiFi Credentials</title-element>
             <input-element-grid>
                 <input-element
                     id="ssid"

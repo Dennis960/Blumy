@@ -23,4 +23,17 @@ export class BasePage extends LitElement {
     next() {
         this.dispatchEvent(new CustomEvent("next"));
     }
+
+    /**
+     * Called once after firstUpdated() after the page has been painted
+     */
+    painted() {}
+
+    firstUpdated() {
+        // let the browser paint the page before calling painted()
+        (async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            this.painted();
+        })();
+    }
 }

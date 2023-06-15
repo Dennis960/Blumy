@@ -44,15 +44,14 @@ export class InputElement extends LitElement {
         | "week" = "text";
     @property() initialValue: any;
 
-    constructor() {
-        super();
+    @query("#input")
+    input: HTMLInputElement;
+
+    firstUpdated() {
         if (this.initialValue !== undefined) {
             this.input.value = this.initialValue;
         }
     }
-
-    @query("input")
-    input: HTMLInputElement;
 
     render() {
         return html`
