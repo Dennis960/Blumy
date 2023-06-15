@@ -20,7 +20,9 @@ export class MqttPage extends BasePage {
             this.serverInput.input.value,
             this.portInput.input.value,
             this.userInput.input.value,
-            this.passwordInput.input.value
+            this.passwordInput.input.value,
+            this.topicInput.input.value,
+            this.clientIdInput.input.value
         );
         if (!res.ok) {
             this.errorText = "Error, device not responding";
