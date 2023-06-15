@@ -1,7 +1,7 @@
 import { html } from "lit";
 import { customElement } from "lit-element";
 import { property, query, state } from "lit/decorators.js";
-import { getUpdatePercentage, updateFirmware, updateFs } from "../api";
+import { getUpdatePercentage, updateFirmware, updateFs } from "../states/api";
 import { BasePage } from "./base-page";
 import { InputElement } from "./page-elements/input-element";
 

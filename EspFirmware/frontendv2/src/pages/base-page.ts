@@ -20,7 +20,7 @@ export class BasePage extends LitElement {
     /**
      * Changes to the next page
      */
-    next(data?: any) {
-        this.dispatchEvent(new CustomEvent("next", { detail: data }));
+    next() {
+        this.dispatchEvent(new CustomEvent("next"));
     }
 }

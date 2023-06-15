@@ -1,4 +1,4 @@
-import { setPlantName } from "../api";
+import { setPlantName } from "../states/api";
 import { html } from "lit";
 import { customElement, state } from "lit-element";
 import { property, query } from "lit/decorators.js";

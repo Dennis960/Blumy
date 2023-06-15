@@ -1,14 +1,12 @@
 import { html } from "lit";
 import { customElement, query } from "lit-element";
-import { property, state } from "lit/decorators.js";
-import { connectToNetwork, isEspConnected, WifiStatus } from "../api";
+import { state } from "lit/decorators.js";
+import { connectToNetwork, isEspConnected, WifiStatus } from "../states/api";
+import { networkState } from "../states/network-state";
 import { BasePage } from "./base-page";
 
 @customElement("wifi-setup-page")
 export class WifiSetupPage extends BasePage {
-    @property({ type: String }) ssid: string;
-    @property({ type: Boolean }) autoConnect: boolean;
-
     @query("#ssid") ssidElement: HTMLInputElement;
     @query("#password") passwordElement: HTMLInputElement;
 
@@ -29,20 +27,26 @@ export class WifiSetupPage extends BasePage {
 
             if (wifiStatus == WifiStatus.ERROR) {
                 this.errorText = "Error, device not responding";
-                return;
-            }
-            if (wifiStatus == WifiStatus.CONNECTED) {
+            } else if (wifiStatus == WifiStatus.CONNECTED) {
                 this.next();
-                return;
+            } else if (wifiStatus == WifiStatus.CONNECT_FAILED) {
+                this.errorText = "Could not connect to WiFi";
+            } else if (wifiStatus == WifiStatus.CONNECT_WRONG_PASSWORD) {
+                this.errorText = "Wrong password";
+            } else if (wifiStatus == WifiStatus.DISCONNECTED) {
+                this.errorText = "The WiFi module is not connected, try resetting the device";
+            } else if (wifiStatus == WifiStatus.NO_SSID_AVAIL) {
+                this.errorText = "The specified SSID cannot be reached";
+            } else {
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+                continue;
             }
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            return;
         }
-        this.errorText = "Could not connect to WiFi";
     }
 
-    constructor() {
-        super();
-        if (this.autoConnect) {
+    firstUpdated() {
+        if (networkState.network?.secure == 7) {
             this.connect();
         }
     }
@@ -55,7 +59,7 @@ export class WifiSetupPage extends BasePage {
                     id="ssid"
                     type="text"
                     label="SSID"
-                    value="${this.ssid}"
+                    value="${networkState.network?.ssid}"
                 ></input-element>
                 <input-element
                     id="password"
