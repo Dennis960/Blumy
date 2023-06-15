@@ -15,14 +15,20 @@ client.on('connect', () => {
 // same format as the POST API
 client.on('message', async (topic, message) => {
   const body = message.toString();
-  const data: Data = JSON.parse(body);
-  // check if sensor exists
-  let sensorExists = true;
-  const sensor = await getSensorById(data.sensorAddress);
-  if (!sensor) {
-    sensorExists = false;
-    // create sensor
-    await createSensorWithId(data.sensorAddress);
+  try {
+    const data: Data = JSON.parse(body);
+    // check if sensor exists
+    let sensorExists = true;
+    const sensor = await getSensorById(data.sensorAddress);
+    if (!sensor) {
+      sensorExists = false;
+      // create sensor
+      await createSensorWithId(data.sensorAddress);
+    }
+    await addDataBySensorId(data);
+  } catch (error) {
+    console.error('error parsing mqtt message', error);
+    console.log('message', body);
+    return;
   }
-  await addDataBySensorId(data);
 });
