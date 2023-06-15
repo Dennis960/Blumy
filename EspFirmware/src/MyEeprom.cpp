@@ -133,7 +133,7 @@ bool isMqttChecksumValid()
     return checksum == calculatedChecksum;
 }
 
-void saveMqttCredentials(String mqttServer, int mqttPort, String mqttUser, String mqttPassword, String mqttTopic, STring mqttClientId)
+void saveMqttCredentials(String mqttServer, int mqttPort, String mqttUser, String mqttPassword, String mqttTopic, String mqttClientId)
 {
     serialPrintf("Saving MQTT credentials\n");
     writeStringToEEPROM(MQTT_SERVER_ADDRESS, mqttServer);

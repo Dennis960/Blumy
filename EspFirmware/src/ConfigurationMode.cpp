@@ -233,7 +233,7 @@ void handleGetIsConnected(AsyncWebServerRequest *request)
 
 void handlePostMqttSetup(AsyncWebServerRequest *request)
 {
-    if (!request->hasParam("server", true) || !request->hasParam("port", true))
+    if (!request->hasParam("server", true) || !request->hasParam("port", true) || !request->hasParam("user", true) || !request->hasParam("password", true) || !request->hasParam("topic", true) || !request->hasParam("clientId", true))
     {
         request->send(400, "text/plain", "Bad request");
         return;
@@ -242,18 +242,24 @@ void handlePostMqttSetup(AsyncWebServerRequest *request)
     AsyncWebParameter *newMqttPort = request->getParam("port", true);
     AsyncWebParameter *newMqttUser = request->getParam("user", true);
     AsyncWebParameter *newMqttPassword = request->getParam("password", true);
+    AsyncWebParameter *newMqttTopic = request->getParam("topic", true);
+    AsyncWebParameter *newMqttClientId = request->getParam("clientId", true);
 
     serialPrintf("Received mqttServer: %s\n", newMqttServer->value().c_str());
     serialPrintf("Received mqttPort: %s\n", newMqttPort->value().c_str());
     serialPrintf("Received mqttUser: %s\n", newMqttUser->value().c_str());
     serialPrintf("Received mqttPassword: %s\n", newMqttPassword->value().c_str());
+    serialPrintf("Received mqttTopic: %s\n", newMqttTopic->value().c_str());
+    serialPrintf("Received mqttClientId: %s\n", newMqttClientId->value().c_str());
 
     String mqttServer = newMqttServer->value();
     int mqttPort = newMqttPort->value().toInt();
     String mqttUser = newMqttUser->value();
     String mqttPassword = newMqttPassword->value();
+    String mqttTopic = newMqttTopic->value();
+    String mqttClientId = newMqttClientId->value();
 
-    saveMqttCredentials(mqttServer, mqttPort, mqttUser, mqttPassword);
+    saveMqttCredentials(mqttServer, mqttPort, mqttUser, mqttPassword, mqttTopic, mqttClientId);
 
     request->send(200, "text/plain", "OK");
 }
