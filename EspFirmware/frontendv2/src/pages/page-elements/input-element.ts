@@ -1,5 +1,5 @@
 import { css, html } from "lit";
-import { LitElement, customElement } from "lit-element";
+import { LitElement, customElement, query } from "lit-element";
 import { property } from "lit/decorators.js";
 
 @customElement("input-element")
@@ -44,16 +44,13 @@ export class InputElement extends LitElement {
         | "week" = "text";
     @property() value: any;
 
-    onChange = (e: Event) => {
-        const input = e.target as HTMLInputElement;
-        this.value = input.value;
-        this.dispatchEvent(new CustomEvent("change", { detail: this.value }));
-    };
+    @query("input")
+    input: HTMLInputElement;
 
     render() {
         return html`
             <label for="input">${this.label}</label>
-            <input id="input" type="${this.type}" placeholder="${this.label}" value="${this.value}" @change="${this.onChange}" />
+            <input id="input" type="${this.type}" placeholder="${this.label}" value="${this.value}" />
         `;
     }
 }
