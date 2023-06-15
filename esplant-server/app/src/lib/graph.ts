@@ -55,7 +55,8 @@ export const defaultGraphOptions: ApexOptions = {
       formatter: valueToDateString
     },
     theme: 'dark',
-    followCursor: false
+    followCursor: false,
+    enabledOnSeries: [0],
   },
   dataLabels: {
     enabled: false
@@ -64,7 +65,8 @@ export const defaultGraphOptions: ApexOptions = {
     labels: {
       colors: 'var(--primary)'
     },
-    horizontalAlign: 'left'
+    horizontalAlign: 'left',
+    showForZeroSeries: false
   },
   grid: {
     show: true,
@@ -103,8 +105,14 @@ export const defaultGraphOptions: ApexOptions = {
         colors: 'var(--primary)'
       }
     },
-    min: 0,
     forceNiceScale: true
+  },
+  annotations: {
+    yaxis: [
+      {
+        y: 0,
+      }
+    ]
   }
 }
 
