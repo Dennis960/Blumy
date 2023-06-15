@@ -322,12 +322,34 @@ export async function createSensorWithId(sensorAddress: number, name = 'new sens
 }
 
 /**
+ * Update the name of a sensor.
+ * @param sensorAddress The address of the sensor.
+ * @param name The new name of the sensor.
+ * @returns Nothing or throws an error if the sensor does not exist.
+ */
+export async function updateSensorName(sensorAddress: number, name: string) {
+  const sensor = await getSensorById(sensorAddress);
+  if (!sensor) {
+    return Promise.reject('Sensor does not exist');
+  }
+  return await dbRun('UPDATE sensor SET name = ? WHERE sensorAddress = ?', [name, sensorAddress]);
+}
+
+/**
  * Add data to the database.
  * @param data The data to add.
  * @returns The id of the inserted data or throws an error if the sensor does not exist.
  */
-export function addDataBySensorId(data: Data) {
+export async function addDataBySensorId(data: Data) {
   data.date = Date.now();
+
+  // update sensor name if necessary
+  const sensor = await getSensorById(data.sensorAddress);
+  if (data.plantName !== undefined) {
+    if (sensor?.name !== data.plantName) {
+      await updateSensorName(data.sensorAddress, data.plantName);
+    }
+  }
 
   let cleanData: any = {};
   // remove any keys that are not in dataSchema

@@ -1,5 +1,5 @@
 import type { ApiResponse, RequestData } from "$types/api";
-import type { Data } from "../../../api/types/data";
+import type { Data, Sensor } from "../../../api/types/data";
 import { type Writable, writable } from "svelte/store";
 
 export class DataClient {
@@ -36,4 +36,13 @@ async function fetchRuntimeData(options: RequestData): Promise<Data[]> {
     return [];
   }
   return (await result.json() as ApiResponse<Data[]>).data;
+}
+
+export async function getAllSensorIds(): Promise<ApiResponse<Sensor[]>> {
+  let result = await fetch("/api/sensors");
+  if (!result.ok) {
+    console.error(result);
+    return { message: "Error", data: [] };
+  }
+  return await result.json();
 }
