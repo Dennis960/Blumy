@@ -1,18 +1,11 @@
 {
-  "name": "data",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite dev",
     "build": "vite build"
   },
-  "author": "",
-  "license": "UNLICENSED",
   "devDependencies": {
-    "vite": "^4.3.9"
-  },
-  "dependencies": {
-    "modern-normalize": "^2.0.0"
+    "@lit-app/state": "^0.8.4",
+    "lit": "^2.7.5",
+    "vite": "^3.1.8"
   }
 }
