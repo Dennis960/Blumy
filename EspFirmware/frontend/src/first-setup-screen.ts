@@ -6,6 +6,7 @@ import "./elements/header-element";
 import "./elements/loader-bar-element";
 import "./pages/mqtt-page";
 import "./pages/name-page";
+import "./pages/reset-page";
 import "./pages/update-page";
 import "./pages/welcome-page";
 import "./pages/wifi-scanner-page";
@@ -85,6 +86,9 @@ export class FirstSetupScreen extends LitElement {
                 @next="${this.next}"
                 @back="${this.back}"
             ></mqtt-page>`,
+            html`<reset-page
+                @back="${this.back}"
+            ></reset-page>`,
         ];
     }
 
