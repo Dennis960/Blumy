@@ -1,7 +1,7 @@
 import { html } from "lit";
 import { css } from "lit";
 import { property, query, state, customElement } from "lit/decorators.js";
-import { getUpdatePercentage, updateFirmware, updateFs } from "../api";
+import { getUpdatePercentage, resetEsp, ResetFlag, updateFirmware, updateFs } from "../api";
 import { BasePage } from "./base-page";
 import { InputElement } from "./page-elements/input-element";
 
@@ -32,17 +32,19 @@ export class UpdatePage extends BasePage {
             return;
         }
         console.log(this.littlefsElement.input.files[0]);
-
+        
         if (this.littlefsElement.input.files[0]) {
+            let finished = false;
             (async () => {
-                while (!this.errorText && this.littlefsProgress < 100) {
+                while (!finished) {
+                    await new Promise((resolve) => setTimeout(resolve, 300));
                     await getUpdatePercentage().then((percentage) => {
                         this.littlefsProgress = percentage;
                     });
-                    await new Promise((resolve) => setTimeout(resolve, 300));
                 }
             })();
             const res = await updateFs(this.littlefsElement.input.files[0]);
+            finished = true;
             if (!res.ok) {
                 this.errorText = "Error, device not responding";
             }
@@ -51,17 +53,19 @@ export class UpdatePage extends BasePage {
             }
         }
         if (this.firmwareElement.input.files[0]) {
+            let finished = false;
             (async () => {
-                while (!this.errorText && this.firmwareProgress < 100) {
+                while (!finished) {
+                    await new Promise((resolve) => setTimeout(resolve, 300));
                     await getUpdatePercentage().then((percentage) => {
                         this.firmwareProgress = percentage;
                     });
-                    await new Promise((resolve) => setTimeout(resolve, 300));
                 }
             })();
             const res = await updateFirmware(
                 this.firmwareElement.input.files[0]
             );
+            finished = true;
             if (!res.ok) {
                 this.errorText = "Error, device not responding";
             }
@@ -69,6 +73,8 @@ export class UpdatePage extends BasePage {
                 this.firmwareProgress = 100;
             }
         }
+        resetEsp(ResetFlag.CONFIGURATION_FLAG);
+        // TODO: open "Waiting for esp to restart" screen
     }
 
     render() {
