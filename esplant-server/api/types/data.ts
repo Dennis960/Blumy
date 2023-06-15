@@ -6,6 +6,7 @@ export type Sensor = {
 export type Data = {
   id?: number;
   sensorAddress: number;
+  plantName: string;
   date?: number | string;
   water: number;
   voltage?: number;
@@ -28,6 +29,11 @@ export const dataSchema: Property[] = [
   {
     name: "id",
     type: ["number"],
+    required: false,
+  },
+  {
+    name: "plantName",
+    type: ["string"],
     required: false,
   },
   {
