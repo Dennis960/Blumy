@@ -10,7 +10,6 @@ export class ProgressBarElement extends LitElement {
         css`
             .progress-bar {
                 grid-column: 1 / -1;
-                margin-bottom: 1rem;
             }
             .progress-bar-fill {
                 height: 0.25rem;

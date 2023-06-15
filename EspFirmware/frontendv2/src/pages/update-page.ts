@@ -1,5 +1,5 @@
 import { html } from "lit";
-import { customElement } from "lit-element";
+import { css, customElement } from "lit-element";
 import { property, query, state } from "lit/decorators.js";
 import { getUpdatePercentage, updateFirmware, updateFs } from "../states/api";
 import { BasePage } from "./base-page";
@@ -7,6 +7,13 @@ import { InputElement } from "./page-elements/input-element";
 
 @customElement("update-page")
 export class UpdatePage extends BasePage {
+    static styles = [
+        css`
+            progress-bar-element {
+                grid-column: span 2;
+            }
+        `,
+    ];
     @property({ type: String }) onlineStatus: string;
     @state() errorText: string = "";
 
@@ -17,13 +24,16 @@ export class UpdatePage extends BasePage {
     @state() firmwareProgress: number = 0;
 
     async upload() {
-        if (!this.littlefsElement.value && !this.firmwareElement.value) {
+        if (
+            !this.littlefsElement.input.files[0] &&
+            !this.firmwareElement.input.files[0]
+        ) {
             this.errorText = "Please select a file to upload";
             return;
         }
-        console.log(this.littlefsElement.value);
+        console.log(this.littlefsElement.input.files[0]);
 
-        if (this.littlefsElement.value) {
+        if (this.littlefsElement.input.files[0]) {
             (async () => {
                 while (!this.errorText && this.littlefsProgress < 100) {
                     await getUpdatePercentage().then((percentage) => {
@@ -32,7 +42,7 @@ export class UpdatePage extends BasePage {
                     await new Promise((resolve) => setTimeout(resolve, 300));
                 }
             })();
-            const res = await updateFs(this.littlefsElement.value);
+            const res = await updateFs(this.littlefsElement.input.files[0]);
             if (!res.ok) {
                 this.errorText = "Error, device not responding";
             }
@@ -40,7 +50,7 @@ export class UpdatePage extends BasePage {
                 this.littlefsProgress = 100;
             }
         }
-        if (this.firmwareElement.value) {
+        if (this.firmwareElement.input.files[0]) {
             (async () => {
                 while (!this.errorText && this.firmwareProgress < 100) {
                     await getUpdatePercentage().then((percentage) => {
@@ -49,7 +59,9 @@ export class UpdatePage extends BasePage {
                     await new Promise((resolve) => setTimeout(resolve, 300));
                 }
             })();
-            const res = await updateFirmware(this.firmwareElement.value);
+            const res = await updateFirmware(
+                this.firmwareElement.input.files[0]
+            );
             if (!res.ok) {
                 this.errorText = "Error, device not responding";
             }
@@ -71,17 +83,11 @@ export class UpdatePage extends BasePage {
                 <progress-bar-element
                     progress="${this.littlefsProgress}"
                 ></progress-bar-element>
-                <progress-bar-element
-                    progress="${this.littlefsProgress}"
-                ></progress-bar-element>
                 <input-element
                     id="firmware"
                     label="firmware.bin"
                     type="file"
                 ></input-element>
-                <progress-bar-element
-                    progress="${this.firmwareProgress}"
-                ></progress-bar-element>
                 <progress-bar-element
                     progress="${this.firmwareProgress}"
                 ></progress-bar-element>
