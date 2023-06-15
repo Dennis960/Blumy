@@ -61,6 +61,10 @@ export async function setPlantName(name: string) {
     return await postDataToEsp("/plantName", params);
 }
 
+export async function getPlantName() {
+    return await getDataFromEsp("/plantName");
+}
+
 export async function getNetworks(): Promise<Network[]> {
     return await getDataFromEsp("/networks");
 }
