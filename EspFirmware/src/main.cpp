@@ -7,6 +7,8 @@
 
 bool wasButtonPressed;
 
+uint32_t resetFlag;
+
 void setup()
 {
     // Reset button check
