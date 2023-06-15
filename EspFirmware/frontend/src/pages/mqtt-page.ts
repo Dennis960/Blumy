@@ -27,6 +27,8 @@ export class MqttPage extends BasePage {
         if (!res.ok) {
             this.errorText = "Error, device not responding";
             return;
+        } else {
+            this.next();
         }
     }
 
