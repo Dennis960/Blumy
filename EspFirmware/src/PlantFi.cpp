@@ -96,6 +96,6 @@ void PlantFi::sendData(int sensorAddress, int water, unsigned long measurementDu
         serialPrintf("MQTT Connection error\n");
     }
     char buffer[200];
-    sprintf(buffer, "{\"sensorAddress\":%d,\"plantName\":%s,\"water\":%d,\"duration\":%lu,\"measurementDuration\":%lu,\"rssi\":%d}", sensorAddress, loadPlantName().c_str(), water, millis(), measurementDuration, WiFi.RSSI());
+    sprintf(buffer, "{\"sensorAddress\":%d,\"plantName\":\"%s\",\"water\":%d,\"duration\":%lu,\"measurementDuration\":%lu,\"rssi\":%d}", sensorAddress, loadPlantName().c_str(), water, millis(), measurementDuration, WiFi.RSSI());
     mqttClient.publish(_mqttTopic.c_str(), buffer);
 }
