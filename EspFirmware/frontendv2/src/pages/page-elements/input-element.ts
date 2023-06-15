@@ -42,7 +42,14 @@ export class InputElement extends LitElement {
         | "time"
         | "url"
         | "week" = "text";
-    @property() value: any;
+    @property() initialValue: any;
+
+    constructor() {
+        super();
+        if (this.initialValue !== undefined) {
+            this.input.value = this.initialValue;
+        }
+    }
 
     @query("input")
     input: HTMLInputElement;
@@ -50,7 +57,7 @@ export class InputElement extends LitElement {
     render() {
         return html`
             <label for="input">${this.label}</label>
-            <input id="input" type="${this.type}" placeholder="${this.label}" value="${this.value}" />
+            <input id="input" type="${this.type}" placeholder="${this.label}" />
         `;
     }
 }

@@ -12,7 +12,7 @@ export class NamePage extends BasePage {
     @state() errorText: string = "";
 
     async submit() {
-        const name = this.nameElement.value ?? "";
+        const name = this.nameElement.input.value ?? "";
         if (name.length < 1 || name.length > 32) {
             this.errorText = "Name must be between 1 and 32 characters";
             return;

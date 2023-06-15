@@ -1,3 +1,4 @@
+import { InputElement } from './page-elements/input-element';
 import { html } from "lit";
 import { customElement, query, state } from "lit-element";
 import { setMqttCredentials } from "../states/api";
@@ -5,20 +6,20 @@ import { BasePage } from "./base-page";
 
 @customElement("mqtt-page")
 export class MqttPage extends BasePage {
-    @query("#server") serverInput: HTMLInputElement;
-    @query("#port") portInput: HTMLInputElement;
-    @query("#user") userInput: HTMLInputElement;
-    @query("#password") passwordInput: HTMLInputElement;
-    @query("#topic") topicInput: HTMLInputElement;
-    @query("#client-id") clientIdInput: HTMLInputElement;
+    @query("#server") serverInput: InputElement;
+    @query("#port") portInput: InputElement;
+    @query("#user") userInput: InputElement;
+    @query("#password") passwordInput: InputElement;
+    @query("#topic") topicInput: InputElement;
+    @query("#client-id") clientIdInput: InputElement;
     @state() errorText: string = "";
 
     async connect() {
         const res = await setMqttCredentials(
-            this.serverInput.value,
-            this.portInput.value,
-            this.userInput.value,
-            this.passwordInput.value
+            this.serverInput.input.value,
+            this.portInput.input.value,
+            this.userInput.input.value,
+            this.passwordInput.input.value
         );
         if (!res.ok) {
             this.errorText = "Error, device not responding";
