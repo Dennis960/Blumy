@@ -26,10 +26,13 @@ export enum ResetFlag {
 /* fetch loading state indicator */
 const fetch = new Proxy(window.fetch, {
     apply: async (target, thisArg, args) => {
-        loadingState.state.numberOfLoaders++;
-        const res = await target.apply(thisArg, args);
-        loadingState.state.numberOfLoaders--;
-        return res;
+        loadingState.state++;
+        try {
+            const res = await target.apply(thisArg, args);
+            return res;
+        } finally {
+            loadingState.state--;
+        }
     },
 });
 
