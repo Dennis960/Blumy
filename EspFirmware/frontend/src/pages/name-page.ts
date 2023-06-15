@@ -1,4 +1,4 @@
-import { setPlantName, setSensorId, setSleepTimeout } from "../api";
+import { getPlantName, getSensorId, getSleepTimeout, setPlantName, setSensorId, setSleepTimeout } from "../api";
 import { html } from "lit";
 import { property, query, customElement, state } from "lit/decorators.js";
 import { BasePage } from "./base-page";
@@ -66,6 +66,21 @@ export class NamePage extends BasePage {
             return;
         }
         this.next();
+    }
+
+    async firstUpdated() {
+        const plantName = await getPlantName();
+        const id = await getSensorId();
+        const sleepTimeout = await getSleepTimeout();
+        if (plantName != null) {
+            this.nameElement.input.value = plantName;
+        }
+        if (id != null) {
+            this.idElement.input.value = String(id);
+        }
+        if (sleepTimeout != null) {
+            this.sleepTimeoutElement.input.value = `${sleepTimeout} ms`;
+        }
     }
 
     render() {

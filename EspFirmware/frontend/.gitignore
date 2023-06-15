@@ -3,3 +3,6 @@ networks
 node_modules
 isConnected
 connectedNetwork
+plantName
+sensorId
+timeouts

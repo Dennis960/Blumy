@@ -449,7 +449,7 @@ void handlePostPlantName(AsyncWebServerRequest *request)
 
 void handleGetPlantName(AsyncWebServerRequest *request)
 {
-    request->send(200, "text/plain", loadPlantName());
+    request->send(200, "text/plain", "\"" + loadPlantName() + "\"");
 }
 
 void handleGetConnectedNetwork(AsyncWebServerRequest *request)
