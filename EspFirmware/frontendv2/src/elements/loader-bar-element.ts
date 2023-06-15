@@ -7,6 +7,9 @@ export class LoaderBarElement extends LitElement {
     @property({ type: Boolean }) active: boolean;
     static styles = [
         css`
+            :host {
+                width: 100%;
+            }
             .loader.active {
                 animation: running-progress 2s cubic-bezier(0.4, 0, 0.2, 1)
                     infinite;

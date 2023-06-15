@@ -1,3 +1,4 @@
+import { loadingState } from './states';
 export type Network = {
     rssi: number;
     ssid: string;
@@ -16,6 +17,16 @@ export enum WifiStatus {
     DISCONNECTED = 7,
     ERROR = 8,
 }
+
+/* fetch loading state indicator */
+const fetch = new Proxy(window.fetch, {
+    apply: async (target, thisArg, args) => {
+      loadingState.state = true;
+      const res = await target.apply(thisArg, args);
+      loadingState.state = false;
+      return res;
+    },
+  });
 
 async function postDataToEsp(url: string, params?: URLSearchParams) {
     return await fetch(url, {

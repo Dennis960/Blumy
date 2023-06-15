@@ -1,4 +1,4 @@
-import { loadingState } from './states';
+import { loadingState } from "./states";
 import { css, html, LitElement } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import "./elements/dots-stepper-element";
@@ -10,7 +10,7 @@ import "./pages/update-page";
 import "./pages/welcome-page";
 import "./pages/wifi-scanner-page";
 import "./pages/wifi-setup-page";
-import { StateController } from '@lit-app/state';
+import { StateController } from "@lit-app/state";
 
 @customElement("first-setup-screen")
 export class FirstSetupScreen extends LitElement {
@@ -20,6 +20,9 @@ export class FirstSetupScreen extends LitElement {
             flex-direction: column;
             align-items: center;
             row-gap: 1rem;
+            width: 100%;
+        }
+        header {
             width: 100%;
         }
         .page {
@@ -58,7 +61,10 @@ export class FirstSetupScreen extends LitElement {
 
     updatePageElements() {
         this.pageElements = [
-            html`<welcome-page @next="${this.next}" @skip="${this.nextScreen}"></welcome-page>`,
+            html`<welcome-page
+                @next="${this.next}"
+                @skip="${this.nextScreen}"
+            ></welcome-page>`,
             html`<update-page
                 @next="${this.next}"
                 @back="${this.back}"
@@ -81,8 +87,8 @@ export class FirstSetupScreen extends LitElement {
             ></mqtt-page>`,
         ];
     }
-    
-    loadingStateController = new StateController(this, loadingState)
+
+    loadingStateController = new StateController(this, loadingState);
 
     updated() {
         // set url param page
@@ -108,8 +114,12 @@ export class FirstSetupScreen extends LitElement {
 
     render() {
         return html`
-            <header-element icon="🌱" title="PlantFi"></header-element>
-            <loader-bar-element ?active="${loadingState.state}"></loader-bar-element>
+            <header>
+                <header-element icon="🌱" title="PlantFi"></header-element>
+                <loader-bar-element
+                    ?active="${loadingState.state}"
+                ></loader-bar-element>
+            </header>
             <dots-stepper-element
                 numberOfDots="${this.pageElements.length}"
                 currentDot="${this.currentDot}"
