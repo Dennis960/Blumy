@@ -1,5 +1,5 @@
-import { css, html, LitElement, state } from "lit-element";
-import { customElement } from "lit/decorators.js";
+import { css, html, LitElement } from "lit";
+import { customElement, state } from "lit/decorators.js";
 import "./elements/dots-stepper-element";
 import "./elements/header-element";
 import "./elements/loader-bar-element";

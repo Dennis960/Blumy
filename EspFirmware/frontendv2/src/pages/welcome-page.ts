@@ -1,6 +1,8 @@
-import { html } from "lit";
-import { css, customElement } from "lit-element";
-import { networkState } from "../states/network-state";
+import { StateController } from "@lit-app/state";
+import { css, html } from "lit";
+import { customElement } from "lit/decorators.js";
+import { getConnectedNetwork, isEspConnected, WifiStatus } from "./../api";
+import { loadingState, networkState } from "./../states";
 import { BasePage } from "./base-page";
 
 @customElement("welcome-page")
@@ -16,21 +18,43 @@ export class WelcomePage extends BasePage {
         `,
     ];
 
+    networkStateController = new StateController(this, networkState);
+
+    constructor() {
+        super();
+        (async () => {
+            loadingState.state = true;
+            const wifiStatus = await isEspConnected();
+            if (wifiStatus == WifiStatus.CONNECTED) {
+                const network = await getConnectedNetwork();
+                networkState.state = {
+                    isConnected: true,
+                    network: network,
+                };
+            } else {
+                loadingState.state = false;
+            }
+        })();
+    }
+
     render() {
         return html`
             <title-element>Welcome</title-element>
             <description-element>
                 PlantFi is currently
-                <span class="${networkState.isConnected ? "green" : "red"}"
-                    >${networkState.isConnected
+                <span
+                    class="${networkState.state.isConnected ? "green" : "red"}"
+                    >${networkState.state.isConnected
                         ? "connected"
                         : "not connected"}</span
                 >
                 to the internet.
-                ${networkState.isConnected && networkState.network?.ssid
+                ${networkState.state.isConnected &&
+                networkState.state.network?.ssid
                     ? html`
                           <br />
-                          Connected to <b>${networkState.network.ssid}</b>.
+                          Connected to
+                          <b>${networkState.state.network?.ssid}</b>.
                       `
                     : html``}
             </description-element>

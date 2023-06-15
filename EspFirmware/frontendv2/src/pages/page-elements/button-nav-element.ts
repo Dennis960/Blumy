@@ -1,5 +1,5 @@
-import { css, html } from "lit";
-import { LitElement, customElement } from "lit-element";
+import { css, html, LitElement } from "lit";
+import { customElement } from "lit/decorators.js";
 
 @customElement("button-nav-element")
 export class ButtonNavElement extends LitElement {

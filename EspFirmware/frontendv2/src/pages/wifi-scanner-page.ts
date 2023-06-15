@@ -1,8 +1,7 @@
-import { networkState } from "../states/network-state";
-import { getNetworks, Network } from "../states/api";
+import { networkState } from "../states";
+import { getNetworks, Network } from "../api";
 import { html } from "lit";
-import { customElement, state } from "lit-element";
-import { property } from "lit/decorators.js";
+import { property, customElement, state } from "lit/decorators.js";
 import { BasePage } from "./base-page";
 
 @customElement("wifi-scanner-page")
@@ -39,7 +38,7 @@ export class WifiScannerPage extends BasePage {
 
     onNetworkClick(e: CustomEvent) {
         const network: Network = e.detail;
-        networkState.network = network;
+        networkState.state.network = network;
         this.next();
     }
 

@@ -1,4 +1,4 @@
-import { LitElement } from "lit-element";
+import { LitElement } from "lit";
 import "./page-elements/button-element";
 import "./page-elements/button-nav-element";
 import "./page-elements/description-element";

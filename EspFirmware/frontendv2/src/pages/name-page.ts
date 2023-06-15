@@ -1,7 +1,6 @@
-import { setPlantName } from "../states/api";
+import { setPlantName } from "../api";
 import { html } from "lit";
-import { customElement, state } from "lit-element";
-import { property, query } from "lit/decorators.js";
+import { property, query, customElement, state } from "lit/decorators.js";
 import { BasePage } from "./base-page";
 import { InputElement } from "./page-elements/input-element";
 

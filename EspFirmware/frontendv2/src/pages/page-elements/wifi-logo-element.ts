@@ -1,7 +1,5 @@
-import { styleMap } from 'lit/directives/style-map.js';
-import { css, html } from "lit";
-import { customElement, LitElement } from "lit-element";
-import { property } from "lit/decorators.js";
+import { css, html, LitElement } from "lit";
+import { customElement, property } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
 
 @customElement("wifi-logo-element")
@@ -19,7 +17,7 @@ export class WifiLogoElement extends LitElement {
         css`
             :host {
                 position: relative;
-                transform: translateY(25%)
+                transform: translateY(25%);
             }
             div {
                 border: 2px solid transparent;
@@ -53,7 +51,9 @@ export class WifiLogoElement extends LitElement {
                     </div>
                 </div>
             </div>
-            <span class="${classMap({ hidden: !this.isSecure, lock: true })}"> 🔒 </span>
+            <span class="${classMap({ hidden: !this.isSecure, lock: true })}">
+                🔒
+            </span>
         `;
     }
 }

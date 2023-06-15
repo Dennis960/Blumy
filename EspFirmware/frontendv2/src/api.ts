@@ -46,6 +46,12 @@ export async function getNetworks(): Promise<Network[]> {
     return await getDataFromEsp("/networks");
 }
 
+export async function getConnectedNetwork(): Promise<Network> {
+    // TODO: implement this on the esp
+    return null;
+    return await getDataFromEsp("/connectedNetwork");
+}
+
 export async function connectToNetwork(ssid: string, password: string) {
     const params = new URLSearchParams();
     params.append("ssid", ssid);
@@ -57,6 +63,9 @@ export async function resetEsp() {
     return await postDataToEsp("/reset");
 }
 
+/**
+ * @returns WifiStatus
+ */
 export async function isEspConnected(): Promise<WifiStatus> {
     const res = await getDataFromEsp("/isConnected");
     if (res == null) {
