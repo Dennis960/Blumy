@@ -5,7 +5,9 @@
   },
   "devDependencies": {
     "@lit-app/state": "^0.8.4",
+    "@types/timestring": "^6.0.2",
     "lit": "^2.7.5",
+    "timestring": "^7.0.0",
     "vite": "^3.1.8"
   }
 }

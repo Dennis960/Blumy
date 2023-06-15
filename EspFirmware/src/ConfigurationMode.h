@@ -119,6 +119,17 @@ void handlePostSensorId(AsyncWebServerRequest *request);
 void handleGetSensorId(AsyncWebServerRequest *request);
 
 /**
+ * Needs int sleepTimeout
+ * Triggers saves the sleepTimeout to EEPROM
+ */
+void handlePostSleepTimeout(AsyncWebServerRequest *request);
+
+/**
+ * Sends text/plain response with the sleepTimeout
+ */
+void handleGetSleepTimeout(AsyncWebServerRequest *request);
+
+/**
  * Sends update.html
 */
 void handleGetUpdateRescue(AsyncWebServerRequest *request);

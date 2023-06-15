@@ -5,16 +5,6 @@
 
 #define RESET_INPUT_PIN 4
 
-//----------------- Measurement delays -----------------
-/**
- * The sleep duration between measurements in seconds
- */
-const uint64_t SLEEP_DURATION_SECONDS = 3;
-/**
- * The sleep duration between measurements in microseconds
- */
-const uint64_t SLEEP_DURATION = SLEEP_DURATION_SECONDS * 1000000;
-
 //----------------- Timeouts -----------------
 /**
  * The time to wait for a connection to be established using the quick connect method (bssid and channel)

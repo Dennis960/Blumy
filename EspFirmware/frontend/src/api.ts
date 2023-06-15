@@ -121,6 +121,16 @@ export async function getSensorId() {
     return Number(await getDataFromEsp("/sensorId"));
 }
 
+export async function setSleepTimeout(timeout: number) {
+    const params = new URLSearchParams();
+    params.append("sleepTimeout", timeout.toString());
+    return await postDataToEsp("/timeouts/sleep", params);
+}
+
+export async function getSleepTimeout() {
+    return Number(await getDataFromEsp("/timeouts/sleep"));
+}
+
 export async function getUpdatePercentage() {
     return Number(await getDataFromEsp("/update/percentage"));
 }

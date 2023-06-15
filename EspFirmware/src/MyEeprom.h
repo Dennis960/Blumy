@@ -19,6 +19,7 @@
 #define MQTT_CLIENT_ID_ADDRESS 240 // char[32] (32 bytes) may overflow
 #define MQTT_CHECKSUM_ADDRESS 272  // uint32_t (4 bytes) exact
 #define PLANT_NAME_ADDRESS 276     // char[32] (32 bytes) max
+#define SLEEP_DURATION_ADDRESS 308 // uint32_t (4 bytes) exact
 
 #define EEPROM_SIZE 512
 
@@ -150,4 +151,17 @@ void savePlantName(String plantName);
  * @return The plant name
  */
 String loadPlantName();
+
+/**
+ * Save the sensor sleep duration to the EEPROM
+ * @param sleepDuration The sensor sleep duration to save
+ */
+void saveSleepDuration(uint32_t sleepDuration);
+
+/**
+ * Load the sensor sleep duration from the EEPROM
+ * @return The sensor sleep duration
+ */
+uint32_t loadSleepDuration();
+
 #endif
