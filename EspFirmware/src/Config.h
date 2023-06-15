@@ -5,12 +5,6 @@
 
 #define RESET_INPUT_PIN 4
 
-//----------------- Sensor Address -----------------
-/**
- * The sensorAddress value used to identify the sensor
- */
-const int sensorAddress = SENSOR_ID;
-
 //----------------- Measurement delays -----------------
 /**
  * The sleep duration between measurements in seconds

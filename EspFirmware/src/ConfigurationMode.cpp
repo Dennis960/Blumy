@@ -69,6 +69,7 @@ void configurationSetup()
     server.on("/isConnected", HTTP_GET, handleGetIsConnected);
     server.on("/mqttSetup", HTTP_POST, handlePostMqttSetup);
     server.on("/sensorId", HTTP_POST, handlePostSensorId);
+    server.on("/sensorId", HTTP_GET, handleGetSensorId);
     server.on("/update/percentage", HTTP_GET, handleGetUpdatePercentage);
     server.on("/plantName", HTTP_POST, handlePostPlantName);
     server.on("/plantName", HTTP_GET, handleGetPlantName);
