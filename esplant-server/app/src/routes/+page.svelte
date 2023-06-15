@@ -34,7 +34,7 @@
   const maxDataPointsParam = $page.url.searchParams.get("maxDataPoints");
   let maxDataPoints = maxDataPointsParam
     ? Number.parseInt(maxDataPointsParam)
-    : document.body.clientWidth / 3;
+    : document.body.clientWidth;
 </script>
 
 <div class="page-container">
