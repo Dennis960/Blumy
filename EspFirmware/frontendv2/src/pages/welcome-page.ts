@@ -13,6 +13,11 @@ export class WelcomePage extends BasePage {
             ></description-element>
             <button-nav-element>
                 <button-element
+                    name="Skip Setup"
+                    @click="${() => this.dispatchEvent(new CustomEvent("skip"))}"
+                    ?secondary="${false}"
+                ></button-element>
+                <button-element
                     name="Start Setup"
                     @click="${this.next}"
                     ?secondary="${true}"

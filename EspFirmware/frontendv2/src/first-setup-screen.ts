@@ -1,16 +1,14 @@
-import { classMap } from 'lit/directives/class-map.js';
-import { Network } from "api";
 import { css, html, LitElement, state } from "lit-element";
 import { customElement } from "lit/decorators.js";
-import "./dots-stepper-element";
-import "./header-element";
+import "./elements/dots-stepper-element";
+import "./elements/header-element";
+import "./elements/loader-bar-element";
 import "./pages/mqtt-page";
 import "./pages/name-page";
 import "./pages/update-page";
 import "./pages/welcome-page";
 import "./pages/wifi-scanner-page";
 import "./pages/wifi-setup-page";
-import "./loader-bar-element";
 
 @customElement("first-setup-screen")
 export class FirstSetupScreen extends LitElement {
@@ -33,32 +31,24 @@ export class FirstSetupScreen extends LitElement {
     @state()
     currentDot = 0;
     @state()
-    ssid = "";
-    @state()
-    autoConnect = false;
-    @state()
     loading = false;
 
     @state()
     pageElements = [];
 
-    next(data?: any) {
-        this.currentDot = Math.min(
-            this.currentDot + 1,
-            this.pageElements.length - 1
-        );
-        if (data?.detail.network) {
-            const network: Network = data.detail.network;
-            this.ssid = network.ssid;
-            this.updatePageElements();
-            if (network.secure == 7) {
-                this.autoConnect = true;
-                this.next();
-            }
+    next() {
+        this.currentDot++;
+        if (this.currentDot >= this.pageElements.length) {
+            this.nextScreen();
         }
     }
     back() {
         this.currentDot = Math.max(this.currentDot - 1, 0);
+    }
+
+    nextScreen() {
+        // redirect to /home
+        window.location.href = "/home";
     }
 
     onDotClick = (e: CustomEvent) => {
@@ -68,7 +58,7 @@ export class FirstSetupScreen extends LitElement {
 
     updatePageElements() {
         this.pageElements = [
-            html`<welcome-page @next="${this.next}"></welcome-page>`,
+            html`<welcome-page @next="${this.next}" @skip="${this.nextScreen}"></welcome-page>`,
             html`<update-page
                 @next="${this.next}"
                 @back="${this.back}"
@@ -84,8 +74,6 @@ export class FirstSetupScreen extends LitElement {
             html`<wifi-setup-page
                 @next="${this.next}"
                 @back="${this.back}"
-                ssid="${this.ssid}"
-                ?autoConnect="${this.autoConnect}"
             ></wifi-setup-page>`,
             html`<mqtt-page
                 @next="${this.next}"

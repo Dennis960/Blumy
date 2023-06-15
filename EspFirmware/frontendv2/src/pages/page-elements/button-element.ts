@@ -7,6 +7,7 @@ import { classMap } from "lit/directives/class-map.js";
 export class ButtonElement extends LitElement {
     @property({ type: Boolean }) secondary: boolean;
     @property({ type: String }) name: string;
+    @property({ type: Boolean }) disabled: boolean;
 
     static styles = [
         css`
@@ -25,11 +26,16 @@ export class ButtonElement extends LitElement {
                 background-color: var(--secondary-base);
                 color: var(--text-light);
             }
+            button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
         `,
     ];
     render() {
         const classes = {
             secondary: this.secondary,
+            disabled: this.disabled,
         };
         return html`
             <button class=${classMap(classes)}>
