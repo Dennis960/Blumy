@@ -36,16 +36,6 @@ export class LoaderBarElement extends LitElement {
         `,
     ];
 
-    /* fetch loading state indicator */
-    fetch = new Proxy(window.fetch, {
-        apply: async (target, thisArg, args) => {
-            this.active = true;
-            const res = await target.apply(thisArg, args);
-            this.active = false;
-            return res;
-        },
-    });
-
     render() {
         return html`
             <div

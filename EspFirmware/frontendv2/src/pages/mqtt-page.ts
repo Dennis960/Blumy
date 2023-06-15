@@ -1,7 +1,7 @@
 import { InputElement } from "./page-elements/input-element";
 import { html } from "lit";
-import { customElement, query, state } from "lit-element";
-import { setMqttCredentials } from "../states/api";
+import { customElement, query, state } from "lit/decorators.js";
+import { setMqttCredentials } from "../api";
 import { BasePage } from "./base-page";
 
 @customElement("mqtt-page")

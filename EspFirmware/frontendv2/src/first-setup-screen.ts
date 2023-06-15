@@ -1,5 +1,6 @@
-import { css, html, LitElement, state } from "lit-element";
-import { customElement } from "lit/decorators.js";
+import { loadingState } from './states';
+import { css, html, LitElement } from "lit";
+import { customElement, state } from "lit/decorators.js";
 import "./elements/dots-stepper-element";
 import "./elements/header-element";
 import "./elements/loader-bar-element";
@@ -9,6 +10,7 @@ import "./pages/update-page";
 import "./pages/welcome-page";
 import "./pages/wifi-scanner-page";
 import "./pages/wifi-setup-page";
+import { StateController } from '@lit-app/state';
 
 @customElement("first-setup-screen")
 export class FirstSetupScreen extends LitElement {
@@ -30,8 +32,6 @@ export class FirstSetupScreen extends LitElement {
 
     @state()
     currentDot = 0;
-    @state()
-    loading = false;
 
     @state()
     pageElements = [];
@@ -81,6 +81,8 @@ export class FirstSetupScreen extends LitElement {
             ></mqtt-page>`,
         ];
     }
+    
+    loadingStateController = new StateController(this, loadingState)
 
     updated() {
         // set url param page
@@ -107,7 +109,7 @@ export class FirstSetupScreen extends LitElement {
     render() {
         return html`
             <header-element icon="🌱" title="PlantFi"></header-element>
-            <loader-bar-element ?active="${this.loading}"></loader-bar-element>
+            <loader-bar-element ?active="${loadingState.state}"></loader-bar-element>
             <dots-stepper-element
                 numberOfDots="${this.pageElements.length}"
                 currentDot="${this.currentDot}"

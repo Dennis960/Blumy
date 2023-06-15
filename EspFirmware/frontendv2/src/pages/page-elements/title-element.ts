@@ -1,5 +1,5 @@
-import { css, html } from "lit";
-import { customElement, LitElement } from "lit-element";
+import { css, html, LitElement } from "lit";
+import { customElement } from "lit/decorators.js";
 
 @customElement("title-element")
 export class TitleElement extends LitElement {

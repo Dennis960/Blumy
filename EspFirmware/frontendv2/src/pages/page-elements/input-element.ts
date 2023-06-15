@@ -1,6 +1,5 @@
-import { css, html } from "lit";
-import { LitElement, customElement, query } from "lit-element";
-import { property } from "lit/decorators.js";
+import { css, html, LitElement } from "lit";
+import { customElement, property, query } from "lit/decorators.js";
 
 @customElement("input-element")
 export class InputElement extends LitElement {

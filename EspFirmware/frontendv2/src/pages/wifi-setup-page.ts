@@ -1,11 +1,9 @@
-import { Network } from "./../states/api";
-import { InputElement } from "./page-elements/input-element";
 import { html } from "lit";
-import { customElement, query } from "lit-element";
-import { state } from "lit/decorators.js";
-import { connectToNetwork, isEspConnected, WifiStatus } from "../states/api";
-import { networkState } from "../states/network-state";
+import { customElement, query, state } from "lit/decorators.js";
+import { connectToNetwork, isEspConnected, Network, WifiStatus } from "../api";
+import { networkState } from "../states";
 import { BasePage } from "./base-page";
+import { InputElement } from "./page-elements/input-element";
 
 @customElement("wifi-setup-page")
 export class WifiSetupPage extends BasePage {
@@ -32,11 +30,12 @@ export class WifiSetupPage extends BasePage {
             if (wifiStatus == WifiStatus.ERROR) {
                 this.errorText = "Error, device not responding";
             } else if (wifiStatus == WifiStatus.CONNECTED) {
-                networkState.isConnected = true;
+                networkState.state.isConnected = true;
                 if (
-                    networkState.network?.ssid != this.ssidElement.input.value
+                    networkState.state.network?.ssid !=
+                    this.ssidElement.input.value
                 ) {
-                    networkState.network = {
+                    networkState.state.network = {
                         ssid: this.ssidElement.input.value,
                     } as Network;
                 }
@@ -59,9 +58,9 @@ export class WifiSetupPage extends BasePage {
     }
 
     async painted() {
-        if (networkState.network?.secure != 7) {
+        if (networkState.state.network?.secure != 7) {
             this.passwordElement.input.focus();
-        } else if (!networkState.isConnected) {
+        } else if (!networkState.state.isConnected) {
             this.connect();
         }
     }
@@ -74,7 +73,7 @@ export class WifiSetupPage extends BasePage {
                     id="ssid"
                     type="text"
                     label="SSID"
-                    initialValue="${networkState.network?.ssid}"
+                    initialValue="${networkState.state.network?.ssid}"
                 ></input-element>
                 <input-element
                     id="password"

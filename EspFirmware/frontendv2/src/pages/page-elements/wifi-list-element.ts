@@ -1,6 +1,6 @@
 import { css, html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { Network } from "states/api";
+import { Network } from "../../api";
 import "./button-element";
 import "./wifi-logo-element";
 import "./loader-spinner-element";
