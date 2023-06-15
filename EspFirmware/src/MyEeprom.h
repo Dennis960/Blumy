@@ -6,17 +6,19 @@
 
 #include "Utils.h"
 
-#define SSID_ADDRESS 0            // char[32] (32 bytes) max
-#define PASSWORD_ADDRESS 32       // char[64] (64 bytes) max
-#define WIFI_CHECKSUM_ADDRESS 96  // uint32_t (4 bytes) exact
-#define RESET_FLAG_ADDRESS 100    // uint32_t (4 bytes) exact
-#define SENSOR_ID_ADDRESS 104     // uint32_t (4 bytes) exact
-#define MQTT_SERVER_ADDRESS 108   // char[32] (32 bytes) may overflow
-#define MQTT_PORT_ADDRESS 140     // uint32_t (4 bytes) exact
-#define MQTT_USER_ADDRESS 144     // char[32] (32 bytes) may overflow
-#define MQTT_PASSWORD_ADDRESS 176 // char[32] (32 bytes) may overflow
-#define MQTT_CHECKSUM_ADDRESS 208 // uint32_t (4 bytes) exact
-#define PLANT_NAME_ADDRESS 212    // char[32] (32 bytes) max
+#define SSID_ADDRESS 0             // char[32] (32 bytes) max
+#define PASSWORD_ADDRESS 32        // char[64] (64 bytes) max
+#define WIFI_CHECKSUM_ADDRESS 96   // uint32_t (4 bytes) exact
+#define RESET_FLAG_ADDRESS 100     // uint32_t (4 bytes) exact
+#define SENSOR_ID_ADDRESS 104      // uint32_t (4 bytes) exact
+#define MQTT_SERVER_ADDRESS 108    // char[32] (32 bytes) may overflow
+#define MQTT_PORT_ADDRESS 140      // uint32_t (4 bytes) exact
+#define MQTT_USER_ADDRESS 144      // char[32] (32 bytes) may overflow
+#define MQTT_PASSWORD_ADDRESS 176  // char[32] (32 bytes) may overflow
+#define MQTT_TOPIC_ADDRESS 208     // char[32] (32 bytes) may overflow
+#define MQTT_CLIENT_ID_ADDRESS 240 // char[32] (32 bytes) may overflow
+#define MQTT_CHECKSUM_ADDRESS 272  // uint32_t (4 bytes) exact
+#define PLANT_NAME_ADDRESS 276     // char[32] (32 bytes) max
 
 #define EEPROM_SIZE 512
 
@@ -121,8 +123,10 @@ bool isMqttChecksumValid();
  * @param mqttPort The MQTT port to save
  * @param mqttUser The MQTT user to save
  * @param mqttPassword The MQTT password to save
+ * @param mqttTopic The MQTT topic to save
+ * @param mqttClientId The MQTT client id to save
  */
-void saveMqttCredentials(String mqttServer, int mqttPort, String mqttUser, String mqttPassword);
+void saveMqttCredentials(String mqttServer, int mqttPort, String mqttUser, String mqttPassword, String mqttTopic, String mqttClientId);
 
 /**
  * Load the MQTT credentials from the EEPROM
@@ -130,8 +134,10 @@ void saveMqttCredentials(String mqttServer, int mqttPort, String mqttUser, Strin
  * @param mqttPort Integer to store the MQTT port in
  * @param mqttUser String to store the MQTT user in
  * @param mqttPassword String to store the MQTT password in
+ * @param mqttTopic String to store the MQTT topic in
+ * @param mqttClientId String to store the MQTT client id in
  */
-void loadMqttCredentials(String &mqttServer, int &mqttPort, String &mqttUser, String &mqttPassword);
+void loadMqttCredentials(String &mqttServer, int &mqttPort, String &mqttUser, String &mqttPassword, String &mqttTopic, String &mqttClientId);
 
 /**
  * Save the plant name to the EEPROM

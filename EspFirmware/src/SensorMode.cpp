@@ -23,10 +23,12 @@ void sensorSetup()
     int mqttPort;
     String mqttUser;
     String mqttPassword;
+    String mqttTopic;
+    String mqttClientId;
 
     if (isMqttChecksumValid())
     {
-        loadMqttCredentials(mqttServer, mqttPort, mqttUser, mqttPassword);
+        loadMqttCredentials(mqttServer, mqttPort, mqttUser, mqttPassword, mqttTopic, mqttClientId);
     }
     else
     {
@@ -36,9 +38,11 @@ void sensorSetup()
         mqttPort = 1883;
         mqttUser = "esplant";
         mqttPassword = "Ma9BdqVcKyxTgJm3";
+        mqttTopic = "esplant";
+        mqttClientId = "sensor-1";
     }
 
-    plantFi = PlantFi(ssid, password, mqttServer, mqttPort, mqttUser, mqttPassword, "esplant", "sensor-1");
+    plantFi = PlantFi(ssid, password, mqttServer, mqttPort, mqttUser, mqttPassword, mqttTopic, mqttClientId);
     plantFi.checkRtcValidity();
 
     serialPrintf("Starting wifi connection\n");
