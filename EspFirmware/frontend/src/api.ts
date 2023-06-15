@@ -23,12 +23,19 @@ export enum ResetFlag {
     CONFIGURATION_FLAG = 1,
 }
 
+// debounce
+let loaderDebounceTimer = null;
+
 /* fetch loading state indicator */
 const fetch = new Proxy(window.fetch, {
     apply: async (target, thisArg, args) => {
         loadingState.state = true;
         const res = await target.apply(thisArg, args);
-        loadingState.state = false;
+        // debouncing loading state in case of many sequential requests
+        clearTimeout(loaderDebounceTimer);
+        loaderDebounceTimer = setTimeout(() => {
+            loadingState.state = false;
+        }, 200);
         return res;
     },
 });
