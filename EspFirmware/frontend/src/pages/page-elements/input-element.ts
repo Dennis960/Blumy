@@ -14,6 +14,12 @@ export class InputElement extends LitElement {
                 padding: 0.5rem;
                 line-height: 1.15;
                 font-size: 100%;
+                width: 100%;
+            }
+            div {
+                display: flex;
+                flex-direction: row;
+                width: 100%;
             }
         `,
     ];
@@ -55,7 +61,14 @@ export class InputElement extends LitElement {
     render() {
         return html`
             <label for="input">${this.label}</label>
-            <input id="input" type="${this.type}" placeholder="${this.label}" />
+            <div>
+                <input
+                    id="input"
+                    type="${this.type}"
+                    placeholder="${this.label}"
+                />
+                <slot></slot>
+            </div>
         `;
     }
 }
