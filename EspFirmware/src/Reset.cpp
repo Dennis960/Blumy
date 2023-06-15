@@ -1,11 +1,13 @@
 #include "Reset.h"
 
-void reset(uint32_t resetFlag)
+uint32_t resetFlag = SENSOR_FLAG;
+
+void reset(uint32_t _resetFlag)
 {
     serialPrintf("Disabling led\n");
     ledOff();
     delay(100);
 
-    saveResetFlag(resetFlag);
+    saveResetFlag(_resetFlag);
     ESP.restart();
 }

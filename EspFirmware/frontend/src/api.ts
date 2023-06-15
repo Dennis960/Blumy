@@ -58,8 +58,6 @@ export async function getNetworks(): Promise<Network[]> {
 }
 
 export async function getConnectedNetwork(): Promise<Network> {
-    // TODO: implement this on the esp
-    return null;
     return await getDataFromEsp("/connectedNetwork");
 }
 

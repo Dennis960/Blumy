@@ -3,10 +3,9 @@
 #include "ConfigurationMode.h"
 #include "SensorMode.h"
 #include "MyEeprom.h"
+#include "Reset.h"
 
 bool wasButtonPressed;
-
-uint32_t resetFlag;
 
 void setup()
 {

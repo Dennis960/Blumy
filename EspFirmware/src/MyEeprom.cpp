@@ -8,7 +8,13 @@ void initEEPROM()
 
 void writeStringToEEPROM(int addrOffset, const String &data)
 {
+    // check if the string is longer than 32 bytes
     int length = data.length();
+    if (length > 32)
+    {
+        serialPrintf("String is too long to write to EEPROM\n");
+        return;
+    }
     EEPROM.write(addrOffset, length);
     for (int i = 0; i < length; ++i)
     {
