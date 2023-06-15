@@ -117,7 +117,7 @@ export class FirstSetupScreen extends LitElement {
             <header>
                 <header-element icon="🌱" title="PlantFi"></header-element>
                 <loader-bar-element
-                    ?active="${loadingState.state.numberOfLoaders > 0}"
+                    ?active="${loadingState.state > 0}"
                 ></loader-bar-element>
             </header>
             <dots-stepper-element

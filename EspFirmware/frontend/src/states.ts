@@ -15,9 +15,8 @@ export const networkState = new CustomState<{
 }>({} as any);
 
 /**
- * numberOfLoaders specifies the number of things that are currently loading.
- * If set to 0, nothing is loading
+ * state specifies the number of things that are currently loading.
+ * If set to <=0, nothing is loading
+ * If set to >0, something is loading
  */
-export const loadingState = new CustomState<{ numberOfLoaders: number }>({
-    numberOfLoaders: 0,
-});
+export const loadingState = new CustomState<number>(0);
