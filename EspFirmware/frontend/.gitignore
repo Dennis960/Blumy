@@ -1,4 +1,4 @@
 connect
 networks
 node_modules
-dist
+isConnected

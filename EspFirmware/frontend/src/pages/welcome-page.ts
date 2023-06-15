@@ -1,8 +1,8 @@
 import { StateController } from "@lit-app/state";
 import { css, html } from "lit";
 import { customElement } from "lit/decorators.js";
-import { getConnectedNetwork, isEspConnected, WifiStatus } from "./../api";
-import { loadingState, networkState } from "./../states";
+import { getConnectedNetwork, isEspConnected, WifiStatus } from "../api";
+import { loadingState, networkState } from "../states";
 import { BasePage } from "./base-page";
 
 @customElement("welcome-page")

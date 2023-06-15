@@ -1,4 +1,4 @@
-import { loadingState } from "./states";
+import { StateController } from "@lit-app/state";
 import { css, html, LitElement } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import "./elements/dots-stepper-element";
@@ -10,7 +10,7 @@ import "./pages/update-page";
 import "./pages/welcome-page";
 import "./pages/wifi-scanner-page";
 import "./pages/wifi-setup-page";
-import { StateController } from "@lit-app/state";
+import { loadingState } from "./states";
 
 @customElement("first-setup-screen")
 export class FirstSetupScreen extends LitElement {
