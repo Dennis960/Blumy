@@ -44,9 +44,6 @@ export class WifiSetupPage extends BasePage {
                 this.errorText = "Could not connect to WiFi";
             } else if (wifiStatus == WifiStatus.CONNECT_WRONG_PASSWORD) {
                 this.errorText = "Wrong password";
-            } else if (wifiStatus == WifiStatus.DISCONNECTED) {
-                this.errorText =
-                    "The WiFi module is not connected, try resetting the device";
             } else if (wifiStatus == WifiStatus.NO_SSID_AVAIL) {
                 this.errorText = "The specified SSID cannot be reached";
             } else {

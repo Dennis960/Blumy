@@ -22,6 +22,8 @@ export class NamePage extends BasePage {
         if (!response.ok) {
             this.errorText = "Error, device not responding";
             return;
+        } else {
+            this.next();
         }
     }
 

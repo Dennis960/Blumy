@@ -1,4 +1,4 @@
-import { loadingState } from './states';
+import { loadingState } from "./states";
 export type Network = {
     rssi: number;
     ssid: string;
@@ -21,12 +21,12 @@ export enum WifiStatus {
 /* fetch loading state indicator */
 const fetch = new Proxy(window.fetch, {
     apply: async (target, thisArg, args) => {
-      loadingState.state = true;
-      const res = await target.apply(thisArg, args);
-      loadingState.state = false;
-      return res;
+        loadingState.state = true;
+        const res = await target.apply(thisArg, args);
+        loadingState.state = false;
+        return res;
     },
-  });
+});
 
 async function postDataToEsp(url: string, params?: URLSearchParams) {
     return await fetch(url, {
@@ -87,13 +87,17 @@ export async function setMqttCredentials(
     server: string,
     port: string,
     username: string,
-    password: string
+    password: string,
+    topic: string,
+    clientId: string
 ) {
     const params = new URLSearchParams();
-    params.append("mqttServer", server);
-    params.append("mqttPort", port);
-    params.append("mqttUsername", username);
-    params.append("mqttPassword", password);
+    params.append("server", server);
+    params.append("port", port);
+    params.append("user", username);
+    params.append("password", password);
+    params.append("topic", topic);
+    params.append("clientId", clientId);
     return await postDataToEsp("/mqttSetup", params);
 }
 
