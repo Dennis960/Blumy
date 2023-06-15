@@ -70,6 +70,8 @@ void configurationSetup()
     server.on("/mqttSetup", HTTP_POST, handlePostMqttSetup);
     server.on("/sensorId", HTTP_POST, handlePostSensorId);
     server.on("/sensorId", HTTP_GET, handleGetSensorId);
+    server.on("/timeouts/sleep", HTTP_POST, handlePostSleepTimeout);
+    server.on("/timeouts/sleep", HTTP_GET, handleGetSleepTimeout);
     server.on("/update/percentage", HTTP_GET, handleGetUpdatePercentage);
     server.on("/plantName", HTTP_POST, handlePostPlantName);
     server.on("/plantName", HTTP_GET, handleGetPlantName);
@@ -292,6 +294,35 @@ void handlePostSensorId(AsyncWebServerRequest *request)
 void handleGetSensorId(AsyncWebServerRequest *request)
 {
     request->send(200, "text/plain", String(loadSensorId()));
+}
+
+void handlePostSleepTimeout(AsyncWebServerRequest *request)
+{
+    if (!request->hasParam("sleepTimeout", true))
+    {
+        request->send(400, "text/plain", "Bad request");
+        return;
+    }
+    AsyncWebParameter *newSleepTimeout = request->getParam("sleepTimeout", true);
+
+    serialPrintf("Received sleepTimeout: %s\n", newSleepTimeout->value().c_str());
+
+    uint32_t sleepTimeout = atol(newSleepTimeout->value().c_str());
+
+    if (sleepTimeout == 0)
+    {
+        request->send(400, "text/plain", "Bad request");
+        return;
+    }
+
+    saveSleepDuration(sleepTimeout);
+
+    request->send(200, "text/plain", "OK");
+}
+
+void handleGetSleepTimeout(AsyncWebServerRequest *request)
+{
+    request->send(200, "text/plain", String(loadSleepDuration()));
 }
 
 void handleGetUpdateRescue(AsyncWebServerRequest *request)

@@ -25,16 +25,16 @@ void serialPrintf(const char *format, ...)
 
 void startDeepSleep(uint64_t duration, bool disableRfAtBoot)
 {
-    serialPrintf("Going to sleep for %llu microseconds\n", duration);
+    serialPrintf("Going to sleep for %llu seconds\n", duration);
     if (disableRfAtBoot)
     {
         // Setting this flag will disable RF at boot
         // resulting in less interference when measuring moisture
-        ESP.deepSleep(duration, WAKE_RF_DISABLED);
+        ESP.deepSleep(duration * 1000, WAKE_RF_DISABLED);
     }
     else
     {
-        ESP.deepSleep(duration);
+        ESP.deepSleep(duration * 1000);
     }
     yield();
 }

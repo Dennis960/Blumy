@@ -1,15 +1,17 @@
-import { setPlantName, setSensorId } from "../api";
+import { setPlantName, setSensorId, setSleepTimeout } from "../api";
 import { html } from "lit";
 import { property, query, customElement, state } from "lit/decorators.js";
 import { BasePage } from "./base-page";
 import { InputElement } from "./page-elements/input-element";
 import { funnyPlantNames } from "./funny-plant-names";
+import timestring from "timestring";
 
 @customElement("name-page")
 export class NamePage extends BasePage {
     @property({ type: String }) onlineStatus: string;
     @query("#name") nameElement: InputElement;
     @query("#id") idElement: InputElement;
+    @query("#sleepTimeout") sleepTimeoutElement: InputElement;
     @state() errorText: string = "";
 
     generateRandomName() {
@@ -30,6 +32,14 @@ export class NamePage extends BasePage {
             this.idElement.input.value.length == 0
                 ? Date.now()
                 : Number(this.idElement.input.value);
+        let sleepTimeoutString = this.sleepTimeoutElement.input.value;
+        if (sleepTimeoutString.length == 0) {
+            // Default to 1 hour
+            sleepTimeoutString = "1h";
+            this.sleepTimeoutElement.input.value = sleepTimeoutString;
+        }
+        const sleepTimeout = timestring(sleepTimeoutString, "ms");
+
         this.idElement.input.value = id.toString();
         if (name.length == 0) {
             name = this.generateRandomName();
@@ -45,8 +55,13 @@ export class NamePage extends BasePage {
         this.errorText = "";
         const plantNameResponse = await setPlantName(name);
         const sensorIdResponse = await setSensorId(id);
+        const sleepTimeoutResponse = await setSleepTimeout(sleepTimeout);
 
-        if (!plantNameResponse.ok || !sensorIdResponse.ok) {
+        if (
+            !plantNameResponse.ok ||
+            !sensorIdResponse.ok ||
+            !sleepTimeoutResponse.ok
+        ) {
             this.errorText = "Error, device not responding";
             return;
         }
@@ -70,6 +85,12 @@ export class NamePage extends BasePage {
                         @click="${this.setIdToDate}"
                         ?secondary="${false}"
                     ></button-element>
+                </input-element>
+                <input-element
+                    id="sleepTimeout"
+                    label="Sleep Timeout"
+                    initialValue="30 min"
+                >
                 </input-element>
             </input-element-grid>
             <error-text-element text="${this.errorText}"></error-text-element>

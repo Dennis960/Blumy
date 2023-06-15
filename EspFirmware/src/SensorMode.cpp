@@ -75,7 +75,7 @@ void sensorLoop()
             serialPrintf("Sending data\n");
             plantFi.sendData(loadSensorId(), sensorValue, sensor.getMeasurementDuration());
             plantFi.disconnect();
-            startDeepSleep(SLEEP_DURATION);
+            startDeepSleep(loadSleepDuration());
         }
     }
     else
@@ -93,7 +93,7 @@ void sensorLoop()
             if (millis() - plantFi.connectionStartTime > WIFI_TIMEOUT)
             {
                 serialPrintf("Regular connect failed, giving up\n");
-                startDeepSleep(SLEEP_DURATION);
+                startDeepSleep(loadSleepDuration());
             }
         }
     }
@@ -102,6 +102,6 @@ void sensorLoop()
     if (millis() - plantFi.connectionStartTime > TOTAL_TIMEOUT)
     {
         serialPrintf("Total timeout\n");
-        startDeepSleep(SLEEP_DURATION);
+        startDeepSleep(loadSleepDuration());
     }
 }

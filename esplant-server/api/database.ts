@@ -172,6 +172,32 @@ const migrations = [
       // rename new table
       'ALTER TABLE data_new RENAME TO data;'
     ]
+  },
+  {
+    name: 'data_add_plantName_text',
+    statements: [
+      // migrate data table add plantName column
+      // create new table
+      `CREATE TABLE IF NOT EXISTS data_new (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sensorAddress INTEGER NOT NULL,
+      date INTEGER NOT NULL,
+      water INTEGER NOT NULL,
+      voltage INTEGER,
+      duration INTEGER,
+      rssi INTEGER,
+      measurementDuration INTEGER,
+      plantName TEXT,
+      FOREIGN KEY (sensorAddress) REFERENCES sensor(sensorAddress)
+      );`,
+      // copy data to new table
+      `INSERT INTO data_new (id, sensorAddress, date, water, voltage, duration, rssi, measurementDuration)
+      SELECT id, sensorAddress, date, water, voltage, duration, rssi, measurementDuration FROM data;`,
+      // drop old table
+      'DROP TABLE data;',
+      // rename new table
+      'ALTER TABLE data_new RENAME TO data;'
+    ]
   }
 ];
 

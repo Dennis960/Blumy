@@ -176,3 +176,15 @@ String loadPlantName()
     serialPrintf("Loading plant name\n");
     return readStringFromEEPROM(PLANT_NAME_ADDRESS);
 }
+
+void saveSleepDuration(uint32_t sleepDuration)
+{
+    serialPrintf("Saving sleep duration\n");
+    writeUint32_tToEEPROM(SLEEP_DURATION_ADDRESS, sleepDuration);
+}
+
+uint32_t loadSleepDuration()
+{
+    serialPrintf("Loading sleep duration\n");
+    return readUint32_tFromEEPROM(SLEEP_DURATION_ADDRESS);
+}
