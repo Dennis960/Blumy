@@ -47,6 +47,7 @@ export class UpdatePage extends BasePage {
             finished = true;
             if (!res.ok) {
                 this.errorText = "Error, device not responding";
+                return;
             }
             if (!this.errorText) {
                 this.littlefsProgress = 100;
@@ -68,6 +69,7 @@ export class UpdatePage extends BasePage {
             finished = true;
             if (!res.ok) {
                 this.errorText = "Error, device not responding";
+                return;
             }
             if (!this.errorText) {
                 this.firmwareProgress = 100;
