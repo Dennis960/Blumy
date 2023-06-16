@@ -40,6 +40,7 @@ export class WifiSetupPage extends BasePage {
                     } as Network;
                 }
                 this.next();
+                return;
             } else if (wifiStatus == WifiStatus.CONNECT_FAILED) {
                 this.errorText = "Could not connect to WiFi";
             } else if (wifiStatus == WifiStatus.CONNECT_WRONG_PASSWORD) {
@@ -54,6 +55,7 @@ export class WifiSetupPage extends BasePage {
             }
             return;
         }
+        this.errorText = "Could not connect to WiFi";
     }
 
     async painted() {
