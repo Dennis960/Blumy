@@ -393,6 +393,16 @@ export async function addDataBySensorId(data: Data) {
 }
 
 /**
+ * Get all data
+ * @param maxDataPoints The maximum number of data points to return. Defaults to 1000.
+ * @returns All data sorted by date.
+ */
+export async function getData(maxDataPoints: number = 1000) {
+  const data = await dbAll<Data>('SELECT * FROM data ORDER BY date DESC LIMIT ?', [maxDataPoints]);
+  return dataToAverage(data, maxDataPoints);
+}
+
+/**
  * Takes a list of data points and averages them to the specified limit.
  * The average of "water", "voltage", and "duration" are calculated.
  * The average of "date" is the last date.

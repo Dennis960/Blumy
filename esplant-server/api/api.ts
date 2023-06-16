@@ -1,6 +1,6 @@
 import cors from 'cors';
 import { json, Router } from 'express';
-import { addDataBySensorId, createSensorWithId, getSensorById, getSensors, getDataBySensorId, deleteDataBySensorId, deleteSensorById, deleteDataById, updateSensorById } from './database.js';
+import { addDataBySensorId, createSensorWithId, getSensorById, getSensors, getDataBySensorId, deleteDataBySensorId, deleteSensorById, deleteDataById, updateSensorById, getData } from './database.js';
 import { Data } from './types/data.js';
 import dateFormat from 'dateformat';
 
@@ -87,6 +87,18 @@ router.post('/data', async (req, res) => {
   return res.status(200).send({
     message: sensorExists ? 'data added' : 'sensor created and data added',
     data
+  });
+});
+
+// GET /api/data?maxDataPoints=100
+// -> 200 message: data found, data: data
+router.get('/data', async (req, res) => {
+  const { maxDataPoints } = req.query;
+  let maxDataPointsNumber = Number(maxDataPoints) || 1000;
+  const data = await getData(maxDataPointsNumber);
+  return res.status(200).send({
+    message: 'data found',
+    data,
   });
 });
 
