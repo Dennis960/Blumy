@@ -1,12 +1,15 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
+import { viteSingleFile } from "vite-plugin-singlefile";
 
 export default defineConfig({
+  plugins: [
+    viteSingleFile(),
+  ],
   build: {
     rollupOptions: {
       input: {
         index: resolve(__dirname, "index.html"),
-        home: resolve(__dirname, "home.html"),
       },
       output: {
         entryFileNames: "assets/[name].js",
