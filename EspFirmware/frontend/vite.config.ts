@@ -15,5 +15,7 @@ export default defineConfig({
       },
     },
     outDir: "../data",
+    target: "es2022",
+    modulePreload: false,
   },
 });
