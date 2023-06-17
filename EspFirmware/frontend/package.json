@@ -11,6 +11,7 @@
     "timestring": "^7.0.0",
     "uglify-js": "^3.17.4",
     "vite": "^3.1.8",
+    "vite-plugin-mock-dev-server": "^1.1.16",
     "vite-plugin-singlefile": "^0.13.5"
   }
 }

@@ -25,10 +25,14 @@ export enum ResetFlag {
 
 /* fetch loading state indicator */
 const fetch = new Proxy(window.fetch, {
-    apply: async (target, thisArg, args) => {
+    apply: async (target, thisArgs, args) => {
+        // add /api prefix to url
+        if (typeof args[0] === "string") {
+            args[0] = "/api" + args[0];
+        }
         loadingState.state++;
         try {
-            const res = await target.apply(thisArg, args);
+            const res = await target.apply(thisArgs, args);
             return res;
         } finally {
             loadingState.state--;
