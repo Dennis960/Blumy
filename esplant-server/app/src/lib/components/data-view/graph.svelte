@@ -30,6 +30,8 @@
   let selectedData: Data;
   let errorMessage: string = "";
 
+  let autoReload = false;
+
   function updateSeries() {
     const schemaProperty = dataSchema.filter(
       (schema) => schema.name == property
@@ -105,6 +107,20 @@
     runtimeDataClient.setOptions(runtimeDataRequest);
   }
 
+  let reloadInterval: number;
+  $: if (autoReload) {
+    if (reloadInterval) {
+      clearInterval(reloadInterval);
+    }
+    reloadInterval = setInterval(() => {
+      updateData();
+    }, 1000);
+  } else {
+    if (reloadInterval) {
+      clearInterval(reloadInterval);
+    }
+  }
+
   $: if (duration) {
     updateData();
   }
@@ -143,11 +159,16 @@
     </form>
   {/if}
 </dialog>
+<form class="reload">
+  <label for="auto-reload">Auto-Reload</label>
+  <input id="auto-reload" name="auto-reload" type="checkbox" bind:checked={autoReload} />
+</form>
 
 <style>
   input {
     color: black;
     width: 100%;
+    height: 1rem;
   }
   p.error {
     color: red;
@@ -155,5 +176,14 @@
   div.buttons {
     display: flex;
     flex-direction: row;
+  }
+  .reload {
+    display: flex;
+  }
+  .reload label {
+    width: 100px;
+  }
+  .reload input {
+    width: 1rem;
   }
 </style>
