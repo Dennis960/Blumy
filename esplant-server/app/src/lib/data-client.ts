@@ -20,6 +20,15 @@ export class DataClient {
     this.options = options;
     this.optionsJson = JSON.stringify(options);
   }
+
+  deleteData(selectedData: number) {
+    return postDeleteData(selectedData);
+  }
+
+  updateData() {
+    if (!this.options) return;
+    this.setOptions(this.options, true);
+  }
 }
 
 async function fetchRuntimeData(options: RequestData): Promise<Data[]> {
@@ -36,6 +45,10 @@ async function fetchRuntimeData(options: RequestData): Promise<Data[]> {
     return [];
   }
   return (await result.json() as ApiResponse<Data[]>).data;
+}
+
+async function postDeleteData(id: number) {
+  return await fetch(`/api/data/${id}`, { method: 'DELETE' });
 }
 
 export async function getAllSensorIds(): Promise<ApiResponse<Sensor[]>> {

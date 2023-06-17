@@ -1,9 +1,10 @@
 <script lang="ts">
   import { DEFAULT_MAX_DATA_POINTS } from "$lib/constants";
   import { DataClient } from "$lib/data-client";
-  import { defaultGraphOptions } from "$lib/graph";
+  import { defaultGraphOptions, deepSpread } from "$lib/graph";
   import type { RequestData } from "$types/api";
   import { onMount } from "svelte";
+  import type { ApexOptions } from 'apexcharts';
   import ApexChart from "./apex-chart.svelte";
   import { type DataKey, dataSchema } from "../../../../../api/types/data";
 
@@ -22,7 +23,12 @@
   let dataStore = runtimeDataClient.dataStore;
 
   let series: ApexAxisChartSeries = [];
-  let options = {};
+  let options: ApexOptions = {};
+
+  let dialog: HTMLDialogElement;
+  type Data = {id: number, date: string, value: number};
+  let selectedData: Data;
+  let errorMessage: string = "";
 
   function updateSeries() {
     const schemaProperty = dataSchema.filter(
@@ -39,6 +45,7 @@
           return {
             x: new Date(data.date || 0),
             y: data[property],
+            id: data.id
           };
         }),
         color: schemaProperty.color,
@@ -54,10 +61,38 @@
         color: "transparent",
       },
     ];
+    const graphOptions = deepSpread(defaultGraphOptions, {
+      chart: {
+        events: {
+          click(event, chartContext, config) {
+            const data = config.config.series[config.seriesIndex].data[config.dataPointIndex];
+            onDataIdClick({
+              id: data.id,
+              date: new Date(data.x).toLocaleString(),
+              value: data.y,
+            });
+          }
+        },
+      }})
     options = {
-      ...defaultGraphOptions,
+      ...graphOptions,
       series: series,
     };
+  }
+
+  function onDataIdClick(data: Data) {
+    dialog.open = true;
+    selectedData = data;
+  }
+
+  async function deleteSelectedData() {
+    const res = await runtimeDataClient.deleteData(selectedData.id);
+    if (!res.ok) {
+      errorMessage = "Data could not be deleted: " + res.statusText;
+    } else {
+      runtimeDataClient.updateData();
+      dialog.open = false;
+    }
   }
 
   function updateData() {
@@ -88,3 +123,37 @@
 </script>
 
 <ApexChart {options} />
+<dialog bind:this={dialog}>
+  {#if selectedData}
+    <p>Folgender Datenpunkt wurde ausgewählt</p>
+    <form action="#">
+      <label for="data-id">ID</label>
+      <input type="number" id="data-id" name="data-id" bind:value={selectedData.id} readonly />
+      <label for="data-date">Datum</label>
+      <input type="text" id="data-date" name="data-date" bind:value={selectedData.date} readonly />
+      <label for="data-value">Wert</label>
+      <input type="number" id="data-value" name="data-value" bind:value={selectedData.value} readonly />
+      {#if errorMessage}
+        <p class="error">{errorMessage}</p>
+      {/if}
+      <div class="buttons">
+        <button type="button" on:click={() => dialog.open = false}>Schließen</button>
+        <button type="button" on:click={deleteSelectedData}>Löschen</button>
+      </div>
+    </form>
+  {/if}
+</dialog>
+
+<style>
+  input {
+    color: black;
+    width: 100%;
+  }
+  p.error {
+    color: red;
+  }
+  div.buttons {
+    display: flex;
+    flex-direction: row;
+  }
+</style>
