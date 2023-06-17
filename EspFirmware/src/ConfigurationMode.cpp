@@ -64,29 +64,29 @@ void configurationSetup()
     // start the webserver
     serialPrintf("Starting webserver\n");
     server.onNotFound(handleGetNotFound);
-    server.on("/connect", HTTP_POST, handlePostConnect);
-    server.on("/reset", HTTP_POST, handlePostReset);
-    server.on("/networks", HTTP_GET, handleGetNetworks);
-    server.on("/isConnected", HTTP_GET, handleGetIsConnected);
-    server.on("/mqttSetup", HTTP_POST, handlePostMqttSetup);
-    server.on("/sensorId", HTTP_POST, handlePostSensorId);
-    server.on("/sensorId", HTTP_GET, handleGetSensorId);
-    server.on("/timeouts/sleep", HTTP_POST, handlePostSleepTimeout);
-    server.on("/timeouts/sleep", HTTP_GET, handleGetSleepTimeout);
-    server.on("/update/percentage", HTTP_GET, handleGetUpdatePercentage);
-    server.on("/plantName", HTTP_POST, handlePostPlantName);
-    server.on("/plantName", HTTP_GET, handleGetPlantName);
-    server.on("/connectedNetwork", HTTP_GET, handleGetConnectedNetwork);
+    server.on("/api/connect", HTTP_POST, handlePostConnect);
+    server.on("/api/reset", HTTP_POST, handlePostReset);
+    server.on("/api/networks", HTTP_GET, handleGetNetworks);
+    server.on("/api/isConnected", HTTP_GET, handleGetIsConnected);
+    server.on("/api/mqttSetup", HTTP_POST, handlePostMqttSetup);
+    server.on("/api/sensorId", HTTP_POST, handlePostSensorId);
+    server.on("/api/sensorId", HTTP_GET, handleGetSensorId);
+    server.on("/api/timeouts/sleep", HTTP_POST, handlePostSleepTimeout);
+    server.on("/api/timeouts/sleep", HTTP_GET, handleGetSleepTimeout);
+    server.on("/api/update/percentage", HTTP_GET, handleGetUpdatePercentage);
+    server.on("/api/plantName", HTTP_POST, handlePostPlantName);
+    server.on("/api/plantName", HTTP_GET, handleGetPlantName);
+    server.on("/api/connectedNetwork", HTTP_GET, handleGetConnectedNetwork);
 
     // OTA
-    server.on("/update/rescue", HTTP_GET, handleGetUpdateRescue);
+    server.on("/api/update/rescue", HTTP_GET, handleGetUpdateRescue);
     server.on(
-        "/update/firmware", HTTP_POST, [](AsyncWebServerRequest *request) {},
+        "/api/update/firmware", HTTP_POST, [](AsyncWebServerRequest *request) {},
         [](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data,
            size_t len, bool final)
         { handlePostUpdate(request, filename, index, data, len, final, U_FLASH); });
     server.on(
-        "/update/littlefs", HTTP_POST, [](AsyncWebServerRequest *request) {},
+        "/api/update/littlefs", HTTP_POST, [](AsyncWebServerRequest *request) {},
         [](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data,
            size_t len, bool final)
         { handlePostUpdate(request, filename, index, data, len, final, U_FS); });
