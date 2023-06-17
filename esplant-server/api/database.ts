@@ -403,6 +403,16 @@ export async function getData(maxDataPoints: number = 1000) {
 }
 
 /**
+ * Get number of data points for a sensor.
+ * @param sensorAddress The address of the sensor.
+ * @returns The number of data points.
+ */
+export async function getDataCountBySensorId(sensorAddress: number) {
+  const data = await dbGet<{ count: number }>('SELECT COUNT(*) as count FROM data WHERE sensorAddress = ?', [sensorAddress]);
+  return data?.count ?? 0;
+}
+
+/**
  * Takes a list of data points and averages them to the specified limit.
  * The average of "water", "voltage", and "duration" are calculated.
  * The average of "date" is the last date.
