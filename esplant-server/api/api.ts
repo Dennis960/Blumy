@@ -1,6 +1,6 @@
 import cors from 'cors';
 import { json, Router } from 'express';
-import { addDataBySensorId, createSensorWithId, getSensorById, getSensors, getDataBySensorId, deleteDataBySensorId, deleteSensorById, deleteDataById, updateSensorById, getData } from './database.js';
+import { addDataBySensorId, getDataCountBySensorId, createSensorWithId, getSensorById, getSensors, getDataBySensorId, deleteDataBySensorId, deleteSensorById, deleteDataById, updateSensorById, getData } from './database.js';
 import { Data } from './types/data.js';
 import dateFormat from 'dateformat';
 
@@ -127,6 +127,25 @@ router.get('/sensors', async (req, res) => {
   return res.status(200).send({
     message: 'sensors found',
     data: sensors,
+  });
+});
+
+// GET /api/sensors/:sensorAddress/data/count
+// -> 404 message: sensor not found, data: {}
+// -> 200 message: data count found, data: count
+router.get('/sensors/:sensorAddress/data/count', async (req, res) => {
+  const { sensorAddress } = req.params;
+  const sensor = await getSensorById(Number(sensorAddress));
+  if (!sensor) {
+    return res.status(404).send({
+      message: 'sensor not found',
+      data: {},
+    });
+  }
+  const count = await getDataCountBySensorId(Number(sensorAddress));
+  return res.status(200).send({
+    message: 'data count found',
+    data: count,
   });
 });
 
