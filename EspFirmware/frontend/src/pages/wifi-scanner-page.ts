@@ -16,8 +16,10 @@ export class WifiScannerPage extends BasePage {
         if (networks === undefined || networks === null) {
             this.errorText = "Error getting networks";
             return;
+        } else {
+            this.errorText = "";
+            this.networks = networks;
         }
-        this.networks = networks;
     }
 
     interval = setInterval(() => {
