@@ -13,11 +13,11 @@ private:
     int values[50];
     long sum = 0;
     int counter = 0;
-    int value = 0;
     unsigned long measurmementStartTime = 0;
     unsigned long measurementEndTime = 0;
 
 public:
+    int value = 0;
     Sensor();
 
     /**
@@ -31,14 +31,20 @@ public:
     int measure();
 
     /**
+     * Measures the soil moisture without averaging the data or ending the measurement.
+     * 
+     * @return The measured analog value, raw.
+    */
+    int measureRaw();
+
+    /**
      * Calculates the time it took for the measurement to stabilize.
      * 
      * @return The duration of the measurement in milliseconds.
     */
-    unsigned long getMeasurementDuration()
-    {
-        return measurementEndTime - measurmementStartTime;
-    }
+    unsigned long getMeasurementDuration();
 };
+
+extern Sensor sensor;
 
 #endif

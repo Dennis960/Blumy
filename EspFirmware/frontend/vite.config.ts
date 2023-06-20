@@ -6,17 +6,13 @@ import mockDevServerPlugin from 'vite-plugin-mock-dev-server'
 export default defineConfig({
   plugins: [
     mockDevServerPlugin(),
-    viteSingleFile(),
+    // viteSingleFile(),
   ],
   build: {
     rollupOptions: {
       input: {
         index: resolve(__dirname, "index.html"),
-      },
-      output: {
-        entryFileNames: "assets/[name].js",
-        chunkFileNames: "assets/[name].js",
-        assetFileNames: "assets/[name].[ext]",
+        home: resolve(__dirname, "home.html"),
       },
     },
     outDir: "../data",

@@ -26,10 +26,6 @@ export enum ResetFlag {
 /* fetch loading state indicator */
 const fetch = new Proxy(window.fetch, {
     apply: async (target, thisArgs, args) => {
-        // add /api prefix to url
-        if (typeof args[0] === "string") {
-            args[0] = "/api" + args[0];
-        }
         loadingState.state++;
         try {
             const res = await target.apply(thisArgs, args);
@@ -41,7 +37,7 @@ const fetch = new Proxy(window.fetch, {
 });
 
 async function postDataToEsp(url: string, params?: URLSearchParams) {
-    return await fetch(url, {
+    return await fetch("/api" + url, {
         method: "POST",
         body: params,
         headers: {
@@ -51,12 +47,21 @@ async function postDataToEsp(url: string, params?: URLSearchParams) {
 }
 
 async function getDataFromEsp(url: string) {
-    return await fetch(url)
+    return await fetch("/api" + url)
         .then((response) => response.json())
         .catch((error) => {
             console.error(error);
             return null;
         });
+}
+
+async function uploadFile(file: File, url: string) {
+    const formData = new FormData();
+    formData.append("upload", file);
+    return await fetch("/api" + url, {
+        method: "POST",
+        body: formData,
+    });
 }
 
 export async function setPlantName(name: string) {
@@ -143,19 +148,14 @@ export async function getUpdatePercentage() {
     return Number(await getDataFromEsp("/update/percentage"));
 }
 
-async function uploadFile(file: File, url: string) {
-    const formData = new FormData();
-    formData.append("upload", file);
-    return await fetch(url, {
-        method: "POST",
-        body: formData,
-    });
-}
-
 export async function updateFs(file: File) {
     return await uploadFile(file, "/update/littlefs");
 }
 
 export async function updateFirmware(file: File) {
     return await uploadFile(file, "/update/firmware");
+}
+
+export async function getSensorValue() {
+    return Number(await getDataFromEsp("/sensor/value"));
 }
