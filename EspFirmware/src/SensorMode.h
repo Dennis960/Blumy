@@ -10,7 +10,6 @@
 #include "Utils.h"
 #include "MyEeprom.h"
 
-extern Sensor sensor;
 extern PlantFi plantFi;
 
 extern int sensorValue;

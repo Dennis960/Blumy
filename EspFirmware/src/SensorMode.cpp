@@ -1,6 +1,5 @@
 #include "SensorMode.h"
 
-Sensor sensor = Sensor();
 PlantFi plantFi = PlantFi("", "", "", 0, "", "", "", "");
 
 int sensorValue = -1;

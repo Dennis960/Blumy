@@ -1,3 +1,4 @@
+import { getSensorValue } from "./api";
 import { css, html, LitElement } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import "./elements/dots-stepper-element";
@@ -10,8 +11,8 @@ import "./pages/welcome-page";
 import "./pages/wifi-scanner-page";
 import "./pages/wifi-setup-page";
 
-@customElement("first-setup-screen")
-export class FirstSetupScreen extends LitElement {
+@customElement("home-screen")
+export class HomeScreen extends LitElement {
     static styles = css`
         :host {
             display: flex;
@@ -30,6 +31,25 @@ export class FirstSetupScreen extends LitElement {
 
     @state()
     loading = false;
+    @state()
+    sensorValue = 0;
+
+    shouldGetSensorValue = true;
+
+    constructor() {
+        super();
+        (async () => {
+            while (this.shouldGetSensorValue) {
+                this.sensorValue = await getSensorValue();
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+            }
+        })();
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        this.shouldGetSensorValue = false;
+    }
 
     render() {
         return html`
@@ -37,6 +57,12 @@ export class FirstSetupScreen extends LitElement {
             <loader-bar-element ?active="${this.loading}"></loader-bar-element>
             <div class="page">
                 This is the home screen. It is currently under construction.
+            </div>
+            <p style="font-size: 1.5rem; font-weight: bold;">
+                Currently reading water value:
+            </p>
+            <div style="font-size: 3rem; font-weight: bold;">
+                ${this.sensorValue}
             </div>
         `;
     }

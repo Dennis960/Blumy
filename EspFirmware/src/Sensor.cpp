@@ -1,5 +1,7 @@
 #include <Sensor.h>
 
+Sensor sensor = Sensor();
+
 Sensor::Sensor()
 {
     analogWriteFreq(40000);
@@ -32,4 +34,14 @@ int Sensor::measure()
         return 1024 - value; // invert -> now 0 is dry and 1024 is wet
     }
     return -1;
+}
+
+int Sensor::measureRaw()
+{
+    return analogRead(ANALOG_PIN);
+}
+
+unsigned long Sensor::getMeasurementDuration()
+{
+    return measurementEndTime - measurmementStartTime;
 }

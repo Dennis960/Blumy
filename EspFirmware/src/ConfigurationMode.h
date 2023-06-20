@@ -12,6 +12,7 @@
 #include "Utils.h"
 #include "MyEeprom.h"
 #include "Reset.h"
+#include "Sensor.h"
 
 #define AP_SSID "PlantFi"
 
@@ -184,4 +185,8 @@ void handleGetPlantName(AsyncWebServerRequest *request);
  */
 void handleGetConnectedNetwork(AsyncWebServerRequest *request);
 
+/**
+ * Sends text/plain response with the last measured sensor value
+*/
+void handleGetSensorValue(AsyncWebServerRequest *request);
 #endif

@@ -1,8 +1,8 @@
 import { StateController } from "@lit-app/state";
 import { css, html } from "lit";
-import { customElement } from "lit/decorators.js";
+import { customElement, state } from "lit/decorators.js";
 import { getConnectedNetwork, isEspConnected, WifiStatus } from "../api";
-import { loadingState, networkState } from "../states";
+import { networkState } from "../states";
 import { BasePage } from "./base-page";
 
 @customElement("welcome-page")
@@ -20,18 +20,28 @@ export class WelcomePage extends BasePage {
 
     networkStateController = new StateController(this, networkState);
 
+    shouldReadWifiStatus = true;
+
     constructor() {
         super();
         (async () => {
-            const wifiStatus = await isEspConnected();
-            if (wifiStatus == WifiStatus.CONNECTED) {
-                const network = await getConnectedNetwork();
-                networkState.state = {
-                    isConnected: true,
-                    network: network,
-                };
+            while (this.shouldReadWifiStatus) {
+                const wifiStatus = await isEspConnected();
+                if (wifiStatus == WifiStatus.CONNECTED) {
+                    const network = await getConnectedNetwork();
+                    networkState.state = {
+                        isConnected: true,
+                        network: network,
+                    };
+                }
+                await new Promise((resolve) => setTimeout(resolve, 1000));
             }
         })();
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        this.shouldReadWifiStatus = false;
     }
 
     render() {

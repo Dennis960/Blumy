@@ -77,6 +77,7 @@ void configurationSetup()
     server.on("/api/plantName", HTTP_POST, handlePostPlantName);
     server.on("/api/plantName", HTTP_GET, handleGetPlantName);
     server.on("/api/connectedNetwork", HTTP_GET, handleGetConnectedNetwork);
+    server.on("/api/sensor/value", HTTP_GET, handleGetSensorValue);
 
     // OTA
     server.on("/api/update/rescue", HTTP_GET, handleGetUpdateRescue);
@@ -158,7 +159,16 @@ void configurationLoop()
 
 void handleGetNotFound(AsyncWebServerRequest *request)
 {
-    request->redirect("/");
+    String path = request->url();
+    if (path.endsWith(".html"))
+    {
+        path = "/";
+    }
+    else
+    {
+        path = path + ".html";
+    }
+    request->redirect(path);
 }
 
 void handlePostConnect(AsyncWebServerRequest *request)
@@ -461,4 +471,9 @@ void handleGetConnectedNetwork(AsyncWebServerRequest *request)
     connectedNetworkJson += "\"channel\": \"" + String(WiFi.channel()) + "\"";
     connectedNetworkJson += "}";
     request->send(200, "text/plain", connectedNetworkJson);
+}
+
+void handleGetSensorValue(AsyncWebServerRequest *request)
+{
+    request->send(200, "text/plain", String(sensor.measureRaw()));
 }
