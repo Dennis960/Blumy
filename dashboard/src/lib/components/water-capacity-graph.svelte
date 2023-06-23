@@ -38,7 +38,7 @@
 			],
 			stroke: {
 				curve: 'straight',
-				width: 1,
+				width: 3,
 				dashArray: [0, 5]
 			},
 			fill: {
@@ -98,12 +98,12 @@
 				yaxis: [
 					{
 						y: sensor.config.upperThreshold,
-						borderColor: 'var(--tblr-warning)'
+						borderColor: 'var(--tblr-warning)',
 					},
 					{
 						y: 1.0,
 						y2: Math.max(1.0, historyEntriesMax),
-						fillColor: 'var(--tblr-danger)'
+						fillColor: 'var(--tblr-danger)',
 					},
 					{
 						y: sensor.config.lowerThreshold,
