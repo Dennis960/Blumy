@@ -117,3 +117,9 @@
 		</div>
 	</div>
 </div>
+
+<style>
+	:global(.tabler-icon) {
+		touch-action: inherit;
+	}
+</style>
