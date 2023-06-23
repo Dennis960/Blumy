@@ -4,6 +4,7 @@
 	import SensorRow from '$lib/components/sensor-row.svelte';
 	import { IconBucketDroplet, IconPlant } from '@tabler/icons-svelte';
 	import Time from 'svelte-time';
+	import SensorStatusCard from '$lib/components/sensor-status-card.svelte';
 
 	$: query = createQuery({
 		queryKey: ['sensor-ids'],
@@ -47,59 +48,40 @@
 <div class="page-body">
 	<div class="row row-deck row-cards">
 		<div class="col-12 col-md-4 col-lg-3">
-			<section class="card">
-				<div class="card-body">
-					<h1 class="subheader mb-0">Plants</h1>
-					<div class="h1">
-						<IconPlant class="align-text-bottom" size={24} />
-						<span class="ms-1">{totalSensors}</span>
-					</div>
-				</div>
-			</section>
+			<SensorStatusCard title="Plants" value={totalSensors.toString()}>
+				<IconPlant slot="icon" class="align-text-bottom" size={24} />
+			</SensorStatusCard>
 		</div>
 
 		{#if minNextWatering}
 			<div class="col-12 col-md-4 col-lg-3">
-				<section class="card">
-					<div class="card-body">
-						<h1 class="subheader mb-0">Next Watering</h1>
-						<div
-							class="h1 {anyWateringToday ? 'text-danger' : ''} {anyWateringTomorrow
-								? 'text-warning'
-								: ''}"
-						>
-							<IconBucketDroplet class="align-text-bottom" size={24} />
-							<Time class="ms-1" relative timestamp={minNextWatering} />
-						</div>
-					</div>
-				</section>
+				<SensorStatusCard
+					title="Next Watering"
+					critical={anyWateringToday}
+					warning={anyWateringTomorrow}
+				>
+					<IconBucketDroplet slot="icon" class="align-text-bottom" size={24} />
+					<Time slot="value" relative timestamp={minNextWatering} />
+				</SensorStatusCard>
 			</div>
 		{/if}
 
 		<div class="col-12 col-md-4 col-lg-3">
-			<section class="card">
-				<div class="card-body">
-					<h1 class="subheader mb-0">Plant Health</h1>
-					<span
-						class="h1 {poorPlantHealth == 0 ? 'text-green' : ''} {poorPlantHealth > 0
-							? 'text-danger'
-							: ''}">{poorPlantHealth} {poorPlantHealth == 1 ? 'Problem' : 'Problems'}</span
-					>
-				</div>
-			</section>
+			<SensorStatusCard
+				title="Plant Health"
+				value={`${poorPlantHealth} ${poorPlantHealth == 1 ? 'Problem' : 'Problems'}`}
+				ok={poorPlantHealth == 0}
+				critical={poorPlantHealth > 0}
+			/>
 		</div>
 
 		<div class="col-12 col-md-4 col-lg-3">
-			<section class="card">
-				<div class="card-body">
-					<h1 class="subheader mb-0">Sensor Health</h1>
-					<span
-						class="h1 {poorSensorHealth == 0 ? 'text-green' : ''} {poorSensorHealth > 0
-							? 'text-danger'
-							: ''}">{poorSensorHealth} {poorSensorHealth == 1 ? 'Problem' : 'Problems'}</span
-					>
-				</div>
-			</section>
+			<SensorStatusCard
+				title="Sensor Health"
+				value={`${poorSensorHealth} ${poorSensorHealth == 1 ? 'Problem' : 'Problems'}`}
+				ok={poorSensorHealth == 0}
+				critical={poorSensorHealth > 0}
+			/>
 		</div>
 
 		<div class="col-12">
