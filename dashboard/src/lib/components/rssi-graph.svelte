@@ -13,12 +13,12 @@
 						x: entry.timestamp,
 						y: entry.rssi
 					})),
-					color: 'var(--tblr-secondary)'
+					color: 'var(--tblr-black)'
 				}
 			],
 			stroke: {
-				curve: 'straight',
-				width: 1
+				curve: 'stepline',
+				width: 2
 			},
 			chart: {
 				type: 'line',

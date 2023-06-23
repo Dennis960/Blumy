@@ -17,7 +17,7 @@
 	export let name: string;
 
 	$: query = createQuery({
-		queryKey: ['sensor-data', id],
+		queryKey: ['sensor-sparkline', id],
 		queryFn: () => {
 			const threeDaysAgo = new Date();
 			threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);

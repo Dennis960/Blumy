@@ -4,14 +4,14 @@
 
 	export let sensor: Sensor;
 
-	$: historyEntriesMax = sensor.waterCapacityHistory
-		.map((entry) => entry.availableWaterCapacity)
-		.reduce((a, b) => Math.max(a, b), 0);
-	$: historyEntriesMin = sensor.waterCapacityHistory
-		.map((entry) => entry.availableWaterCapacity)
-		.reduce((a, b) => Math.min(a, b), 1);
-
 	function getOptions(): ChartOptions {
+		const waterCapacityMax = sensor.waterCapacityHistory
+			.map((entry) => entry.availableWaterCapacity)
+			.reduce((a, b) => Math.max(a, b), 0);
+		const waterCapacityMin = sensor.waterCapacityHistory
+			.map((entry) => entry.availableWaterCapacity)
+			.reduce((a, b) => Math.min(a, b), 1);
+
 		return {
 			series: [
 				{
@@ -72,7 +72,7 @@
 					},
 					{
 						y: 1.0,
-						y2: Math.max(1.0, historyEntriesMax),
+						y2: Math.max(1.0, waterCapacityMax),
 						fillColor: 'var(--tblr-danger)'
 					},
 					{
@@ -80,7 +80,7 @@
 						borderColor: 'var(--tblr-warning)'
 					},
 					{
-						y: Math.min(0.0, historyEntriesMin),
+						y: Math.min(0.0, waterCapacityMin),
 						y2: 0.0,
 						fillColor: 'var(--tblr-danger)'
 					}
