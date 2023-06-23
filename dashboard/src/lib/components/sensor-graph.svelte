@@ -68,6 +68,13 @@
 		legend: {
 			show: false
 		},
+		tooltip: {
+			x: {
+				formatter: (v: number) => {
+					return new Date(v).toLocaleString();
+				}
+			}
+		},
 		plotOptions: {
 			area: {
 				fillTo: 'end'
