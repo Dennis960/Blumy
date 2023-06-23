@@ -10,7 +10,7 @@
 	onMount(async () => {
 		const Litepicker = (await import('litepicker')).default;
 		litepicker = new Litepicker({
-			element: container,
+			element: container.firstChild ?? container,
 			...options,
 			setup: (picker) => {
 				options.setup?.(picker);
@@ -31,4 +31,6 @@
 	});
 </script>
 
-<div class="datepicker-inline" bind:this={container} />
+<div class="datepicker-inline" bind:this={container}>
+	<slot></slot>
+</div>

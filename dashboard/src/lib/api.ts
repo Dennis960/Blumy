@@ -32,6 +32,11 @@ export interface WaterCapacityHistoryEntry {
     availableWaterCapacity: number;
 }
 
+export interface RSSIHistoryEntry {
+    timestamp: Date;
+    rssi: number;
+}
+
 export interface SensorStatus {
     signalStrength: 'offline' | 'strong' | 'moderate' | 'weak';
     drowning: boolean;
@@ -48,6 +53,7 @@ export interface Sensor {
     config: SensorConfiguration;
     lastReading: SensorReading | undefined;
     waterCapacityHistory: WaterCapacityHistoryEntry[];
+    rssiHistory: RSSIHistoryEntry[];
     estimatedNextWatering: Date | undefined;
     status: SensorStatus;
 }
@@ -203,7 +209,7 @@ export async function fetchSensorData(
         endDate: endDate.getTime().toString(),
         maxDataPoints: '9999999'
     });
-    const config = {
+    const config: SensorConfiguration = {
         name,
         // TODO fetch config from API
         fieldCapacity: 1000,
@@ -234,6 +240,11 @@ export async function fetchSensorData(
 
     const detectedWateringReadings = detectWateringReadings(sensorData);
     const model = fitModel(sensorData, detectedWateringReadings);
+    
+    const rssiHistory = sensorData.map((reading) => ({
+        timestamp: reading.timestamp,
+        rssi: reading.rssi
+    }));
 
     const waterCapacityHistory = (<WaterCapacityHistoryEntry[]>[]).concat(
         sensorData.map((reading) => ({
@@ -263,6 +274,7 @@ export async function fetchSensorData(
         config,
         lastReading,
         waterCapacityHistory,
+        rssiHistory,
         estimatedNextWatering:
             model == undefined ? undefined : model.predictTimestamp(config.lowerThreshold),
         status

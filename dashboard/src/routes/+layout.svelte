@@ -28,9 +28,7 @@
 				>
 					<span class="navbar-toggler-icon" />
 				</button>
-				<a class="navbar-brand ms-2 ms-lg-0 me-auto" href="/">
-					PlantFi Dashboard
-				</a>
+				<a class="navbar-brand ms-2 ms-lg-0 me-auto" href="/"> PlantFi Dashboard </a>
 				<div class="collapse navbar-collapse" id="navbarNav">
 					<ul class="navbar-nav">
 						<li class="nav-item">
@@ -41,11 +39,7 @@
 			</div>
 		</header>
 		<div class="page-wrapper">
-			<div class="page-body">
-				<div class="container-xl">
-					<slot />
-				</div>
-			</div>
+			<slot />
 		</div>
 	</div>
 </QueryClientProvider>
