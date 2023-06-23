@@ -23,6 +23,7 @@
 	import Litepicker from '$lib/components/litepicker.svelte';
 	import SensorStatusCard from '$lib/components/sensor-status-card.svelte';
 	import RssiGraph from '$lib/components/rssi-graph.svelte';
+	import { goto } from '$app/navigation';
 
 	export let data;
 
@@ -37,9 +38,12 @@
 		endDate: data.endDate
 	};
 
-	function updateDate(newStartDate: Date, newEndDate: Date) {
-		startDate = newStartDate;
-		endDate = newEndDate;
+	function updateDate(startDate: Date, endDate: Date) {
+		const query = new URLSearchParams({
+			from: startDate.getTime().toString(),
+			to: endDate.getTime().toString()
+		});
+		goto(`?${query.toString()}`);
 	}
 
 	function handleDateChange(e: CustomEvent) {
@@ -49,9 +53,6 @@
 		newEndDate.setHours(23, 59, 59, 999);
 		updateDate(newStartDate, newEndDate);
 	}
-
-	let startDate = data.startDate;
-	let endDate = data.endDate;
 
 	$: statusQuery = createQuery({
 		queryKey: ['sensor-data', data.id],
@@ -64,8 +65,9 @@
 	});
 
 	$: historyQuery = createQuery({
-		queryKey: ['sensor-data', data.id, startDate, endDate],
-		queryFn: () => fetchSensorData(data.id, data.name, startDate, endDate)
+		queryKey: ['sensor-data', data.id, data.startDate, data.endDate],
+		queryFn: () => fetchSensorData(data.id, data.name, data.startDate, data.endDate),
+		keepPreviousData: true
 	});
 </script>
 
