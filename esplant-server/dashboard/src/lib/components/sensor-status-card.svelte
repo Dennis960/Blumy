@@ -10,12 +10,12 @@
 	<div class="card-body">
 		<h1 class="subheader mb-0">{title}</h1>
 		<div
-			class="h1 {ok && !warning && !critical ? 'text-green' : ''} {warning && !critical
+			class="h2 d-flex align-items-center {ok && !warning && !critical ? 'text-green' : ''} {warning && !critical
 				? 'text-warning'
 				: ''} {critical ? 'text-danger' : ''}"
 		>
 			<slot name="icon" />
-			<span class={$$slots.icon ? 'ms-1' : ''}>
+			<span class="{$$slots.icon ? 'ms-1' : ''} text-nowrap text-truncate">
 				<slot name="value">
 					{value}
 				</slot>
