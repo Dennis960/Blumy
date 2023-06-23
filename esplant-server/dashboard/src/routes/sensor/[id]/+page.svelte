@@ -73,12 +73,12 @@
 
 <div class="page-header">
 	<div class="container-xl">
-		<div class="row">
-			<div class="col">
+		<div class="row row-gap-3 align-items-center">
+			<div class="col-12 col-md-auto me-auto">
 				<h1 class="page-title">{data.name}</h1>
 			</div>
 
-			<div class="col-auto me-auto">
+			<div class="col-auto">
 				<div class="input-icon">
 					<Litepicker options={litepickerOptions} on:selected={handleDateChange}>
 						<input class="form-control pe-5" />
@@ -96,13 +96,13 @@
 	<div class="container-xl">
 		<div class="row row-decks row-cards">
 			{#if $statusQuery.data?.lastReading == undefined}
-				<div class="col-12 col-md-4 col-lg-3">
+				<div class="col-6 col-md-3 col-lg-2">
 					<SensorStatusCard title="Sensor Health" value="No Data" critical>
-						<IconAlertTriangle slot="icon" class="align-text-bottom" size={24} />
+						<IconAlertTriangle slot="icon" size={24} />
 					</SensorStatusCard>
 				</div>
 			{:else}
-				<div class="col-12 col-md-4 col-lg-3">
+				<div class="col-6 col-md-3 col-lg-2">
 					<SensorStatusCard
 						title="Water Capacity"
 						value={$statusQuery.data.status.drowning
@@ -115,22 +115,22 @@
 					>
 						<svelte:fragment slot="icon">
 							{#if $statusQuery.data.status.drowning}
-								<IconScubaMask class="align-text-bottom" size={24} />
+								<IconScubaMask size={24} />
 							{:else if $statusQuery.data.status.wilting}
-								<IconGrave class="align-text-bottom" size={24} />
+								<IconGrave size={24} />
 							{:else if $statusQuery.data.status.overwatered}
-								<IconDropletFilled class="align-text-bottom" size={24} />
+								<IconDropletFilled size={24} />
 							{:else if $statusQuery.data.status.underwatered}
-								<IconDroplet class="align-text-bottom" size={24} />
+								<IconDroplet size={24} />
 							{:else}
-								<IconDropletFilled2 class="align-text-bottom" size={24} />
+								<IconDropletFilled2 size={24} />
 							{/if}
 						</svelte:fragment>
 					</SensorStatusCard>
 				</div>
 
 				{#if $statusQuery.data.estimatedNextWatering != undefined}
-					<div class="col-12 col-md-4 col-lg-3">
+					<div class="col-6 col-md-3 col-lg-2">
 						<SensorStatusCard
 							title="Next Watering"
 							critical={$statusQuery.data.status.waterToday}
@@ -138,9 +138,9 @@
 						>
 							<svelte:fragment slot="icon">
 								{#if $statusQuery.data.status.waterToday || $statusQuery.data.status.waterTomorrow}
-									<IconClockExclamation class="align-text-bottom" size={24} />
+									<IconClockExclamation size={24} />
 								{:else}
-									<IconBucketDroplet class="align-text-bottom" size={24} />
+									<IconBucketDroplet size={24} />
 								{/if}
 							</svelte:fragment>
 							<Time slot="value" relative timestamp={$statusQuery.data.estimatedNextWatering} />
@@ -148,7 +148,7 @@
 					</div>
 				{/if}
 
-				<div class="col-12 col-md-4 col-lg-3">
+				<div class="col-6 col-md-3 col-lg-2">
 					<SensorStatusCard
 						title="Sensor Health"
 						value={$statusQuery.data.status.signalStrength == 'offline'
@@ -164,28 +164,28 @@
 					>
 						<svelte:fragment slot="icon">
 							{#if $statusQuery.data.status.signalStrength == 'offline'}
-								<IconWifiOff class="align-text-bottom" size={24} />
+								<IconWifiOff size={24} />
 							{:else if $statusQuery.data.status.lowBattery || $statusQuery.data.status.signalStrength == 'weak'}
-								<IconAlertTriangle class="align-text-bottom" size={24} />
+								<IconAlertTriangle size={24} />
 							{:else if $statusQuery.data.status.signalStrength == 'strong'}
-								<IconWifi2 class="align-text-bottom" size={24} />
+								<IconWifi2 size={24} />
 							{:else if $statusQuery.data.status.signalStrength == 'moderate'}
-								<IconWifi1 class="align-text-bottom" size={24} />
+								<IconWifi1 size={24} />
 							{/if}
 						</svelte:fragment>
 					</SensorStatusCard>
 				</div>
 
-				<div class="col-12 col-md-4 col-lg-3">
+				<div class="col-6 col-md-3 col-lg-2">
 					<SensorStatusCard
 						title="Last Update"
 						critical={$statusQuery.data.status.signalStrength == 'offline'}
 					>
 						<svelte:fragment slot="icon">
 							{#if $statusQuery.data.status.signalStrength == 'offline'}
-								<IconWifiOff class="align-text-bottom" size={24} />
+								<IconWifiOff size={24} />
 							{:else}
-								<IconClock class="align-text-bottom" size={24} />
+								<IconClock size={24} />
 							{/if}
 						</svelte:fragment>
 						<Time slot="value" relative timestamp={$statusQuery.data.lastReading.timestamp} />
@@ -199,7 +199,7 @@
 						<div class="d-flex flex-wrap">
 							<h1 class="card-title">Water Capacity History</h1>
 						</div>
-						<div class="water-capacity-graph">
+						<div class="graph water-capacity-graph">
 							{#if $historyQuery.data != undefined}
 								<WaterCapacityGraph sensor={$historyQuery.data} />
 							{/if}
@@ -208,15 +208,17 @@
 				</section>
 			</div>
 
-			<div class="col-6">
+			<div class="col-12 col-lg-6">
 				<section class="card">
 					<div class="card-body">
 						<div class="d-flex flex-wrap">
 							<h1 class="card-title">RSSI History</h1>
 						</div>
-						{#if $historyQuery.data != undefined}
-							<RssiGraph sensor={$historyQuery.data} />
-						{/if}
+						<div class="graph">
+							{#if $historyQuery.data != undefined}
+								<RssiGraph sensor={$historyQuery.data} />
+							{/if}
+						</div>
 					</div>
 				</section>
 			</div>
@@ -225,6 +227,16 @@
 </div>
 
 <style>
+	/* disable graph touch events on mobile to allow touch scrolling */
+	.graph {
+		pointer-events: none;
+	}
+	@media (hover: hover) {
+		.graph {
+			pointer-events: auto;
+		}
+	}
+
 	.water-capacity-graph {
 		height: 60vh;
 	}

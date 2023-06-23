@@ -48,26 +48,26 @@
 <div class="page-body">
 	<div class="container-xl">
 		<div class="row row-deck row-cards">
-			<div class="col-12 col-md-4 col-lg-3">
+			<div class="col-12 col-md-3 col-lg-2">
 				<SensorStatusCard title="Plants" value={totalSensors.toString()}>
-					<IconPlant slot="icon" class="align-text-bottom" size={24} />
+					<IconPlant slot="icon" size={24} />
 				</SensorStatusCard>
 			</div>
 
 			{#if minNextWatering}
-				<div class="col-12 col-md-4 col-lg-3">
+				<div class="col-12 col-md-3 col-lg-2">
 					<SensorStatusCard
 						title="Next Watering"
 						critical={anyWateringToday}
 						warning={anyWateringTomorrow}
 					>
-						<IconBucketDroplet slot="icon" class="align-text-bottom" size={24} />
+						<IconBucketDroplet slot="icon" size={24} />
 						<Time slot="value" relative timestamp={minNextWatering} />
 					</SensorStatusCard>
 				</div>
 			{/if}
 
-			<div class="col-12 col-md-4 col-lg-3">
+			<div class="col-6 col-md-3 col-lg-2">
 				<SensorStatusCard
 					title="Plant Health"
 					value={`${poorPlantHealth} ${poorPlantHealth == 1 ? 'Problem' : 'Problems'}`}
@@ -76,7 +76,7 @@
 				/>
 			</div>
 
-			<div class="col-12 col-md-4 col-lg-3">
+			<div class="col-6 col-md-3 col-lg-2">
 				<SensorStatusCard
 					title="Sensor Health"
 					value={`${poorSensorHealth} ${poorSensorHealth == 1 ? 'Problem' : 'Problems'}`}
@@ -88,7 +88,7 @@
 			<div class="col-12">
 				<div class="card">
 					<div class="table-responsive">
-						<table class="table table-vcenter card-table table-striped">
+						<table class="table table-vcenter table-striped">
 							<thead>
 								<tr>
 									<th>Name</th>

@@ -15,7 +15,7 @@
 
 <QueryClientProvider client={data.queryClient}>
 	<div class="page">
-		<header class="navbar navbar-expand-sm navbar-light d-print-none">
+		<header class="navbar navbar-expand-sm d-print-none">
 			<div class="container-xl">
 				<button
 					class="navbar-toggler"
