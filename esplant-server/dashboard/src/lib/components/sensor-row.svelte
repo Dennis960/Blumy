@@ -1,17 +1,16 @@
 <script lang="ts">
 	import Time from 'svelte-time';
-	import {
-		IconWifi1,
-		IconWifi2,
-		IconWifiOff,
-		IconClockExclamation,
-		IconAlertTriangle
-	} from '@tabler/icons-svelte';
+	import IconWifi1 from '@tabler/icons-svelte/dist/svelte/icons/IconWifi1.svelte';
+	import IconWifi2 from '@tabler/icons-svelte/dist/svelte/icons/IconWifi2.svelte';
+	import IconWifiOff from '@tabler/icons-svelte/dist/svelte/icons/IconWifiOff.svelte';
+	import IconClockExclamation from '@tabler/icons-svelte/dist/svelte/icons/IconClockExclamation.svelte';
+	import IconAlertTriangle from '@tabler/icons-svelte/dist/svelte/icons/IconAlertTriangle.svelte';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { browser } from '$app/environment';
 	import { fetchSensorData } from '$lib/api';
 	import SensorSparkline from './sensor-sparkline.svelte';
 	import { createEventDispatcher, onDestroy } from 'svelte';
+	import { goto } from '$app/navigation';
 
 	export let id: number;
 	export let name: string;
@@ -43,8 +42,8 @@
 </script>
 
 {#if $query.data != undefined}
-	<tr>
-		<th class="text-truncate" scope="row">{name}</th>
+	<tr on:click={() => goto(`/sensor/${id}`)}>
+		<th scope="row" class="sensor-name">{name}</th>
 		<td>
 			{#if $query.data?.lastReading == undefined}
 				<span>No Data</span>
@@ -89,8 +88,9 @@
 
 		<td>
 			<div
-				class="{$query.data.status.signalStrength == 'offline' ? 'text-danger' : ''} {$query.data
-					.status.lowBattery || $query.data.status.signalStrength == 'weak'
+				class="text-nowrap {$query.data.status.signalStrength == 'offline'
+					? 'text-danger'
+					: ''} {$query.data.status.lowBattery || $query.data.status.signalStrength == 'weak'
 					? 'text-warning'
 					: ''}"
 			>
@@ -115,7 +115,7 @@
 			</div>
 		</td>
 
-		<td class="w-1">
+		<td class="w-1 graph">
 			{#if $query.data.waterCapacityHistory.length > 0}
 				{#if browser}
 					<SensorSparkline sensor={$query.data} />
@@ -128,3 +128,28 @@
 		</td>
 	</tr>
 {/if}
+
+<style>
+	/* disable graph touch events on mobile to allow touch scrolling */
+	.graph {
+		pointer-events: none;
+	}
+	@media (hover: hover) {
+		.graph {
+			pointer-events: auto;
+		}
+	}
+
+	.sensor-name {
+		max-width: 12rem;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	@media (min-width: 992px) {
+		.sensor-name {
+			max-width: 20rem;
+		}
+	}
+</style>
