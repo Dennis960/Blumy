@@ -77,7 +77,7 @@ with pysftp.Connection('hoppingadventure.com', username='hopping', private_key="
     if dashboard_param in args:
         print('Deploying ' + dashboard_name)
         npm_build(dashboard_name)
-        upload_folder(sftp, dashboard_name + '/dist', dashboard_name)
+        upload_folder(sftp, backend_name + '/', dashboard_name)
     else:
         print('Skipping ' + dashboard_name + ' deploy, enable with "' + dashboard_param + '"')
 
