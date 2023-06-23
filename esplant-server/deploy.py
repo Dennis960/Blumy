@@ -7,8 +7,10 @@ local_path = os.path.dirname(os.path.realpath(__file__)).replace('\\', '/')
 remote_path = '/var/www/hoppingadventure/hopping/esplant'
 frontend_name = 'app'
 backend_name = 'api'
+dashboard_name = 'dashboard'
 frontend_param = 'f'
 backend_param = 'b'
+dashboard_param = 'd'
 
 def try_mkdir(sftp: pysftp.Connection, folder: str):
     try:
@@ -72,5 +74,11 @@ with pysftp.Connection('hoppingadventure.com', username='hopping', private_key="
     else:
         print('Skipping ' + frontend_name + ' deploy, enable with "' + frontend_param + '"')
 
+    if dashboard_param in args:
+        print('Deploying ' + dashboard_name)
+        npm_build(dashboard_name)
+        upload_folder(sftp, dashboard_name + '/dist', dashboard_name)
+    else:
+        print('Skipping ' + dashboard_name + ' deploy, enable with "' + dashboard_param + '"')
 
 print('Done!')
