@@ -14,7 +14,7 @@
 	});
 
 	// TODO use a store or request the data at the top level
-	$: sensors = {} as Record<number, Sensor>;
+	const sensors = {} as Record<number, Sensor>;
 	function handleUpdateSensor(event: CustomEvent<Sensor>) {
 		const { detail } = event;
 		sensors[detail.id] = detail;
@@ -46,69 +46,71 @@
 </script>
 
 <div class="page-body">
-	<div class="row row-deck row-cards">
-		<div class="col-12 col-md-4 col-lg-3">
-			<SensorStatusCard title="Plants" value={totalSensors.toString()}>
-				<IconPlant slot="icon" class="align-text-bottom" size={24} />
-			</SensorStatusCard>
-		</div>
-
-		{#if minNextWatering}
+	<div class="container-xl">
+		<div class="row row-deck row-cards">
 			<div class="col-12 col-md-4 col-lg-3">
-				<SensorStatusCard
-					title="Next Watering"
-					critical={anyWateringToday}
-					warning={anyWateringTomorrow}
-				>
-					<IconBucketDroplet slot="icon" class="align-text-bottom" size={24} />
-					<Time slot="value" relative timestamp={minNextWatering} />
+				<SensorStatusCard title="Plants" value={totalSensors.toString()}>
+					<IconPlant slot="icon" class="align-text-bottom" size={24} />
 				</SensorStatusCard>
 			</div>
-		{/if}
 
-		<div class="col-12 col-md-4 col-lg-3">
-			<SensorStatusCard
-				title="Plant Health"
-				value={`${poorPlantHealth} ${poorPlantHealth == 1 ? 'Problem' : 'Problems'}`}
-				ok={poorPlantHealth == 0}
-				critical={poorPlantHealth > 0}
-			/>
-		</div>
+			{#if minNextWatering}
+				<div class="col-12 col-md-4 col-lg-3">
+					<SensorStatusCard
+						title="Next Watering"
+						critical={anyWateringToday}
+						warning={anyWateringTomorrow}
+					>
+						<IconBucketDroplet slot="icon" class="align-text-bottom" size={24} />
+						<Time slot="value" relative timestamp={minNextWatering} />
+					</SensorStatusCard>
+				</div>
+			{/if}
 
-		<div class="col-12 col-md-4 col-lg-3">
-			<SensorStatusCard
-				title="Sensor Health"
-				value={`${poorSensorHealth} ${poorSensorHealth == 1 ? 'Problem' : 'Problems'}`}
-				ok={poorSensorHealth == 0}
-				critical={poorSensorHealth > 0}
-			/>
-		</div>
+			<div class="col-12 col-md-4 col-lg-3">
+				<SensorStatusCard
+					title="Plant Health"
+					value={`${poorPlantHealth} ${poorPlantHealth == 1 ? 'Problem' : 'Problems'}`}
+					ok={poorPlantHealth == 0}
+					critical={poorPlantHealth > 0}
+				/>
+			</div>
 
-		<div class="col-12">
-			<div class="card">
-				<div class="table-responsive">
-					<table class="table table-vcenter card-table table-striped">
-						<thead>
-							<tr>
-								<th>Name</th>
-								<th>Water Capacity</th>
-								<th>Next Watering</th>
-								<th>Sensor Health</th>
-								<th>3 Day History</th>
-								<th />
-							</tr>
-						</thead>
-						<tbody>
-							{#each $query.data as sensor (sensor.id)}
-								<SensorRow
-									id={sensor.id}
-									name={sensor.name}
-									on:update-sensor={handleUpdateSensor}
-									on:remove-sensor={handleRemoveSensor}
-								/>
-							{/each}
-						</tbody>
-					</table>
+			<div class="col-12 col-md-4 col-lg-3">
+				<SensorStatusCard
+					title="Sensor Health"
+					value={`${poorSensorHealth} ${poorSensorHealth == 1 ? 'Problem' : 'Problems'}`}
+					ok={poorSensorHealth == 0}
+					critical={poorSensorHealth > 0}
+				/>
+			</div>
+
+			<div class="col-12">
+				<div class="card">
+					<div class="table-responsive">
+						<table class="table table-vcenter card-table table-striped">
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>Water Capacity</th>
+									<th>Next Watering</th>
+									<th>Sensor Health</th>
+									<th>3 Day History</th>
+									<th />
+								</tr>
+							</thead>
+							<tbody>
+								{#each $query.data as sensor (sensor.id)}
+									<SensorRow
+										id={sensor.id}
+										name={sensor.name}
+										on:update-sensor={handleUpdateSensor}
+										on:remove-sensor={handleRemoveSensor}
+									/>
+								{/each}
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>
