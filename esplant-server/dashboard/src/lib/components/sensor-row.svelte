@@ -1,12 +1,10 @@
 <script lang="ts">
 	import Time from 'svelte-time';
-	import {
-		IconWifi1,
-		IconWifi2,
-		IconWifiOff,
-		IconClockExclamation,
-		IconAlertTriangle
-	} from '@tabler/icons-svelte';
+	import IconWifi1 from '@tabler/icons-svelte/dist/svelte/icons/IconWifi1.svelte';
+	import IconWifi2 from '@tabler/icons-svelte/dist/svelte/icons/IconWifi2.svelte';
+	import IconWifiOff from '@tabler/icons-svelte/dist/svelte/icons/IconWifiOff.svelte';
+	import IconClockExclamation from '@tabler/icons-svelte/dist/svelte/icons/IconClockExclamation.svelte';
+	import IconAlertTriangle from '@tabler/icons-svelte/dist/svelte/icons/IconAlertTriangle.svelte';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { browser } from '$app/environment';
 	import { fetchSensorData } from '$lib/api';
