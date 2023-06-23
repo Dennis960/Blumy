@@ -1,20 +1,18 @@
 <script lang="ts">
 	import Time from 'svelte-time';
-	import {
-		IconWifi1,
-		IconWifi2,
-		IconWifiOff,
-		IconDroplet,
-		IconDropletFilled2,
-		IconDropletFilled,
-		IconScubaMask,
-		IconGrave,
-		IconClockExclamation,
-		IconClock,
-		IconAlertTriangle,
-		IconBucketDroplet,
-		IconCalendar
-	} from '@tabler/icons-svelte';
+	import IconWifi1 from '@tabler/icons-svelte/dist/svelte/icons/IconWifi1.svelte';
+	import IconWifi2 from '@tabler/icons-svelte/dist/svelte/icons/IconWifi2.svelte';
+	import IconWifiOff from '@tabler/icons-svelte/dist/svelte/icons/IconWifiOff.svelte';
+	import IconDroplet from '@tabler/icons-svelte/dist/svelte/icons/IconDroplet.svelte';
+	import IconDropletFilled2 from '@tabler/icons-svelte/dist/svelte/icons/IconDropletFilled2.svelte';
+	import IconDropletFilled from '@tabler/icons-svelte/dist/svelte/icons/IconDropletFilled.svelte';
+	import IconScubaMask from '@tabler/icons-svelte/dist/svelte/icons/IconScubaMask.svelte';
+	import IconGrave from '@tabler/icons-svelte/dist/svelte/icons/IconGrave.svelte';
+	import IconClockExclamation from '@tabler/icons-svelte/dist/svelte/icons/IconClockExclamation.svelte';
+	import IconClock from '@tabler/icons-svelte/dist/svelte/icons/IconClock.svelte';
+	import IconAlertTriangle from '@tabler/icons-svelte/dist/svelte/icons/IconAlertTriangle.svelte';
+	import IconBucketDroplet from '@tabler/icons-svelte/dist/svelte/icons/IconBucketDroplet.svelte';
+	import IconCalendar from '@tabler/icons-svelte/dist/svelte/icons/IconCalendar.svelte';
 	import IconChevronLeft from '@tabler/icons/chevron-left.svg?raw';
 	import IconChevronRight from '@tabler/icons/chevron-right.svg?raw';
 	import { createQuery } from '@tanstack/svelte-query';

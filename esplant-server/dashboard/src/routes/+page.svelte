@@ -2,7 +2,8 @@
 	import { fetchSensors, type Sensor } from '$lib/api';
 	import { createQuery } from '@tanstack/svelte-query';
 	import SensorRow from '$lib/components/sensor-row.svelte';
-	import { IconBucketDroplet, IconPlant } from '@tabler/icons-svelte';
+	import IconBucketDroplet from '@tabler/icons-svelte/dist/svelte/icons/IconBucketDroplet.svelte';
+	import IconPlant from '@tabler/icons-svelte/dist/svelte/icons/IconPlant.svelte';
 	import Time from 'svelte-time';
 	import SensorStatusCard from '$lib/components/sensor-status-card.svelte';
 
