@@ -9,8 +9,8 @@ const config = {
 
 	kit: {
 		adapter: adapter({
-			pages: '../esplant-server/api/dashboard',
-			assets: '../esplant-server/api/dashboard',
+			pages: '../api/dashboard',
+			assets: '../api/dashboard',
 			fallback: 'index.html',
 		}),
 		alias: {
