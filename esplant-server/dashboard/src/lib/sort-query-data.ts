@@ -35,10 +35,10 @@ function compareSensorsBy(sensorA: Sensor, sensorB: Sensor, sortKey: SortKey) {
 			return 1;
 		if (sensorB.waterCapacityHistory == undefined || sensorA.waterCapacityHistory.length == 0)
 			return -1;
-		// TODO check if this is correct, I want to compare the last water capacity
+        if (sensorA.lastReading?.availableWaterCapacity == undefined) return 1;
+        if (sensorB.lastReading?.availableWaterCapacity == undefined) return -1;
 		return (
-			sensorA.waterCapacityHistory[sensorA.waterCapacityHistory.length - 1].availableWaterCapacity -
-			sensorB.waterCapacityHistory[sensorB.waterCapacityHistory.length - 1].availableWaterCapacity
+			sensorA.lastReading?.availableWaterCapacity - sensorB.lastReading?.availableWaterCapacity
 		);
 	}
 	if (sortKey === SortKey.SENSOR_HEALTH) {
