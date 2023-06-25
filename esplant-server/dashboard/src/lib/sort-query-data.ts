@@ -7,46 +7,42 @@ export enum SortKey {
 	NEXT_WATERING,
 	SENSOR_HEALTH
 }
-// TODO add types
 export function sortQueryDataBy(
 	queryData: SensorStub[],
 	sensors: Record<number, Sensor>,
 	sortKey: SortKey,
 	ascending = true
 ) {
-	// sort queryData by corresponding sensor next watering
 	return queryData.sort((a, b) => {
-		const comparison = compareBy(a, b, sensors, sortKey);
+		if (sortKey === SortKey.NAME) return a.name.localeCompare(b.name);
+		const sensorA = sensors[a.id];
+		const sensorB = sensors[b.id];
+		if (sensorA == undefined) return 1;
+		if (sensorB == undefined) return -1;
+		const comparison = compareSensorsBy(sensorA, sensorB, sortKey);
 		return ascending ? comparison : -comparison;
 	});
 }
-function compareBy(
-	a: SensorStub,
-	b: SensorStub,
-	sensors: Record<number, Sensor>,
-	sortKey: SortKey
-) {
-	if (sortKey === SortKey.NAME) return a.name.localeCompare(b.name);
-	if (sortKey === SortKey.ID) return a.id - b.id;
-	const sensorA = sensors[a.id];
-	const sensorB = sensors[b.id];
-	if (sensorA == undefined) return 1;
-	if (sensorB == undefined) return -1;
+function compareSensorsBy(sensorA: Sensor, sensorB: Sensor, sortKey: SortKey) {
+	if (sortKey === SortKey.ID) return sensorA.id - sensorB.id;
 	if (sortKey === SortKey.NEXT_WATERING) {
 		if (sensorA.estimatedNextWatering == undefined) return 1;
 		if (sensorB.estimatedNextWatering == undefined) return -1;
 		return sensorA.estimatedNextWatering.getTime() - sensorB.estimatedNextWatering.getTime();
 	}
 	if (sortKey === SortKey.WATER_CAPACITY) {
-		if (sensorA.waterCapacityHistory == undefined) return 1;
-		if (sensorB.waterCapacityHistory == undefined) return -1;
-		// TODO fix this code
+		if (sensorA.waterCapacityHistory == undefined || sensorA.waterCapacityHistory.length == 0)
+			return 1;
+		if (sensorB.waterCapacityHistory == undefined || sensorA.waterCapacityHistory.length == 0)
+			return -1;
+		// TODO check if this is correct, I want to compare the last water capacity
 		return (
 			sensorA.waterCapacityHistory[sensorA.waterCapacityHistory.length - 1].availableWaterCapacity -
 			sensorB.waterCapacityHistory[sensorB.waterCapacityHistory.length - 1].availableWaterCapacity
 		);
 	}
 	if (sortKey === SortKey.SENSOR_HEALTH) {
+        // TODO add a better way to compare sensor health
 		if (sensorA.status.signalStrength == 'offline') return 1;
 		if (sensorB.status.signalStrength == 'offline') return -1;
 		if (sensorA.status.signalStrength == 'weak') return 1;
