@@ -6,6 +6,7 @@
 	import IconPlant from '@tabler/icons-svelte/dist/svelte/icons/IconPlant.svelte';
 	import Time from 'svelte-time';
 	import SensorStatusCard from '$lib/components/sensor-status-card.svelte';
+	import { SortKey, sortQueryDataBy } from '$lib/sort-query-data';
 
 	$: query = createQuery({
 		queryKey: ['sensor-ids'],
@@ -44,6 +45,8 @@
 		.map((sensor) => sensor.estimatedNextWatering!)
 		.filter((nextWatering) => nextWatering != undefined)
 		.sort((a, b) => a.getTime() - b.getTime())[0];
+
+	$: queryDataSorted = sortQueryDataBy($query.data, sensors, SortKey.NEXT_WATERING);
 </script>
 
 <div class="page-body">
@@ -101,7 +104,7 @@
 								</tr>
 							</thead>
 							<tbody>
-								{#each $query.data as sensor (sensor.id)}
+								{#each queryDataSorted as sensor (sensor.id)}
 									<SensorRow
 										id={sensor.id}
 										name={sensor.name}
