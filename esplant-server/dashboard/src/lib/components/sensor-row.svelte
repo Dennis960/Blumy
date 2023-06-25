@@ -152,4 +152,8 @@
 			max-width: 20rem;
 		}
 	}
+
+	tr {
+		cursor: pointer;
+	}
 </style>
