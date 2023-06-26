@@ -14,12 +14,16 @@ export function sortQueryDataBy(
 	ascending = true
 ) {
 	return queryData.sort((a, b) => {
-		if (sortKey === SortKey.NAME) return a.name.localeCompare(b.name);
-		const sensorA = sensors[a.id];
-		const sensorB = sensors[b.id];
-		if (sensorA == undefined) return 1;
-		if (sensorB == undefined) return -1;
-		const comparison = compareSensorsBy(sensorA, sensorB, sortKey);
+		let comparison = 0;
+		if (sortKey === SortKey.NAME) {
+			comparison = a.name.localeCompare(b.name);
+		} else {
+			const sensorA = sensors[a.id];
+			const sensorB = sensors[b.id];
+			if (sensorA == undefined) return 1;
+			if (sensorB == undefined) return -1;
+			comparison = compareSensorsBy(sensorA, sensorB, sortKey);
+		}
 		return ascending ? comparison : -comparison;
 	});
 }
