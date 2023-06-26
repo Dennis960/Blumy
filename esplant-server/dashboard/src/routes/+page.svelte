@@ -129,7 +129,7 @@
 										</TableSorter>
 									</th>
 									<th>
-										<TableSorter sortKey={SortKey.NEXT_WATERING} on:sort={sort} bind:this={tableSorters[2]}>
+										<TableSorter sortKey={SortKey.NEXT_WATERING} on:sort={sort} bind:this={tableSorters[2]} sortDirection="asc">
 											Next Watering
 										</TableSorter>
 									</th>
