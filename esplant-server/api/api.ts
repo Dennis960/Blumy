@@ -1,8 +1,14 @@
-import cors from 'cors';
-import { json, Router } from 'express';
-import { addDataBySensorId, getDataCountBySensorId, createSensorWithId, getSensorById, getSensors, getDataBySensorId, deleteDataBySensorId, deleteSensorById, deleteDataById, updateSensorById, getData } from './database.js';
-import { Data } from './types/data.js';
-import dateFormat from 'dateformat';
+import cors from "cors";
+import { json, Router } from "express";
+import {
+  addDataBySensorId,
+  createSensorWithId,
+  getSensorById,
+  getSensors,
+  getDataBySensorId,
+} from "./database.js";
+import { Data } from "./types/data.js";
+import dateFormat from "dateformat";
 
 const router = Router();
 router.use(json());
@@ -13,11 +19,11 @@ function formatDateData(data: Data[]): Data[] {
     if (!data.date) {
       return {
         ...data,
-        date: 'unknown',
-      }
+        date: "unknown",
+      };
     }
     const date = new Date(data.date);
-    const formattedDate = dateFormat(date, 'dd.mm.yyyy HH:MM:ss');
+    const formattedDate = dateFormat(date, "dd.mm.yyyy HH:MM:ss");
     return {
       ...data,
       date: formattedDate,
@@ -39,7 +45,7 @@ router.use((req, res, next) => {
         }
       }
       data = JSON.stringify(data, null, 2);
-      res.setHeader('Content-Type', 'application/json');
+      res.setHeader("Content-Type", "application/json");
       res.send = originalSend;
       return res.send(data);
     };
@@ -59,12 +65,12 @@ router.use((req, res, next) => {
 // -> 400 message: sensorAddress and water are required, data: {}
 // -> 500 message: could not create sensor, data: {}
 // -> 200 message: data added, data: data
-router.post('/data', async (req, res) => {
+router.post("/data", async (req, res) => {
   const dataObj: Data = req.body;
-  
+
   if (dataObj.sensorAddress == undefined || dataObj.water == undefined) {
     return res.status(400).send({
-      message: 'sensorAddress and water are required',
+      message: "sensorAddress and water are required",
       data: {},
     });
   }
@@ -77,7 +83,7 @@ router.post('/data', async (req, res) => {
     const createdSensor = await createSensorWithId(dataObj.sensorAddress);
     if (!createdSensor) {
       return res.status(500).send({
-        message: 'could not create sensor',
+        message: "could not create sensor",
         data: {},
       });
     }
@@ -85,67 +91,18 @@ router.post('/data', async (req, res) => {
   // add data
   const data = await addDataBySensorId(dataObj);
   return res.status(200).send({
-    message: sensorExists ? 'data added' : 'sensor created and data added',
-    data
-  });
-});
-
-// GET /api/data?maxDataPoints=100
-// -> 200 message: data found, data: data
-router.get('/data', async (req, res) => {
-  const { maxDataPoints } = req.query;
-  let maxDataPointsNumber = Number(maxDataPoints) || 1000;
-  const data = await getData(maxDataPointsNumber);
-  return res.status(200).send({
-    message: 'data found',
+    message: sensorExists ? "data added" : "sensor created and data added",
     data,
-  });
-});
-
-// GET /api/sensors/:sensorAddress
-// -> 404 message: sensor not found, data: {}
-// -> 200 message: sensor found, data: sensor
-router.get('/sensors/:sensorAddress', async (req, res) => {
-  const { sensorAddress } = req.params;
-  const sensor = await getSensorById(Number(sensorAddress));
-  if (!sensor) {
-    return res.status(404).send({
-      message: 'sensor not found',
-      data: {},
-    });
-  }
-  return res.status(200).send({
-    message: 'sensor found',
-    data: sensor,
   });
 });
 
 // GET /api/sensors
 // -> 200 message: sensors found, data: sensors
-router.get('/sensors', async (req, res) => {
+router.get("/sensors", async (req, res) => {
   const sensors = await getSensors();
   return res.status(200).send({
-    message: 'sensors found',
+    message: "sensors found",
     data: sensors,
-  });
-});
-
-// GET /api/sensors/:sensorAddress/data/count
-// -> 404 message: sensor not found, data: {}
-// -> 200 message: data count found, data: count
-router.get('/sensors/:sensorAddress/data/count', async (req, res) => {
-  const { sensorAddress } = req.params;
-  const sensor = await getSensorById(Number(sensorAddress));
-  if (!sensor) {
-    return res.status(404).send({
-      message: 'sensor not found',
-      data: {},
-    });
-  }
-  const count = await getDataCountBySensorId(Number(sensorAddress));
-  return res.status(200).send({
-    message: 'data count found',
-    data: count,
   });
 });
 
@@ -156,144 +113,60 @@ router.get('/sensors/:sensorAddress/data/count', async (req, res) => {
 // -> 400 message: invalid endDate, data: {}
 // -> 400 message: invalid maxDataPoints, data: {}
 // -> 200 message: data found, data: data
-router.get('/sensors/:sensorAddress/data', async (req, res) => {
+router.get("/sensors/:sensorAddress/data", async (req, res) => {
   const { sensorAddress } = req.params;
   const { startDate, endDate, maxDataPoints } = req.query;
   const sensor = await getSensorById(Number(sensorAddress));
   if (!sensor) {
     return res.status(404).send({
-      message: 'sensor not found',
+      message: "sensor not found",
       data: {},
     });
   }
-  // check if startDate, endDate and maxDataPoints are valid or don't exist
-  if (typeof startDate == 'string' && isNaN(Number(startDate))) {
+  // check if startDate, endDate and maxDataPoints are valid
+  if (isNaN(Number(startDate))) {
     return res.status(400).send({
-      message: 'invalid startDate',
+      message: "invalid startDate",
       data: {},
     });
   }
-  if (typeof endDate == 'string' && isNaN(Number(endDate))) {
+  if (isNaN(Number(endDate))) {
     return res.status(400).send({
-      message: 'invalid endDate',
+      message: "invalid endDate",
       data: {},
     });
   }
-  if (typeof maxDataPoints == 'string' && isNaN(Number(maxDataPoints))) {
+  if (isNaN(Number(maxDataPoints))) {
     return res.status(400).send({
-      message: 'invalid maxDataPoints',
+      message: "invalid maxDataPoints",
       data: {},
     });
   }
-  const parsedStartDate = typeof startDate == 'string' ? Math.floor(Number(startDate)) : undefined;
-  const parsedEndDate = typeof endDate == 'string' ? Math.floor(Number(endDate)) : undefined;
-  const parsedMaxDataPoints = typeof maxDataPoints == 'string' ? Math.floor(Number(maxDataPoints)) : undefined;
-  const data = await getDataBySensorId(Number(sensorAddress), parsedStartDate, parsedEndDate, parsedMaxDataPoints);
+  const parsedStartDate = Math.floor(Number(startDate));
+  const parsedEndDate = Math.floor(Number(endDate));
+  const parsedMaxDataPoints = Math.floor(Number(maxDataPoints));
+  const data = await getDataBySensorId(
+    Number(sensorAddress),
+    parsedStartDate,
+    parsedEndDate,
+    parsedMaxDataPoints
+  );
   if (!data) {
     return res.status(404).send({
-      message: 'data not found',
+      message: "data not found",
       data: {},
     });
   }
   return res.status(200).send({
-    message: 'data found',
+    message: "data found",
     data,
-  });
-});
-
-// PUT /api/sensors/:sensorAddress
-// {
-//   "name": "new name"
-// }
-// -> 404 message: sensor not found, data: {}
-// -> 400 message: name is required, data: {}
-// -> 200 message: sensor updated, data: sensor
-router.put('/sensors/:sensorAddress', async (req, res) => {
-  const { sensorAddress } = req.params;
-  const { name } = req.body;
-  if (!name) {
-    return res.status(400).send({
-      message: 'name is required',
-      data: {},
-    });
-  }
-  const sensor = await getSensorById(Number(sensorAddress));
-  if (!sensor) {
-    return res.status(404).send({
-      message: 'sensor not found',
-      data: {},
-    });
-  }
-
-  await updateSensorById(Number(sensorAddress), name);
-  return res.status(200).send({
-    message: 'sensor updated',
-    data: await getSensorById(Number(sensorAddress)),
-  });
-});
-
-// DELETE /api/sensors/:sensorAddress/data
-// -> 404 message: data not found, data: {}
-// -> 200 message: data deleted, data: {}
-router.delete('/sensors/:sensorAddress/data', async (req, res) => {
-  const { sensorAddress } = req.params;
-  const data = await getDataBySensorId(Number(sensorAddress));
-  if (!data) {
-    return res.status(404).send({
-      message: 'data not found',
-      data: {},
-    });
-  }
-  deleteDataBySensorId(Number(sensorAddress));
-  return res.status(200).send({
-    message: 'data deleted',
-    data: {},
-  });
-});
-
-// DELETE /api/sensors/:sensorAddress
-// -> 404 message: sensor not found, data: {}
-// -> 200 message: sensor deleted, data: {}
-router.delete('/sensors/:sensorAddress', async (req, res) => {
-  const { sensorAddress } = req.params;
-  const sensor = await getSensorById(Number(sensorAddress));
-  if (!sensor) {
-    return res.status(404).send({
-      message: 'sensor not found',
-      data: {},
-    });
-  }
-  deleteDataBySensorId(Number(sensorAddress));
-  deleteSensorById(Number(sensorAddress));
-  return res.status(200).send({
-    message: 'sensor deleted',
-    data: {},
-  });
-});
-
-// DELETE /api/data/:dataId
-// -> 404 message: data not found, data: {}
-// -> 200 message: data deleted, data: {}
-router.delete('/data/:dataId', async (req, res) => {
-  const { dataId } = req.params;
-  const data = await getDataBySensorId(Number(dataId));
-  if (!data) {
-    return res.status(404).send({
-      message: 'data not found',
-      data: {},
-    });
-  }
-  deleteDataById(Number(dataId));
-  return res.status(200).send({
-    message: 'data deleted',
-    data: {},
   });
 });
 
 // 404
 // -> 404 message: This page does not exists, data: {}
 router.use((req, res) => {
-  res.status(404).send({ message: 'This page does not exists', data: {} });
+  res.status(404).send({ message: "This page does not exists", data: {} });
 });
 
 export default router;

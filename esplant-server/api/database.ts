@@ -393,26 +393,6 @@ export async function addDataBySensorId(data: Data) {
 }
 
 /**
- * Get all data
- * @param maxDataPoints The maximum number of data points to return. Defaults to 1000.
- * @returns All data sorted by date.
- */
-export async function getData(maxDataPoints: number = 1000) {
-  const data = await dbAll<Data>('SELECT * FROM data ORDER BY date DESC LIMIT ?', [maxDataPoints]);
-  return dataToAverage(data, maxDataPoints);
-}
-
-/**
- * Get number of data points for a sensor.
- * @param sensorAddress The address of the sensor.
- * @returns The number of data points.
- */
-export async function getDataCountBySensorId(sensorAddress: number) {
-  const data = await dbGet<{ count: number }>('SELECT COUNT(*) as count FROM data WHERE sensorAddress = ?', [sensorAddress]);
-  return data?.count ?? 0;
-}
-
-/**
  * Takes a list of data points and averages them to the specified limit.
  * The average of "water", "voltage", and "duration" are calculated.
  * The average of "date" is the last date.
@@ -447,63 +427,8 @@ function dataToAverage(data: Data[], limit: number) {
  * @param maxDataPoints The maximum number of data points. (optional)
  * @returns The data or an empty list if sensor does not exist.
  */
-export async function getDataBySensorId(sensorAddress: number, startDate?: number, endDate?: number, maxDataPoints?: number): Promise<Data[]> {
-  // if maxDataPoints and startDate and endDate, return maxDataPoints averaged data points between startDate and endDate
-  if (maxDataPoints && startDate && endDate) {
-    const data = await dbAll<Data>('SELECT * FROM data WHERE sensorAddress = ? AND date >= ? AND date <= ? ORDER BY date DESC', [sensorAddress, startDate, endDate]);
-    return dataToAverage(data, maxDataPoints);
-  }
-  // if maxDataPoints and startDate, return maxDataPoints averaged data points after startDate
-  if (maxDataPoints && startDate) {
-    const data = await dbAll<Data>('SELECT * FROM data WHERE sensorAddress = ? AND date >= ? ORDER BY date DESC', [sensorAddress, startDate]);
-    return dataToAverage(data, maxDataPoints);
-  }
-  // if maxDataPoints and endDate, return maxDataPoints before endDate
-  if (maxDataPoints && endDate) {
-    return await dbAll<Data>('SELECT * FROM data WHERE sensorAddress = ? AND date <= ? ORDER BY date DESC LIMIT ?', [sensorAddress, endDate, maxDataPoints]);
-  }
-  // if only maxDataPoints, return the last maxDataPoints
-  if (maxDataPoints) {
-    return await dbAll<Data>('SELECT * FROM data WHERE sensorAddress = ? ORDER BY date DESC LIMIT ?', [sensorAddress, maxDataPoints]);
-  }
-  // if only startDate, return all data points after startDate
-  if (startDate) {
-    return await dbAll<Data>('SELECT * FROM data WHERE sensorAddress = ? AND date >= ? ORDER BY date DESC', [sensorAddress, startDate]);
-  }
-  // else return last 100 data points
-  return await dbAll<Data>('SELECT * FROM data WHERE sensorAddress = ? ORDER BY date DESC LIMIT 100', [sensorAddress]);
-}
-
-export function updateSensorById(sensorAddress: number, name: string) {
-  return dbRun('UPDATE sensor SET name = ? WHERE sensorAddress = ?', [name, sensorAddress]);
-}
-
-/**
- * Delete data by sensor address.
- * @param sensorAddress The address of the sensor.
- */
-export function deleteDataBySensorId(sensorAddress: number) {
-  dbRun('DELETE FROM data WHERE sensorAddress = ?', [sensorAddress]).catch((err) => {
-    console.log(err.message);
-  });
-}
-
-/**
- * Delete data by id.
- * @param id The id of the data.
- */
-export function deleteDataById(id: number) {
-  dbRun('DELETE FROM data WHERE id = ?', [id]).catch((err) => {
-    console.log(err.message);
-  });
-}
-
-/**
- * Delete sensor by sensor address.
- * @param sensorAddress The address of the sensor.
- */
-export function deleteSensorById(sensorAddress: number) {
-  dbRun('DELETE FROM sensor WHERE sensorAddress = ?', [sensorAddress]).catch((err) => {
-    console.log(err.message);
-  });
+export async function getDataBySensorId(sensorAddress: number, startDate: number, endDate: number, maxDataPoints: number): Promise<Data[]> {
+  // return maxDataPoints averaged data points between startDate and endDate
+  const data = await dbAll<Data>('SELECT * FROM data WHERE sensorAddress = ? AND date >= ? AND date <= ? ORDER BY date DESC', [sensorAddress, startDate, endDate]);
+  return dataToAverage(data, maxDataPoints);
 }
