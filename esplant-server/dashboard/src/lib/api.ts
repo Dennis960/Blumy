@@ -63,8 +63,7 @@ export interface SensorStub {
     name: string;
 }
 
-const BASE_URL = 'https://esplant.hoppingadventure.com/api';
-const DEFAULT_HISTORY_DAYS = 3;
+const BASE_URL = import.meta.env.VITE_API_URL ?? 'https://esplant.hoppingadventure.com/api';
 const OFFLINE_TIMEOUT = 120 * 60 * 1000; // 2 hours
 const WATERING_THRESHOLD = 0.05 / (60 * 60 * 1000); // water capacity gain per hour threshold
 const WATERING_WINDOW = 4 * 60 * 60 * 1000;
