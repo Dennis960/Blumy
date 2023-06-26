@@ -425,6 +425,9 @@ function dataToAverage(data: Data[], limit: number) {
   if (data.length <= limit) {
     return data;
   }
+  if (limit <= 0) {
+    return data;
+  }
   const averagedData: Data[] = [];
   const step = Math.floor(data.length / limit);
   for (let i = 0; i < data.length; i += step) {
