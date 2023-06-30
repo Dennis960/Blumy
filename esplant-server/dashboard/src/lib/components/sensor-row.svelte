@@ -5,129 +5,116 @@
 	import IconWifiOff from '@tabler/icons-svelte/dist/svelte/icons/IconWifiOff.svelte';
 	import IconClockExclamation from '@tabler/icons-svelte/dist/svelte/icons/IconClockExclamation.svelte';
 	import IconAlertTriangle from '@tabler/icons-svelte/dist/svelte/icons/IconAlertTriangle.svelte';
-	import { createQuery } from '@tanstack/svelte-query';
 	import { browser } from '$app/environment';
-	import { fetchSensorData } from '$lib/api';
 	import SensorSparkline from './sensor-sparkline.svelte';
-	import { createEventDispatcher, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import type { SensorDTO } from '$lib/types/api';
+	import { fetchSensorHistory } from '$lib/api';
+	import { createQuery } from '@tanstack/svelte-query';
 
-	export let id: number;
-	export let name: string;
+	export let sensor: SensorDTO;
 
-	$: query = createQuery({
-		queryKey: ['sensor-sparkline', id],
-		queryFn: () => {
-			const threeDaysAgo = new Date();
-			threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-			return fetchSensorData(id, name, threeDaysAgo, new Date());
+	$: historyQuery = createQuery({
+		queryKey: ['sensor-sparkline', sensor.id],
+		queryFn: async () => {
+			const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+			return await fetchSensorHistory(sensor.id, new Date(), threeDaysAgo)
 		},
-		// refetch every 5 minutes
-		refetchInterval: 5 * 60 * 1000
+		refetchInterval: 15 * 60 * 1000,
 	});
 
-	$: availableWaterCapacityPercent = ($query.data?.lastReading?.availableWaterCapacity ?? 0) * 100;
-
-	const dispatch = createEventDispatcher();
-
-	$: {
-		if ($query.data != undefined) {
-			dispatch('update-sensor', $query.data);
-		}
-	}
-
-	onDestroy(() => {
-		dispatch('remove-sensor', id);
-	});
+	$: availableWaterCapacityPercent = (sensor.lastUpdate?.waterCapacity ?? 0) * 100;
+	$: waterToday =
+		sensor.prediction != undefined &&
+		(sensor.prediction.nextWatering <= new Date() ||
+			sensor.prediction.nextWatering.toLocaleDateString() == new Date().toLocaleDateString());
+	$: waterTomorrow =
+		sensor.prediction != undefined &&
+		sensor.prediction.nextWatering.toLocaleDateString() ==
+			new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString();
 </script>
 
-{#if $query.data != undefined}
-	<tr on:click={() => goto(`/sensor/${id}`)}>
-		<th scope="row" class="sensor-name">{name}</th>
-		<td>
-			{#if $query.data?.lastReading == undefined}
-				<span>No Data</span>
-			{:else}
-				<div class="progress progress-sm">
-					<div
-						class="progress-bar {$query.data.status.drowning || $query.data.status.wilting
-							? 'bg-danger'
-							: ''} {$query.data.status.overwatered || $query.data.status.underwatered
-							? 'bg-warning'
-							: ''}"
-						style="width: {availableWaterCapacityPercent}%"
-						role="progressbar"
-						aria-valuenow={availableWaterCapacityPercent}
-						aria-valuemin={0}
-						aria-valuemax={100}
-						aria-label="{Math.round(availableWaterCapacityPercent)}% Complete"
-					>
-						<span class="visually-hidden"
-							>{Math.round(availableWaterCapacityPercent)}% Complete</span
-						>
-					</div>
-				</div>
-			{/if}
-		</td>
-
-		<td>
-			{#if $query.data.estimatedNextWatering != undefined}
+<tr on:click={() => goto(`/sensor/${sensor.id}`)}>
+	<th scope="row" class="sensor-name">{sensor.config.name}</th>
+	<td>
+		{#if sensor.lastUpdate == undefined}
+			<span>No Data</span>
+		{:else}
+			<div class="progress progress-sm">
 				<div
-					class="align-items-center {$query.data.status.waterToday ? 'text-danger' : ''} {$query
-						.data.status.waterTomorrow
-						? 'text-warning'
+					class="progress-bar {sensor.plantHealth.critical ? 'bg-danger' : ''} {sensor.plantHealth
+						.warning
+						? 'bg-warning'
 						: ''}"
+					style="width: {availableWaterCapacityPercent}%"
+					role="progressbar"
+					aria-valuenow={availableWaterCapacityPercent}
+					aria-valuemin={0}
+					aria-valuemax={100}
+					aria-label="{Math.round(availableWaterCapacityPercent)}% Complete"
 				>
-					{#if $query.data.status.waterToday || $query.data.status.waterTomorrow}
-						<IconClockExclamation class="align-text-bottom" size={16} />
-					{/if}
-					<Time relative timestamp={$query.data.estimatedNextWatering} />
+					<span class="visually-hidden">{Math.round(availableWaterCapacityPercent)}% Complete</span>
 				</div>
-			{/if}
-		</td>
+			</div>
+		{/if}
+	</td>
 
-		<td>
+	<td>
+		{#if sensor.prediction != undefined}
 			<div
-				class="text-nowrap {$query.data.status.signalStrength == 'offline'
-					? 'text-danger'
-					: ''} {$query.data.status.lowBattery || $query.data.status.signalStrength == 'weak'
+				class="align-items-center {waterToday ? 'text-danger' : ''} {waterTomorrow
 					? 'text-warning'
 					: ''}"
 			>
-				{#if $query.data.status.signalStrength == 'offline'}
-					<IconWifiOff class="align-text-bottom" size={16} />
-				{:else if $query.data.status.lowBattery || $query.data.status.signalStrength == 'weak'}
-					<IconAlertTriangle class="align-text-bottom" size={16} />
-				{:else if $query.data.status.signalStrength == 'strong'}
-					<IconWifi2 class="align-text-bottom" size={16} />
-				{:else if $query.data.status.signalStrength == 'moderate'}
-					<IconWifi1 class="align-text-bottom" size={16} />
+				{#if waterToday || waterTomorrow}
+					<IconClockExclamation class="align-text-bottom" size={16} />
 				{/if}
-				{#if $query.data.status.signalStrength == 'offline'}
-					<span>offline</span>
-				{:else if $query.data.status.lowBattery}
-					<span>Low Battery</span>
-				{:else if $query.data.status.signalStrength == 'weak'}
-					<span>Poor Signal</span>
-				{:else}
-					<span>Ok</span>
-				{/if}
+				<Time relative timestamp={sensor.prediction.nextWatering} />
 			</div>
-		</td>
+		{/if}
+	</td>
 
-		<td class="w-1 graph">
-			{#if $query.data.waterCapacityHistory.length > 0}
-				{#if browser}
-					<SensorSparkline sensor={$query.data} />
-				{/if}
+	<td>
+		<div
+			class="text-nowrap {sensor.sensorHealth.critical
+				? 'text-danger'
+				: ''} {sensor.sensorHealth.warning
+				? 'text-warning'
+				: ''}"
+		>
+			{#if sensor.sensorHealth.signalStrength == 'offline'}
+				<IconWifiOff class="align-text-bottom" size={16} />
+			{:else if sensor.sensorHealth.lowBattery || sensor.sensorHealth.signalStrength == 'weak'}
+				<IconAlertTriangle class="align-text-bottom" size={16} />
+			{:else if sensor.sensorHealth.signalStrength == 'strong'}
+				<IconWifi2 class="align-text-bottom" size={16} />
+			{:else if sensor.sensorHealth.signalStrength == 'moderate'}
+				<IconWifi1 class="align-text-bottom" size={16} />
 			{/if}
-		</td>
+			{#if sensor.sensorHealth.signalStrength == 'offline'}
+				<span>offline</span>
+			{:else if sensor.sensorHealth.lowBattery}
+				<span>Low Battery</span>
+			{:else if sensor.sensorHealth.signalStrength == 'weak'}
+				<span>Poor Signal</span>
+			{:else}
+				<span>Ok</span>
+			{/if}
+		</div>
+	</td>
 
-		<td class="text-end">
-			<a href="/sensor/{id}">Details</a>
-		</td>
-	</tr>
-{/if}
+	<td class="w-1 graph">
+		{#if $historyQuery.data != undefined && $historyQuery.data.waterCapacityHistory.length > 0}
+			{#if browser}
+				<SensorSparkline sensor={sensor} history={$historyQuery.data} />
+			{/if}
+		{/if}
+	</td>
+
+	<td class="text-end">
+		<a href="/sensor/{sensor.id}">Details</a>
+	</td>
+</tr>
 
 <style>
 	/* disable graph touch events on mobile to allow touch scrolling */

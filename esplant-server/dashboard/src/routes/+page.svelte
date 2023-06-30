@@ -1,49 +1,31 @@
 <script lang="ts">
-	import { fetchSensors, type Sensor } from '$lib/api';
 	import { createQuery } from '@tanstack/svelte-query';
 	import SensorRow from '$lib/components/sensor-row.svelte';
 	import IconBucketDroplet from '@tabler/icons-svelte/dist/svelte/icons/IconBucketDroplet.svelte';
 	import IconPlant from '@tabler/icons-svelte/dist/svelte/icons/IconPlant.svelte';
 	import Time from 'svelte-time';
 	import SensorStatusCard from '$lib/components/sensor-status-card.svelte';
+	import { fetchSensorOverview } from '$lib/api';
 
 	$: query = createQuery({
-		queryKey: ['sensor-ids'],
-		queryFn: () => fetchSensors(),
+		queryKey: ['sensor-overview'],
+		queryFn: () => fetchSensorOverview(),
 		refetchInterval: 60 * 60 * 1000, // refetch every hour
-		initialData: []
+		initialData: {
+			sensors: []
+		},
 	});
 
-	// TODO use a store or request the data at the top level
-	const sensors = {} as Record<number, Sensor>;
-	function handleUpdateSensor(event: CustomEvent<Sensor>) {
-		const { detail } = event;
-		sensors[detail.id] = detail;
-	}
-
-	function handleRemoveSensor(event: CustomEvent<number>) {
-		const { detail } = event;
-		delete sensors[detail];
-	}
-
-	$: totalSensors = Object.keys(sensors).length;
-	$: poorPlantHealth = Object.values(sensors).filter(
-		(sensor) =>
-			sensor.status.overwatered ||
-			sensor.status.underwatered ||
-			sensor.status.drowning ||
-			sensor.status.wilting
-	).length;
-	$: poorSensorHealth = Object.values(sensors).filter(
-		(sensor) =>
-			sensor.status.lowBattery || ['offline', 'weak'].includes(sensor.status.signalStrength)
-	).length;
-	$: anyWateringToday = Object.values(sensors).some((sensor) => sensor.status.waterToday);
-	$: anyWateringTomorrow = Object.values(sensors).some((sensor) => sensor.status.waterTomorrow);
-	$: minNextWatering = Object.values(sensors)
-		.map((sensor) => sensor.estimatedNextWatering!)
+	$: totalSensors = $query.data.sensors.length;
+	$: poorPlantHealth = $query.data.sensors.filter((sensor) => sensor.plantHealth.critical).length
+	$: poorSensorHealth = $query.data.sensors.filter((sensor) => sensor.sensorHealth.critical).length
+	$: minNextWatering = $query.data.sensors
+		.map((sensor) => sensor.prediction?.nextWatering!)
 		.filter((nextWatering) => nextWatering != undefined)
+		.map((nw) => new Date(nw)) // TODO use superjson for API responses
 		.sort((a, b) => a.getTime() - b.getTime())[0];
+	$: anyWateringToday = minNextWatering && minNextWatering.getTime() < new Date().getTime() + 24 * 60 * 60 * 1000; // TODO use end of day
+	$: anyWateringTomorrow = minNextWatering && minNextWatering.getTime() < new Date().getTime() + 2 * 24 * 60 * 60 * 1000;
 </script>
 
 <div class="page-body">
@@ -101,13 +83,8 @@
 								</tr>
 							</thead>
 							<tbody>
-								{#each $query.data as sensor (sensor.id)}
-									<SensorRow
-										id={sensor.id}
-										name={sensor.name}
-										on:update-sensor={handleUpdateSensor}
-										on:remove-sensor={handleRemoveSensor}
-									/>
+								{#each $query.data.sensors as sensor (sensor.id)}
+									<SensorRow {sensor} />
 								{/each}
 							</tbody>
 						</table>
