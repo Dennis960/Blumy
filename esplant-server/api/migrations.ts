@@ -1,4 +1,6 @@
-import { Knex } from "knex";
+import Knex from "knex";
+import knexfile from "./knexfile.js";
+export const knex = Knex(knexfile.development);
 
 const createSensorTableStatement = `CREATE TABLE IF NOT EXISTS sensor (
   sensor_address INTEGER PRIMARY KEY NOT NULL,
@@ -198,9 +200,18 @@ const migrations = [
       "ALTER TABLE data_new RENAME TO data;",
     ],
   },
+  {
+    name: "sensor_add_config",
+    statements: [
+      "ALTER TABLE sensor ADD COLUMN fieldCapacity INTEGER DEFAULT 1024;",
+      "ALTER TABLE sensor ADD COLUMN permanentWiltingPoint INTEGER DEFAULT 128;",
+      "ALTER TABLE sensor ADD COLUMN lowerThreshold INTEGER DEFAULT 0.2;",
+      "ALTER TABLE sensor ADD COLUMN upperThreshold REAL DEFAULT 0.8;",
+    ],
+  },
 ];
 
-export async function migrateDatabase(knex: Knex) {
+export async function migrateDatabase() {
   console.log("Connected to SQLite database");
   // create tables if not exist
   await knex.raw(createSensorTableStatement);
@@ -222,7 +233,8 @@ export async function migrateDatabase(knex: Knex) {
     const migrationExists = await knex
       .from("migration")
       .select("id")
-      .where({ id: migrationIndex + 1 });
+      .where({ id: migrationIndex + 1 })
+      .first();
     if (!migrationExists) {
       console.log(`Migrating ${migration.name}`);
       for (const statement of migration.statements) {
