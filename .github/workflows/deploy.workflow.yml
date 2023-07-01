@@ -12,7 +12,7 @@ jobs:
             - name: Install dependencies
               run: |
                 python -m pip install --upgrade pip
-                pip install pysftp
+                python -m pip install pysftp
             - name: Deploy
               run: |
                 cd esplant-server
