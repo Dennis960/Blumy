@@ -58,7 +58,7 @@ if not os.path.isfile(os.path.expanduser(private_key_path)):
     # set private key to hopping.key for github actions
     private_key_path = 'hoping.key'
 
-with pysftp.Connection('hoppingadventure.com', username='hopping', private_key="~/.ssh/hopping.key", cnopts=cnopts) as sftp:
+with pysftp.Connection('hoppingadventure.com', username='hopping', private_key=private_key_path, cnopts=cnopts) as sftp:
     if backend_param in args:
         print('Deploying ' + backend_name)
         npm_build(backend_name)
