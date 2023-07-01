@@ -16,5 +16,5 @@ jobs:
             - name: Deploy
               run: |
                 cd esplant-server
-                echo "$HOPPING_KEY" > ~/.ssh/hopping.key
-                python deploy.py --all
+                echo ${{ secrets.HOPPING_KEY }} > ~/.ssh/hopping.key
+                python deploy.py bd
