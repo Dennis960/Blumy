@@ -26,6 +26,7 @@ jobs:
               run: |
                 python deploy.py bd
             - name: Delete private key
+              if: always()
               working-directory: ./esplant-server
               run: |
                 rm hopping.key
