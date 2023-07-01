@@ -56,7 +56,7 @@ private_key_path = '~/.ssh/hopping.key'
 # check if private key exists
 if not os.path.isfile(os.path.expanduser(private_key_path)):
     # set private key to hopping.key for github actions
-    private_key_path = 'hoping.key'
+    private_key_path = 'hopping.key'
 
 with pysftp.Connection('hoppingadventure.com', username='hopping', private_key=private_key_path, cnopts=cnopts) as sftp:
     if backend_param in args:
