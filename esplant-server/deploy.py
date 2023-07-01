@@ -5,10 +5,8 @@ import subprocess
 
 local_path = os.path.dirname(os.path.realpath(__file__)).replace('\\', '/')
 remote_path = '/var/www/hoppingadventure/hopping/esplant'
-frontend_name = 'app'
 backend_name = 'api'
 dashboard_name = 'dashboard'
-frontend_param = 'f'
 backend_param = 'b'
 dashboard_param = 'd'
 
@@ -67,13 +65,6 @@ with pysftp.Connection('hoppingadventure.com', username='hopping', private_key="
     else:
         print('Skipping ' + backend_name + ' deploy,      enable with "' + backend_param + '"')
     
-    if frontend_param in args:
-        print('Deploying ' + frontend_name)
-        npm_build(frontend_name)
-        upload_folder(sftp, backend_name + '/' + frontend_name)
-    else:
-        print('Skipping ' + frontend_name + ' deploy, enable with "' + frontend_param + '"')
-
     if dashboard_param in args:
         print('Deploying ' + dashboard_name)
         npm_build(dashboard_name)

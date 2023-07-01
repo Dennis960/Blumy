@@ -14,12 +14,6 @@ import "./mqtt-listener.js";
 // serve api
 app.use("/api", api);
 
-// serve app
-app.use("/app", express.static("app"));
-app.get("/app*", (_req, res) => {
-  res.sendFile("/app/index.html", { root: "." });
-});
-
 // serve dashboard
 app.use("/", express.static("dashboard"));
 app.get("/*", (_req, res) => {
