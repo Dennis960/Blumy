@@ -63,7 +63,7 @@ export default class SensorRepository {
       .update({ name })
       .where({ sensorAddress })
       .returning(["sensorAddress"])
-      .first();
+      .then((rows) => rows[0]);
     if (!id) {
       return Promise.reject("Sensor does not exist");
     }
