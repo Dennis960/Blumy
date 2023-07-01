@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "node --watch --loader ts-node/esm ./index.ts",
-    "build": "tsc",
+    "build": "tsc && cp package.json dist/",
     "start": "node dist/index.js"
   },
   "type": "module",
