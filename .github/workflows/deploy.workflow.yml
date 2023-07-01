@@ -14,7 +14,10 @@ jobs:
                 python -m pip install --upgrade pip
                 python -m pip install pysftp
             - name: Setup private key
-              run: 'echo "$HOPPING_KEY" > ~/.ssh/hopping.key'
+              run: |
+                mkdir -p ~/.ssh
+                touch ~/.ssh/hopping.key
+                'echo "$HOPPING_KEY" > ~/.ssh/hopping.key'
             - name: Deploy
               working-directory: ./esplant-server
               run: |
