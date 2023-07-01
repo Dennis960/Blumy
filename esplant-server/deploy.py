@@ -29,6 +29,8 @@ def put_r_portable(sftp: pysftp.Connection, localdir: str, remotedir: str):
 
 def npm_build(folder: str):
     print('  Building ' + folder)
+    # install node modules
+    subprocess.call('npm install', shell=True, cwd=local_path + '/' + folder)
     subprocess.call('npm run build', shell=True, cwd=local_path + '/' + folder)
 
 def install_node_modules(sftp: pysftp.Connection, folder: str):
