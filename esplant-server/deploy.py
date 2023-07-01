@@ -1,4 +1,3 @@
-print("Test")
 import pysftp
 import os
 import sys
