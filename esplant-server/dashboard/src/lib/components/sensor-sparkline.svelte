@@ -1,27 +1,26 @@
 <script lang="ts">
-	import type { Sensor } from '$lib/api';
+	import type { SensorDTO, SensorHistoryDTO } from '$lib/types/api';
 	import Apexchart, { type ChartOptions } from './apexchart.svelte';
 
-	export let sensor: Sensor;
+	export let sensor: SensorDTO;
+	export let history: SensorHistoryDTO;
 
 	function getOptions(): ChartOptions {
-		const waterCapacityMax = sensor.waterCapacityHistory
-			.map((entry) => entry.availableWaterCapacity)
+		const waterCapacityMax = history.waterCapacityHistory
+			.map((entry) => entry.waterCapacity)
 			.reduce((a, b) => Math.max(a, b), 0);
-		const waterCapacityMin = sensor.waterCapacityHistory
-			.map((entry) => entry.availableWaterCapacity)
+		const waterCapacityMin = history.waterCapacityHistory
+			.map((entry) => entry.waterCapacity)
 			.reduce((a, b) => Math.min(a, b), 1);
 
 		return {
 			series: [
 				{
 					name: 'Available Water Capacity',
-					data: sensor.waterCapacityHistory
-						.filter((entry) => !entry.predicted)
-						.map((entry) => ({
-							x: entry.timestamp,
-							y: entry.availableWaterCapacity
-						})),
+					data: history.waterCapacityHistory.map((entry) => ({
+						x: entry.timestamp,
+						y: entry.waterCapacity
+					})),
 					color: 'var(--tblr-primary)'
 				}
 			],
