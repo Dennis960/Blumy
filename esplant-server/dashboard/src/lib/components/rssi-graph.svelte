@@ -1,15 +1,15 @@
 <script lang="ts">
-	import type { Sensor } from '$lib/api';
+	import type { SensorHistoryDTO } from '$lib/types/api';
 	import Apexchart, { type ChartOptions } from './apexchart.svelte';
 
-	export let sensor: Sensor;
+	export let history: SensorHistoryDTO;
 
 	function getOptions(): ChartOptions {
 		return {
 			series: [
 				{
 					name: 'RSSI',
-					data: sensor.rssiHistory.map((entry) => ({
+					data: history.rssiHistory.map((entry) => ({
 						x: entry.timestamp,
 						y: entry.rssi
 					})),

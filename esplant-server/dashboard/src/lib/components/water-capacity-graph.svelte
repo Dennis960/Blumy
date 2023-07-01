@@ -1,40 +1,48 @@
 <script lang="ts">
 	import IconBucketDroplet from '@tabler/icons/bucket-droplet.svg';
-	import type { Sensor } from '$lib/api';
+	import type { SensorDTO, SensorHistoryDTO } from '$lib/types/api';
 	import Apexchart, { type ChartOptions } from './apexchart.svelte';
 
-	export let sensor: Sensor;
+	export let sensor: SensorDTO;
+	export let history: SensorHistoryDTO;
 
 	function getOptions(): ChartOptions {
-		const historyEntriesMax = sensor.waterCapacityHistory
-			.map((entry) => entry.availableWaterCapacity)
+		const historyEntriesMax = history.waterCapacityHistory
+			.map((entry) => entry.waterCapacity)
 			.reduce((a, b) => Math.max(a, b), 0);
-		const historyEntriesMin = sensor.waterCapacityHistory
-			.map((entry) => entry.availableWaterCapacity)
+		const historyEntriesMin = history.waterCapacityHistory
+			.map((entry) => entry.waterCapacity)
 			.reduce((a, b) => Math.min(a, b), 1);
+
+		const firstTimestamp = history.waterCapacityHistory[0].timestamp;
+		const lastTimestamp =
+			history.waterCapacityHistory[history.waterCapacityHistory.length - 1].timestamp;
+		const graphEndsToday = lastTimestamp.toDateString() == new Date().toDateString();
 
 		return {
 			series: [
 				{
 					name: 'Available Water Capacity',
-					data: sensor.waterCapacityHistory
-						.filter((entry) => !entry.predicted)
-						.map((entry) => ({
-							x: entry.timestamp,
-							y: entry.availableWaterCapacity
-						})),
+					data: history.waterCapacityHistory.map((entry) => ({
+						x: entry.timestamp,
+						y: entry.waterCapacity
+					})),
 					color: 'var(--tblr-primary)'
 				},
-				{
-					name: 'Predicted Available Water Capacity',
-					data: sensor.waterCapacityHistory
-						.filter((entry) => entry.predicted)
-						.map((entry) => ({
-							x: entry.timestamp,
-							y: entry.availableWaterCapacity
-						})),
-					color: 'var(--tblr-primary)'
-				}
+				...(sensor.prediction != undefined && graphEndsToday
+					? [
+							{
+								name: 'Predicted Available Water Capacity',
+								data: sensor.prediction.predictedWaterCapacity
+									.filter((entry) => entry.timestamp > firstTimestamp)
+									.map((entry) => ({
+										x: entry.timestamp,
+										y: entry.waterCapacity
+									})),
+								color: 'var(--tblr-primary)'
+							}
+					  ]
+					: [])
 			],
 			stroke: {
 				curve: 'straight',
@@ -45,8 +53,8 @@
 				gradient: {
 					shade: 'light',
 					gradientToColors: ['var(--tblr-primary)', 'var(--tblr-primary)'],
-					opacityFrom: [0.4, 0.1],
-					opacityTo: [0.4, 0.1]
+					opacityFrom: [0.4, 0.0],
+					opacityTo: [0.4, 0.0]
 				}
 			},
 			chart: {
@@ -98,12 +106,12 @@
 				yaxis: [
 					{
 						y: sensor.config.upperThreshold,
-						borderColor: 'var(--tblr-warning)',
+						borderColor: 'var(--tblr-warning)'
 					},
 					{
 						y: 1.0,
 						y2: Math.max(1.0, historyEntriesMax),
-						fillColor: 'var(--tblr-danger)',
+						fillColor: 'var(--tblr-danger)'
 					},
 					{
 						y: sensor.config.lowerThreshold,
@@ -116,11 +124,11 @@
 					}
 				],
 				points: [
-					...(sensor.waterCapacityHistory
+					...(history.waterCapacityHistory
 						.filter((entry) => entry.detectedWatering)
 						.map((entry) => ({
 							x: entry.timestamp.getTime(),
-							y: entry.availableWaterCapacity,
+							y: entry.waterCapacity,
 							marker: {
 								size: 0
 							},
