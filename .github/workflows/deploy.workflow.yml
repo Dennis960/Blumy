@@ -1,0 +1,16 @@
+name: Deploy to esplant.hoppingadventure.com
+on: workflow_dispatch
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: Setup Python
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.10
+            - name: Install dependencies
+              run: pip install pysftp
+            - run: cd esplant-server
+            - run: echo "$HOPPING_KEY" > ~/.ssh/hopping.key
+            - run: python deploy.py --all
