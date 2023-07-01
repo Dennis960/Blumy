@@ -1,5 +1,5 @@
 <script lang="ts">
-	import IconBucketDroplet from '@tabler/icons/bucket-droplet.svg';
+	import { IconBucketDropletSvg } from '$lib/icons';
 	import type { SensorDTO, SensorHistoryDTO } from '$lib/types/api';
 	import Apexchart, { type ChartOptions } from './apexchart.svelte';
 
@@ -133,7 +133,7 @@
 								size: 0
 							},
 							image: {
-								path: IconBucketDroplet,
+								path: IconBucketDropletSvg,
 								offsetX: 5,
 								offsetY: -10
 							}

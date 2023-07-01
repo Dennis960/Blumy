@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { createQuery } from '@tanstack/svelte-query';
 	import SensorRow from '$lib/components/sensor-row.svelte';
-	import IconBucketDroplet from '@tabler/icons-svelte/dist/svelte/icons/IconBucketDroplet.svelte';
-	import IconPlant from '@tabler/icons-svelte/dist/svelte/icons/IconPlant.svelte';
 	import Time from 'svelte-time';
 	import SensorStatusCard from '$lib/components/sensor-status-card.svelte';
 	import { fetchSensorOverview } from '$lib/api';
 	import { SortKey, sortQueryDataBy } from '$lib/sort-query-data';
 	import TableSorter, { type SortDirection } from '$lib/components/table-sorter.svelte';
+	import { IconPlant, IconBucketDroplet } from '$lib/icons';
 
 	$: query = createQuery({
 		queryKey: ['sensor-overview'],
@@ -49,7 +48,6 @@
 		const asc = direction === 'asc';
 		sortKey = key;
 		sortAsc = asc;
-		console.log('sort', key, asc);
 	}
 	$: queryDataSorted = sortQueryDataBy($query.data, sortKey, sortAsc);
 </script>
