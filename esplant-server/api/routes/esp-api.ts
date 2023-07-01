@@ -15,7 +15,6 @@ const dataController = new DataController();
 //   "measurementDuration": 5000,
 // }
 // -> 400 message: sensorAddress and water are required, data: {}
-// -> 500 message: could not create sensor, data: {}
 // -> 200 message: data added, data: data
 router.post("/data", async (req, res) => {
   const dataObj: Data = req.body;
