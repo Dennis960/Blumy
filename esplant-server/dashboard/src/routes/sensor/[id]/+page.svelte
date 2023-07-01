@@ -40,13 +40,15 @@
 
 	$: sensorQuery = createQuery({
 		queryKey: ['sensor', data.id],
-		queryFn: () => fetchSensor(data.id)
+		queryFn: () => fetchSensor(data.id),
+		refetchInterval: 15 * 60 * 1000,
 	});
 
 	$: historyQuery = createQuery({
 		queryKey: ['sensor-data', data.id, data.startDate, data.endDate],
 		queryFn: () => fetchSensorHistory(data.id, data.startDate, data.endDate),
-		keepPreviousData: true
+		keepPreviousData: true,
+		refetchInterval: 15 * 60 * 1000,
 	});
 
 	$: waterToday =
