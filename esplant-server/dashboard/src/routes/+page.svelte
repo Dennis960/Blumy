@@ -6,6 +6,8 @@
 	import Time from 'svelte-time';
 	import SensorStatusCard from '$lib/components/sensor-status-card.svelte';
 	import { fetchSensorOverview } from '$lib/api';
+	import { SortKey, sortQueryDataBy } from '$lib/sort-query-data';
+	import TableSorter, { type SortDirection } from '$lib/components/table-sorter.svelte';
 
 	$: query = createQuery({
 		queryKey: ['sensor-overview'],
@@ -26,6 +28,30 @@
 		.sort((a, b) => a.getTime() - b.getTime())[0];
 	$: anyWateringToday = minNextWatering && minNextWatering.getTime() < new Date().getTime() + 24 * 60 * 60 * 1000; // TODO use end of day
 	$: anyWateringTomorrow = minNextWatering && minNextWatering.getTime() < new Date().getTime() + 2 * 24 * 60 * 60 * 1000;
+
+	let tableSorters: TableSorter[] = [];
+	let sortKey = SortKey.NEXT_WATERING;
+	let sortAsc = true;
+
+	function sort(event: CustomEvent<{ key: SortKey; direction: SortDirection }>) {
+		const { key, direction } = event.detail;
+		if (direction === undefined) {
+			// default sorting is by id
+			sortKey = SortKey.ID;
+			sortAsc = true;
+			return;
+		}
+		tableSorters.forEach((tableSorter) => {
+			if (tableSorter.sortKey !== key) {
+				tableSorter.sortDirection = undefined;
+			}
+		});
+		const asc = direction === 'asc';
+		sortKey = key;
+		sortAsc = asc;
+		console.log('sort', key, asc);
+	}
+	$: queryDataSorted = sortQueryDataBy($query.data, sortKey, sortAsc);
 </script>
 
 <div class="page-body">
@@ -74,17 +100,33 @@
 						<table class="table table-vcenter table-striped">
 							<thead>
 								<tr>
-									<th>Name</th>
-									<th>Water Capacity</th>
-									<th>Next Watering</th>
-									<th>Sensor Health</th>
+									<th>
+										<TableSorter sortKey={SortKey.NAME} on:sort={sort} bind:this={tableSorters[0]}>
+											Name
+										</TableSorter>
+									</th>
+									<th>
+										<TableSorter sortKey={SortKey.WATER_CAPACITY} on:sort={sort} bind:this={tableSorters[1]}>
+											Water Capacity
+										</TableSorter>
+									</th>
+									<th>
+										<TableSorter sortKey={SortKey.NEXT_WATERING} on:sort={sort} bind:this={tableSorters[2]} sortDirection="asc">
+											Next Watering
+										</TableSorter>
+									</th>
+									<th>
+										<TableSorter sortKey={SortKey.SENSOR_HEALTH} on:sort={sort} bind:this={tableSorters[3]}>
+											Sensor Health
+										</TableSorter>
+									</th>
 									<th>3 Day History</th>
 									<th />
 								</tr>
 							</thead>
 							<tbody>
-								{#each $query.data.sensors as sensor (sensor.id)}
-									<SensorRow {sensor} />
+								{#each queryDataSorted as sensor (sensor.id)}
+									<SensorRow sensor={sensor} />
 								{/each}
 							</tbody>
 						</table>
