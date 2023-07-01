@@ -1,20 +1,6 @@
 <script lang="ts">
 	import Time from 'svelte-time';
-	import IconWifi1 from '@tabler/icons-svelte/dist/svelte/icons/IconWifi1.svelte';
-	import IconWifi2 from '@tabler/icons-svelte/dist/svelte/icons/IconWifi2.svelte';
-	import IconWifiOff from '@tabler/icons-svelte/dist/svelte/icons/IconWifiOff.svelte';
-	import IconDroplet from '@tabler/icons-svelte/dist/svelte/icons/IconDroplet.svelte';
-	import IconDropletFilled2 from '@tabler/icons-svelte/dist/svelte/icons/IconDropletFilled2.svelte';
-	import IconDropletFilled from '@tabler/icons-svelte/dist/svelte/icons/IconDropletFilled.svelte';
-	import IconScubaMask from '@tabler/icons-svelte/dist/svelte/icons/IconScubaMask.svelte';
-	import IconGrave from '@tabler/icons-svelte/dist/svelte/icons/IconGrave.svelte';
-	import IconClockExclamation from '@tabler/icons-svelte/dist/svelte/icons/IconClockExclamation.svelte';
-	import IconClock from '@tabler/icons-svelte/dist/svelte/icons/IconClock.svelte';
-	import IconAlertTriangle from '@tabler/icons-svelte/dist/svelte/icons/IconAlertTriangle.svelte';
-	import IconBucketDroplet from '@tabler/icons-svelte/dist/svelte/icons/IconBucketDroplet.svelte';
-	import IconCalendar from '@tabler/icons-svelte/dist/svelte/icons/IconCalendar.svelte';
-	import IconChevronLeft from '@tabler/icons/chevron-left.svg?raw';
-	import IconChevronRight from '@tabler/icons/chevron-right.svg?raw';
+	import { IconAlertTriangle, IconBucketDroplet, IconCalendar, IconChevronLeftRaw, IconChevronRightRaw, IconClock, IconClockExclamation, IconDroplet, IconDropletFilled, IconDropletFilled2, IconGrave, IconScubaMask, IconSettings, IconWifi1, IconWifi2, IconWifiOff } from '$lib/icons.js';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { fetchSensor, fetchSensorHistory } from '$lib/api.js';
 	import WaterCapacityGraph from '$lib/components/water-capacity-graph.svelte';
@@ -28,8 +14,8 @@
 	const litepickerOptions = {
 		singleMode: false,
 		buttonText: {
-			previousMonth: IconChevronLeft,
-			nextMonth: IconChevronRight
+			previousMonth: IconChevronLeftRaw,
+			nextMonth: IconChevronRightRaw
 		},
 		maxDate: new Date(),
 		startDate: data.startDate,
@@ -89,6 +75,7 @@
 						<IconCalendar />
 					</span>
 				</div>
+				<IconSettings class="ms-2" />
 			</div>
 		</div>
 	</div>
@@ -208,7 +195,7 @@
 				<section class="card">
 					<div class="card-body">
 						<div class="d-flex flex-wrap">
-							<h1 class="card-title">RSSI History</h1>
+							<h1 class="card-title">Connection Strength</h1>
 						</div>
 						<div class="graph">
 							{#if $historyQuery.data != undefined}
