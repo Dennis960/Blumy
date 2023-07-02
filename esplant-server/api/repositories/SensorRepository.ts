@@ -68,4 +68,29 @@ export default class SensorRepository {
       return Promise.reject("Sensor does not exist");
     }
   }
+
+  static async update(
+    sensorAddress: number,
+    changes: Partial<Sensor>
+  ): Promise<Sensor> {
+    if ("sensorAddress" in changes) {
+      delete changes["sensorAddress"];
+    }
+    const sensor = await knex<Sensor>("sensor")
+      .update(changes)
+      .where({ sensorAddress })
+      .returning([
+        "sensorAddress",
+        "name",
+        "fieldCapacity",
+        "permanentWiltingPoint",
+        "lowerThreshold",
+        "upperThreshold",
+      ])
+      .then((r) => r[0]);
+    if (sensor == undefined) {
+      return Promise.reject("Sensor does not exist");
+    }
+    return sensor;
+  }
 }

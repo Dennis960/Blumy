@@ -7,7 +7,7 @@ export interface SensorReading {
   rssi: number;
 }
 
-export interface SensorConfiguration {
+export interface SensorConfigurationDTO {
   name: string;
   fieldCapacity: number; // max water value
   /*
@@ -52,17 +52,21 @@ export interface PlantHealthDTO {
 
 export interface SensorDTO {
   id: number;
-  config: SensorConfiguration;
+  config: SensorConfigurationDTO;
   sensorHealth: SensorHealthDTO;
   plantHealth: PlantHealthDTO;
-  lastUpdate: {
-    timestamp: Date
-    waterCapacity: number
-  } | undefined
-  prediction: {
-    nextWatering: Date
-    predictedWaterCapacity: WaterCapacityHistoryEntry[]
-  } | undefined;
+  lastUpdate:
+    | {
+        timestamp: Date;
+        waterCapacity: number;
+      }
+    | undefined;
+  prediction:
+    | {
+        nextWatering: Date;
+        predictedWaterCapacity: WaterCapacityHistoryEntry[];
+      }
+    | undefined;
 }
 
 export interface SensorOverviewDTO {
@@ -73,4 +77,11 @@ export interface SensorHistoryDTO {
   id: number;
   waterCapacityHistory: WaterCapacityHistoryEntry[];
   rssiHistory: RSSIHistoryEntry[];
+}
+
+export interface SensorValueDistributionDTO {
+  waterCapacityDistribution: {
+    bucket: number;
+    count: number;
+  }[];
 }

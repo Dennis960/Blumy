@@ -91,4 +91,21 @@ export default class SensorDataRepository {
       .orderBy("date", "desc");
     return this.dataToAverage(data, maxDataPoints);
   }
+
+  static async getCountByWaterCapacityBucket(
+    sensorId: number,
+    sinceDate: Date,
+    bucketSize: number
+  ): Promise<{ bucket: number; count: number }[]> {
+    const dist = await knex("data")
+      .select({
+        count: knex.raw("count(*)"),
+        bucket: knex.raw(`floor(water / ${bucketSize}) * ${bucketSize}`),
+      })
+      .where({ sensorAddress: sensorId })
+      .andWhere("date", ">=", sinceDate)
+      .groupBy("bucket")
+      .orderBy("bucket");
+    return dist;
+  }
 }
