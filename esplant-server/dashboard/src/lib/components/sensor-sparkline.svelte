@@ -5,7 +5,7 @@
 	export let sensor: SensorDTO;
 	export let history: SensorHistoryDTO;
 
-	function getOptions(): ChartOptions {
+	function getOptions(sensor: SensorDTO, history: SensorHistoryDTO): ChartOptions {
 		const waterCapacityMax = history.waterCapacityHistory
 			.map((entry) => entry.waterCapacity)
 			.reduce((a, b) => Math.max(a, b), 0);
@@ -87,7 +87,7 @@
 			}
 		};
 	}
-	$: chartOptions = getOptions();
+	$: chartOptions = getOptions(sensor, history);
 </script>
 
 <Apexchart options={chartOptions} />

@@ -1,0 +1,154 @@
+<script lang="ts">
+	import { goto } from '$app/navigation';
+	import { fetchSensor, fetchSensorValueDistribution, submitSensorConfig } from '$lib/api.js';
+	import Slider, { type SliderOptions } from '$lib/components/slider.svelte';
+	import WaterCapacityDistribution from '$lib/components/water-capacity-distribution.svelte';
+	import type { SensorConfigurationDTO } from '$lib/types/api.js';
+	import { createQuery, useQueryClient } from '@tanstack/svelte-query';
+	import { onMount } from 'svelte';
+
+	export let data;
+
+	let sliderOptions: SliderOptions;
+
+	let config: SensorConfigurationDTO;
+
+	onMount(async () => {
+		const sensor = await fetchSensor(data.id);
+		config = sensor.config;
+		sliderOptions = {
+			start: [
+				config.permanentWiltingPoint,
+				config.lowerThreshold * config.fieldCapacity,
+				config.upperThreshold * config.fieldCapacity,
+				config.fieldCapacity
+			],
+			connect: true,
+			range: { min: [0], max: [1024] },
+			pips: {
+				mode: 'values' as any,
+				density: 3,
+				values: [0, 250, 500, 750, 1000]
+			}
+		};
+	});
+
+	function handleSliderInput(e: CustomEvent) {
+		const [permanentWiltingPoint, lowerThreshold, upperThreshold, fieldCapacity] =
+			e.detail.values.map((v: string) => Math.floor(parseFloat(v)));
+		config = {
+			...config,
+			permanentWiltingPoint,
+			lowerThreshold: lowerThreshold / fieldCapacity,
+			upperThreshold: upperThreshold / fieldCapacity,
+			fieldCapacity
+		};
+	}
+
+	let error: string;
+
+	const queryClient = useQueryClient();
+	async function handleSubmit() {
+		try {
+			config = await submitSensorConfig(data.id, config);
+		} catch (e) {
+			console.error(e);
+			error = `${e}`;
+			return;
+		}
+		queryClient.invalidateQueries(['sensor', data.id]);
+		goto(`/sensor/${data.id}`);
+	}
+
+	$: valueDistributionQuery = createQuery({
+		queryKey: ['sensor-value-distribution', data.id],
+		queryFn: () => fetchSensorValueDistribution(data.id),
+		refetchInterval: 15 * 60 * 1000
+	});
+</script>
+
+<div class="page-header">
+	<div class="container">
+		<div class="row row-gap-3 align-items-center">
+			<div class="col-12">
+				{#if config != undefined}
+					<form on:submit={handleSubmit}>
+						<section class="card">
+							<div class="card-header">
+								<h1 class="card-title">Sensor Settings</h1>
+							</div>
+							<div class="card-body">
+								<div class="row mb-3">
+									<div class="col-12 col-md-6 col-lg-4">
+										<label for="name" class="form-label">Name</label>
+										<input type="text" class="form-control" id="name" value={config.name} />
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-12 col-md-6 col-lg-4">
+										<label for="slider" class="form-label">Sensor Value Thresholds</label>
+										{#if $valueDistributionQuery.data != undefined && sliderOptions != undefined}
+											<div class="my-2 slider">
+												<WaterCapacityDistribution
+													sensorValueDistribution={$valueDistributionQuery.data}
+													sensorConfig={config}
+												/>
+                                                <div class="slider__input">
+												<Slider options={sliderOptions} on:input={handleSliderInput} />
+                                                </div>
+											</div>
+										{/if}
+										<small class="form-hint">
+											Set minimum and maximum acceptable sensor values and thresholds for
+											underwatering and overwatering alarms.
+										</small>
+									</div>
+									{#if error != undefined}
+										<div class="mt-3 alert alert-danger" role="alert">
+											{error}
+										</div>
+									{/if}
+								</div>
+								<div class="card-footer text-end">
+									<div class="d-flex justify-content-end column-gap-2">
+										<a href={`/sensor/${data.id}`} class="btn btn-link">Cancel</a>
+										<button type="submit" class="btn btn-primary">Save</button>
+									</div>
+								</div>
+							</div>
+						</section>
+					</form>
+				{/if}
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.slider {
+		padding-bottom: 2.5rem;
+	}
+
+	.slider :global(.noUi-connects) {
+		background: var(--tblr-danger);
+	}
+
+	.slider :global(.noUi-connects > div:nth-child(1)) {
+		background: var(--tblr-warning);
+	}
+
+	.slider :global(.noUi-connects > div:nth-child(2)) {
+		background: var(--tblr-success);
+	}
+
+	.slider :global(.noUi-connects > div:nth-child(3)) {
+		background: var(--tblr-warning);
+	}
+
+    .slider__input {
+        /* align slider knobs with sparkline above */
+        padding-left: 14px;
+        padding-right: 6px;
+    }
+</style>

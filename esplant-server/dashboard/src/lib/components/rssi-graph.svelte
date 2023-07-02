@@ -4,7 +4,7 @@
 
 	export let history: SensorHistoryDTO;
 
-	function getOptions(): ChartOptions {
+	function getOptions(history: SensorHistoryDTO): ChartOptions {
 		return {
 			series: [
 				{
@@ -72,7 +72,7 @@
 		};
 	}
 
-	$: chartOptions = getOptions();
+	$: chartOptions = getOptions(history);
 </script>
 
 <Apexchart options={chartOptions} />

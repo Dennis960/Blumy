@@ -62,7 +62,7 @@
 </script>
 
 <div class="page-header">
-	<div class="container-xl">
+	<div class="container">
 		<div class="row row-gap-3 align-items-center">
 			<div class="col-12 col-md-auto me-auto">
 				<h1 class="page-title">{$sensorQuery.data?.config.name}</h1>
@@ -77,7 +77,12 @@
 						<IconCalendar />
 					</span>
 				</div>
-				<IconSettings class="ms-2" />
+			</div>
+			<div class="col-auto">
+				<a class="btn" href={`/sensor/${data.id}/settings`}>
+					<IconSettings />
+					<span class="ms-2">Settings</span>
+				</a>
 			</div>
 		</div>
 	</div>
