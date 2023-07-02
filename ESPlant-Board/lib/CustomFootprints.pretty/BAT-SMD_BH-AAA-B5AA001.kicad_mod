@@ -52,8 +52,8 @@
   (pad "2" smd rect (at -27.875032 -5.5) (size 11.000025 7.000025) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 3057a000-cab6-4ca6-b5fe-1452eb876d14))
   (pad "3" smd rect (at -27.875032 5.5) (size 11.000025 7.000025) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp fb9c0af1-9a80-4865-b0cf-2ed08f8baa3c))
   (pad "4" smd rect (at 27.875032 5.5) (size 11.000025 7.000025) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp b9a5d289-2dee-4be9-922d-b3e1284538c8))
-  (model "D:/GitProjects/ESPlant/ESPlant-Board/lib/./footprint/packages3d/BAT-SMD_BH-AAA-B5AA001.wrl"
-    (offset (xyz 0.0000253999996185 -0.0000253999996185 0.0999235985))
+  (model "${KIPRJMOD}/lib/footprint/packages3d/BAT-SMD_BH-AAA-B5AA001.wrl"
+    (offset (xyz 0 0 0))
     (scale (xyz 1 1 1))
     (rotate (xyz 0 0 0))
   )
