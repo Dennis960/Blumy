@@ -18,7 +18,7 @@
 		queryKey: ['sensor-sparkline', sensor.id],
 		queryFn: async () => {
 			const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
-			return await fetchSensorHistory(sensor.id, new Date(), threeDaysAgo)
+			return await fetchSensorHistory(sensor.id, threeDaysAgo, new Date());
 		},
 		refetchInterval: 15 * 60 * 1000,
 	});
