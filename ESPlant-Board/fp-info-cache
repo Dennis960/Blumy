@@ -1,4 +1,4 @@
-20122158105773267
+20123855343596215
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -50162,12 +50162,12 @@ BAT-SMD_BH-AAA-B5AA001 footprint
 4
 4
 CustomFootprints
-BAT_2468
-
-
+MICRO-USB-SMD_5P-P0.65-H-F_C10418
+MICRO-USB-SMD_5P-P0.65-H-F_C10418 footprint
+MICRO-USB-SMD_5P-P0.65-H-F_C10418 footprint
 0
-2
-2
+9
+9
 CustomFootprints
 SENSOR-SMD_L3.0-W3.0-P1.00-BR
 SENSOR-SMD_L3.0-W3.0-P1.00-BR footprint
@@ -50183,6 +50183,20 @@ SENSORS-SMD_ALS-PT19 footprint
 2
 2
 CustomFootprints
+SOT-223-3_L6.5-W3.4-P2.30-LS7.0-BR
+SOT-223-3_L6.5-W3.4-P2.30-LS7.0-BR footprint
+SOT-223-3_L6.5-W3.4-P2.30-LS7.0-BR footprint
+0
+4
+4
+CustomFootprints
+SW-SMD_MK-12C02-G025
+SW-SMD_MK-12C02-G025 footprint
+SW-SMD_MK-12C02-G025 footprint
+0
+7
+7
+CustomFootprints
 SW_Push_1P1T_XKB_TS-1187A
 SMD Tactile Switch, http://www.helloxkb.com/public/images/pdf/TS-1187A-X-X-X.pdf
 SPST Tactile Switch
@@ -50196,13 +50210,6 @@ WIFI-SMD_ESP32-MINI-1-N4 footprint
 0
 73
 65
-CustomFootprints
-WIFI-SMD_ESP32-WROOM-32E
-WIFI-SMD_ESP32-WROOM-32E footprint
-WIFI-SMD_ESP32-WROOM-32E footprint
-0
-47
-39
 Diode_SMD
 D_0201_0603Metric
 Diode SMD 0201 (0603 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: https://www.vishay.com/docs/20052/crcw0201e3.pdf), generated with kicad-footprint-generator
