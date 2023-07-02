@@ -14,9 +14,14 @@
 			.map((entry) => entry.waterCapacity)
 			.reduce((a, b) => Math.min(a, b), 1);
 
-		const firstTimestamp = history.waterCapacityHistory[0].timestamp;
+		const firstTimestamp =
+			history.waterCapacityHistory.length > 0
+				? history.waterCapacityHistory[0].timestamp
+				: new Date(0);
 		const lastTimestamp =
-			history.waterCapacityHistory[history.waterCapacityHistory.length - 1].timestamp;
+			history.waterCapacityHistory.length > 0
+				? history.waterCapacityHistory[history.waterCapacityHistory.length - 1].timestamp
+				: new Date();
 		const graphEndsToday = lastTimestamp.toDateString() == new Date().toDateString();
 
 		return {
