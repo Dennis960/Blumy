@@ -17,3 +17,8 @@ export { default as IconPlant } from '@tabler/icons-svelte/dist/svelte/icons/Ico
 export { default as IconChevronLeftRaw } from '@tabler/icons/chevron-left.svg?raw';
 export { default as IconChevronRightRaw } from '@tabler/icons/chevron-right.svg?raw';
 export { default as IconBucketDropletSvg } from '@tabler/icons/bucket-droplet.svg';
+export { default as IconDropletSvg } from '@tabler/icons/droplet.svg';
+export { default as IconDropletFilled2Svg } from '@tabler/icons/droplet-filled-2.svg';
+export { default as IconDropletFilledSvg } from '@tabler/icons/droplet-filled.svg';
+export { default as IconScubeMaskSvg } from '@tabler/icons/scuba-mask.svg';
+export { default as IconGraveSvg } from '@tabler/icons/grave.svg';

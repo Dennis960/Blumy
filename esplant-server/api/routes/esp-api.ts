@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { Data } from "../types/data.js";
-import DataController from "../controllers/SensorController.js";
+import SensorController from "../controllers/SensorController.js";
 
 const router = Router();
-const dataController = new DataController();
+const dataController = new SensorController();
 
 // POST /api/data
 // {

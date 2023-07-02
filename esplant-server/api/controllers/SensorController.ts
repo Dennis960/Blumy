@@ -3,12 +3,13 @@ import { Data } from "../types/data.js";
 import {
   PlantHealthDTO,
   RSSIHistoryEntry,
-  SensorConfiguration,
+  SensorConfigurationDTO,
   SensorDTO,
   SensorHealthDTO,
   SensorHistoryDTO,
   SensorOverviewDTO,
   SensorReading,
+  SensorValueDistributionDTO,
   WaterCapacityHistoryEntry,
 } from "../types/api.js";
 import Sensor from "../repositories/SensorRepository.js";
@@ -20,18 +21,18 @@ const WATERING_THRESHOLD = 0.05 / (60 * 60 * 1000); // water capacity gain per h
 const WATERING_WINDOW = 4 * 60 * 60 * 1000;
 const PREDICTION_IMPLAUSIBLE_WATERLOSS_EXPONENT = -0.05 / (60 * 60 * 1000); // max plausible water capacity loss per ms
 
-export default class DataController {
+export default class SensorController {
   private async getSensorConfiguration(
     id: number
-  ): Promise<SensorConfiguration | undefined> {
+  ): Promise<SensorConfigurationDTO | undefined> {
     const sensor = await Sensor.getById(id);
     if (sensor == undefined) {
       return undefined;
     }
-    return sensor
+    return sensor;
   }
 
-  private mapData(r: Data, config: SensorConfiguration): SensorReading {
+  private mapData(r: Data, config: SensorConfigurationDTO): SensorReading {
     return {
       id: r.id!,
       timestamp: new Date(r.date!),
@@ -127,8 +128,7 @@ export default class DataController {
         model != undefined
           ? {
               nextWatering: model.predictTimestamp(config.lowerThreshold),
-              predictedWaterCapacity:
-                model.predictEntries(60 * 60 * 1000, 24),
+              predictedWaterCapacity: model.predictEntries(60 * 60 * 1000, 24),
             }
           : undefined,
       sensorHealth,
@@ -152,7 +152,7 @@ export default class DataController {
 
   private getPlantHealth(
     lastReading: SensorReading | undefined,
-    config: SensorConfiguration
+    config: SensorConfigurationDTO
   ): PlantHealthDTO {
     const status = {
       drowning:
@@ -286,12 +286,11 @@ export default class DataController {
 
     function predictEntries(intervalMs: number, intervals: number) {
       const predictions: WaterCapacityHistoryEntry[] = [];
-      const t1 = Date.now() - lastWateringReading.timestamp.getTime() + intervalMs * intervals;
-      for (
-        let offset = 0;
-        offset < t1;
-        offset += intervalMs
-      ) {
+      const t1 =
+        Date.now() -
+        lastWateringReading.timestamp.getTime() +
+        intervalMs * intervals;
+      for (let offset = 0; offset < t1; offset += intervalMs) {
         predictions.push({
           timestamp: new Date(lastWateringReading.timestamp.getTime() + offset),
           waterCapacity: a * Math.exp(b * offset),
@@ -326,5 +325,35 @@ export default class DataController {
     }
     // add data
     return await SensorDataRepository.create(data);
+  }
+
+  public async getSensorValueDistribution(
+    sensorId: number
+  ): Promise<SensorValueDistributionDTO> {
+    const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+    const waterCapacityDistribution =
+      await SensorDataRepository.getCountByWaterCapacityBucket(
+        sensorId,
+        since,
+        16
+      );
+
+    return {
+      waterCapacityDistribution,
+    };
+  }
+
+  public async updateSensorConfig(
+    sensorId: number,
+    config: SensorConfigurationDTO
+  ): Promise<SensorConfigurationDTO> {
+    const sensor = await SensorRepository.update(sensorId, config);
+    return {
+      name: sensor.name,
+      fieldCapacity: sensor.fieldCapacity,
+      permanentWiltingPoint: sensor.permanentWiltingPoint,
+      upperThreshold: sensor.upperThreshold,
+      lowerThreshold: sensor.lowerThreshold,
+    };
   }
 }
