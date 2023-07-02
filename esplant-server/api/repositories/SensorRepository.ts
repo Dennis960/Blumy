@@ -27,7 +27,14 @@ export default class SensorRepository {
    * @returns All sensors.
    */
   static async getAll(): Promise<Sensor[]> {
-    return await knex<Sensor>("sensor").select("sensorAddress", "name");
+    return await knex<Sensor>("sensor").select(
+      "sensorAddress",
+      "name",
+      "fieldCapacity",
+      "permanentWiltingPoint",
+      "lowerThreshold",
+      "upperThreshold"
+    );
   }
 
   /**

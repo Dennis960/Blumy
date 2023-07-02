@@ -18,3 +18,12 @@ export type Data = {
   rssi?: number;
   measurementDuration?: number;
 };
+
+export type Subscription = {
+  id?: number;
+  sensorAddress: number;
+  lastNotification?: Date;
+  endpoint: string;
+  keys_p256dh: string;
+  keys_auth: string;
+};

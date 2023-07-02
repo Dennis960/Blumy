@@ -209,6 +209,20 @@ const migrations = [
       "ALTER TABLE sensor ADD COLUMN upperThreshold REAL DEFAULT 0.8;",
     ],
   },
+  {
+    name: "add_subscription_table",
+    statements: [
+      `CREATE TABLE IF NOT EXISTS subscription (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sensorAddress INTEGER NOT NULL,
+      lastNotification INTEGER,
+      endpoint TEXT NOT NULL,
+      keys_p256dh TEXT NOT NULL,
+      keys_auth TEXT NOT NULL,
+      FOREIGN KEY (sensorAddress) REFERENCES sensor(sensorAddress)
+      );`,
+    ],
+  },
 ];
 
 export async function migrateDatabase() {

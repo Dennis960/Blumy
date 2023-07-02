@@ -1,6 +1,7 @@
 <script>
 	import '@tabler/core/dist/css/tabler.css';
 	import '@tabler/core/dist/css/tabler-vendors.css'; // TODO remove all vendors except litepicker
+	import { pwaInfo } from 'virtual:pwa-info';
 	import { QueryClientProvider } from '@tanstack/svelte-query';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
@@ -11,7 +12,13 @@
 	});
 
 	export let data;
+
+	$: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : '';
 </script>
+
+<svelte:head>
+	{@html webManifestLink}
+</svelte:head>
 
 <QueryClientProvider client={data.queryClient}>
 	<div class="page">
