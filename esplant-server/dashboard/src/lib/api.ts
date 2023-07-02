@@ -58,3 +58,52 @@ export async function submitSensorConfig(
 		.then((response) => response.text())
 		.then((text) => SuperJSON.parse(text));
 }
+
+export async function fetchPublicVapidKey(): Promise<string> {
+	return await fetch(`${BASE_URL}/vapid-public-key`).then((response) => response.text());
+}
+
+export async function checkSubscription(
+	sensorId: number,
+	subscription: PushSubscription
+): Promise<boolean> {
+	return await fetch(`${BASE_URL}/sensors/${sensorId}/check-subscription`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: SuperJSON.stringify(subscription)
+	})
+		.then((response) => response.text())
+		.then((text) => SuperJSON.parse(text));
+}
+
+export async function submitSubscription(
+	sensorId: number,
+	subscription: PushSubscription
+): Promise<void> {
+	return await fetch(`${BASE_URL}/sensors/${sensorId}/subscribe`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: SuperJSON.stringify(subscription)
+	})
+		.then((response) => response.text())
+		.then((text) => SuperJSON.parse(text));
+}
+
+export async function submitUnsubscription(
+	sensorId: number,
+	subscription: PushSubscription
+): Promise<void> {
+	return await fetch(`${BASE_URL}/sensors/${sensorId}/unsubscribe`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: SuperJSON.stringify(subscription)
+	})
+		.then((response) => response.text())
+		.then((text) => SuperJSON.parse(text));
+}
