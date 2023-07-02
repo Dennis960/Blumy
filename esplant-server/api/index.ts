@@ -1,9 +1,14 @@
-import express from "express";
-import api from "./api.js";
 import { migrateDatabase } from "./migrations.js";
-
 await migrateDatabase();
 
+// send notifications every day at 8, 12, 16 and 20
+import NotificationService from "./services/NotificationService.js";
+import cron from "node-cron";
+cron.schedule("0 8,12,16,20 * * *", async () => {
+    await NotificationService.triggerPushNotifications();
+})
+
+import express from "express";
 const app = express();
 
 const PORT = 4803;
@@ -11,6 +16,7 @@ const PORT = 4803;
 // use mqtt-listener
 import "./mqtt-listener.js";
 
+import api from "./api.js";
 // serve api
 app.use("/api", api);
 

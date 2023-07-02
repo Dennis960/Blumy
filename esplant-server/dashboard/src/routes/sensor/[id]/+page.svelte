@@ -1,6 +1,23 @@
 <script lang="ts">
 	import Time from 'svelte-time';
-	import { IconAlertTriangle, IconBucketDroplet, IconCalendar, IconChevronLeftRaw, IconChevronRightRaw, IconClock, IconClockExclamation, IconDroplet, IconDropletFilled, IconDropletFilled2, IconGrave, IconScubaMask, IconSettings, IconWifi1, IconWifi2, IconWifiOff } from '$lib/icons.js';
+	import {
+		IconAlertTriangle,
+		IconBucketDroplet,
+		IconCalendar,
+		IconChevronLeftRaw,
+		IconChevronRightRaw,
+		IconClock,
+		IconClockExclamation,
+		IconDroplet,
+		IconDropletFilled,
+		IconDropletFilled2,
+		IconGrave,
+		IconScubaMask,
+		IconSettings,
+		IconWifi1,
+		IconWifi2,
+		IconWifiOff
+	} from '$lib/icons.js';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { fetchSensor, fetchSensorHistory } from '$lib/api.js';
 	import WaterCapacityGraph from '$lib/components/water-capacity-graph.svelte';
@@ -8,6 +25,7 @@
 	import SensorStatusCard from '$lib/components/sensor-status-card.svelte';
 	import RssiGraph from '$lib/components/rssi-graph.svelte';
 	import { goto } from '$app/navigation';
+	import NotificationToggle from '$lib/components/notification-toggle.svelte';
 
 	export let data;
 
@@ -41,14 +59,14 @@
 	$: sensorQuery = createQuery({
 		queryKey: ['sensor', data.id],
 		queryFn: () => fetchSensor(data.id),
-		refetchInterval: 15 * 60 * 1000,
+		refetchInterval: 15 * 60 * 1000
 	});
 
 	$: historyQuery = createQuery({
 		queryKey: ['sensor-data', data.id, data.startDate, data.endDate],
 		queryFn: () => fetchSensorHistory(data.id, data.startDate, data.endDate),
 		keepPreviousData: true,
-		refetchInterval: 15 * 60 * 1000,
+		refetchInterval: 15 * 60 * 1000
 	});
 
 	$: waterToday =
@@ -185,10 +203,15 @@
 
 			<div class="col-12">
 				<section class="card">
-					<div class="card-body">
-						<div class="d-flex flex-wrap">
-							<h1 class="card-title">Water Capacity History</h1>
+					<div class="card-header">
+						<h1 class="card-title">Water Capacity History</h1>
+						<div class="card-actions">
+							{#if $sensorQuery.data != undefined}
+								<NotificationToggle sensor={$sensorQuery.data} />
+							{/if}
 						</div>
+					</div>
+					<div class="card-body">
 						<div class="graph water-capacity-graph">
 							{#if $sensorQuery.data != undefined && $historyQuery.data != undefined}
 								<WaterCapacityGraph sensor={$sensorQuery.data} history={$historyQuery.data} />

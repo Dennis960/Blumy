@@ -76,5 +76,4 @@ router.post("/sensors/:id/config", async (req, res) => {
   return res.json(sensor);
 });
 
-
 export default router;
