@@ -48,5 +48,5 @@
 		checked={subscribed}
 		on:input={handleToggleNotifications}
 	/>
-	<span class="form-check-label">Push Notifications</span>
+	<span class="form-check-label">Push-Benachrichtigungen</span>
 </label>
