@@ -27,7 +27,7 @@
 		return {
 			series: [
 				{
-					name: 'Available Water Capacity',
+					name: 'Verfügbare Wasserkapazität',
 					data: history.waterCapacityHistory.map((entry) => ({
 						x: entry.timestamp,
 						y: entry.waterCapacity
@@ -37,7 +37,7 @@
 				...(sensor.prediction != undefined && graphEndsToday
 					? [
 							{
-								name: 'Predicted Available Water Capacity',
+								name: 'Vorhergesagte verfügbare Wasserkapazität',
 								data: sensor.prediction.predictedWaterCapacity
 									.filter((entry) => entry.timestamp > firstTimestamp)
 									.map((entry) => ({

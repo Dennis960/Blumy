@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Time from 'svelte-time';
+	import Time from '$lib/components/time.svelte';
 	import { browser } from '$app/environment';
 	import SensorSparkline from './sensor-sparkline.svelte';
 	import { goto } from '$app/navigation';
@@ -34,7 +34,7 @@
 	<th scope="row" class="sensor-name">{sensor.config.name}</th>
 	<td>
 		{#if sensor.lastUpdate == undefined}
-			<span>No Data</span>
+			<span>Keine Daten</span>
 		{:else}
 			<div class="progress progress-sm">
 				<div
@@ -47,9 +47,9 @@
 					aria-valuenow={availableWaterCapacityPercent}
 					aria-valuemin={0}
 					aria-valuemax={100}
-					aria-label="{Math.round(availableWaterCapacityPercent)}% Complete"
+					aria-label="{Math.round(availableWaterCapacityPercent)}%"
 				>
-					<span class="visually-hidden">{Math.round(availableWaterCapacityPercent)}% Complete</span>
+					<span class="visually-hidden">{Math.round(availableWaterCapacityPercent)}%</span>
 				</div>
 			</div>
 		{/if}
@@ -88,11 +88,11 @@
 				<IconWifi1 class="align-text-bottom" size={16} />
 			{/if}
 			{#if sensor.sensorHealth.signalStrength == 'offline'}
-				<span>offline</span>
+				<span>Offline</span>
 			{:else if sensor.sensorHealth.lowBattery}
-				<span>Low Battery</span>
+				<span>Batterie schwach</span>
 			{:else if sensor.sensorHealth.signalStrength == 'weak'}
-				<span>Poor Signal</span>
+				<span>Empfang schlecht</span>
 			{:else}
 				<span>Ok</span>
 			{/if}

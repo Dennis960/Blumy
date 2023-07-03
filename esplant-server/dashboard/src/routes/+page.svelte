@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createQuery } from '@tanstack/svelte-query';
 	import SensorRow from '$lib/components/sensor-row.svelte';
-	import Time from 'svelte-time';
+	import Time from '$lib/components/time.svelte';
 	import SensorStatusCard from '$lib/components/sensor-status-card.svelte';
 	import { fetchSensorOverview } from '$lib/api';
 	import { SortKey, sortQueryDataBy } from '$lib/sort-query-data';
@@ -14,19 +14,21 @@
 		refetchInterval: 60 * 60 * 1000, // refetch every hour
 		initialData: {
 			sensors: []
-		},
+		}
 	});
 
 	$: totalSensors = $query.data.sensors.length;
-	$: poorPlantHealth = $query.data.sensors.filter((sensor) => sensor.plantHealth.critical).length
-	$: poorSensorHealth = $query.data.sensors.filter((sensor) => sensor.sensorHealth.critical).length
+	$: poorPlantHealth = $query.data.sensors.filter((sensor) => sensor.plantHealth.critical).length;
+	$: poorSensorHealth = $query.data.sensors.filter((sensor) => sensor.sensorHealth.critical).length;
 	$: minNextWatering = $query.data.sensors
 		.map((sensor) => sensor.prediction?.nextWatering!)
 		.filter((nextWatering) => nextWatering != undefined)
 		.map((nw) => new Date(nw)) // TODO use superjson for API responses
 		.sort((a, b) => a.getTime() - b.getTime())[0];
-	$: anyWateringToday = minNextWatering && minNextWatering.getTime() < new Date().getTime() + 24 * 60 * 60 * 1000; // TODO use end of day
-	$: anyWateringTomorrow = minNextWatering && minNextWatering.getTime() < new Date().getTime() + 2 * 24 * 60 * 60 * 1000;
+	$: anyWateringToday =
+		minNextWatering && minNextWatering.getTime() < new Date().getTime() + 24 * 60 * 60 * 1000; // TODO use end of day
+	$: anyWateringTomorrow =
+		minNextWatering && minNextWatering.getTime() < new Date().getTime() + 2 * 24 * 60 * 60 * 1000;
 
 	let tableSorters: TableSorter[] = [];
 	let sortKey = SortKey.NEXT_WATERING;
@@ -56,7 +58,7 @@
 	<div class="container-xl">
 		<div class="row row-deck row-cards">
 			<div class="col-12 col-md-3 col-lg-2">
-				<SensorStatusCard title="Plants" value={totalSensors.toString()}>
+				<SensorStatusCard title="Pflanzen" value={totalSensors.toString()}>
 					<IconPlant slot="icon" size={24} />
 				</SensorStatusCard>
 			</div>
@@ -64,7 +66,7 @@
 			{#if minNextWatering}
 				<div class="col-12 col-md-3 col-lg-2">
 					<SensorStatusCard
-						title="Next Watering"
+						title="Nächste Bewässerung"
 						critical={anyWateringToday}
 						warning={anyWateringTomorrow}
 					>
@@ -76,8 +78,8 @@
 
 			<div class="col-6 col-md-3 col-lg-2">
 				<SensorStatusCard
-					title="Plant Health"
-					value={`${poorPlantHealth} ${poorPlantHealth == 1 ? 'Problem' : 'Problems'}`}
+					title="Planzen-Status"
+					value={`${poorPlantHealth} ${poorPlantHealth == 1 ? 'Problem' : 'Probleme'}`}
 					ok={poorPlantHealth == 0}
 					critical={poorPlantHealth > 0}
 				/>
@@ -85,8 +87,8 @@
 
 			<div class="col-6 col-md-3 col-lg-2">
 				<SensorStatusCard
-					title="Sensor Health"
-					value={`${poorSensorHealth} ${poorSensorHealth == 1 ? 'Problem' : 'Problems'}`}
+					title="Sensor-Status"
+					value={`${poorSensorHealth} ${poorSensorHealth == 1 ? 'Problem' : 'Probleme'}`}
 					ok={poorSensorHealth == 0}
 					critical={poorSensorHealth > 0}
 				/>
@@ -104,27 +106,40 @@
 										</TableSorter>
 									</th>
 									<th>
-										<TableSorter sortKey={SortKey.WATER_CAPACITY} on:sort={sort} bind:this={tableSorters[1]}>
-											Water Capacity
+										<TableSorter
+											sortKey={SortKey.WATER_CAPACITY}
+											on:sort={sort}
+											bind:this={tableSorters[1]}
+										>
+											Wasserkapazität
 										</TableSorter>
 									</th>
 									<th>
-										<TableSorter sortKey={SortKey.NEXT_WATERING} on:sort={sort} bind:this={tableSorters[2]} sortDirection="asc">
-											Next Watering
+										<TableSorter
+											sortKey={SortKey.NEXT_WATERING}
+											on:sort={sort}
+											bind:this={tableSorters[2]}
+											sortDirection="asc"
+										>
+											Nächste Bewässerung
 										</TableSorter>
 									</th>
 									<th>
-										<TableSorter sortKey={SortKey.SENSOR_HEALTH} on:sort={sort} bind:this={tableSorters[3]}>
-											Sensor Health
+										<TableSorter
+											sortKey={SortKey.SENSOR_HEALTH}
+											on:sort={sort}
+											bind:this={tableSorters[3]}
+										>
+											Sensor-Status
 										</TableSorter>
 									</th>
-									<th>3 Day History</th>
+									<th>Letzte 3 Tage</th>
 									<th />
 								</tr>
 							</thead>
 							<tbody>
 								{#each queryDataSorted as sensor (sensor.id)}
-									<SensorRow sensor={sensor} />
+									<SensorRow {sensor} />
 								{/each}
 							</tbody>
 						</table>

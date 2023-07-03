@@ -16,7 +16,7 @@
 		return {
 			series: [
 				{
-					name: 'Available Water Capacity',
+					name: 'Verfügbare Wasserkapazität',
 					data: history.waterCapacityHistory.map((entry) => ({
 						x: entry.timestamp,
 						y: entry.waterCapacity

@@ -75,7 +75,7 @@
 					<form on:submit={handleSubmit}>
 						<section class="card">
 							<div class="card-header">
-								<h1 class="card-title">Sensor Settings</h1>
+								<h1 class="card-title">Sensor-Einstellungen</h1>
 							</div>
 							<div class="card-body">
 								<div class="row mb-3">
@@ -87,21 +87,21 @@
 
 								<div class="row mb-3">
 									<div class="col-12 col-md-6 col-lg-4">
-										<label for="slider" class="form-label">Sensor Value Thresholds</label>
+										<label for="slider" class="form-label">Schwellwerte</label>
 										{#if $valueDistributionQuery.data != undefined && sliderOptions != undefined}
 											<div class="my-2 slider">
 												<WaterCapacityDistribution
 													sensorValueDistribution={$valueDistributionQuery.data}
 													sensorConfig={config}
 												/>
-                                                <div class="slider__input">
-												<Slider options={sliderOptions} on:input={handleSliderInput} />
-                                                </div>
+												<div class="slider__input">
+													<Slider options={sliderOptions} on:input={handleSliderInput} />
+												</div>
 											</div>
 										{/if}
 										<small class="form-hint">
-											Set minimum and maximum acceptable sensor values and thresholds for
-											underwatering and overwatering alarms.
+											Setze minimale und maximale akzeptable Sensorwerte und Schwellwerte für Unter-
+											und Überwässerung.
 										</small>
 									</div>
 									{#if error != undefined}
@@ -112,8 +112,8 @@
 								</div>
 								<div class="card-footer text-end">
 									<div class="d-flex justify-content-end column-gap-2">
-										<a href={`/sensor/${data.id}`} class="btn btn-link">Cancel</a>
-										<button type="submit" class="btn btn-primary">Save</button>
+										<a href={`/sensor/${data.id}`} class="btn btn-link">Abbrechen</a>
+										<button type="submit" class="btn btn-primary">Speichern</button>
 									</div>
 								</div>
 							</div>
@@ -146,9 +146,9 @@
 		background: var(--tblr-warning);
 	}
 
-    .slider__input {
-        /* align slider knobs with sparkline above */
-        padding-left: 14px;
-        padding-right: 6px;
-    }
+	.slider__input {
+		/* align slider knobs with sparkline above */
+		padding-left: 14px;
+		padding-right: 6px;
+	}
 </style>
