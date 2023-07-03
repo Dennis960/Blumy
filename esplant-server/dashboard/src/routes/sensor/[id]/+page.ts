@@ -32,7 +32,7 @@ export const load: PageLoad = async function ({ params, parent, url }) {
 		queryFn: async () => {
 			const sensor = await fetchSensor(id);
 			if (sensor == undefined) {
-				throw error(404, 'Sensor not found');
+				throw error(404, 'Sensor nicht gefunden');
 			}
 			return sensor;
 		}

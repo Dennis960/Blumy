@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Time from 'svelte-time';
+	import Time from '$lib/components/time.svelte';
 	import {
 		IconAlertTriangle,
 		IconBucketDroplet,
@@ -99,7 +99,7 @@
 			<div class="col-auto">
 				<a class="btn" href={`/sensor/${data.id}/settings`}>
 					<IconSettings />
-					<span class="ms-2">Settings</span>
+					<span class="ms-2">Einstellungen</span>
 				</a>
 			</div>
 		</div>
@@ -111,14 +111,14 @@
 		<div class="row row-decks row-cards">
 			{#if $sensorQuery.data?.lastUpdate == undefined}
 				<div class="col-6 col-md-3 col-lg-2">
-					<SensorStatusCard title="Sensor Health" value="No Data" critical>
+					<SensorStatusCard title="Sensor-Status" value="Keine Daten" critical>
 						<IconAlertTriangle slot="icon" size={24} />
 					</SensorStatusCard>
 				</div>
 			{:else}
 				<div class="col-6 col-md-3 col-lg-2">
 					<SensorStatusCard
-						title="Water Capacity"
+						title="Wasserkapazität"
 						value={$sensorQuery.data.plantHealth.drowning
 							? '>100%'
 							: $sensorQuery.data.plantHealth.wilting
@@ -147,7 +147,11 @@
 
 				{#if $sensorQuery.data.prediction != undefined}
 					<div class="col-6 col-md-3 col-lg-2">
-						<SensorStatusCard title="Next Watering" critical={waterToday} warning={waterTomorrow}>
+						<SensorStatusCard
+							title="Nächste Bewässerung"
+							critical={waterToday}
+							warning={waterTomorrow}
+						>
 							<svelte:fragment slot="icon">
 								{#if waterToday || waterTomorrow}
 									<IconClockExclamation size={24} />
@@ -162,13 +166,13 @@
 
 				<div class="col-6 col-md-3 col-lg-2">
 					<SensorStatusCard
-						title="Sensor Health"
+						title="Sensor-Status"
 						value={$sensorQuery.data.sensorHealth.signalStrength == 'offline'
-							? 'offline'
+							? 'Offline'
 							: $sensorQuery.data.sensorHealth.lowBattery
-							? 'Low Battery'
+							? 'Batterie schwach'
 							: $sensorQuery.data.sensorHealth.signalStrength == 'weak'
-							? 'Poor Signal'
+							? 'Empfang schlecht'
 							: 'Ok'}
 						critical={$sensorQuery.data.sensorHealth.critical}
 						warning={$sensorQuery.data.sensorHealth.warning}
@@ -188,7 +192,10 @@
 				</div>
 
 				<div class="col-6 col-md-3 col-lg-2">
-					<SensorStatusCard title="Last Update" critical={$sensorQuery.data.sensorHealth.critical}>
+					<SensorStatusCard
+						title="Letzte Aktualisierung"
+						critical={$sensorQuery.data.sensorHealth.critical}
+					>
 						<svelte:fragment slot="icon">
 							{#if $sensorQuery.data.sensorHealth.signalStrength == 'offline'}
 								<IconWifiOff size={24} />
@@ -204,7 +211,7 @@
 			<div class="col-12">
 				<section class="card">
 					<div class="card-header">
-						<h1 class="card-title">Water Capacity History</h1>
+						<h1 class="card-title">Verlauf der Wasserkapazität</h1>
 						<div class="card-actions">
 							{#if $sensorQuery.data != undefined}
 								<NotificationToggle sensor={$sensorQuery.data} />
@@ -225,7 +232,7 @@
 				<section class="card">
 					<div class="card-body">
 						<div class="d-flex flex-wrap">
-							<h1 class="card-title">Connection Strength</h1>
+							<h1 class="card-title">Signalstärke</h1>
 						</div>
 						<div class="graph">
 							{#if $historyQuery.data != undefined}
