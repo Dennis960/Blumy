@@ -1,0 +1,39 @@
+name: Deploy esplant-server
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Build Esplant dashboard and api"]
+    branches: ["main"]
+    types:
+      - completed
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pysftp
+      - name: Setup private key
+        working-directory: ./esplant-server
+        run: |
+          touch hopping.key
+          echo ${{ secrets.HOPPING_KEY }} | base64 -d > hopping.key
+      - name: Deploy
+        working-directory: ./esplant-server
+        run: |
+          python deploy.py bd
+      - name: Delete private key
+        if: always()
+        working-directory: ./esplant-server
+        run: |
+          rm hopping.key
