@@ -1,4 +1,4 @@
-20123855343596215
+20125544289137304
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -50158,6 +50158,13 @@ CustomFootprints
 BAT-SMD_BH-AAA-B5AA001
 BAT-SMD_BH-AAA-B5AA001 footprint
 BAT-SMD_BH-AAA-B5AA001 footprint
+0
+4
+4
+CustomFootprints
+BUZ-SMD_4P-L8.5-W8.5-P8.50-BR
+BUZ-SMD_4P-L8.5-W8.5-P8.50-BR footprint
+BUZ-SMD_4P-L8.5-W8.5-P8.50-BR footprint
 0
 4
 4
