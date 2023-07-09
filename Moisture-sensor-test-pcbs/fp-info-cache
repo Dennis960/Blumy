@@ -1,4 +1,4 @@
-20128922886716149
+20115420917217328
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -50154,76 +50154,6 @@ SMD SMT ceramic resonator filter filter hand-soldering
 0
 3
 3
-CustomFootprints
-BAT-SMD_BH-AAA-B5AA001
-BAT-SMD_BH-AAA-B5AA001 footprint
-BAT-SMD_BH-AAA-B5AA001 footprint
-0
-4
-4
-CustomFootprints
-BUZ-SMD_4P-L8.5-W8.5-P8.50-BR
-BUZ-SMD_4P-L8.5-W8.5-P8.50-BR footprint
-BUZ-SMD_4P-L8.5-W8.5-P8.50-BR footprint
-0
-4
-4
-CustomFootprints
-LOGO
-
-
-0
-0
-0
-CustomFootprints
-MICRO-USB-SMD_5P-P0.65-H-F_C10418
-MICRO-USB-SMD_5P-P0.65-H-F_C10418 footprint
-MICRO-USB-SMD_5P-P0.65-H-F_C10418 footprint
-0
-9
-9
-CustomFootprints
-SENSOR-SMD_L3.0-W3.0-P1.00-BR
-SENSOR-SMD_L3.0-W3.0-P1.00-BR footprint
-SENSOR-SMD_L3.0-W3.0-P1.00-BR footprint
-0
-6
-6
-CustomFootprints
-SENSORS-SMD_ALS-PT19
-SENSORS-SMD_ALS-PT19 footprint
-SENSORS-SMD_ALS-PT19 footprint
-0
-2
-2
-CustomFootprints
-SOT-223-3_L6.5-W3.4-P2.30-LS7.0-BR
-SOT-223-3_L6.5-W3.4-P2.30-LS7.0-BR footprint
-SOT-223-3_L6.5-W3.4-P2.30-LS7.0-BR footprint
-0
-4
-4
-CustomFootprints
-SW-SMD_MK-12C02-G025
-SW-SMD_MK-12C02-G025 footprint
-SW-SMD_MK-12C02-G025 footprint
-0
-7
-7
-CustomFootprints
-SW_Push_1P1T_XKB_TS-1187A
-SMD Tactile Switch, http://www.helloxkb.com/public/images/pdf/TS-1187A-X-X-X.pdf
-SPST Tactile Switch
-0
-4
-2
-CustomFootprints
-WIFI-SMD_ESP32-MINI-1-N4
-WIFI-SMD_ESP32-MINI-1-N4 footprint
-WIFI-SMD_ESP32-MINI-1-N4 footprint
-0
-73
-65
 Diode_SMD
 D_0201_0603Metric
 Diode SMD 0201 (0603 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: https://www.vishay.com/docs/20052/crcw0201e3.pdf), generated with kicad-footprint-generator
@@ -84216,6 +84146,20 @@ test point THT pad
 0
 1
 1
+ThroughHoleParts
+Capacitor
+
+
+0
+2
+2
+ThroughHoleParts
+Resistor
+
+
+0
+2
+2
 Transformer_SMD
 Pulse_P0926NL
 SMT Gate Drive Transformer, 1:1:1, 8.0x6.3x5.3mm (https://productfinder.pulseeng.com/products/datasheets/SPM2007_61.pdf)
