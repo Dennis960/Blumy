@@ -1,0 +1,4 @@
+Designator,Footprint,Quantity,Value,LCSC Part #
+"C2_6, C2_5, C2_4, C2_3, C2_2, C2",Capacitor,6,C,
+"D1_6, D1_5, D1_4, D1_3, D1_2, D1",Resistor,6,D,
+"R1_6, R1_5, R1_4, R1_3, R1_2, R1, R2_6, R2_5, R2_4, R2_3, R2_2, R2",Resistor,12,R,
