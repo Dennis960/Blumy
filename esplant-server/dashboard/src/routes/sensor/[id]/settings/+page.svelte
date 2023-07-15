@@ -45,6 +45,23 @@
 		};
 	}
 
+	function handleImageInput(e: Event) {
+		const reader = new FileReader();
+		reader.onload = (e: ProgressEvent<FileReader>) => {
+			const imageUrl = e.target?.result as string;
+			config = {
+				...config,
+				imageUrl
+			};
+		};
+
+		const target = e.target as HTMLInputElement;
+		if (target.files == undefined || target.files[0] == undefined) {
+			return;
+		}
+		reader.readAsDataURL(target.files[0]);
+	}
+
 	let error: string;
 
 	const queryClient = useQueryClient();
@@ -87,6 +104,26 @@
 
 								<div class="row mb-3">
 									<div class="col-12 col-md-6 col-lg-4">
+										<label for="image" class="form-label">Foto</label>
+										<span
+											class="avatar avatar-lg mb-2"
+											style="background-image: url({config.imageUrl})"
+										/>
+										<input
+											type="file"
+											accept="image/*"
+											class="form-control"
+											id="image"
+											name="image"
+											on:change={handleImageInput}
+											required={config.imageUrl == undefined}
+											capture="environment"
+										/>
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-12 col-md-6 col-lg-4">
 										<label for="slider" class="form-label">Schwellwerte</label>
 										{#if $valueDistributionQuery.data != undefined && sliderOptions != undefined}
 											<div class="my-2 slider">
@@ -110,6 +147,7 @@
 										</div>
 									{/if}
 								</div>
+
 								<div class="card-footer text-end">
 									<div class="d-flex justify-content-end column-gap-2">
 										<a href={`/sensor/${data.id}`} class="btn btn-link">Abbrechen</a>

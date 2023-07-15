@@ -57,14 +57,14 @@
 <div class="page-body">
 	<div class="container-xl">
 		<div class="row row-deck row-cards">
-			<div class="col-12 col-md-3 col-lg-2">
+			<div class="col-12 col-md-4 col-lg-3">
 				<SensorStatusCard title="Pflanzen" value={totalSensors.toString()}>
 					<IconPlant slot="icon" size={24} />
 				</SensorStatusCard>
 			</div>
 
 			{#if minNextWatering}
-				<div class="col-12 col-md-3 col-lg-2">
+				<div class="col-12 col-md-4 col-lg-3">
 					<SensorStatusCard
 						title="Nächste Bewässerung"
 						critical={anyWateringToday}
@@ -76,7 +76,7 @@
 				</div>
 			{/if}
 
-			<div class="col-6 col-md-3 col-lg-2">
+			<div class="col-12 col-md-4 col-lg-3">
 				<SensorStatusCard
 					title="Planzen-Status"
 					value={`${poorPlantHealth} ${poorPlantHealth == 1 ? 'Problem' : 'Probleme'}`}
@@ -85,7 +85,7 @@
 				/>
 			</div>
 
-			<div class="col-6 col-md-3 col-lg-2">
+			<div class="col-12 col-md-4 col-lg-3">
 				<SensorStatusCard
 					title="Sensor-Status"
 					value={`${poorSensorHealth} ${poorSensorHealth == 1 ? 'Problem' : 'Probleme'}`}
@@ -100,6 +100,7 @@
 						<table class="table table-vcenter table-striped">
 							<thead>
 								<tr>
+									<th></th>
 									<th>
 										<TableSorter sortKey={SortKey.NAME} on:sort={sort} bind:this={tableSorters[0]}>
 											Name
