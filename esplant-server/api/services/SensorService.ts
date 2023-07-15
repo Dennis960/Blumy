@@ -1,35 +1,23 @@
+import SensorEntity from "../entities/SensorEntity.js";
+import SensorReadingEntity from "../entities/SensorReadingEntity.js";
 import SensorDataRepository from "../repositories/SensorDataRepository.js";
 import SensorRepository from "../repositories/SensorRepository.js";
 import {
   SensorConfigurationDTO,
-  SensorReading,
+  SensorReadingDTO,
   WaterCapacityHistoryEntry,
 } from "../types/api.js";
-import { Data } from "../types/data.js";
 import { calculateDerivative, exponentialRegression } from "../util/ml.js";
+import sharp from "sharp";
 
 const WATERING_THRESHOLD = 0.05 / (60 * 60 * 1000); // water capacity gain per hour threshold
 const WATERING_WINDOW = 4 * 60 * 60 * 1000;
 const PREDICTION_IMPLAUSIBLE_WATERLOSS_EXPONENT = -0.05 / (60 * 60 * 1000); // max plausible water capacity loss per ms
 
 export default class SensorService {
-  private static mapData(
-    r: Data,
-    config: SensorConfigurationDTO
-  ): SensorReading {
-    return {
-      id: r.id!,
-      timestamp: new Date(r.date!),
-      water: r.water,
-      availableWaterCapacity:
-        (r.water - config.permanentWiltingPoint) /
-        (config.fieldCapacity - config.permanentWiltingPoint),
-      voltage: r.voltage,
-      rssi: r.rssi!,
-    };
-  }
-
-  public static async getRecentReadings(id: number): Promise<SensorReading[]> {
+  public static async getRecentReadings(
+    id: number
+  ): Promise<SensorReadingDTO[]> {
     const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     return await this.getReadings(id, oneWeekAgo, new Date());
   }
@@ -41,8 +29,16 @@ export default class SensorService {
     if (sensor == undefined) {
       return undefined;
     }
+
+    const emptyImage =
+      "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
     return {
       name: sensor.name,
+      imageUrl:
+        sensor.image != undefined
+          ? "data:image/webp;base64," + sensor.image.toString("base64")
+          : emptyImage,
       fieldCapacity: sensor.fieldCapacity,
       permanentWiltingPoint: sensor.permanentWiltingPoint,
       lowerThreshold: sensor.lowerThreshold,
@@ -50,12 +46,33 @@ export default class SensorService {
     };
   }
 
+  public static async setConfiguration(
+    id: number,
+    config: SensorConfigurationDTO
+  ): Promise<SensorConfigurationDTO> {
+    let sensorEntity = SensorEntity.fromDTO(id, config);
+    // shrink image
+    sensorEntity.image =
+      sensorEntity.image != null
+        ? await sharp(sensorEntity.image)
+            .resize(800, 800, {
+              fit: "inside",
+              withoutEnlargement: true,
+            })
+            .toFormat("webp")
+            .toBuffer()
+        : null;
+
+    sensorEntity = await SensorRepository.update(id, sensorEntity);
+    return SensorEntity.toDTO(sensorEntity);
+  }
+
   public static async getReadings(
     id: number,
     startDate: Date,
     endDate: Date,
     limit: number = 1000
-  ): Promise<SensorReading[]> {
+  ): Promise<SensorReadingDTO[]> {
     const config = await this.getConfiguration(id);
     if (config == undefined) {
       return [];
@@ -66,8 +83,8 @@ export default class SensorService {
       endDate,
       limit
     );
-    const sensorData: SensorReading[] = data.map((r) =>
-      this.mapData(r, config)
+    const sensorData: SensorReadingDTO[] = data.map((r) =>
+      SensorReadingEntity.toDTO(r, config)
     );
     sensorData.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
     return sensorData;
@@ -75,7 +92,7 @@ export default class SensorService {
   /**
    * Find all readings where the sensor was watered
    */
-  public static detectWateringReadings(readings: SensorReading[]) {
+  public static detectWateringReadings(readings: SensorReadingDTO[]) {
     // calculate second derivate
     const deltas = calculateDerivative(
       readings.map((reading) => ({
@@ -117,7 +134,7 @@ export default class SensorService {
   /**
    * Predict available water capacity
    */
-  public static fitModel(sensorReadings: SensorReading[]) {
+  public static fitModel(sensorReadings: SensorReadingDTO[]) {
     if (sensorReadings.length === 0) {
       return undefined;
     }

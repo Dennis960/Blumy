@@ -1,7 +1,7 @@
-import { Data } from "../types/data";
 import Sensor from "./SensorRepository.js";
 import Knex from "knex";
 import knexfile from "../knexfile.js";
+import SensorReadingEntity from "../entities/SensorReadingEntity";
 export const knex = Knex(knexfile.development);
 
 export default class SensorDataRepository {
@@ -10,7 +10,7 @@ export default class SensorDataRepository {
    * @param data The data to add.
    * @returns The id of the inserted data or throws an error if the sensor does not exist.
    */
-  static async create(data: Data): Promise<number | undefined> {
+  static async create(data: SensorReadingEntity): Promise<number | undefined> {
     data.date = Date.now();
 
     // update sensor name
@@ -18,7 +18,7 @@ export default class SensorDataRepository {
       await Sensor.updateName(data.sensorAddress, data.plantName);
     }
 
-    return knex<Data>("data").insert(data).returning("id");
+    return knex<SensorReadingEntity>("data").insert(data).returning("id");
   }
 
   /**
@@ -30,11 +30,14 @@ export default class SensorDataRepository {
    * @param limit The final number of data points.
    * @returns The averaged data.
    */
-  private static dataToAverage(data: Data[], limit: number): Data[] {
+  private static dataToAverage(
+    data: SensorReadingEntity[],
+    limit: number
+  ): SensorReadingEntity[] {
     if (data.length <= limit) {
       return data;
     }
-    const averagedData: Data[] = [];
+    const averagedData: SensorReadingEntity[] = [];
     const step = Math.floor(data.length / limit);
     for (let i = 0; i < data.length; i += step) {
       const dataSlice = data.slice(i, i + step);
@@ -47,7 +50,7 @@ export default class SensorDataRepository {
         dataSlice.reduce((acc, cur) => acc + (cur.duration ?? 0), 0) /
         dataSlice.length;
       // make a copy of the last data point and change the values
-      const averagedDataPoint: Data = {
+      const averagedDataPoint: SensorReadingEntity = {
         ...dataSlice[dataSlice.length - 1],
         water,
         voltage,
@@ -71,9 +74,9 @@ export default class SensorDataRepository {
     startDate: Date,
     endDate: Date,
     maxDataPoints: number
-  ): Promise<Data[]> {
+  ): Promise<SensorReadingEntity[]> {
     // return maxDataPoints averaged data points between startDate and endDate
-    const data = await knex<Data>("data")
+    const data = await knex<SensorReadingEntity>("data")
       .select(
         "id",
         "sensorAddress",

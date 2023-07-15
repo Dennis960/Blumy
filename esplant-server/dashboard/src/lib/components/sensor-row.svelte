@@ -6,7 +6,13 @@
 	import type { SensorDTO } from '$lib/types/api';
 	import { fetchSensorHistory } from '$lib/api';
 	import { createQuery } from '@tanstack/svelte-query';
-	import { IconClockExclamation, IconWifiOff, IconAlertTriangle, IconWifi2, IconWifi1 } from '$lib/icons';
+	import {
+		IconClockExclamation,
+		IconWifiOff,
+		IconAlertTriangle,
+		IconWifi2,
+		IconWifi1
+	} from '$lib/icons';
 
 	export let sensor: SensorDTO;
 
@@ -16,7 +22,7 @@
 			const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
 			return await fetchSensorHistory(sensor.id, threeDaysAgo, new Date());
 		},
-		refetchInterval: 15 * 60 * 1000,
+		refetchInterval: 15 * 60 * 1000
 	});
 
 	$: availableWaterCapacityPercent = (sensor.lastUpdate?.waterCapacity ?? 0) * 100;
@@ -31,6 +37,9 @@
 </script>
 
 <tr on:click={() => goto(`/sensor/${sensor.id}`)}>
+	<th class="w-1">
+		<span class="avatar avatar-xs" style="background-image: url({sensor.config.imageUrl})" />
+	</th>
 	<th scope="row" class="sensor-name">{sensor.config.name}</th>
 	<td>
 		{#if sensor.lastUpdate == undefined}
@@ -72,9 +81,8 @@
 
 	<td>
 		<div
-			class="text-nowrap {sensor.sensorHealth.critical
-				? 'text-danger'
-				: ''} {sensor.sensorHealth.warning
+			class="text-nowrap {sensor.sensorHealth.critical ? 'text-danger' : ''} {sensor.sensorHealth
+				.warning
 				? 'text-warning'
 				: ''}"
 		>
@@ -102,7 +110,7 @@
 	<td class="w-1 graph">
 		{#if $historyQuery.data != undefined && $historyQuery.data.waterCapacityHistory.length > 0}
 			{#if browser}
-				<SensorSparkline sensor={sensor} history={$historyQuery.data} />
+				<SensorSparkline {sensor} history={$historyQuery.data} />
 			{/if}
 		{/if}
 	</td>

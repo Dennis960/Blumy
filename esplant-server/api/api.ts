@@ -8,7 +8,7 @@ import superjson from "./middlewares/superjson.js";
 const router = Router();
 router.use(json());
 router.use(cors());
-router.use(superjson)
+router.use(superjson);
 router.use(sensorRoutes);
 router.use(espApiRoutes);
 router.use(webPushRoutes);

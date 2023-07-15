@@ -65,13 +65,18 @@ router.get("/sensors/:id/history", async (req, res) => {
 });
 
 router.get("/sensors/:id/value-distribution", async (req, res) => {
-  const distribution = await sensorController.getSensorValueDistribution(parseInt(req.params.id));
+  const distribution = await sensorController.getSensorValueDistribution(
+    parseInt(req.params.id)
+  );
   return res.json(distribution);
 });
 
 router.post("/sensors/:id/config", async (req, res) => {
-  const config = req.body // TODO validate
-  const sensor = await sensorController.updateSensorConfig(parseInt(req.params.id), config);
+  const config = req.body; // TODO validate
+  const sensor = await sensorController.updateSensorConfig(
+    parseInt(req.params.id),
+    config
+  );
   // TODO 404 if does not exist
   return res.json(sensor);
 });
