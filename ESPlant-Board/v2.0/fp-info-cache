@@ -1,4 +1,4 @@
-20128922886717149
+20135680549812444
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -50169,6 +50169,27 @@ BUZ-SMD_4P-L8.5-W8.5-P8.50-BR footprint
 4
 4
 CustomFootprints
+JLCPCB_ToolingHole
+
+
+0
+0
+0
+CustomFootprints
+LED0805-GREEN-RD
+LED0805-R-RD footprint
+LED0805-R-RD footprint
+0
+2
+2
+CustomFootprints
+LED0805-RD_RED
+LED0805-RD_RED footprint
+LED0805-RD_RED footprint
+0
+2
+2
+CustomFootprints
 LOGO
 
 
@@ -50193,6 +50214,13 @@ CustomFootprints
 SENSORS-SMD_ALS-PT19
 SENSORS-SMD_ALS-PT19 footprint
 SENSORS-SMD_ALS-PT19 footprint
+0
+2
+2
+CustomFootprints
+SOD-123F_L2.7-W1.6-LS3.8-RD
+SOD-123F_L2.7-W1.6-LS3.8-RD footprint
+SOD-123F_L2.7-W1.6-LS3.8-RD footprint
 0
 2
 2
