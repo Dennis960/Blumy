@@ -223,6 +223,12 @@ const migrations = [
       );`,
     ],
   },
+  {
+    name: "sensor_add_image",
+    statements: [
+      "ALTER TABLE sensor ADD COLUMN image BLOB;",
+    ],
+  },
 ];
 
 export async function migrateDatabase() {

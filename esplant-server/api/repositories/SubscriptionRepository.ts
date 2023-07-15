@@ -1,11 +1,13 @@
 import Knex from "knex";
 import knexfile from "../knexfile.js";
-import { Subscription } from "../types/data.js";
+import SubscriptionEntity from "../entities/SubscriptionEntity.js";
 export const knex = Knex(knexfile.development);
 
 export default class SubscriptionRepository {
-  static async create(subscription: Subscription): Promise<Subscription> {
-    return (await knex<Subscription>("subscription")
+  static async create(
+    subscription: Omit<SubscriptionEntity, "id">
+  ): Promise<SubscriptionEntity> {
+    return (await knex<SubscriptionEntity>("subscription")
       .insert(subscription)
       .returning([
         "id",
@@ -18,12 +20,14 @@ export default class SubscriptionRepository {
       .then((rows) => rows[0]))!;
   }
 
-  static async delete(subscription: Subscription): Promise<void> {
-    await knex<Subscription>("subscription").delete().where(subscription);
+  static async delete(subscription: { endpoint: string }): Promise<void> {
+    await knex<SubscriptionEntity>("subscription").delete().where(subscription);
   }
 
-  static async exists(subscription: Partial<Subscription>): Promise<boolean> {
-    const existingSubscription = await knex<Subscription>("subscription")
+  static async exists(
+    subscription: Partial<SubscriptionEntity>
+  ): Promise<boolean> {
+    const existingSubscription = await knex<SubscriptionEntity>("subscription")
       .where(subscription)
       .first();
     return existingSubscription != undefined;
@@ -31,8 +35,8 @@ export default class SubscriptionRepository {
 
   static async getBySensorAddress(
     sensorAddress: number
-  ): Promise<Subscription[]> {
-    return await knex<Subscription>("subscription")
+  ): Promise<SubscriptionEntity[]> {
+    return await knex<SubscriptionEntity>("subscription")
       .select(
         "id",
         "sensorAddress",
@@ -48,7 +52,7 @@ export default class SubscriptionRepository {
     sensorAddress: number,
     lastNotification: Date
   ) {
-    return await knex<Subscription>("subscription")
+    return await knex<SubscriptionEntity>("subscription")
       .where({ sensorAddress })
       .update({ lastNotification })
       .returning([

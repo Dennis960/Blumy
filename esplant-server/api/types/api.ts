@@ -1,4 +1,4 @@
-export interface SensorReading {
+export interface SensorReadingDTO {
   id: number;
   timestamp: Date;
   water: number; // sensor units in range 0-1000
@@ -9,6 +9,7 @@ export interface SensorReading {
 
 export interface SensorConfigurationDTO {
   name: string;
+  imageUrl: string; // data URL for now
   fieldCapacity: number; // max water value
   /*
    * Typical permanent wilting points:

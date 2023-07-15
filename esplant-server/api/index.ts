@@ -5,11 +5,12 @@ await migrateDatabase();
 import NotificationService from "./services/NotificationService.js";
 import cron from "node-cron";
 cron.schedule("0 8,12,16,20 * * *", async () => {
-    await NotificationService.triggerPushNotifications();
-})
+  await NotificationService.triggerPushNotifications();
+});
 
 import express from "express";
 const app = express();
+app.use(express.json({ limit: "10mb" })); // allow image upload
 
 const PORT = 4803;
 

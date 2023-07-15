@@ -80,22 +80,12 @@
 </script>
 
 <div class="page-header">
-	<div class="container">
+	<div class="container-xl">
 		<div class="row row-gap-3 align-items-center">
-			<div class="col-12 col-md-auto me-auto">
+			<div class="col-auto me-auto">
 				<h1 class="page-title">{$sensorQuery.data?.config.name}</h1>
 			</div>
 
-			<div class="col-auto">
-				<div class="input-icon">
-					<Litepicker options={litepickerOptions} on:selected={handleDateChange}>
-						<input class="form-control pe-5" />
-					</Litepicker>
-					<span class="input-icon-addon">
-						<IconCalendar />
-					</span>
-				</div>
-			</div>
 			<div class="col-auto">
 				<a class="btn" href={`/sensor/${data.id}/settings`}>
 					<IconSettings />
@@ -108,105 +98,142 @@
 
 <div class="page-body">
 	<div class="container-xl">
-		<div class="row row-decks row-cards">
-			{#if $sensorQuery.data?.lastUpdate == undefined}
-				<div class="col-6 col-md-3 col-lg-2">
-					<SensorStatusCard title="Sensor-Status" value="Keine Daten" critical>
-						<IconAlertTriangle slot="icon" size={24} />
-					</SensorStatusCard>
-				</div>
-			{:else}
-				<div class="col-6 col-md-3 col-lg-2">
-					<SensorStatusCard
-						title="Wasserkapazität"
-						value={$sensorQuery.data.plantHealth.drowning
-							? '>100%'
-							: $sensorQuery.data.plantHealth.wilting
-							? '<0%'
-							: Math.round($sensorQuery.data.lastUpdate.waterCapacity * 100) + '%'}
-						warning={$sensorQuery.data.plantHealth.overwatered ||
-							$sensorQuery.data.plantHealth.underwatered}
-						critical={$sensorQuery.data.plantHealth.drowning ||
-							$sensorQuery.data.plantHealth.wilting}
-					>
-						<svelte:fragment slot="icon">
-							{#if $sensorQuery.data.plantHealth.drowning}
-								<IconScubaMask size={24} />
-							{:else if $sensorQuery.data.plantHealth.wilting}
-								<IconGrave size={24} />
-							{:else if $sensorQuery.data.plantHealth.overwatered}
-								<IconDropletFilled size={24} />
-							{:else if $sensorQuery.data.plantHealth.underwatered}
-								<IconDroplet size={24} />
-							{:else}
-								<IconDropletFilled2 size={24} />
-							{/if}
-						</svelte:fragment>
-					</SensorStatusCard>
-				</div>
-
-				{#if $sensorQuery.data.prediction != undefined}
-					<div class="col-6 col-md-3 col-lg-2">
-						<SensorStatusCard
-							title="Nächste Bewässerung"
-							critical={waterToday}
-							warning={waterTomorrow}
-						>
-							<svelte:fragment slot="icon">
-								{#if waterToday || waterTomorrow}
-									<IconClockExclamation size={24} />
-								{:else}
-									<IconBucketDroplet size={24} />
-								{/if}
-							</svelte:fragment>
-							<Time slot="value" relative timestamp={$sensorQuery.data.prediction.nextWatering} />
-						</SensorStatusCard>
-					</div>
-				{/if}
-
-				<div class="col-6 col-md-3 col-lg-2">
-					<SensorStatusCard
-						title="Sensor-Status"
-						value={$sensorQuery.data.sensorHealth.signalStrength == 'offline'
-							? 'Offline'
-							: $sensorQuery.data.sensorHealth.lowBattery
-							? 'Batterie schwach'
-							: $sensorQuery.data.sensorHealth.signalStrength == 'weak'
-							? 'Empfang schlecht'
-							: 'Ok'}
-						critical={$sensorQuery.data.sensorHealth.critical}
-						warning={$sensorQuery.data.sensorHealth.warning}
-					>
-						<svelte:fragment slot="icon">
-							{#if $sensorQuery.data.sensorHealth.signalStrength == 'offline'}
-								<IconWifiOff size={24} />
-							{:else if $sensorQuery.data.sensorHealth.lowBattery || $sensorQuery.data.sensorHealth.signalStrength == 'weak'}
-								<IconAlertTriangle size={24} />
-							{:else if $sensorQuery.data.sensorHealth.signalStrength == 'strong'}
-								<IconWifi2 size={24} />
-							{:else if $sensorQuery.data.sensorHealth.signalStrength == 'moderate'}
-								<IconWifi1 size={24} />
-							{/if}
-						</svelte:fragment>
-					</SensorStatusCard>
-				</div>
-
-				<div class="col-6 col-md-3 col-lg-2">
-					<SensorStatusCard
-						title="Letzte Aktualisierung"
-						critical={$sensorQuery.data.sensorHealth.critical}
-					>
-						<svelte:fragment slot="icon">
-							{#if $sensorQuery.data.sensorHealth.signalStrength == 'offline'}
-								<IconWifiOff size={24} />
-							{:else}
-								<IconClock size={24} />
-							{/if}
-						</svelte:fragment>
-						<Time slot="value" relative timestamp={$sensorQuery.data.lastUpdate.timestamp} />
-					</SensorStatusCard>
+		<div class="row">
+			{#if $sensorQuery.data != undefined}
+				<div class="col-auto mb-2">
+					<span
+						class="avatar avatar-2xl"
+						style="background-image: url({$sensorQuery.data.config.imageUrl})"
+					/>
 				</div>
 			{/if}
+
+			<div class="col-auto">
+				<div class="row row-decks row-cards">
+					{#if $sensorQuery.data?.lastUpdate == undefined}
+						<div class="col">
+							<SensorStatusCard title="Sensor-Status" value="Keine Daten" critical>
+								<IconAlertTriangle slot="icon" size={24} />
+							</SensorStatusCard>
+						</div>
+					{:else}
+						<div class="col-12 col-md-6 col-lg-4">
+							<SensorStatusCard
+								title="Wasserkapazität"
+								value={$sensorQuery.data.plantHealth.drowning
+									? '>100%'
+									: $sensorQuery.data.plantHealth.wilting
+									? '<0%'
+									: Math.round($sensorQuery.data.lastUpdate.waterCapacity * 100) + '%'}
+								warning={$sensorQuery.data.plantHealth.overwatered ||
+									$sensorQuery.data.plantHealth.underwatered}
+								critical={$sensorQuery.data.plantHealth.drowning ||
+									$sensorQuery.data.plantHealth.wilting}
+							>
+								<svelte:fragment slot="icon">
+									{#if $sensorQuery.data.plantHealth.drowning}
+										<IconScubaMask size={24} />
+									{:else if $sensorQuery.data.plantHealth.wilting}
+										<IconGrave size={24} />
+									{:else if $sensorQuery.data.plantHealth.overwatered}
+										<IconDropletFilled size={24} />
+									{:else if $sensorQuery.data.plantHealth.underwatered}
+										<IconDroplet size={24} />
+									{:else}
+										<IconDropletFilled2 size={24} />
+									{/if}
+								</svelte:fragment>
+							</SensorStatusCard>
+						</div>
+
+						{#if $sensorQuery.data.prediction != undefined}
+						<div class="col-12 col-md-6 col-lg-4">
+								<SensorStatusCard
+									title="Nächste Bewässerung"
+									critical={waterToday}
+									warning={waterTomorrow}
+								>
+									<svelte:fragment slot="icon">
+										{#if waterToday || waterTomorrow}
+											<IconClockExclamation size={24} />
+										{:else}
+											<IconBucketDroplet size={24} />
+										{/if}
+									</svelte:fragment>
+									<Time
+										slot="value"
+										relative
+										timestamp={$sensorQuery.data.prediction.nextWatering}
+									/>
+								</SensorStatusCard>
+							</div>
+						{/if}
+
+						<div class="col-12 col-md-6 col-lg-4">
+							<SensorStatusCard
+								title="Sensor-Status"
+								value={$sensorQuery.data.sensorHealth.signalStrength == 'offline'
+									? 'Offline'
+									: $sensorQuery.data.sensorHealth.lowBattery
+									? 'Batterie schwach'
+									: $sensorQuery.data.sensorHealth.signalStrength == 'weak'
+									? 'Empfang schlecht'
+									: 'Ok'}
+								critical={$sensorQuery.data.sensorHealth.critical}
+								warning={$sensorQuery.data.sensorHealth.warning}
+							>
+								<svelte:fragment slot="icon">
+									{#if $sensorQuery.data.sensorHealth.signalStrength == 'offline'}
+										<IconWifiOff size={24} />
+									{:else if $sensorQuery.data.sensorHealth.lowBattery || $sensorQuery.data.sensorHealth.signalStrength == 'weak'}
+										<IconAlertTriangle size={24} />
+									{:else if $sensorQuery.data.sensorHealth.signalStrength == 'strong'}
+										<IconWifi2 size={24} />
+									{:else if $sensorQuery.data.sensorHealth.signalStrength == 'moderate'}
+										<IconWifi1 size={24} />
+									{/if}
+								</svelte:fragment>
+							</SensorStatusCard>
+						</div>
+
+						<div class="col-12 col-md-6 col-lg-4">
+							<SensorStatusCard
+								title="Letzte Aktualisierung"
+								critical={$sensorQuery.data.sensorHealth.critical}
+							>
+								<svelte:fragment slot="icon">
+									{#if $sensorQuery.data.sensorHealth.signalStrength == 'offline'}
+										<IconWifiOff size={24} />
+									{:else}
+										<IconClock size={24} />
+									{/if}
+								</svelte:fragment>
+								<Time slot="value" relative timestamp={$sensorQuery.data.lastUpdate.timestamp} />
+							</SensorStatusCard>
+						</div>
+					{/if}
+				</div>
+			</div>
+		</div>
+
+		<div class="mt-4 row row-decks row-cards">
+			<div class="mb-2 col-12">
+				<div class="row row-gap-3 align-items-center">
+					<div class="col-auto me-auto">
+						<h2 class="page-title">Analytics</h2>
+					</div>
+					<div class="col-auto">
+						<div class="input-icon">
+							<Litepicker options={litepickerOptions} on:selected={handleDateChange}>
+								<input class="form-control pe-5" />
+							</Litepicker>
+							<span class="input-icon-addon">
+								<IconCalendar />
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
 
 			<div class="col-12">
 				<section class="card">

@@ -1,4 +1,3 @@
-import { Data } from "../types/data.js";
 import {
   PlantHealthDTO,
   RSSIHistoryEntry,
@@ -7,13 +6,14 @@ import {
   SensorHealthDTO,
   SensorHistoryDTO,
   SensorOverviewDTO,
-  SensorReading,
+  SensorReadingDTO,
   SensorValueDistributionDTO,
   WaterCapacityHistoryEntry,
 } from "../types/api.js";
 import SensorDataRepository from "../repositories/SensorDataRepository.js";
 import SensorRepository from "../repositories/SensorRepository.js";
 import SensorService from "../services/SensorService.js";
+import SensorReadingEntity from "../entities/SensorReadingEntity.js";
 
 const OFFLINE_TIMEOUT = 120 * 60 * 1000; // 2 hours
 
@@ -105,7 +105,7 @@ export default class SensorController {
   }
 
   private getPlantHealth(
-    lastReading: SensorReading | undefined,
+    lastReading: SensorReadingDTO | undefined,
     config: SensorConfigurationDTO
   ): PlantHealthDTO {
     const status = {
@@ -131,7 +131,7 @@ export default class SensorController {
   }
 
   private getSensorHealth(
-    lastReading: SensorReading | undefined
+    lastReading: SensorReadingDTO | undefined
   ): SensorHealthDTO {
     const status = {
       signalStrength:
@@ -155,7 +155,7 @@ export default class SensorController {
     };
   }
 
-  public async addSensorData(data: Data) {
+  public async addSensorData(data: SensorReadingEntity) {
     const sensor = await SensorRepository.getById(data.sensorAddress);
     if (!sensor) {
       // create sensor
@@ -188,13 +188,6 @@ export default class SensorController {
     sensorId: number,
     config: SensorConfigurationDTO
   ): Promise<SensorConfigurationDTO> {
-    const sensor = await SensorRepository.update(sensorId, config);
-    return {
-      name: sensor.name,
-      fieldCapacity: sensor.fieldCapacity,
-      permanentWiltingPoint: sensor.permanentWiltingPoint,
-      upperThreshold: sensor.upperThreshold,
-      lowerThreshold: sensor.lowerThreshold,
-    };
+    return await SensorService.setConfiguration(sensorId, config);
   }
 }

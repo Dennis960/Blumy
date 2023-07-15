@@ -1,8 +1,8 @@
 import webpush from "web-push";
 import SensorRepository from "../repositories/SensorRepository.js";
 import SubscriptionRepository from "../repositories/SubscriptionRepository.js";
-import { Sensor } from "../types/data";
 import SensorService from "./SensorService.js";
+import SensorEntity from "../entities/SensorEntity.js";
 
 export default class NotificationService {
   public static async triggerPushNotifications(): Promise<void> {
@@ -28,14 +28,13 @@ export default class NotificationService {
     }
   }
 
-  public static async notifySensor(sensor: Sensor) {
+  public static async notifySensor(sensor: SensorEntity) {
     const subscriptions = await SubscriptionRepository.getBySensorAddress(
       sensor.sensorAddress
     );
 
     const payload = JSON.stringify({
-      title: `Plant ${sensor.name} needs water`,
-      body: "Your plant needs water. Please water it now.",
+      title: `${sensor.name} braucht Wasser!`,
     });
 
     for (const subscription of subscriptions) {
