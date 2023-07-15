@@ -56,7 +56,7 @@ export default class SensorRepository {
         "lowerThreshold",
         "upperThreshold",
       ])
-      .first())!;
+      .then((rows) => rows[0]))!;
   }
 
   /**
