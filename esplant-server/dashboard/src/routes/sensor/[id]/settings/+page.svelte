@@ -131,7 +131,7 @@
 													sensorValueDistribution={$valueDistributionQuery.data}
 													sensorConfig={config}
 												/>
-												<div class="slider__input">
+												<div>
 													<Slider options={sliderOptions} on:input={handleSliderInput} />
 												</div>
 											</div>
@@ -182,11 +182,5 @@
 
 	.slider :global(.noUi-connects > div:nth-child(3)) {
 		background: var(--tblr-warning);
-	}
-
-	.slider__input {
-		/* align slider knobs with sparkline above */
-		padding-left: 14px;
-		padding-right: 6px;
 	}
 </style>
