@@ -172,15 +172,19 @@ export default class SensorController {
     sensorId: number
   ): Promise<SensorValueDistributionDTO> {
     const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+    const bucketSize = 16;
     const waterCapacityDistribution =
       await SensorDataRepository.getCountByWaterCapacityBucket(
         sensorId,
         since,
-        16
+        bucketSize
       );
 
     return {
-      waterCapacityDistribution,
+      waterCapacityDistribution: {
+        bucketSize,
+        entries: waterCapacityDistribution,
+      },
     };
   }
 

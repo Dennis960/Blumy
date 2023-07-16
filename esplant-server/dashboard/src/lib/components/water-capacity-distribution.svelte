@@ -24,10 +24,19 @@
 			(bucket <= sensorConfig.lowerThreshold * sensorConfig.fieldCapacity ||
 				bucket >= sensorConfig.upperThreshold * sensorConfig.fieldCapacity);
 
-		const data = sensorValueDistribution.waterCapacityDistribution.map((entry) => ({
-			x: entry.bucket,
-			y: entry.count
-		}));
+		const sensorValueMax = 1024;
+		const distributionMap: Map<number, number> = new Map();
+		for (
+			let x = 0;
+			x < sensorValueMax;
+			x += sensorValueDistribution.waterCapacityDistribution.bucketSize
+		) {
+			distributionMap.set(x, 0);
+		}
+		sensorValueDistribution.waterCapacityDistribution.entries.forEach((entry) => {
+			distributionMap.set(entry.bucket, entry.count);
+		});
+		const data = [...distributionMap.entries()].map(([x, y]) => ({ x, y }));
 
 		const height = 48;
 
@@ -53,7 +62,19 @@
 			},
 			xaxis: {
 				min: 0,
-				max: 1024
+				max: sensorValueMax
+			},
+			plotOptions: {
+				bar: {
+					columnWidth: '100%'
+				}
+			},
+			grid: {
+				padding: {
+					// align with slider
+					left: -12,
+					right: -4
+				}
 			},
 			colors: [
 				function ({ dataPointIndex }: { dataPointIndex: number }) {
@@ -149,7 +170,7 @@
 						}
 					},
 					{
-						x: (sensorConfig.fieldCapacity + 1024) / 2,
+						x: (sensorConfig.fieldCapacity + sensorValueMax) / 2,
 						y: 0,
 						marker: {
 							size: 0
