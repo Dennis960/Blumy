@@ -1,0 +1,24 @@
+{
+    "layout": {
+        "hspace": "2mm",
+        "vspace": "2mm",
+        "cols": "5"
+    },
+    "tabs": {
+        "vwidth": "5mm",
+        "hwidth": "5mm",
+        "spacing": "30mm"
+    },
+    "cuts": {
+        "type": "mousebites"
+    },
+    "framing": {
+        "type": "railstb"
+    },
+    "tooling": {
+        "type": "4hole"
+    },
+    "fiducials": {
+        "type": "4fid"
+    }
+}
