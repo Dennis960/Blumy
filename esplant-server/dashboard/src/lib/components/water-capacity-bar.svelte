@@ -12,7 +12,7 @@
 </script>
 
 <div class="progress-container">
-	<div class="progress progress-sm">
+	<div class="progress rounded-pill">
 		<div
 			class="progress-bar bg-{color}"
 			style="width: {availableWaterCapacityPercent}%"
@@ -22,33 +22,27 @@
 			aria-valuemax={100}
 			aria-label="{Math.round(availableWaterCapacityPercent)}%"
 		>
-			<span class="visually-hidden">{Math.round(availableWaterCapacityPercent)}%</span>
+			{Math.round(availableWaterCapacityPercent)}%
 		</div>
 	</div>
 	<span class="progress-bar-tick" style="left: {sensor.config.lowerThreshold * 100}%" />
 	<span class="progress-bar-tick" style="left: {sensor.config.upperThreshold * 100}%" />
-	{#if sensor.lastUpdate?.waterCapacity != undefined}
-		<span class="progress-bar-icon text-{color}" style="left: {availableWaterCapacityPercent}%">
-			<IconDropletFilled size={20} />
-		</span>
-	{/if}
 </div>
 
 <style>
 	.progress-container {
 		position: relative;
+		--bar-height: 1rem;
 	}
 
-	.progress-bar-icon {
-		position: absolute;
-		top: -0.5rem;
-		margin-left: -0.5rem;
+	.progress {
+		height: var(--bar-height);
 	}
 
 	.progress-bar-tick {
 		position: absolute;
-		top: -0.25rem;
-		height: 0.75rem;
-		border-left: 1px solid black;
+		top: 0;
+		height: var(--bar-height);
+		border-left: 2px solid rgba(0, 0, 0, 0.5);
 	}
 </style>
