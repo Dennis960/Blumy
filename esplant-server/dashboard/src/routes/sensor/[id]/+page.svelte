@@ -100,7 +100,7 @@
 	<div class="container-xl">
 		<div class="row">
 			{#if $sensorQuery.data != undefined}
-				<div class="col-auto mb-2">
+				<div class="col mb-2">
 					<span
 						class="avatar avatar-2xl"
 						style="background-image: url({$sensorQuery.data.config.imageUrl})"
