@@ -106,7 +106,7 @@
 									<div class="col-12 col-md-6 col-lg-4">
 										<label for="image" class="form-label">Foto</label>
 										<span
-											class="avatar avatar-lg mb-2"
+											class="avatar avatar-2xl mb-2"
 											style="background-image: url({config.imageUrl})"
 										/>
 										<input
