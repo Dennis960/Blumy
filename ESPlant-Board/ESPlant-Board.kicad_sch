@@ -2935,7 +2935,7 @@
   )
 
   (symbol (lib_id "Connector_Generic:Conn_02x04_Odd_Even") (at 246.38 142.24 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 396bf575-7b62-4684-b550-8d3b1589f634)
     (property "Reference" "J1" (at 247.65 133.35 0)
       (effects (font (size 1.27 1.27)))
@@ -3781,7 +3781,7 @@
   )
 
   (symbol (lib_id "Custom_Parts:micro_USBFemale") (at 64.77 176.53 0) (unit 1)
-    (in_bom no) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid c991ff7a-c602-4eea-8121-436499a12e60)
     (property "Reference" "USB1" (at 65.405 165.1 0)
       (effects (font (size 1.27 1.27)))
@@ -3836,10 +3836,10 @@
     (property "MPN" "C318884" (at 247.65 63.5 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 56a923d3-78f4-4df5-ae9d-f92734019343))
-    (pin "1" (uuid 56a923d3-78f4-4df5-ae9d-f92734019343))
-    (pin "2" (uuid 7377b88e-673c-42c1-adf1-47b2333d4500))
-    (pin "2" (uuid 7377b88e-673c-42c1-adf1-47b2333d4500))
+    (pin "1" (uuid 56a923d3-78f4-4df5-ae9d-f92734019344))
+    (pin "1" (uuid 56a923d3-78f4-4df5-ae9d-f92734019344))
+    (pin "2" (uuid 7377b88e-673c-42c1-adf1-47b2333d4501))
+    (pin "2" (uuid 7377b88e-673c-42c1-adf1-47b2333d4501))
     (instances
       (project "ESPlant-Board"
         (path "/fa2a81f8-bf39-4c28-beef-a6fc807c4564"
@@ -3920,10 +3920,10 @@
     (property "MPN" "C318884" (at 247.65 93.98 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 6d5a133d-4493-48b3-b170-ca4956174c26))
-    (pin "1" (uuid 6d5a133d-4493-48b3-b170-ca4956174c26))
-    (pin "2" (uuid aeea7b82-46c0-4315-990d-09ebf651576b))
-    (pin "2" (uuid aeea7b82-46c0-4315-990d-09ebf651576b))
+    (pin "1" (uuid 6d5a133d-4493-48b3-b170-ca4956174c27))
+    (pin "1" (uuid 6d5a133d-4493-48b3-b170-ca4956174c27))
+    (pin "2" (uuid aeea7b82-46c0-4315-990d-09ebf651576c))
+    (pin "2" (uuid aeea7b82-46c0-4315-990d-09ebf651576c))
     (instances
       (project "ESPlant-Board"
         (path "/fa2a81f8-bf39-4c28-beef-a6fc807c4564"
