@@ -82,7 +82,10 @@ export interface SensorHistoryDTO {
 
 export interface SensorValueDistributionDTO {
   waterCapacityDistribution: {
-    bucket: number;
-    count: number;
-  }[];
+    bucketSize: number;
+    entries: {
+      bucket: number;
+      count: number;
+    }[];
+  };
 }
