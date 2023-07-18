@@ -1,4 +1,3 @@
-import Sensor from "./SensorRepository.js";
 import Knex from "knex";
 import knexfile from "../knexfile.js";
 import SensorReadingEntity from "../entities/SensorReadingEntity";
@@ -12,12 +11,6 @@ export default class SensorDataRepository {
    */
   static async create(data: SensorReadingEntity): Promise<number | undefined> {
     data.date = Date.now();
-
-    // update sensor name
-    if (data.plantName !== undefined) {
-      await Sensor.updateName(data.sensorAddress, data.plantName);
-    }
-
     return knex<SensorReadingEntity>("data").insert(data).returning("id");
   }
 
