@@ -13,6 +13,7 @@
 		IconWifi2,
 		IconWifi1
 	} from '$lib/icons';
+	import WaterCapacityBar from './water-capacity-bar.svelte';
 
 	export let sensor: SensorDTO;
 
@@ -25,7 +26,6 @@
 		refetchInterval: 15 * 60 * 1000
 	});
 
-	$: availableWaterCapacityPercent = (sensor.lastUpdate?.waterCapacity ?? 0) * 100;
 	$: waterToday =
 		sensor.prediction != undefined &&
 		(sensor.prediction.nextWatering <= new Date() ||
@@ -45,22 +45,7 @@
 		{#if sensor.lastUpdate == undefined}
 			<span>Keine Daten</span>
 		{:else}
-			<div class="progress progress-sm">
-				<div
-					class="progress-bar {sensor.plantHealth.critical ? 'bg-danger' : ''} {sensor.plantHealth
-						.warning
-						? 'bg-warning'
-						: ''}"
-					style="width: {availableWaterCapacityPercent}%"
-					role="progressbar"
-					aria-valuenow={availableWaterCapacityPercent}
-					aria-valuemin={0}
-					aria-valuemax={100}
-					aria-label="{Math.round(availableWaterCapacityPercent)}%"
-				>
-					<span class="visually-hidden">{Math.round(availableWaterCapacityPercent)}%</span>
-				</div>
-			</div>
+			<WaterCapacityBar sensor={sensor} />
 		{/if}
 	</td>
 
