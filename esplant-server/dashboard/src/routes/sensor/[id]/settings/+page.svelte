@@ -98,7 +98,7 @@
 								<div class="row mb-3">
 									<div class="col-12 col-md-6 col-lg-4">
 										<label for="name" class="form-label">Name</label>
-										<input type="text" class="form-control" id="name" value={config.name} />
+										<input type="text" class="form-control" id="name" bind:value={config.name} />
 									</div>
 								</div>
 
