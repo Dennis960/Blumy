@@ -41,12 +41,18 @@
 	}
 </script>
 
-<label class="form-check form-switch">
-	<input
-		class="form-check-input"
-		type="checkbox"
-		checked={subscribed}
-		on:input={handleToggleNotifications}
-	/>
-	<span class="form-check-label">Push-Benachrichtigungen</span>
-</label>
+<div class="datagrid-item">
+	<label for="push-switch" class="datagrid-title">Push-Benachrichtigungen</label>
+	<div class="datagrid-content">
+		<div class="form-check form-switch">
+			<input
+				class="form-check-input"
+				type="checkbox"
+				id="push-switch"
+				checked={subscribed}
+				on:input={handleToggleNotifications}
+			/>
+			<span>{subscribed ? 'Aktiviert' : 'Deaktiviert'}</span>
+		</div>
+	</div>
+</div>

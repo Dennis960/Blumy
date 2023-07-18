@@ -99,6 +99,20 @@ export default class SensorController {
       )
     );
 
+    // sort by water capacity
+    sensors.sort((a, b) => {
+      if (a.lastUpdate == undefined && b.lastUpdate == undefined) {
+        return 0;
+      }
+      if (a.lastUpdate == undefined) {
+        return 1;
+      }
+      if (b.lastUpdate == undefined) {
+        return -1;
+      }
+      return a.lastUpdate.waterCapacity - b.lastUpdate.waterCapacity;
+    });
+
     return {
       sensors,
     };
