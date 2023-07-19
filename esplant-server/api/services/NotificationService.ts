@@ -37,6 +37,10 @@ export default class NotificationService {
       title: `${sensor.name} braucht Wasser!`,
     });
 
+    console.log(
+      `Sending subscriptions to ${subscriptions.length} subscribers of sensor ${sensor.name}`
+    );
+
     for (const subscription of subscriptions) {
       if (subscription.lastNotification != undefined) {
         // skip if last notified less than 1 hour ago
