@@ -1,4 +1,4 @@
-import webpush from "web-push";
+import webpush, { WebPushError } from "web-push";
 import SensorRepository from "../repositories/SensorRepository.js";
 import SubscriptionRepository from "../repositories/SubscriptionRepository.js";
 import SensorService from "./SensorService.js";
@@ -54,22 +54,33 @@ export default class NotificationService {
         }
       }
 
-      await webpush.sendNotification(
-        {
-          endpoint: subscription.endpoint,
-          keys: {
-            p256dh: subscription.keys_p256dh,
-            auth: subscription.keys_auth,
+      try {
+        await webpush.sendNotification(
+          {
+            endpoint: subscription.endpoint,
+            keys: {
+              p256dh: subscription.keys_p256dh,
+              auth: subscription.keys_auth,
+            },
           },
-        },
-        payload
-      );
+          payload
+        );
 
-      await SubscriptionRepository.updateLastNotification(
-        sensor.sensorAddress,
-        new Date()
-      );
-      console.log(`Sent push notification`);
+        await SubscriptionRepository.updateLastNotification(
+          sensor.sensorAddress,
+          new Date()
+        );
+        console.log(`Sent push notification`);
+      } catch (err) {
+        if (err instanceof WebPushError && err.statusCode == 410) {
+          await SubscriptionRepository.delete({
+            endpoint: subscription.endpoint,
+          });
+          console.log(`Deleted expired subscription ${subscription.endpoint}`);
+        } else {
+          console.error("Error sending push notification", err);
+        }
+      }
     }
   }
 }
