@@ -465,8 +465,8 @@
       "idf": "",
       "netlist": "",
       "specctra_dsn": "",
-      "step": "",
-      "vrml": ""
+      "step": "ESPlant-Board.step",
+      "vrml": "ESPlant-Board.wrl"
     },
     "page_layout_descr_file": ""
   },
