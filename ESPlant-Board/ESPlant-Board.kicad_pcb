@@ -2262,6 +2262,8 @@
     (stroke (width 0.15) (type default)) (layer "Dwgs.User") (tstamp ba35eb7e-d835-4dfd-adb9-6528dfc4399d))
   (gr_line (start 279.04 148.7) (end 287.04 148.45)
     (stroke (width 0.15) (type default)) (layer "Dwgs.User") (tstamp baa7d987-7af0-4a4b-a376-348022e073f2))
+  (gr_line (start 278.74 100) (end 278.74 115.5)
+    (stroke (width 0.15) (type default)) (layer "Dwgs.User") (tstamp be40dfbe-aa9f-4d13-856e-dcb1b7e79f90))
   (gr_line (start 289.04 103) (end 299.04 103)
     (stroke (width 0.15) (type default)) (layer "Dwgs.User") (tstamp bf96d0be-fb01-4869-9e91-5d667e42d00f))
   (gr_line (start 289.04 102.3) (end 298.04 102.3)
@@ -2282,6 +2284,10 @@
     (stroke (width 0.15) (type default)) (layer "Dwgs.User") (tstamp dec2e9e7-366e-4f01-8520-056938e1a492))
   (gr_line (start 280.189809 99.199975) (end 280.189809 95.900508)
     (stroke (width 0.15) (type default)) (layer "Dwgs.User") (tstamp dfcfcdf0-3081-4468-a393-e7ab22af1c15))
+  (gr_line (start 278.74 115.5) (end 294.34 115.5)
+    (stroke (width 0.15) (type default)) (layer "Dwgs.User") (tstamp dff48e09-7291-4895-ae74-1b93b256c3af))
+  (gr_line (start 294.34 115.5) (end 294.34 100)
+    (stroke (width 0.15) (type default)) (layer "Dwgs.User") (tstamp dff48e09-7291-4895-ae74-1b93b256c3af))
   (gr_line (start 299.04 103) (end 299.04 148)
     (stroke (width 0.15) (type default)) (layer "Dwgs.User") (tstamp e3e6aca7-9542-4ca9-9d33-b9562ca2fdba))
   (gr_line (start 299.54 130) (end 299.54 150)
@@ -2424,10 +2430,10 @@
   (dimension (type aligned) (layer "Cmts.User") (tstamp 1481fee2-d9e9-4c9a-af03-94488d2d2157)
     (pts (xy 288.54 225) (xy 288.54 95.2))
     (height 21)
-    (gr_text "129,8000 mm" (at 308.39 160.1 90) (layer "Cmts.User") (tstamp 1481fee2-d9e9-4c9a-af03-94488d2d2157)
+    (gr_text "129,8 mm" (at 308.39 160.1 90) (layer "Cmts.User") (tstamp 1481fee2-d9e9-4c9a-af03-94488d2d2157)
       (effects (font (size 1 1) (thickness 0.15)))
     )
-    (format (prefix "") (suffix "") (units 3) (units_format 1) (precision 4))
+    (format (prefix "") (suffix "") (units 3) (units_format 1) (precision 1))
     (style (thickness 0.1) (arrow_length 1.27) (text_position_mode 0) (extension_height 0.58642) (extension_offset 0.5) keep_text_aligned)
   )
   (dimension (type aligned) (layer "Cmts.User") (tstamp 30d0e39d-684c-4512-8ac8-33313831ba71)
@@ -2447,6 +2453,15 @@
     )
     (format (prefix "") (suffix "") (units 3) (units_format 1) (precision 1))
     (style (thickness 0.15) (arrow_length 1.27) (text_position_mode 2) (extension_height 0.58642) (extension_offset 0.5) keep_text_aligned)
+  )
+  (dimension (type aligned) (layer "Cmts.User") (tstamp 38b61571-fdbc-4848-9531-e9fb6064e9fc)
+    (pts (xy 278.74 115.5) (xy 278.74 100))
+    (height -6.2)
+    (gr_text "15,5000 mm" (at 271.39 107.75 90) (layer "Cmts.User") (tstamp 38b61571-fdbc-4848-9531-e9fb6064e9fc)
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (format (prefix "") (suffix "") (units 3) (units_format 1) (precision 4))
+    (style (thickness 0.15) (arrow_length 1.27) (text_position_mode 0) (extension_height 0.58642) (extension_offset 0.5) keep_text_aligned)
   )
   (dimension (type aligned) (layer "Cmts.User") (tstamp 3991d8ac-4f0d-4b8e-ad4c-fd7177341aba)
     (pts (xy 294.54 155) (xy 294.54 100))
@@ -2470,6 +2485,15 @@
     (pts (xy 299.54 100) (xy 299.54 98))
     (height 4)
     (gr_text "2,0 mm" (at 306.04 99 90) (layer "Cmts.User") (tstamp 3c203f88-1821-46c7-bc24-aec80949d701)
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (format (prefix "") (suffix "") (units 3) (units_format 1) (precision 1))
+    (style (thickness 0.15) (arrow_length 1.27) (text_position_mode 2) (extension_height 0.58642) (extension_offset 0.5) keep_text_aligned)
+  )
+  (dimension (type aligned) (layer "Cmts.User") (tstamp 5b47749d-3afa-4393-a54e-998fa6506608)
+    (pts (xy 277.54 95.2) (xy 278.74 95.2))
+    (height -6.4)
+    (gr_text "1,2 mm" (at 278.14 87.2) (layer "Cmts.User") (tstamp 5b47749d-3afa-4393-a54e-998fa6506608)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (format (prefix "") (suffix "") (units 3) (units_format 1) (precision 1))
@@ -2513,8 +2537,8 @@
   )
   (dimension (type aligned) (layer "Cmts.User") (tstamp 8e96339f-da9e-4e42-ba28-1edeaa01108a)
     (pts (xy 277.54 100) (xy 299.54 100))
-    (height -11.5)
-    (gr_text "22,0 mm" (at 288.54 87.35) (layer "Cmts.User") (tstamp 8e96339f-da9e-4e42-ba28-1edeaa01108a)
+    (height -8.3)
+    (gr_text "22,0 mm" (at 288.54 90.55) (layer "Cmts.User") (tstamp 8e96339f-da9e-4e42-ba28-1edeaa01108a)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (format (prefix "") (suffix "") (units 3) (units_format 1) (precision 1))
@@ -2530,9 +2554,9 @@
     (style (thickness 0.15) (arrow_length 1.27) (text_position_mode 2) (extension_height 0.58642) (extension_offset 0.5) keep_text_aligned)
   )
   (dimension (type aligned) (layer "Cmts.User") (tstamp d68f8127-d626-4adc-9eda-4677a3a83017)
-    (pts (xy 299.04 149.1) (xy 299.04 101.9))
+    (pts (xy 299.04 149.25) (xy 299.04 101.75))
     (height 1.5)
-    (gr_text "47,2 mm" (at 301.54 126.25 90) (layer "Cmts.User") (tstamp d68f8127-d626-4adc-9eda-4677a3a83017)
+    (gr_text "47,5 mm" (at 301.54 126.25 90) (layer "Cmts.User") (tstamp d68f8127-d626-4adc-9eda-4677a3a83017)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (format (prefix "") (suffix "") (units 3) (units_format 1) (precision 1))
@@ -2560,6 +2584,15 @@
     (pts (xy 296.54 151) (xy 299.54 151))
     (height 5)
     (gr_text "3,0 mm" (at 298.04 157.5) (layer "Cmts.User") (tstamp ec16bbaa-9fe4-44c0-9fad-305cf0e86a7e)
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (format (prefix "") (suffix "") (units 3) (units_format 1) (precision 1))
+    (style (thickness 0.15) (arrow_length 1.27) (text_position_mode 2) (extension_height 0.58642) (extension_offset 0.5) keep_text_aligned)
+  )
+  (dimension (type aligned) (layer "Cmts.User") (tstamp f8d3f09c-4b7f-4db2-8615-de5c2217ce2c)
+    (pts (xy 299.04 149.25) (xy 299.04 148.95))
+    (height 6.2)
+    (gr_text "0,3 mm" (at 306.84 149.1 90) (layer "Cmts.User") (tstamp f8d3f09c-4b7f-4db2-8615-de5c2217ce2c)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (format (prefix "") (suffix "") (units 3) (units_format 1) (precision 1))
@@ -10062,11 +10095,13 @@
       30d0e39d-684c-4512-8ac8-33313831ba71
       313cde2a-1d64-44b3-8286-9f7de2aa78f1
       317b507a-df2a-4ee1-ba2c-6c521b75bd78
+      38b61571-fdbc-4848-9531-e9fb6064e9fc
       3991d8ac-4f0d-4b8e-ad4c-fd7177341aba
       399dbec8-cd6d-4810-8165-8a43bc721bb9
       3c203f88-1821-46c7-bc24-aec80949d701
       3e443197-43d1-44b1-a03f-ba9d7ebd2646
       42edc6a8-1e82-4c3d-b75f-72a21042e589
+      5b47749d-3afa-4393-a54e-998fa6506608
       605e2a19-5b4c-476e-a9c3-37547dccb592
       60e24168-5d16-4f68-bb63-5bfe6972a653
       62fc6f4d-dbb3-4529-9b37-022c1fa254d0
@@ -10088,6 +10123,7 @@
       92d42f29-6401-4fba-a78d-fdedd6ffd9bd
       a34078d6-a376-4bad-aa04-3a0be8ebd669
       aa082123-2bcc-4f64-83e9-f2872dc549a9
+      be40dfbe-aa9f-4d13-856e-dcb1b7e79f90
       c6869572-7be0-4855-8fe8-787f8e843b54
       caa57b1e-365e-4877-96a5-3f3bd0a733c7
       d68f8127-d626-4adc-9eda-4677a3a83017
@@ -10097,6 +10133,7 @@
       dec2e9e7-366e-4f01-8520-056938e1a492
       ded36cd2-5408-4606-a4d0-3b9870c08a83
       dfcfcdf0-3081-4468-a393-e7ab22af1c15
+      dff48e09-7291-4895-ae74-1b93b256c3af
       e08ca8cf-15b4-475b-b191-76e6fd72a2e3
       e5a1965d-c421-4964-9ee1-8c24181ad61b
       e71b80d5-3060-48e6-97b8-05126d6b5c51
@@ -10146,6 +10183,7 @@
       ee43fbfa-7530-454f-b17c-8338cd73bc99
       ef604a96-bbd5-4cdd-a82e-7451cfcbfaa4
       f25635cd-0413-4d40-9695-0760d4f3c438
+      f8d3f09c-4b7f-4db2-8615-de5c2217ce2c
       fdd80a65-d80d-4621-bac9-6aac0e5282d8
       feeb1786-2c67-4387-a859-e5a9466cfa1c
     )
