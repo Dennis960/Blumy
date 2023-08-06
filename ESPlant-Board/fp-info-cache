@@ -1,4 +1,4 @@
-21689629872827510
+21691321195930797
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -63932,6 +63932,13 @@ NPTH
 0
 PCM_kikit
 Tab
+A symbol representing annotation for tab placement
+
+0
+0
+0
+PCM_kikit
+Tab_5mm
 A symbol representing annotation for tab placement
 
 0
