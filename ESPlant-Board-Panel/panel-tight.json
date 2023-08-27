@@ -14,6 +14,7 @@
     "cuts": {
         "type": "mousebites",
         "drill": "0.6mm",
+        "spacing": "1mm",
         "offset": "-0.35mm"
     },
     "framing": {
@@ -32,7 +33,6 @@
         "opening": "2mm"
     },
     "post": {
-        "millradius": "1mm",
         "dimensions": "True"
     }
 }
