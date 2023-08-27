@@ -15,11 +15,12 @@
         "type": "mousebites",
         "drill": "0.6mm",
         "spacing": "1mm",
-        "offset": "-0.35mm"
+        "offset": "-0.3mm"
     },
     "framing": {
         "type": "frame",
-        "vspace": "5mm"
+        "vspace": "5mm",
+        "cuts": "none"
     },
     "tooling": {
         "type": "4hole",
@@ -33,7 +34,6 @@
         "opening": "2mm"
     },
     "post": {
-        "millradius": "1mm",
         "dimensions": "True"
     }
 }
