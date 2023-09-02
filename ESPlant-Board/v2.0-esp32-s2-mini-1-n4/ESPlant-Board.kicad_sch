@@ -1927,6 +1927,10 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 1d41bbad-19ad-46b4-8692-3c4fab47b5ef)
   )
+  (label "USB" (at 48.26 165.1 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 283fcffd-29bf-48df-bdb4-a1305e72c777)
+  )
   (label "RX" (at 212.09 72.39 0) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 28d1c28d-1d5e-4d69-bfa4-6b51f72464c3)
@@ -2078,6 +2082,10 @@
   (label "Voltage_Measurement_Analog" (at 156.21 74.93 180) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid f67dd6ce-4b59-4a51-9b76-5263cb2fa16f)
+  )
+  (label "BAT" (at 80.01 165.1 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid fc88e563-a80b-40de-a0e8-a7af12589b47)
   )
 
   (symbol (lib_id "Device:C") (at 74.93 115.57 0) (unit 1)
@@ -3424,10 +3432,10 @@
     (property "JLCPCB Position Offset" "" (at 261.62 63.5 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 56a923d3-78f4-4df5-ae9d-f9273401934b))
-    (pin "1" (uuid 56a923d3-78f4-4df5-ae9d-f9273401934b))
-    (pin "2" (uuid 7377b88e-673c-42c1-adf1-47b2333d4508))
-    (pin "2" (uuid 7377b88e-673c-42c1-adf1-47b2333d4508))
+    (pin "1" (uuid 56a923d3-78f4-4df5-ae9d-f9273401934c))
+    (pin "1" (uuid 56a923d3-78f4-4df5-ae9d-f9273401934c))
+    (pin "2" (uuid 7377b88e-673c-42c1-adf1-47b2333d4509))
+    (pin "2" (uuid 7377b88e-673c-42c1-adf1-47b2333d4509))
     (instances
       (project "ESPlant-Board"
         (path "/fa2a81f8-bf39-4c28-beef-a6fc807c4564"
@@ -3486,10 +3494,10 @@
     (property "JLCPCB Position Offset" "" (at 261.62 93.98 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 6d5a133d-4493-48b3-b170-ca4956174c2e))
-    (pin "1" (uuid 6d5a133d-4493-48b3-b170-ca4956174c2e))
-    (pin "2" (uuid aeea7b82-46c0-4315-990d-09ebf6515773))
-    (pin "2" (uuid aeea7b82-46c0-4315-990d-09ebf6515773))
+    (pin "1" (uuid 6d5a133d-4493-48b3-b170-ca4956174c2f))
+    (pin "1" (uuid 6d5a133d-4493-48b3-b170-ca4956174c2f))
+    (pin "2" (uuid aeea7b82-46c0-4315-990d-09ebf6515774))
+    (pin "2" (uuid aeea7b82-46c0-4315-990d-09ebf6515774))
     (instances
       (project "ESPlant-Board"
         (path "/fa2a81f8-bf39-4c28-beef-a6fc807c4564"
