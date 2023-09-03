@@ -20,7 +20,7 @@ jobs:
           sudo apt install --install-recommends kicad
       - name: Build ESPlant-Board svg with KiCad
         run: |
-          kicad-cli sch export svg ESPlant-Board.kicad_sch
+          kicad-cli sch export svg ./ESPlant-Board.kicad_sch
       - name: Upload svg
         uses: actions/upload-artifact@v3
         with:
@@ -28,7 +28,7 @@ jobs:
           path: ESPlant-Board/ESPlant-Board.svg
       - name: Build ESPlant-Board pdf with KiCad
         run: |
-          kicad-cli sch export pdf ESPlant-Board.kicad_sch
+          kicad-cli sch export pdf ./ESPlant-Board.kicad_sch
       - name: Upload pdf
         uses: actions/upload-artifact@v3
         with:
