@@ -9,9 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: registry.gitlab.com/kicad/kicad-ci/kicad-cli-docker/kicad:nightly
-      options: --entrypoint ""
+    container: pierrechevalier83/kicad_cli
     steps:
       - uses: actions/checkout@v3
       - name: Build ESPlant-Board svg with KiCad
