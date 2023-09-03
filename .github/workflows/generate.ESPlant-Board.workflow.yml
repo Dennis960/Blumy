@@ -1,0 +1,35 @@
+name: Build ESPlant-Board with KiCad
+on:
+  push:
+    paths:
+      - "ESPlant-Board/ESPlant-Board.kicad_sch"
+  workflow_dispatch:
+jobs:
+  svg:
+    runs-on: ubuntu-latest
+    container: ware/kicad
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build ESPlant-Board svg with KiCad
+        working-directory: ./ESPlant-Board
+        run: |
+          kicad-cli sch export svg ESPlant-Board.kicad_sch
+      - name: Upload svg
+        uses: actions/upload-artifact@v2
+        with:
+          name: ESPlant-Board.svg
+          path: ESPlant-Board.svg
+  pdf:
+    runs-on: ubuntu-latest
+    container: ware/kicad
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build ESPlant-Board pdf with KiCad
+        working-directory: ./ESPlant-Board
+        run: |
+          kicad-cli sch export pdf ESPlant-Board.kicad_sch
+      - name: Upload pdf
+        uses: actions/upload-artifact@v2
+        with:
+          name: ESPlant-Board.pdf
+          path: ESPlant-Board.pdf
