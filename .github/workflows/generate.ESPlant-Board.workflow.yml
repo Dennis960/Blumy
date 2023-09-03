@@ -37,3 +37,5 @@ jobs:
           commit_message: "Board: [bot] Update ESPlant-Board pdfs"
           commit_options: "--no-verify --signoff"
           file_pattern: ESPlant-Board/dist/*.pdf
+          branch: bot
+          create_branch: true
