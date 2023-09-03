@@ -1,4 +1,4 @@
-name: Build ESPlant-Board with KiCad
+name: Export ESPlant-Board with KiCad
 on:
   push:
     paths:
@@ -7,7 +7,7 @@ on:
       - .github/workflows/generate.ESPlant-Board.workflow.yml
   workflow_dispatch:
 jobs:
-  build:
+  export:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -16,19 +16,19 @@ jobs:
           sudo add-apt-repository --yes ppa:kicad/kicad-7.0-releases
           sudo apt update
           sudo apt install --install-recommends kicad
-      - name: Build ESPlant-Board schematic with KiCad
+      - name: Export ESPlant-Board schematic with KiCad
         run: |
-          kicad-cli sch export svg ESPlant-Board/ESPlant-Board.kicad_sch
-      - name: Upload svg
+          kicad-cli sch export pdf ESPlant-Board/ESPlant-Board.kicad_sch
+      - name: Upload pdf
         uses: actions/upload-artifact@v3
         with:
           name: ESPlant-Board-sch
-          path: ESPlant-Board/ESPlant-Board.svg
-      - name: Build ESPlant-Board pcb with KiCad
+          path: ESPlant-Board/ESPlant-Board.pdf
+      - name: Export ESPlant-Board pcb with KiCad
         run: |
-          kicad-cli pcb export svg ESPlant-Board.kicad_pcb --layers F.Cu,B.Cu,F.Silkscreen,B.Silkscreen,User.Drawings,User.Comments,Edge.Cuts --exclude-drawing-sheet --page-size-mode 2
-      - name: Upload svg
+          kicad-cli pcb export pdf ESPlant-Board.kicad_pcb --layers F.Cu,B.Cu,F.Silkscreen,B.Silkscreen,User.Drawings,User.Comments,Edge.Cuts --exclude-drawing-sheet --page-size-mode 2
+      - name: Upload pdf
         uses: actions/upload-artifact@v3
         with:
           name: ESPlant-Board-pcb
-          path: ESPlant-Board/ESPlant-Board.svg
+          path: ESPlant-Board/ESPlant-Board.pdf
