@@ -26,7 +26,7 @@ jobs:
           path: ESPlant-Board/ESPlant-Board.svg
       - name: Build ESPlant-Board pcb with KiCad
         run: |
-          kicad-cli pcb export svg ESPlant-Board/ESPlant-Board.kicad_pcb
+          kicad-cli pcb export svg ESPlant-Board.kicad_pcb --layers F.Cu,B.Cu,F.Silkscreen,B.Silkscreen,User.Drawings,User.Comments,Edge.Cuts --exclude-drawing-sheet --page-size-mode 2
       - name: Upload svg
         uses: actions/upload-artifact@v3
         with:
