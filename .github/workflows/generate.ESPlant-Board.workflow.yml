@@ -9,6 +9,8 @@ on:
 jobs:
   export:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
       - name: Add KiCad PPA and install KiCad
@@ -19,16 +21,19 @@ jobs:
       - name: Export ESPlant-Board schematic with KiCad
         run: |
           kicad-cli sch export pdf ESPlant-Board/ESPlant-Board.kicad_sch
-      - name: Upload pdf
-        uses: actions/upload-artifact@v3
-        with:
-          name: ESPlant-Board-sch
-          path: ESPlant-Board.pdf
+      - name: Move pdf to dist folder
+        run: |
+          mkdir ESPlant-Board/dist
+          mv ESPlant-Board.pdf ESPlant-Board/dist/ESPlant-Board-schematic.pdf
       - name: Export ESPlant-Board pcb with KiCad
         run: |
           kicad-cli pcb export pdf ESPlant-Board/ESPlant-Board.kicad_pcb --layers F.Cu,B.Cu,F.Silkscreen,B.Silkscreen,User.Drawings,User.Comments,Edge.Cuts
-      - name: Upload pdf
-        uses: actions/upload-artifact@v3
+      - name: Move pdf to dist folder
+        run: |
+          mv ESPlant-Board.pdf ESPlant-Board/dist/ESPlant-Board-pcb.pdf
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          name: ESPlant-Board-pcb
-          path: ESPlant-Board.pdf
+          commit_message: "Update ESPlant-Board pdfs"
+          commit_options: "--no-verify --signoff"
+          file_pattern: ESPlant-Board/dist/*.pdf
