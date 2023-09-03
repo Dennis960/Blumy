@@ -23,7 +23,7 @@ jobs:
           kicad-cli sch export pdf ESPlant-Board/ESPlant-Board.kicad_sch
       - name: Move pdf to dist folder
         run: |
-          mkdir ESPlant-Board/dist
+          mkdir -p ESPlant-Board/dist
           mv ESPlant-Board.pdf ESPlant-Board/dist/ESPlant-Board-schematic.pdf
       - name: Export ESPlant-Board pcb with KiCad
         run: |
