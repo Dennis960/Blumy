@@ -5,9 +5,9 @@ on:
       - "ESPlant-Board/ESPlant-Board.kicad_sch"
   workflow_dispatch:
 jobs:
-  svg:
+  build:
     runs-on: ubuntu-latest
-    container: ware/kicad
+    container: kicad/kicad
     steps:
       - uses: actions/checkout@v2
       - name: Build ESPlant-Board svg with KiCad
@@ -17,13 +17,8 @@ jobs:
       - name: Upload svg
         uses: actions/upload-artifact@v2
         with:
-          name: ESPlant-Board.svg
-          path: ESPlant-Board.svg
-  pdf:
-    runs-on: ubuntu-latest
-    container: ware/kicad
-    steps:
-      - uses: actions/checkout@v2
+          name: ESPlant-Board
+          path: ESPlant-Board/ESPlant-Board.svg
       - name: Build ESPlant-Board pdf with KiCad
         working-directory: ./ESPlant-Board
         run: |
@@ -31,5 +26,5 @@ jobs:
       - name: Upload pdf
         uses: actions/upload-artifact@v2
         with:
-          name: ESPlant-Board.pdf
-          path: ESPlant-Board.pdf
+          name: ESPlant-Board
+          path: ESPlant-Board/ESPlant-Board.pdf
