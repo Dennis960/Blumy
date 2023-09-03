@@ -39,3 +39,4 @@ jobs:
           file_pattern: ESPlant-Board/dist/*.pdf
           branch: bot
           create_branch: true
+          push_options: "--force-with-lease"
