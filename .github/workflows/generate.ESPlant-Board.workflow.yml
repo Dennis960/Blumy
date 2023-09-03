@@ -8,8 +8,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: registry.gitlab.com/kicad/kicad-ci/kicad-cli-docker:latest  # Use the GitLab Docker image
-      options: --entrypoint ""  # Override the default entrypoint to run custom commands
+      image: registry.gitlab.com/kicad/kicad-ci/kicad-cli-docker:latest
+      options: --entrypoint ""
     steps:
       - uses: actions/checkout@v2
       - name: Build ESPlant-Board svg with KiCad
