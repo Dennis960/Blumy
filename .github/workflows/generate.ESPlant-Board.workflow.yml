@@ -26,7 +26,7 @@ jobs:
           path: ESPlant-Board.pdf
       - name: Export ESPlant-Board pcb with KiCad
         run: |
-          kicad-cli pcb export pdf ESPlant-Board.kicad_pcb --layers F.Cu,B.Cu,F.Silkscreen,B.Silkscreen,User.Drawings,User.Comments,Edge.Cuts
+          kicad-cli pcb export pdf ESPlant-Board/ESPlant-Board.kicad_pcb --layers F.Cu,B.Cu,F.Silkscreen,B.Silkscreen,User.Drawings,User.Comments,Edge.Cuts
       - name: Upload pdf
         uses: actions/upload-artifact@v3
         with:
