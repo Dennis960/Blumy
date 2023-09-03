@@ -34,6 +34,6 @@ jobs:
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Update ESPlant-Board pdfs"
+          commit_message: "Board: [bot] Update ESPlant-Board pdfs"
           commit_options: "--no-verify --signoff"
           file_pattern: ESPlant-Board/dist/*.pdf
