@@ -9,11 +9,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: pierrechevalier83/kicad_cli
+    env:
+      working-directory: ./ESPlant-Board
     steps:
       - uses: actions/checkout@v3
+      - name: Add KiCad PPA and install KiCad
+        run: |
+          sudo add-apt-repository --yes ppa:kicad/kicad-7.0-releases
+          sudo apt update
+          sudo apt install --install-recommends kicad
       - name: Build ESPlant-Board svg with KiCad
-        working-directory: ./ESPlant-Board
         run: |
           kicad-cli sch export svg ESPlant-Board.kicad_sch
       - name: Upload svg
@@ -22,7 +27,6 @@ jobs:
           name: ESPlant-Board
           path: ESPlant-Board/ESPlant-Board.svg
       - name: Build ESPlant-Board pdf with KiCad
-        working-directory: ./ESPlant-Board
         run: |
           kicad-cli sch export pdf ESPlant-Board.kicad_sch
       - name: Upload pdf
