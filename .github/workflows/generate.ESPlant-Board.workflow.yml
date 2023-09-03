@@ -13,13 +13,13 @@ jobs:
       image: registry.gitlab.com/kicad/kicad-ci/kicad-cli-docker/kicad:nightly
       options: --entrypoint ""
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Build ESPlant-Board svg with KiCad
         working-directory: ./ESPlant-Board
         run: |
           kicad-cli sch export svg ESPlant-Board.kicad_sch
       - name: Upload svg
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ESPlant-Board
           path: ESPlant-Board/ESPlant-Board.svg
@@ -28,7 +28,7 @@ jobs:
         run: |
           kicad-cli sch export pdf ESPlant-Board.kicad_sch
       - name: Upload pdf
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ESPlant-Board
           path: ESPlant-Board/ESPlant-Board.pdf
