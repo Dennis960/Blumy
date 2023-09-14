@@ -1,0 +1,3 @@
+[submodule "ESPlant-Board/lib/kicad-libraries"]
+	path = ESPlant-Board/lib/kicad-libraries
+	url = https://github.com/espressif/kicad-libraries
