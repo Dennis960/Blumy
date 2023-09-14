@@ -20,7 +20,7 @@
     "framing": {
         "type": "frame",
         "vspace": "5mm",
-        "cuts": "none"
+        "cuts": "v"
     },
     "tooling": {
         "type": "4hole",
