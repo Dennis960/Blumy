@@ -1,0 +1,7 @@
+{
+    "triggerTaskOnSave.tasks": {
+        "python-main": [
+            "*.py"
+        ]
+    }
+}
