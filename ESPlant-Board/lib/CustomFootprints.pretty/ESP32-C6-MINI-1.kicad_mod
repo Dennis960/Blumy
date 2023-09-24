@@ -159,7 +159,7 @@
       )
     )
   )
-  (model "${KIPRJMOD}/lib/footprint/packages3d/ESP32-C3-MINI-1.STEP"
+  (model "${KIPRJMOD}/lib/packages3d/ESP32-C3-MINI-1.STEP"
     (offset (xyz -6.6 -8.37 0))
     (scale (xyz 1 1 1))
     (rotate (xyz 0 0 0))

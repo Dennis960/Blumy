@@ -31,7 +31,7 @@
   (pad "2" smd rect (at 2.969952 0) (size 2.5 1.1) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp d1612808-4ed3-4866-ad00-fde4ac1c4f34))
   (pad "3" smd rect (at 2.969952 -2.299975) (size 2.5 1.1) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp c8983d67-cc6d-4fb9-a969-f80dbb49fa37))
   (pad "4" smd rect (at -2.969977 0) (size 2.340005 3.6) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp d620e0e3-acf4-4d99-96c2-b603245fb314))
-  (model "${KIPRJMOD}/lib/footprint/packages3d/SOT-223-3_L6.5-W3.4-P2.30-LS7.0-BR.wrl"
+  (model "${KIPRJMOD}/lib/packages3d/SOT-223-3_L6.5-W3.4-P2.30-LS7.0-BR.wrl"
     (offset (xyz 0 0 0))
     (scale (xyz 1 1 1))
     (rotate (xyz 0 0 -180))

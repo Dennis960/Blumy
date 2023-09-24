@@ -46,7 +46,7 @@
   (pad "5" smd rect (at 3.799975 1.583439) (size 1.1 0.929997) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 6b6098cb-1b4b-4d06-b0a5-95263c2cb269))
   (pad "6" smd rect (at -3.799975 1.583439) (size 1.1 0.929997) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 878c7397-3787-46c1-8993-5435fce24adc))
   (pad "7" smd rect (at -3.799975 -0.686563) (size 1.1 0.929997) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp c0d843e1-5e11-4274-abb1-8965e8830bae))
-  (model "${KIPRJMOD}/lib/footprint/packages3d/SW-SMD_MK-12C02-G025.wrl"
+  (model "${KIPRJMOD}/lib/packages3d/SW-SMD_MK-12C02-G025.wrl"
     (offset (xyz 0 -0.7 -6.2))
     (scale (xyz 1 1 1))
     (rotate (xyz 0 0 0))
