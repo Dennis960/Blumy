@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build --emptyOutDir"
+  },
+  "devDependencies": {
+    "@lit-app/state": "^0.8.4",
+    "@types/node": "^20.3.1",
+    "@types/timestring": "^6.0.2",
+    "lit": "^2.7.5",
+    "timestring": "^7.0.0",
+    "uglify-js": "^3.17.4",
+    "vite": "^3.1.8",
+    "vite-plugin-mock-dev-server": "^1.1.16",
+    "vite-plugin-singlefile": "^0.13.5"
+  }
+}
