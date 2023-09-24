@@ -1,3 +1,7 @@
 *-backups
 production
 ~*.lck
+fp-info-cache
+fp-lib-table
+sym-lib-table
+*.kicad_prl
