@@ -15,22 +15,28 @@ jobs:
       - uses: actions/checkout@v3
       - name: Add KiCad PPA and install KiCad
         run: |
-          sudo add-apt-repository --yes ppa:kicad/kicad-7.0-releases
+          sudo add-apt-repository --yes ppa:kicad/kicad-dev-nightly
           sudo apt update
-          sudo apt install --install-recommends kicad
+          sudo apt install --install-recommends kicad-nightly
       - name: Export ESPlant-Board schematic with KiCad
         run: |
-          kicad-cli sch export pdf ESPlant-Board/ESPlant-Board.kicad_sch
+          kicad-cli-nigtly sch export pdf ESPlant-Board/ESPlant-Board.kicad_sch
       - name: Move pdf to dist folder
         run: |
           mkdir -p ESPlant-Board/dist
           mv ESPlant-Board.pdf ESPlant-Board/dist/ESPlant-Board-schematic.pdf
       - name: Export ESPlant-Board pcb with KiCad
         run: |
-          kicad-cli pcb export pdf ESPlant-Board/ESPlant-Board.kicad_pcb --layers F.Cu,B.Cu,F.Silkscreen,B.Silkscreen,User.Drawings,User.Comments,Edge.Cuts
+          kicad-cli-nightly pcb export pdf ESPlant-Board/ESPlant-Board.kicad_pcb --layers F.Cu,B.Cu,F.Silkscreen,B.Silkscreen,User.Drawings,User.Comments,Edge.Cuts
       - name: Move pdf to dist folder
         run: |
           mv ESPlant-Board.pdf ESPlant-Board/dist/ESPlant-Board-pcb.pdf
+      - name: Export ESPlant-Board 3d model with KiCad
+        run: |
+          kicad-cli-nightly pcb export vrml ESPlant-Board.kicad_pcb -o ESPlant-Board.wrl
+      - name: Move wrl to dist folder
+        run: |
+          mv ESPlant-Board.wrl ESPlant-Board/dist/ESPlant-Board.wrl
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
