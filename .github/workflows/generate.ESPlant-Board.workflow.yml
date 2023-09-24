@@ -20,7 +20,7 @@ jobs:
           sudo apt install --install-recommends kicad-nightly
       - name: Export ESPlant-Board schematic with KiCad
         run: |
-          kicad-cli-nigtly sch export pdf ESPlant-Board/ESPlant-Board.kicad_sch
+          kicad-cli-nightly sch export pdf ESPlant-Board/ESPlant-Board.kicad_sch
       - name: Move pdf to dist folder
         run: |
           mkdir -p ESPlant-Board/dist
