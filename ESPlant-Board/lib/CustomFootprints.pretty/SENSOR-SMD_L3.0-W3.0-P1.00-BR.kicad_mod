@@ -45,7 +45,7 @@
   (pad "4" smd rect (at -1.000025 -1.000025 180) (size 0.8 0.5) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 8d90cc98-5247-4609-84ae-45b7314d9bd6))
   (pad "5" smd rect (at -1.000025 -0.000025 180) (size 0.8 0.5) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 9aeecf1e-cae2-4e5c-b91c-1e7c29d636b5))
   (pad "6" smd rect (at -1.000025 0.999975 180) (size 0.8 0.5) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 0f6247a7-4ceb-4d44-a919-ed79b9bc5c6b))
-  (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/footprint/packages3d/SENSOR-SMD_L3.0-W3.0-P1.00-BR.wrl"
+  (model "${KIPRJMOD}/lib/footprint/packages3d/SENSOR-SMD_L3.0-W3.0-P1.00-BR.wrl"
     (offset (xyz -0.0000253999996185 0.0000253999996185 0.009905999851))
     (scale (xyz 1 1 1))
     (rotate (xyz 0 0 -180))
