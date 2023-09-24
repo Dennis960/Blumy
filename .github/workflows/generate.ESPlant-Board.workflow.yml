@@ -33,7 +33,7 @@ jobs:
           mv ESPlant-Board.pdf ESPlant-Board/dist/ESPlant-Board-pcb.pdf
       - name: Export ESPlant-Board 3d model with KiCad
         run: |
-          kicad-cli-nightly pcb export vrml ESPlant-Board.kicad_pcb -o ESPlant-Board.wrl
+          kicad-cli-nightly pcb export vrml ESPlant-Board/ESPlant-Board.kicad_pcb -o ESPlant-Board/dist/ESPlant-Board.wrl
       - name: Move wrl to dist folder
         run: |
           mv ESPlant-Board.wrl ESPlant-Board/dist/ESPlant-Board.wrl
