@@ -8,4 +8,4 @@ Nothing to see here... The repository changes faster than the README atm.
 
 ## ESPlant Server
 
-For more information about the API, see the [ESPlant Server Documentation](esplant-server/README.md).
+For more information about the API, see the [ESPlant Server Documentation](ESPlant-Server/README.md).

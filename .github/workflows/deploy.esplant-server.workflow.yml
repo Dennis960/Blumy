@@ -1,8 +1,8 @@
-name: Deploy esplant-server
+name: Deploy ESPlant-Server
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["Build Esplant dashboard and api"]
+    workflows: ["Build ESPlant dashboard and api"]
     branches: ["main"]
     types:
       - completed
@@ -24,16 +24,16 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pysftp
       - name: Setup private key
-        working-directory: ./esplant-server
+        working-directory: ./ESPlant-Server
         run: |
           touch hopping.key
           echo ${{ secrets.HOPPING_KEY }} | base64 -d > hopping.key
       - name: Deploy
-        working-directory: ./esplant-server
+        working-directory: ./ESPlant-Server
         run: |
           python deploy.py bd
       - name: Delete private key
         if: always()
-        working-directory: ./esplant-server
+        working-directory: ./ESPlant-Server
         run: |
           rm hopping.key

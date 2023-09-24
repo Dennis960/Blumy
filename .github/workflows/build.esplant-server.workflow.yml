@@ -1,17 +1,17 @@
-name: Build esplant-server
+name: Build ESPlant-Server
 on:
   push:
     branches:
       - main
     paths:
       - "api/**"
-      - "esplant-server/**"
+      - "ESPlant-Server/**"
   pull_request:
     branches:
       - main
     paths:
       - "api/**"
-      - "esplant-server/**"
+      - "ESPlant-Server/**"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,14 +21,14 @@ jobs:
         with:
           node-version: "20"
       - name: Install api dependencies
-        working-directory: ./esplant-server/api
+        working-directory: ./ESPlant-Server/api
         run: npm install
       - name: Build api
-        working-directory: ./esplant-server/api
+        working-directory: ./ESPlant-Server/api
         run: npm run build
       - name: Install dashboard dependencies
-        working-directory: ./esplant-server/dashboard
+        working-directory: ./ESPlant-Server/dashboard
         run: npm install
       - name: Build dashboard
-        working-directory: ./esplant-server/dashboard
+        working-directory: ./ESPlant-Server/dashboard
         run: npm run build
