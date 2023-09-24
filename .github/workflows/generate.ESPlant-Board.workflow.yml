@@ -23,8 +23,8 @@ jobs:
           mkdir -p ESPlant-Board/dist
       - name: Export ESPlant-Board
         run: |
-          kicad-cli-nightly sch export pdf ESPlant-Board/ESPlant-Board.kicad_sch -o ESPlant-Board/ESPlant-Board-schematic.pdf
-          kicad-cli-nightly pcb export pdf ESPlant-Board/ESPlant-Board.kicad_pcb --layers F.Cu,B.Cu,F.Silkscreen,B.Silkscreen,User.Drawings,User.Comments,Edge.Cuts -o ESPlant-Board/ESPlant-Board-pcb.pdf
+          kicad-cli-nightly sch export pdf ESPlant-Board/ESPlant-Board.kicad_sch -o ESPlant-Board/dist/ESPlant-Board-schematic.pdf
+          kicad-cli-nightly pcb export pdf ESPlant-Board/ESPlant-Board.kicad_pcb --layers F.Cu,B.Cu,F.Silkscreen,B.Silkscreen,User.Drawings,User.Comments,Edge.Cuts -o ESPlant-Board/dist/ESPlant-Board-pcb.pdf
           kicad-cli-nightly pcb export vrml ESPlant-Board/ESPlant-Board.kicad_pcb -o ESPlant-Board/dist/ESPlant-Board.wrl
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
