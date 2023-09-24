@@ -21,9 +21,6 @@ jobs:
       - name: Build pages
         working-directory: ./ESPlant-Pages
         run: npm run build
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
       - name: Deploy to GitHub Pages
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
