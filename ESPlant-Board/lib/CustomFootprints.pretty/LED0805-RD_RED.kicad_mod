@@ -29,7 +29,7 @@
     (stroke (width 0.1) (type default)) (layer "F.SilkS") (tstamp b3d90a15-71a6-477b-b309-b42ffd5ea64b))
   (pad "1" smd rect (at -1.100127 -0.000102 180) (size 1 1.250013) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 9fa103b7-a35f-4e05-83ca-e9c81a14e896))
   (pad "2" smd rect (at 1.100025 -0.000102 180) (size 1 1.250013) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 085bb898-fae3-4e06-b230-b5be4bb8504e))
-  (model "${KIPRJMOD}/lib/footprint/packages3d/LED0805-RD_RED.wrl"
+  (model "${KIPRJMOD}/lib/packages3d/LED0805-RD_RED.wrl"
     (offset (xyz 0 0 0.009905999851))
     (scale (xyz 1 1 1))
     (rotate (xyz 0 0 0))

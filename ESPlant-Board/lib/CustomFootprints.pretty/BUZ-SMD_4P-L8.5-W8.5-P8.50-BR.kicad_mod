@@ -37,7 +37,7 @@
   (pad "2" smd rect (at 3.599822 3.599949) (size 2.400051 2.400051) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 2a3ae12f-c841-4225-8ced-64a0de4e8014))
   (pad "3" smd rect (at 3.599568 -3.599695) (size 2.400051 2.400051) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp f3f82dc7-b340-419b-836e-69b5c7d36b9c))
   (pad "4" smd rect (at -3.599822 -3.599949) (size 2.400051 2.400051) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 63ee8ab7-a958-4c22-83e6-4366df98a235))
-  (model "${KIPRJMOD}/lib/footprint/packages3d/BUZ-SMD_4P-L8.5-W8.5-P8.50-BR.wrl"
+  (model "${KIPRJMOD}/lib/packages3d/BUZ-SMD_4P-L8.5-W8.5-P8.50-BR.wrl"
     (offset (xyz 0.0001269999981 -0.0001269999981 0))
     (scale (xyz 1 1 1))
     (rotate (xyz 0 0 0))

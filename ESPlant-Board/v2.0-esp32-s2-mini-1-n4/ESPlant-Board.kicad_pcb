@@ -618,7 +618,7 @@
       (net 27 "/LED_GREEN") (pinfunction "A") (pintype "passive") (tstamp 3e91f7b2-297e-4689-b3e3-97a95598e18a))
     (pad "2" smd rect (at -1.050292 0) (size 1 1.399543) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 7 "GND") (pinfunction "K") (pintype "passive") (tstamp 69a4e0bc-17aa-4dd9-bab9-69bd58306a2b))
-    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/./footprint/packages3d/LED0805-R-RD.wrl"
+    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/./packages3d/LED0805-R-RD.wrl"
       (offset (xyz 0 0 0.009905999851))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
@@ -935,7 +935,7 @@
       (net 1 "/EN") (pinfunction "C") (pintype "passive") (tstamp 2763cef0-42e5-42b9-abf0-ef5f3dd842a4))
     (pad "2" smd rect (at 3 1.875 90) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 1 "/EN") (pinfunction "C") (pintype "passive") (tstamp 41d3c4dc-32ef-4e2e-b5d2-7d5da6bbe3b4))
-    (model "${KIPRJMOD}/lib/footprint/packages3d/SW-SMD_4P-L5.1-W5.1-P3.70-LS6.5-TL-2.wrl"
+    (model "${KIPRJMOD}/lib/packages3d/SW-SMD_4P-L5.1-W5.1-P3.70-LS6.5-TL-2.wrl"
       (offset (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
@@ -1415,7 +1415,7 @@
       (net 32 "/IO9") (pinfunction "C") (pintype "passive") (tstamp 95508a53-8083-4058-94cd-e478922322fe))
     (pad "2" smd rect (at 3 1.875 270) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 32 "/IO9") (pinfunction "C") (pintype "passive") (tstamp 3c098428-221c-44f6-a654-bcc563acb896))
-    (model "${KIPRJMOD}/lib/footprint/packages3d/SW-SMD_4P-L5.1-W5.1-P3.70-LS6.5-TL-2.wrl"
+    (model "${KIPRJMOD}/lib/packages3d/SW-SMD_4P-L5.1-W5.1-P3.70-LS6.5-TL-2.wrl"
       (offset (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
@@ -1483,7 +1483,7 @@
       (net 7 "GND") (pinfunction "GND") (pintype "power_in") (tstamp 6dbd7636-d0be-4b72-ad8b-b5744a496336))
     (pad "6" smd rect (at -1.000025 0.999975 270) (size 0.8 0.5) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 29 "unconnected-(U5-NC-Pad6)") (pinfunction "NC") (pintype "no_connect") (tstamp b80f088d-b187-40f2-8336-efd4717a683e))
-    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/footprint/packages3d/SENSOR-SMD_L3.0-W3.0-P1.00-BR.wrl"
+    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/packages3d/SENSOR-SMD_L3.0-W3.0-P1.00-BR.wrl"
       (offset (xyz -0.0000253999996185 0.0000253999996185 0.009905999851))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 -180))
@@ -1529,7 +1529,7 @@
       (net 2 "/AD_Capacitance") (pinfunction "K") (pintype "passive") (tstamp 1b144e99-3806-4cd5-a80f-0fc5df350df1))
     (pad "2" smd rect (at 1.73495 0 270) (size 1.1 1) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 8 "/SensorCapV") (pinfunction "A") (pintype "passive") (tstamp 639bc418-1940-49f0-856f-df12355b9cee))
-    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/./footprint/packages3d/SOD-123F_L2.7-W1.6-LS3.8-RD.wrl"
+    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/./packages3d/SOD-123F_L2.7-W1.6-LS3.8-RD.wrl"
       (offset (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
@@ -1599,7 +1599,7 @@
     (pad "SH1" thru_hole oval (at -3.599949 1.324968 90) (size 1.3 2.2) (drill oval 0.700025 1.500127) (layers "*.Cu" "*.Mask") (tstamp ccdeb283-d51a-40c6-ab28-b35619d986fb))
     (pad "SH2" thru_hole oval (at 3.599949 1.324968 90) (size 1.3 2.2) (drill oval 0.700025 1.500127) (layers "*.Cu" "*.Mask") (tstamp 53378fa4-ecb8-41bf-9a54-6118a4a1bd67))
     (pad "SH3" thru_hole circle (at 2.424943 -1.325019 90) (size 1.2 1.2) (drill 0.700025) (layers "*.Cu" "*.Mask") (tstamp a7c481cb-0dc0-46a9-896f-7cbef2bafb60))
-    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/./footprint/packages3d/MICRO-USB-SMD_5P-P0.65-H-F_C10418.wrl"
+    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/./packages3d/MICRO-USB-SMD_5P-P0.65-H-F_C10418.wrl"
       (offset (xyz 0 -1.206296782 -0.05003799925))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 -180))
@@ -1647,7 +1647,7 @@
       (net 7 "GND") (pinfunction "-") (pintype "passive") (tstamp 7a570713-f1c4-40ba-a7f9-7252c9a5db86))
     (pad "2" smd rect (at 1.100025 -0.000102) (size 1 1.250013) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 28 "/LED_RED") (pinfunction "+") (pintype "passive") (tstamp 58bda763-b5cb-478a-bde1-2a0c01ad65b8))
-    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/./footprint/packages3d/LED0805-RD_RED.wrl"
+    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/./packages3d/LED0805-RD_RED.wrl"
       (offset (xyz 0 0 0.009905999851))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
@@ -1762,7 +1762,7 @@
       (net 7 "GND") (pinfunction "2") (pintype "power_in") (tstamp 9a958120-d9f1-4bab-bfca-7830bc41fb98))
     (pad "3" smd rect (at 3.599568 -3.599695 180) (size 2.400051 2.400051) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 859d41bb-c6ae-41b8-969e-6036f7e3ce07))
     (pad "4" smd rect (at -3.599822 -3.599949 180) (size 2.400051 2.400051) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp c92c9e47-424b-4777-b4ba-e096d459557c))
-    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/./footprint/packages3d/BUZ-SMD_4P-L8.5-W8.5-P8.50-BR.wrl"
+    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/./packages3d/BUZ-SMD_4P-L8.5-W8.5-P8.50-BR.wrl"
       (offset (xyz 0.0001269999981 -0.0001269999981 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
@@ -2127,7 +2127,7 @@
       (net 19 "Net-(U7-VIN)") (pinfunction "VIN") (pintype "power_in") (tstamp ede0ae56-e1c3-47b5-9803-c8a171abc016))
     (pad "4" smd rect (at -2.969977 0 270) (size 2.340005 3.6) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 22 "/USB") (pinfunction "VOUT") (pintype "power_out") (tstamp e13ee726-a685-4ec1-bf4c-37d5d2bc4539))
-    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/./footprint/packages3d/SOT-223-3_L6.5-W3.4-P2.30-LS7.0-BR.wrl"
+    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/./packages3d/SOT-223-3_L6.5-W3.4-P2.30-LS7.0-BR.wrl"
       (offset (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 -180))
@@ -2196,7 +2196,7 @@
       (net 17 "/Light_Sensor_In") (pinfunction "C") (pintype "passive") (tstamp a61c4ae2-e774-4ecd-9c1f-996a45dbf77e))
     (pad "2" smd rect (at 0.750064 0 180) (size 0.8 0.8) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 3 "/Light_Sensor_Analog") (pinfunction "E") (pintype "passive") (tstamp 3e5916e5-80bc-4be1-b04a-2fa739b24a87))
-    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/footprint/packages3d/SENSORS-SMD_ALS-PT19.wrl"
+    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/packages3d/SENSORS-SMD_ALS-PT19.wrl"
       (offset (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 -180))
@@ -2266,7 +2266,7 @@
       (net 25 "unconnected-(U8-Pad6)") (pinfunction "6") (pintype "no_connect") (tstamp e458545d-bf4c-4d5d-9d6b-19fa5951c9d8))
     (pad "7" smd rect (at -3.799975 -0.686563) (size 1.1 0.929997) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 26 "unconnected-(U8-Pad7)") (pinfunction "7") (pintype "no_connect") (tstamp d3789917-0c40-4f07-9189-5551fb9acd04))
-    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/./footprint/packages3d/SW-SMD_MK-12C02-G025.wrl"
+    (model "/home/dennis/Documents/Esplant/ESPlant-Board/lib/./packages3d/SW-SMD_MK-12C02-G025.wrl"
       (offset (xyz 0 -0.7 -6.2))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
