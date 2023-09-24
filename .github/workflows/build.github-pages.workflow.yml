@@ -5,7 +5,6 @@ on:
       - main
     paths:
       - "ESPlant-Pages/**"
-      - ".github/workflows/build.github-pages.workflow.yml"
   workflow_dispatch:
 jobs:
   build:
@@ -21,21 +20,15 @@ jobs:
       - name: Build pages
         working-directory: ./ESPlant-Pages
         run: npm run build
-      - name: upload pages
-        uses: actions/upload-artifact@v3
-        with:
-          name: github-pages
-          path: ESPlant-Pages/dist
   deploy:
-    needs: build
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/upload-pages-artifact@v2
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "github-pages: [bot] Deploy ESPlant-Pages"
+          commit_options: "--no-verify --signoff"
+          file_pattern: docs
+          branch: gh-pages
+          create_branch: true
+          push_options: "--force-with-lease"
