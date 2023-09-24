@@ -30,11 +30,11 @@ board_bottom_hole_padding = (3, 4) # padding from bottom left corner of board
 battery_spring_hole_size = (3.3, 0.5) # oval
 battery_spring_hole_padding = (5.5, 5.9) # padding from bottom left corner of board
 battery_spring_thickness = battery_spring_hole_size[1] + battery_spring_tolerance
-battery_spring_contact_size = 10
+battery_spring_contact_size = 11
 battery_spring_leg_size = (battery_spring_hole_size[0] + battery_spring_tolerance, battery_spring_thickness, 8)
 battery_spring_contact_size = (battery_spring_contact_size, battery_spring_thickness, battery_spring_contact_size)
 battery_spring_spring_length = 8
-battery_spring_spring_width = 6
+battery_spring_spring_width = 7
 
 # sensor
 sensor_length = 60
