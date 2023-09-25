@@ -1,20 +1,23 @@
-(footprint "SW_Push_1P1T_XKB_TS-1187A" (version 20221018) (generator pcbnew)
+(footprint "SW_Push_1P1T_XKB_TS-1187A" (version 20230913) (generator pcbnew)
   (layer "F.Cu")
   (descr "SMD Tactile Switch, http://www.helloxkb.com/public/images/pdf/TS-1187A-X-X-X.pdf")
   (tags "SPST Tactile Switch")
+  (property "Reference" "REF**" (at 0 -3.75 0) (layer "F.SilkS") (tstamp 0fc88032-8838-49cb-b728-e0b2251840d2)
+    (effects (font (size 1 1) (thickness 0.15)))
+  )
+  (property "Value" "SW_Push_1P1T_XKB_TS-1187A" (at 0 3.75 0) (layer "F.Fab") (tstamp 098ec8e4-6659-4ce6-b4c3-ae561d210993)
+    (effects (font (size 1 1) (thickness 0.15)))
+  )
+  (property "Footprint" "" (at 0 0 0 unlocked) (layer "F.Fab") hide (tstamp b533c68d-ba00-402b-9b71-601e12a0b775)
+    (effects (font (size 1.27 1.27)))
+  )
+  (property "Datasheet" "" (at 0 0 0 unlocked) (layer "F.Fab") hide (tstamp 42a3492b-cbc9-46b5-a140-d088a6fd53f4)
+    (effects (font (size 1.27 1.27)))
+  )
+  (property "Description" "" (at 0 0 0 unlocked) (layer "F.Fab") hide (tstamp 74adb596-e284-49e3-b11b-701507ec66e9)
+    (effects (font (size 1.27 1.27)))
+  )
   (attr smd)
-  (fp_text reference "REF**" (at 0 -3.75) (layer "F.SilkS")
-      (effects (font (size 1 1) (thickness 0.15)))
-    (tstamp 0fc88032-8838-49cb-b728-e0b2251840d2)
-  )
-  (fp_text value "SW_Push_1P1T_XKB_TS-1187A" (at 0 3.75) (layer "F.Fab")
-      (effects (font (size 1 1) (thickness 0.15)))
-    (tstamp 098ec8e4-6659-4ce6-b4c3-ae561d210993)
-  )
-  (fp_text user "${REFERENCE}" (at 0 -3.75) (layer "F.Fab")
-      (effects (font (size 1 1) (thickness 0.15)))
-    (tstamp c6cead17-e57a-4afe-84eb-9de8c8bcf151)
-  )
   (fp_line (start -2.75 -1) (end -2.75 1)
     (stroke (width 0.12) (type solid)) (layer "F.SilkS") (tstamp 941ff02d-374c-492c-b70e-ea94e5596660))
   (fp_line (start -1.75 -2.3) (end -1.3 -2.75)
@@ -80,7 +83,6 @@
       (xy -3.25 -1.6)
       (xy -3.25 -2.1)
     )
-
     (stroke (width 0.1) (type solid)) (fill none) (layer "F.Fab") (tstamp 6f05189b-050e-4df1-8cce-c345e106f690))
   (fp_poly
     (pts
@@ -89,7 +91,6 @@
       (xy -3.25 1.6)
       (xy -3.25 2.1)
     )
-
     (stroke (width 0.1) (type solid)) (fill none) (layer "F.Fab") (tstamp 8ea09fd2-29cd-4b39-95d0-f6b8cccaf50e))
   (fp_poly
     (pts
@@ -98,7 +99,6 @@
       (xy 3.25 -1.6)
       (xy 3.25 -2.1)
     )
-
     (stroke (width 0.1) (type solid)) (fill none) (layer "F.Fab") (tstamp f0572845-8e71-4b9a-a23c-9946e1f5ae0f))
   (fp_poly
     (pts
@@ -107,7 +107,6 @@
       (xy 3.25 1.6)
       (xy 3.25 2.1)
     )
-
     (stroke (width 0.1) (type solid)) (fill none) (layer "F.Fab") (tstamp ed4771a9-6196-4694-ad9c-6d04b1154a7b))
   (fp_poly
     (pts
@@ -120,7 +119,6 @@
       (xy -1.85 -0.85)
       (xy -0.85 -1.85)
     )
-
     (stroke (width 0.1) (type solid)) (fill none) (layer "F.Fab") (tstamp 46819414-db13-4f18-a0be-9ad4fd5f1f26))
   (fp_poly
     (pts
@@ -149,13 +147,23 @@
       (xy -1.575 -1.975)
       (xy -1.25 -1.975)
     )
-
     (stroke (width 0.1) (type solid)) (fill none) (layer "F.Fab") (tstamp bc77dbbd-56d3-4c6c-aa13-ea19fc3167c2))
-  (pad "1" smd rect (at -3 -1.875) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 2fdf9f96-3bc8-4370-a497-47cf413d8eb6))
-  (pad "1" smd rect (at 3 -1.875) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp ef152499-9140-4e95-9a81-89d58a4473ba))
-  (pad "2" smd rect (at -3 1.875) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp c0f8e203-3d85-4d5e-bbf8-0a1cf32bcf1b))
-  (pad "2" smd rect (at 3 1.875) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 0320eeb2-6a91-4d2d-9032-8bc9cc0cb72d))
-  (model "${KIPRJMOD}/lib/packages3d/SW-SMD_4P-L5.1-W5.1-P3.70-LS6.5-TL-2.wrl"
+  (fp_text user "${REFERENCE}" (at 0 -3.75 0) (layer "F.Fab") (tstamp c6cead17-e57a-4afe-84eb-9de8c8bcf151)
+    (effects (font (size 1 1) (thickness 0.15)))
+  )
+  (pad "1" smd rect (at -3 -1.875) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask")
+    (tstamp 2fdf9f96-3bc8-4370-a497-47cf413d8eb6)
+  )
+  (pad "1" smd rect (at 3 -1.875) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask")
+    (tstamp ef152499-9140-4e95-9a81-89d58a4473ba)
+  )
+  (pad "2" smd rect (at -3 1.875) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask")
+    (tstamp c0f8e203-3d85-4d5e-bbf8-0a1cf32bcf1b)
+  )
+  (pad "2" smd rect (at 3 1.875) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask")
+    (tstamp 0320eeb2-6a91-4d2d-9032-8bc9cc0cb72d)
+  )
+  (model "${KIPRJMOD}/lib/packages3d/SW-SMD_4P-L5.1-W5.1-P3.70-LS6.5-TL-2.step"
     (offset (xyz 0 0 0))
     (scale (xyz 1 1 1))
     (rotate (xyz 0 0 0))
