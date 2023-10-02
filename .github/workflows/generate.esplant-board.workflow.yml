@@ -24,6 +24,7 @@ jobs:
       - name: Export ESPlant-Board
         run: |
           kicad-cli-nightly sch export pdf ESPlant-Board/ESPlant-Board.kicad_sch -o ESPlant-Board/dist/ESPlant-Board-schematic.pdf
+          kicad-cli-nightly sch export svg ESPlant-Board/ESPlant-Board.kicad_sch -o ESPlant-Board/dist/ESPlant-Board-schematic.svg
           kicad-cli-nightly pcb export pdf ESPlant-Board/ESPlant-Board.kicad_pcb --layers F.Cu,B.Cu,F.Silkscreen,B.Silkscreen,User.Drawings,User.Comments,Edge.Cuts -o ESPlant-Board/dist/ESPlant-Board-pcb.pdf
           kicad-cli-nightly pcb export vrml ESPlant-Board/ESPlant-Board.kicad_pcb -o ESPlant-Board/dist/ESPlant-Board.wrl
           kicad-cli-nightly pcb export step ESPlant-Board/ESPlant-Board.kicad_pcb --drill-origin --no-dnp --subst-models -o ESPlant-Board/dist/ESPlant-Board.step
