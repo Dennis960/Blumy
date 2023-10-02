@@ -5,12 +5,14 @@ on:
       - main
     paths:
       - "ESPlant-Server/**"
+      - "ESPlant-Pages/**"
       - ".github/workflows/deploy.esplant-server.workflow.yml"
   pull_request:
     branches:
       - main
     paths:
       - "ESPlant-Server/**"
+      - "ESPlant-Pages/**"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,7 +35,15 @@ jobs:
         run: npm run build
       - name: Copy api/dashboard into api/dist
         run: cp -r ./ESPlant-Server/api/dashboard ./ESPlant-Server/api/dist
-      - name: Upload artifacts
+      - name: Install pages dependencies
+        working-directory: ./ESPlant-Pages
+        run: npm install
+      - name: Build pages
+        working-directory: ./ESPlant-Pages
+        run: npm run build
+      - name: Copy ESPlant-Pages/dist into ESPlant-Server/api/dist
+        run: cp -r ./ESPlant-Pages/dist ./ESPlant-Server/api/dist
+      - name: Upload server artifacts
         uses: actions/upload-artifact@v3
         with:
           name: ESPlant-Server
