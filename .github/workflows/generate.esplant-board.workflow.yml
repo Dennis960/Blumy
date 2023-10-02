@@ -4,7 +4,7 @@ on:
     paths:
       - "ESPlant-Board/ESPlant-Board.kicad_sch"
       - "ESPlant-Board/ESPlant-Board.kicad_pcb"
-      - .github/workflows/generate.ESPlant-Board.workflow.yml
+      - .github/workflows/generate.esplant-board.workflow.yml
   workflow_dispatch:
 jobs:
   export:
