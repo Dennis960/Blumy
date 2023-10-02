@@ -14,7 +14,7 @@ on:
       - "ESPlant-Server/**"
       - "ESPlant-Pages/**"
 jobs:
-  build:
+  build-api:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -27,43 +27,73 @@ jobs:
       - name: Build api
         working-directory: ./ESPlant-Server/api
         run: npm run build
+      - name: Upload server artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ESPlant-Api
+          path: ./ESPlant-Server/api/dist
+  build-dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20"
       - name: Install dashboard dependencies
         working-directory: ./ESPlant-Server/dashboard
         run: npm install
       - name: Build dashboard
         working-directory: ./ESPlant-Server/dashboard
         run: npm run build
-      - name: Copy api/dashboard into api/dist
-        run: cp -r ./ESPlant-Server/api/dashboard ./ESPlant-Server/api/dist
+      - name: Upload dashboard artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ESPlant-Dashboard
+          path: ./ESPlant-Server/api/dashboard
+  build-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20"
       - name: Install pages dependencies
         working-directory: ./ESPlant-Pages
         run: npm install
       - name: Build pages
         working-directory: ./ESPlant-Pages
         run: npm run build
-      - name: Copy ESPlant-Pages/dist into ESPlant-Server/api/dist
-        run: cp -r ./ESPlant-Pages/dist ./ESPlant-Server/api/dist
-      - name: Upload server artifacts
+      - name: Upload pages artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ESPlant-Server
-          path: ./ESPlant-Server/api/dist
+          name: ESPlant-Pages
+          path: ./ESPlant-Pages/dist
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs: ["build-api", "build-dashboard", "build-pages"]
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Download artifacts
+      - name: Download api artifacts
         uses: actions/download-artifact@v3
         with:
-          name: ESPlant-Server
-          path: ESPlant-Server
+          name: ESPlant-Api
+          path: ESPlant-Api
+      - name: Download dashboard artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ESPlant-Dashboard
+          path: ESPlant-Api/dashboard
+      - name: Download pages artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ESPlant-Pages
+          path: ESPlant-Api/pages
       - name: Deploy to server
         uses: easingthemes/ssh-deploy@main
         with:
           SSH_PRIVATE_KEY: ${{ secrets.HOPPING_KEY }}
           ARGS: "-rlgoDzvc -i"
-          SOURCE: "ESPlant-Server/"
+          SOURCE: "ESPlant-Api/"
           REMOTE_HOST: ${{ secrets.HOPPING_HOST }}
           REMOTE_USER: ${{ secrets.HOPPING_USER }}
           TARGET: ${{ secrets.HOPPING_HOST_PATH }}/api
