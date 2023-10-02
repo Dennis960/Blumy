@@ -9,6 +9,7 @@ cron.schedule("0 8,12,16,20 * * *", async () => {
 });
 
 import express from "express";
+import sirv from "sirv";
 const app = express();
 app.use(express.json({ limit: "10mb" })); // allow image upload
 
@@ -21,10 +22,14 @@ import api from "./api.js";
 // serve api
 app.use("/api", api);
 
+// serve pages
+app.use("/pages", sirv("pages"));
 // serve dashboard
-app.use("/", express.static("dashboard"));
-app.get("/*", (_req, res) => {
-  res.sendFile("/dashboard/index.html", { root: "." });
+app.use("/dashboard", sirv("dashboard"));
+
+// redirect root to dashboard
+app.get("/", (req, res) => {
+  res.redirect("/dashboard");
 });
 
 // default 404 error page
