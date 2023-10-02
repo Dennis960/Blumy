@@ -5,7 +5,7 @@ on:
       - main
     paths:
       - "ESPlant-Pages/**"
-      - ".github/workflows/build.github-pages.workflow.yml"
+      - ".github/workflows/deploy.esplant-pages.workflow.yml"
   workflow_dispatch:
 jobs:
   build:
