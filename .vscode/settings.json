@@ -1,7 +1,7 @@
 {
     "triggerTaskOnSave.tasks": {
         "python-main": [
-            "*.py"
+            "ESPlant-Case/**/main.py"
         ]
     }
 }
