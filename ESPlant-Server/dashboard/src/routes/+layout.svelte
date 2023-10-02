@@ -5,6 +5,7 @@
 	import { QueryClientProvider } from '@tanstack/svelte-query';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { base } from '$app/paths';
 
 	onMount(async () => {
 		// @ts-ignore
@@ -35,11 +36,11 @@
 				>
 					<span class="navbar-toggler-icon" />
 				</button>
-				<a class="navbar-brand ms-2 ms-lg-0 me-auto" href="/">ES-Plant Dashboard</a>
+				<a class="navbar-brand ms-2 ms-lg-0 me-auto" href="./">ES-Plant Dashboard</a>
 				<div class="collapse navbar-collapse" id="navbarNav">
 					<ul class="navbar-nav">
 						<li class="nav-item">
-							<a class="nav-link {$page.url.pathname == '/' ? 'active' : ''}" href="/">Sensoren</a>
+							<a class="nav-link {$page.url.pathname == `/${base}` ? 'active' : ''}" href="{base}">Sensoren</a>
 						</li>
 					</ul>
 				</div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import {
 		IconSettings,
 		IconAlertTriangle,
@@ -136,7 +137,7 @@
 	</div>
 	<div class="card-footer">
 		<div class="d-flex justify-content-end">
-			<a class="btn" href={`/sensor/${sensor.id}/settings`}>
+			<a class="btn" href={`${base}/sensor/${sensor.id}/settings`}>
 				<IconSettings />
 				<span class="ms-2">Einstellungen</span>
 			</a>
