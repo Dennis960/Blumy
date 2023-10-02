@@ -59,7 +59,7 @@
 
 <header>
   <div class="logo">
-    <img src="Logo.png" alt="ESPlant-Pages Logo" />
+    <img src="/Logo.png" alt="ESPlant-Pages Logo" />
     <div>ESPlant</div>
   </div>
   <nav />
