@@ -6,5 +6,5 @@ export default defineConfig({
 	plugins: [sveltekit(), SvelteKitPWA({
 		registerType: 'autoUpdate',
 	})],
-	base: '/dashboard/',
+	base: '',
 });
