@@ -23,9 +23,9 @@ import api from "./api.js";
 app.use("/api", api);
 
 // serve pages
-app.use("/pages", sirv("pages"));
+app.use("/pages", sirv("pages", { single: true }));
 // serve dashboard
-app.use("/dashboard", sirv("dashboard"));
+app.use("/dashboard", sirv("dashboard", { single: true }));
 
 // redirect root to dashboard
 app.get("/", (req, res) => {
