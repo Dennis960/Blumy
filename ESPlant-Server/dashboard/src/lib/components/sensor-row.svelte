@@ -14,6 +14,7 @@
 		IconWifi1
 	} from '$lib/icons';
 	import WaterCapacityBar from './water-capacity-bar.svelte';
+	import { base } from '$app/paths';
 
 	export let sensor: SensorDTO;
 
@@ -36,7 +37,7 @@
 			new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString();
 </script>
 
-<tr on:click={() => goto(`/sensor/${sensor.id}`)}>
+<tr on:click={() => goto(`${base}/sensor/${sensor.id}`)}>
 	<th class="w-1">
 		<span class="avatar avatar-xs" style="background-image: url({sensor.config.imageUrl})" />
 	</th>
@@ -101,7 +102,7 @@
 	</td>
 
 	<td class="text-end">
-		<a href="/sensor/{sensor.id}">Details</a>
+		<a href="{base}/sensor/{sensor.id}">Details</a>
 	</td>
 </tr>
 

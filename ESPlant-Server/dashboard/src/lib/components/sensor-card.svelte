@@ -12,6 +12,7 @@
 		IconScubaMask,
 		IconWifiOff
 	} from '$lib/icons';
+	import { base } from '$app/paths';
 
 	export let sensor: SensorDTO;
 
@@ -26,7 +27,7 @@
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<section on:click={() => goto(`/sensor/${sensor.id}`)} class="card d-flex flex-column">
+<section on:click={() => goto(`${base}/sensor/${sensor.id}`)} class="card d-flex flex-column">
 	<div class="h-100 row row-0">
 		<div class="col-4">
 			<span
@@ -39,7 +40,7 @@
 				<div class="row">
 					<div class="col me-auto">
 						<h1 class="card-title mb-2 text-nowrap text-truncate">
-							<a href={`/sensor/${sensor.id}`}>{sensor.config.name}</a>
+							<a href="{base}/sensor/{sensor.id}">{sensor.config.name}</a>
 						</h1>
 					</div>
 					<div

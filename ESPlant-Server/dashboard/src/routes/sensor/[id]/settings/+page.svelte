@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { fetchSensor, fetchSensorValueDistribution, submitSensorConfig } from '$lib/api.js';
 	import Slider, { type SliderOptions } from '$lib/components/slider.svelte';
 	import WaterCapacityDistribution from '$lib/components/water-capacity-distribution.svelte';
@@ -74,7 +75,7 @@
 			return;
 		}
 		queryClient.invalidateQueries(['sensor', data.id]);
-		goto(`/sensor/${data.id}`);
+		goto(`${base}/sensor/${data.id}`);
 	}
 
 	$: valueDistributionQuery = createQuery({
@@ -150,7 +151,7 @@
 
 								<div class="card-footer text-end">
 									<div class="d-flex justify-content-end column-gap-2">
-										<a href={`/sensor/${data.id}`} class="btn btn-link">Abbrechen</a>
+										<a href={`${base}/sensor/${data.id}`} class="btn btn-link">Abbrechen</a>
 										<button type="submit" class="btn btn-primary">Speichern</button>
 									</div>
 								</div>
