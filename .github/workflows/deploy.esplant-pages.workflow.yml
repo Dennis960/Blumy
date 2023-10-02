@@ -43,4 +43,4 @@ jobs:
           SOURCE: "ESPlant-Pages/"
           REMOTE_HOST: ${{ secrets.HOPPING_HOST }}
           REMOTE_USER: ${{ secrets.HOPPING_USER }}
-          TARGET: ${{ secrets.HOPPING_HOST_PATH }}
+          TARGET: ${{ secrets.HOPPING_HOST_PATH }}/api/pages
