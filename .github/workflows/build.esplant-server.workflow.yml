@@ -32,3 +32,10 @@ jobs:
       - name: Build dashboard
         working-directory: ./ESPlant-Server/dashboard
         run: npm run build
+      - name: Copy api/dashboard into api/dist
+        run: cp -r ./ESPlant-Server/api/dashboard ./ESPlant-Server/api/dist
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ESPlant-Server
+          path: ./ESPlant-Server/api/dist
