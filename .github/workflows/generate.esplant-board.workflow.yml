@@ -27,13 +27,27 @@ jobs:
           kicad-cli-nightly pcb export pdf ESPlant-Board/ESPlant-Board.kicad_pcb --layers F.Cu,B.Cu,F.Silkscreen,B.Silkscreen,User.Drawings,User.Comments,Edge.Cuts -o ESPlant-Board/dist/ESPlant-Board-pcb.pdf
           kicad-cli-nightly pcb export vrml ESPlant-Board/ESPlant-Board.kicad_pcb -o ESPlant-Board/dist/ESPlant-Board.wrl
           kicad-cli-nightly pcb export step ESPlant-Board/ESPlant-Board.kicad_pcb --drill-origin --no-dnp --subst-models -o ESPlant-Board/dist/ESPlant-Board.step
-
-      - name: Commit and push changes
-        uses: stefanzweifel/git-auto-commit-action@v4
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
         with:
-          commit_message: "Board: [bot] Update ESPlant-Board pdfs"
-          commit_options: "--no-verify --signoff"
-          file_pattern: ESPlant-Board/dist/*
-          branch: bot
-          create_branch: true
-          push_options: "--force-with-lease"
+          name: ESPlant-Board
+          path: ESPlant-Board/dist
+  upload:
+    runs-on: ubuntu-latest
+    needs: export
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ESPlant-Board
+          path: ESPlant-Board
+      - name: Upload to server
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.HOPPING_KEY }}
+          ARGS: "-rlgoDzvc -i"
+          SOURCE: "ESPlant-Board/"
+          REMOTE_HOST: ${{ secrets.HOPPING_HOST }}
+          REMOTE_USER: ${{ secrets.HOPPING_USER }}
+          TARGET: ${{ secrets.HOPPING_HOST_PATH }}/api/pages/ESPlant-Board
+        
