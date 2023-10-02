@@ -1,17 +1,50 @@
 name: Deploy ESPlant-Server
 on:
-  workflow_dispatch:
-  workflow_run:
-    workflows: ["Build ESPlant-Server"]
-    branches: ["main"]
-    types:
-      - completed
+  push:
+    branches:
+      - main
+    paths:
+      - "api/**"
+      - "ESPlant-Server/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "api/**"
+      - "ESPlant-Server/**"
 env:
   # TODO: extract this to github SECRET
   HOST_PATH: /var/www/hoppingadventure/hopping/esplant/api
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+      - name: Install api dependencies
+        working-directory: ./ESPlant-Server/api
+        run: npm install
+      - name: Build api
+        working-directory: ./ESPlant-Server/api
+        run: npm run build
+      - name: Install dashboard dependencies
+        working-directory: ./ESPlant-Server/dashboard
+        run: npm install
+      - name: Build dashboard
+        working-directory: ./ESPlant-Server/dashboard
+        run: npm run build
+      - name: Copy api/dashboard into api/dist
+        run: cp -r ./ESPlant-Server/api/dashboard ./ESPlant-Server/api/dist
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ESPlant-Server
+          path: ./ESPlant-Server/api/dist
   deploy:
     runs-on: ubuntu-latest
+    needs: build
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Download artifacts
