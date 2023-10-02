@@ -3,5 +3,6 @@
         "python-main": [
             "ESPlant-Case/**/main.py"
         ]
-    }
+    },
+    "editor.selectionClipboard": false
 }
