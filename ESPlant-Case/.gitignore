@@ -1,1 +1,3 @@
 *.FCBak
+v3/parts
+v3/*.step
