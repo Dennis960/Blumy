@@ -1,0 +1,46 @@
+name: Build ESPlant-Pages
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "ESPlant-Pages/**"
+      - ".github/workflows/build.github-pages.workflow.yml"
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        working-directory: ./ESPlant-Pages
+        run: npm install
+      - name: Build pages
+        working-directory: ./ESPlant-Pages
+        run: npm run build
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ESPlant-Pages
+          path: ESPlant-Pages/dist
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ESPlant-Server
+          path: ESPlant-Server
+      - name: Deploy to server
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.HOPPING_KEY }}
+          ARGS: "-rlgoDzvc -i"
+          SOURCE: "ESPlant-Server/"
+          REMOTE_HOST: ${{ secrets.HOPPING_HOST }}
+          REMOTE_USER: ${{ secrets.HOPPING_USER }}
+          TARGET: ${{ secrets.HOPPING_HOST_PATH }}
