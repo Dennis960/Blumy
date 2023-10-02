@@ -2,38 +2,40 @@ name: Deploy ESPlant-Server
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["Build ESPlant dashboard and api"]
+    workflows: ["Build ESPlant-Server"]
     branches: ["main"]
     types:
       - completed
+env:
+  # TODO: extract this to github SECRET
+  HOST_PATH: /var/www/hoppingadventure/hopping/esplant/api
 jobs:
   deploy:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
         with:
-          node-version: "20"
-      - name: Setup Python
-        uses: actions/setup-python@v4
+          name: ESPlant-Server
+          path: ESPlant-Server
+      - name: Deploy to server
+        uses: easingthemes/ssh-deploy@main
         with:
-          python-version: "3.10"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install pysftp
-      - name: Setup private key
-        working-directory: ./ESPlant-Server
-        run: |
-          touch hopping.key
-          echo ${{ secrets.HOPPING_KEY }} | base64 -d > hopping.key
-      - name: Deploy
-        working-directory: ./ESPlant-Server
-        run: |
-          python deploy.py bd
-      - name: Delete private key
-        if: always()
-        working-directory: ./ESPlant-Server
-        run: |
-          rm hopping.key
+          SSH_PRIVATE_KEY: ${{ secrets.HOPPING_KEY }}
+          ARGS: "-rlgoDzvc -i"
+          SOURCE: "ESPlant-Server/"
+          REMOTE_HOST: "hoppingadventure.com"
+          REMOTE_USER: "hopping"
+          TARGET: ${{ env.HOST_PATH }}
+          SCRIPT_BEFORE: |
+            echo "Nothing to do before deploy"
+          SCRIPT_AFTER: |
+            echo "Install dependencies for api"
+            cd ${{ env.HOST_PATH }}/api
+            npm install
+            echo "Restarting esplant-service"
+            sudo systemctl restart esplant.service
+            echo "Create data directory if not exists"
+            mkdir -p ${{ env.HOST_PATH }}/data
+
