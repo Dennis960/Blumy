@@ -1,4 +1,7 @@
-from ocp_vscode import *
+try:
+    from ocp_vscode import show_object
+except ImportError:
+    show_object = lambda *any: None
 from utils import load_part_data, import_part_step
 from components import battery_springs
 import cadquery as cq
