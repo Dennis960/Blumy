@@ -59,7 +59,7 @@
 
 <header>
   <div class="logo">
-    <img src="/Logo.png" alt="ESPlant-Pages Logo" />
+    <img src="./Logo.png" alt="ESPlant-Pages Logo" />
     <div>ESPlant</div>
   </div>
   <nav />
@@ -67,11 +67,11 @@
 <main>
   <h1>ESPlant-Board v2.0 3d model</h1>
   <div class="vrml-container">
-    <VrmlViewer src="https://raw.githubusercontent.com/Dennis960/ESPlant/bot/ESPlant-Board/dist/ESPlant-Board.wrl"/>
+    <VrmlViewer src=".ESPlant-Board/ESPlant-Board.wrl"/>
   </div>
   <h1>ESPlant-Board v1.0 Schematic</h1>
   <img
-    src="https://raw.githubusercontent.com/Dennis960/ESPlant/bot/ESPlant-Board/v1.0/ESPlant-Board.svg"
+    src=".ESPlant-Board/ESPlant-Board.svg"
     alt="SVG"
   />
 </main>
