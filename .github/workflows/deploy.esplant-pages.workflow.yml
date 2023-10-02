@@ -22,7 +22,7 @@ jobs:
         working-directory: ./ESPlant-Pages
         run: npm run build
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ESPlant-Pages
           path: ESPlant-Pages/dist
