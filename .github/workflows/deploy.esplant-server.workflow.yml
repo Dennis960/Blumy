@@ -13,7 +13,7 @@ on:
       - "ESPlant-Server/**"
 env:
   # TODO: extract this to github SECRET
-  HOST_PATH: /var/www/hoppingadventure/hopping/esplant/api
+  HOST_PATH: /var/www/hoppingadventure/hopping/esplant
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -52,17 +52,13 @@ jobs:
           name: ESPlant-Server
           path: ESPlant-Server
       - name: Deploy to server
-        uses: easingthemes/ssh-deploy@main
+        uses: appleboy/ssh-action@master
         with:
-          SSH_PRIVATE_KEY: ${{ secrets.HOPPING_KEY }}
-          ARGS: "-rlgoDzvc -i"
-          SOURCE: "ESPlant-Server/"
-          REMOTE_HOST: "hoppingadventure.com"
-          REMOTE_USER: "hopping"
-          TARGET: ${{ env.HOST_PATH }}
-          SCRIPT_BEFORE: |
-            echo "Nothing to do before deploy"
-          SCRIPT_AFTER: |
+          host: "hoppingadventure.com"
+          username: "hopping"
+          key: ${{ secrets.HOPPING_KEY }}
+          port: 22
+          script: |
             echo "Install dependencies for api"
             cd ${{ env.HOST_PATH }}/api
             npm install
