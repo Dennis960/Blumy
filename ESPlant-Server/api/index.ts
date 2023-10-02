@@ -23,7 +23,7 @@ import api from "./api.js";
 app.use("/api", api);
 
 // serve pages
-app.use("/pages", sirv("pages", { single: true }));
+app.use("/pages", sirv("pages", { single: true, dotfiles: true }));
 // serve dashboard
 app.use("/dashboard", sirv("dashboard", { single: true }));
 
