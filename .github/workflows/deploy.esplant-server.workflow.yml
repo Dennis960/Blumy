@@ -4,13 +4,12 @@ on:
     branches:
       - main
     paths:
-      - "api/**"
       - "ESPlant-Server/**"
+      - ".github/workflows/deploy.esplant-server.workflow.yml"
   pull_request:
     branches:
       - main
     paths:
-      - "api/**"
       - "ESPlant-Server/**"
 env:
   # TODO: extract this to github SECRET
