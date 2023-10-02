@@ -67,11 +67,11 @@
 <main>
   <h1>ESPlant-Board v2.0 3d model</h1>
   <div class="vrml-container">
-    <VrmlViewer src=".ESPlant-Board/ESPlant-Board.wrl"/>
+    <VrmlViewer src="./ESPlant-Board/ESPlant-Board.wrl"/>
   </div>
   <h1>ESPlant-Board v1.0 Schematic</h1>
   <img
-    src=".ESPlant-Board/ESPlant-Board.svg"
+    src="./ESPlant-Board/ESPlant-Board.svg"
     alt="SVG"
   />
 </main>
