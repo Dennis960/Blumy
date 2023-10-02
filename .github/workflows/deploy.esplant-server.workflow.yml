@@ -56,7 +56,7 @@ jobs:
           SOURCE: "ESPlant-Server/"
           REMOTE_HOST: ${{ secrets.HOPPING_HOST }}
           REMOTE_USER: ${{ secrets.HOPPING_USER }}
-          TARGET: ${{ secrets.HOPPING_HOST_PATH }}
+          TARGET: ${{ secrets.HOPPING_HOST_PATH }}/api
           SCRIPT_BEFORE: |
             echo "Nothing to do before deploy"
           SCRIPT_AFTER: |
