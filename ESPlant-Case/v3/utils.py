@@ -60,3 +60,22 @@ def import_part_step(part: Part):
     if axis_angle_rotation[2] != 0:
         part_step = part_step.rotate(axisStartPoint=axis_angle_rotation[0], axisEndPoint=axis_angle_rotation[1], angleDegrees=axis_angle_rotation[2])
     return part_step.translate((part.posx, part.posy, part.posz))
+
+def load_parts(parts_exclude: List[str] = []):
+    part_data = load_part_data()
+    parts: List[cq.Workplane] = []
+    part_bounding_boxes: List[cq.Workplane] = []
+    part_names: List[str] = []
+
+    for part in part_data:
+        if any(part_exclude in part.name for part_exclude in parts_exclude):
+            continue
+        part_names.append(part.name)
+        part_step = import_part_step(part)
+        part_step_center = part_step.val().CenterOfBoundBox()
+        parts.append(part_step)
+        bounding_box = part_step.val().BoundingBox()
+        bounding_box_part = cq.Workplane("XY").box(bounding_box.xlen, bounding_box.ylen, bounding_box.zlen).translate((part_step_center.x, part_step_center.y, part_step_center.z))
+        part_bounding_boxes.append(bounding_box_part)
+
+    return parts, part_bounding_boxes, part_names
