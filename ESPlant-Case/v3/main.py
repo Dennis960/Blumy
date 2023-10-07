@@ -6,6 +6,10 @@ from utils import load_part_data, import_part_step
 from components import battery_springs
 import cadquery as cq
 from typing import List
+from board_converter import convert_if_needed
+
+# Converts the pcb board and generates the parts.json file if it doesn't exist yet
+convert_if_needed()
 
 ###----------------- General tolerances -----------------###
 minimum_width = 0.5
@@ -16,8 +20,12 @@ board_tolerance_xy = 1.5
 board_tolerance_z = 0.5
 part_tolerance = 1
 
-###----------------- Board + Components -----------------###
 
+###----------------- Board + Components (Original) -----------------###
+board = cq.importers.importStep("ESPlant-Case/v3/ESPlant-Board.step")
+
+
+###----------------- Board + Components (Boxes) -----------------###
 part_data = load_part_data()
 # regex for parts to skip
 parts_to_skip = ["PinHeader"]
@@ -62,7 +70,12 @@ for part_name, bounding_box_part in zip(part_names, bounding_box_parts):
 for part_name, part_tolerace_shell in zip(part_names, part_tolerace_shells):
     show_object(part_tolerace_shell, name=part_name + "_tolerance_shell")
 show_object(battery_springs, name="battery_springs")
+show_object(board, name="board")
 # show_object(parts, name="parts")
 
 ###----------------- Export -----------------###
-# cq.Assembly(board).save("board.step")
+objects = [board] + bounding_box_parts + part_tolerace_shells + [battery_springs]
+assembly = cq.Assembly()
+for obj in objects:
+    assembly.add(obj)
+assembly.save("ESPlant-Case/v3/ESPlant-Case.step")
