@@ -3,8 +3,15 @@ import os
 import FreeCAD # /usr/lib/freecad/lib must be added to $PYTHONPATH
 import Import
 
-board_path = "ESPlant-Board.step"
-parts_folder = "parts/"
+case_dir = "ESPlant-Case/v3/"
+
+kicad_nightly_cli_cmd = "kicad-cli-nightly pcb export step ESPlant-Board/ESPlant-Board.kicad_pcb --drill-origin --no-dnp --subst-models -o " + case_dir + "ESPlant-Board.step"
+
+# run kicad-cli-nightly
+os.system( kicad_nightly_cli_cmd)
+
+board_path = case_dir + "ESPlant-Board.step"
+parts_folder = case_dir + "parts/"
 
 # create folder
 if not os.path.exists(parts_folder):
