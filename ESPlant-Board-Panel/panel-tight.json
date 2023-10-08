@@ -1,0 +1,38 @@
+{
+    "layout": {
+        "hspace": "2mm",
+        "vspace": "5mm",
+        "cols": "6"
+    },
+    "source": {
+        "tolerance": "15mm"
+    },
+    "tabs": {
+        "type": "annotation",
+        "tabfootprints": "PCM_kikit:Tab_5mm"
+    },
+    "cuts": {
+        "type": "mousebites",
+        "drill": "0.6mm",
+        "spacing": "1mm",
+        "offset": "-0.3mm"
+    },
+    "framing": {
+        "type": "tightframe",
+        "vspace": "5mm"
+    },
+    "tooling": {
+        "type": "4hole",
+        "hoffset": "2.5mm",
+        "voffset": "2.5mm"
+    },
+    "fiducials": {
+        "type": "4fid",
+        "hoffset": "3.85mm",
+        "voffset": "5mm",
+        "opening": "2mm"
+    },
+    "post": {
+        "dimensions": "True"
+    }
+}

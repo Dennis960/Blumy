@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "python-main",
+            "type": "shell",
+            "command": "python3",
+            "args": [
+                "${workspaceFolder}/ESPlant-Case/v3/main.py"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
