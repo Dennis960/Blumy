@@ -1,42 +1,38 @@
-import Knex from "knex";
-import knexfile from "../knexfile.js";
 import SensorEntity from "../entities/SensorEntity.js";
-export const knex = Knex(knexfile.development);
+import { knex } from "../config/knex.js";
 
 export default class SensorRepository {
   /**
    * Get sensor
    * @param sensorAddress The address of the sensor.
    */
-  static async getById(sensorAddress: number): Promise<SensorEntity | undefined> {
-     return await knex<SensorEntity>("sensor")
-      .select(
-        "sensorAddress",
-        "name",
-        "image",
-        "fieldCapacity",
-        "permanentWiltingPoint",
-        "lowerThreshold",
-        "upperThreshold"
-      )
+  static async getById(
+    sensorAddress: number
+  ): Promise<SensorEntity | undefined> {
+    return await knex<SensorEntity>("sensor")
+      .select("*")
       .where({ sensorAddress })
       .first();
+  }
+
+  static async getIdByToken(token: string): Promise<number | undefined> {
+    return await knex<SensorEntity>("sensor")
+      .select("*")
+      .where({ token })
+      .first()
+      .then((r) => r?.sensorAddress);
+  }
+
+  static async getAll(): Promise<SensorEntity[]> {
+    return await knex<SensorEntity>("sensor").select("*");
   }
 
   /**
    * Get all sensors.
    * @returns All sensors.
    */
-  static async getAll(): Promise<SensorEntity[]> {
-    return await knex<SensorEntity>("sensor").select(
-      "sensorAddress",
-      "name",
-      "image",
-      "fieldCapacity",
-      "permanentWiltingPoint",
-      "lowerThreshold",
-      "upperThreshold"
-    );
+  static async getAllForOwner(owner: number): Promise<SensorEntity[]> {
+    return await knex<SensorEntity>("sensor").select("*").where({ owner });
   }
 
   /**
@@ -45,20 +41,11 @@ export default class SensorRepository {
    * @returns The sensor
    */
   static async create(
-    sensorAddress: number,
-    name = "new sensor"
+    sensor: Omit<SensorEntity, "sensorAddress">
   ): Promise<SensorEntity> {
     return (await knex<SensorEntity>("sensor")
-      .insert({ sensorAddress, name })
-      .returning([
-        "sensorAddress",
-        "name",
-        "image",
-        "fieldCapacity",
-        "permanentWiltingPoint",
-        "lowerThreshold",
-        "upperThreshold",
-      ])
+      .insert(sensor)
+      .returning("*")
       .then((rows) => rows[0]))!;
   }
 
@@ -89,19 +76,19 @@ export default class SensorRepository {
     const sensor = await knex<SensorEntity>("sensor")
       .update(changes)
       .where({ sensorAddress })
-      .returning([
-        "sensorAddress",
-        "name",
-        "image",
-        "fieldCapacity",
-        "permanentWiltingPoint",
-        "lowerThreshold",
-        "upperThreshold",
-      ])
+      .returning("*")
       .then((r) => r[0]);
     if (sensor == undefined) {
       return Promise.reject("Sensor does not exist");
     }
     return sensor;
+  }
+
+  static async getOwner(sensorAddress: number): Promise<number | undefined> {
+    return await knex<SensorEntity>("sensor")
+      .select("owner")
+      .where({ sensorAddress })
+      .first()
+      .then((r) => r?.owner);
   }
 }

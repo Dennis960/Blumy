@@ -1,7 +1,5 @@
-import Knex from "knex";
-import knexfile from "../knexfile.js";
 import SensorReadingEntity from "../entities/SensorReadingEntity";
-export const knex = Knex(knexfile.development);
+import { knex } from "../config/knex.js";
 
 export default class SensorDataRepository {
   /**
@@ -9,7 +7,9 @@ export default class SensorDataRepository {
    * @param data The data to add.
    * @returns The id of the inserted data or throws an error if the sensor does not exist.
    */
-  static async create(data: SensorReadingEntity): Promise<number | undefined> {
+  static async create(
+    data: Omit<SensorReadingEntity, "id">
+  ): Promise<number | undefined> {
     data.date = Date.now();
     return knex<SensorReadingEntity>("data").insert(data).returning("id");
   }
@@ -70,17 +70,7 @@ export default class SensorDataRepository {
   ): Promise<SensorReadingEntity[]> {
     // return maxDataPoints averaged data points between startDate and endDate
     const data = await knex<SensorReadingEntity>("data")
-      .select(
-        "id",
-        "sensorAddress",
-        "plantName",
-        "date",
-        "water",
-        "voltage",
-        "duration",
-        "rssi",
-        "measurementDuration"
-      )
+      .select("*")
       .where({ sensorAddress })
       .andWhere("date", ">=", startDate)
       .andWhere("date", "<=", endDate)

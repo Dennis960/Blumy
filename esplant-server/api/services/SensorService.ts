@@ -1,14 +1,11 @@
-import SensorEntity from "../entities/SensorEntity.js";
 import SensorReadingEntity from "../entities/SensorReadingEntity.js";
 import SensorDataRepository from "../repositories/SensorDataRepository.js";
 import SensorRepository from "../repositories/SensorRepository.js";
 import {
-  SensorConfigurationDTO,
   SensorReadingDTO,
   WaterCapacityHistoryEntry,
 } from "../types/api.js";
 import { calculateDerivative, exponentialRegression } from "../util/ml.js";
-import sharp from "sharp";
 
 const WATERING_THRESHOLD = 0.05 / (60 * 60 * 1000); // water capacity gain per hour threshold
 const WATERING_WINDOW = 4 * 60 * 60 * 1000;
@@ -22,59 +19,14 @@ export default class SensorService {
     return await this.getReadings(id, oneWeekAgo, new Date());
   }
 
-  public static async getConfiguration(
-    id: number
-  ): Promise<SensorConfigurationDTO | undefined> {
-    const sensor = await SensorRepository.getById(id);
-    if (sensor == undefined) {
-      return undefined;
-    }
-
-    const emptyImage =
-      "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-
-    return {
-      name: sensor.name,
-      imageUrl:
-        sensor.image != undefined
-          ? "data:image/webp;base64," + sensor.image.toString("base64")
-          : emptyImage,
-      fieldCapacity: sensor.fieldCapacity,
-      permanentWiltingPoint: sensor.permanentWiltingPoint,
-      lowerThreshold: sensor.lowerThreshold,
-      upperThreshold: sensor.upperThreshold,
-    };
-  }
-
-  public static async setConfiguration(
-    id: number,
-    config: SensorConfigurationDTO
-  ): Promise<SensorConfigurationDTO> {
-    let sensorEntity = SensorEntity.fromDTO(id, config);
-    // shrink image
-    sensorEntity.image =
-      sensorEntity.image != null
-        ? await sharp(sensorEntity.image)
-            .resize(800, 800, {
-              fit: "inside",
-              withoutEnlargement: true,
-            })
-            .toFormat("webp")
-            .toBuffer()
-        : null;
-
-    sensorEntity = await SensorRepository.update(id, sensorEntity);
-    return SensorEntity.toDTO(sensorEntity);
-  }
-
   public static async getReadings(
     id: number,
     startDate: Date,
     endDate: Date,
     limit: number = 1000
   ): Promise<SensorReadingDTO[]> {
-    const config = await this.getConfiguration(id);
-    if (config == undefined) {
+    const sensorEntity = await SensorRepository.getById(id);
+    if (sensorEntity == undefined) {
       return [];
     }
     const data = await SensorDataRepository.getAllBySensorId(
@@ -84,7 +36,7 @@ export default class SensorService {
       limit
     );
     const sensorData: SensorReadingDTO[] = data.map((r) =>
-      SensorReadingEntity.toDTO(r, config)
+      SensorReadingEntity.toDTO(r, sensorEntity)
     );
     sensorData.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
     return sensorData;

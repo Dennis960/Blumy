@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { migrateDatabase } from "./migrations.js";
 await migrateDatabase();
 
