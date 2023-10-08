@@ -1,7 +1,5 @@
-import Knex from "knex";
-import knexfile from "../knexfile.js";
 import SubscriptionEntity from "../entities/SubscriptionEntity.js";
-export const knex = Knex(knexfile.development);
+import { knex } from "../config/knex.js";
 
 export default class SubscriptionRepository {
   static async create(
