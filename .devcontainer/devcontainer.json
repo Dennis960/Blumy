@@ -1,0 +1,19 @@
+{
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"name": "ESPlant-Case container",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-azuretools.vscode-docker",
+				"github.vscode-github-actions",
+				"GitHub.copilot",
+				"GitHub.copilot-chat",
+				"bernhard-42.ocp-cad-viewer",
+				"ms-python.python",
+				"Gruntfuggly.triggertaskonsave"
+			]
+		}
+	}
+}

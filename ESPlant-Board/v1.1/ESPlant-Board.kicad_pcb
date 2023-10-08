@@ -288,7 +288,7 @@
       (pinfunction "2") (pintype "passive") (tstamp 07df8ca4-31b8-46e2-a936-18b06f4536bc))
     (pad "2" smd rect (at 3 1.875) (size 1 0.75) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 14 "Net-(D3-A)") (pinfunction "2") (pintype "passive") (tstamp e9463d17-5ce2-4397-a14d-f1390e9ef100))
-    (model "${KIPRJMOD}/lib/footprint/packages3d/SW-SMD_4P-L5.1-W5.1-P3.70-LS6.5-TL-2.wrl"
+    (model "${KIPRJMOD}/lib/packages3d/SW-SMD_4P-L5.1-W5.1-P3.70-LS6.5-TL-2.wrl"
       (offset (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
@@ -483,7 +483,7 @@
       (net 27 "Net-(U2-+-Pad3)") (pinfunction "+") (pintype "power_out") (tstamp e253e0e0-c508-4e8a-a67e-a5642f01b626))
     (pad "4" smd rect (at 27.875032 5.5 270) (size 11.000025 7.000025) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 12 "GND") (pinfunction "-") (pintype "power_out") (tstamp fc9bced7-f359-4ec7-ac40-806a41aabdf5))
-    (model "D:/GitProjects/ESPlant/ESPlant-Board/lib/./footprint/packages3d/BAT-SMD_BH-AAA-B5AA001.wrl"
+    (model "D:/GitProjects/ESPlant/ESPlant-Board/lib/./packages3d/BAT-SMD_BH-AAA-B5AA001.wrl"
       (offset (xyz 0.0000253999996185 -0.0000253999996185 0.0999235985))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
