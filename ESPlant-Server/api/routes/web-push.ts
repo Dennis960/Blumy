@@ -2,6 +2,7 @@ import { Router } from "express";
 import webpush, { PushSubscription } from "web-push";
 import SubscriptionController from "../controllers/SubscriptionController.js";
 import NotificationService from "../services/NotificationService.js";
+import { isOwner } from "../middlewares/authenticated.js";
 
 const router = Router();
 
@@ -31,25 +32,25 @@ router.get("/vapid-public-key", (req, res) => {
   res.send(publicVapidKey);
 });
 
-router.post("/sensors/:id/subscribe", async (req, res) => {
+router.post("/sensors/:sensorId/subscribe", isOwner, async (req, res) => {
   const subscription: PushSubscription = req.body;
-  await SubscriptionController.subscribe(parseInt(req.params.id), subscription);
+  await SubscriptionController.subscribe(parseInt(req.params.sensorId), subscription);
   res.send({});
 });
 
-router.post("/sensors/:id/unsubscribe", async (req, res) => {
+router.post("/sensors/:sensorId/unsubscribe", isOwner, async (req, res) => {
   const subscription: PushSubscription = req.body;
   await SubscriptionController.unsubscribe(
-    parseInt(req.params.id),
+    parseInt(req.params.sensorId),
     subscription
   );
   res.send({});
 });
 
-router.post("/sensors/:id/check-subscription", async (req, res) => {
+router.post("/sensors/:sensorId/check-subscription", isOwner, async (req, res) => {
   const subscription: PushSubscription = req.body;
   const subscribed = await SubscriptionController.getIsSubscribed(
-    parseInt(req.params.id),
+    parseInt(req.params.sensorId),
     subscription
   );
   res.send(subscribed);

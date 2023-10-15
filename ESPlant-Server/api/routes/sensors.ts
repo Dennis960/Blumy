@@ -1,23 +1,22 @@
 import { Router } from "express";
 import SensorController from "../controllers/SensorController.js";
+import validate from "../middlewares/validate.js";
+import { z } from "zod";
+import { sensorConfigurationDTOSchema } from "../types/api.js";
+import { isOwner, isUser } from "../middlewares/authenticated.js";
 
 const router = Router();
 const sensorController = new SensorController();
 
 // GET /api/sensors
 // -> 200 message: sensors found, data: sensors
-router.get("/sensors", async (req, res) => {
-  const sensors = await sensorController.getSensorOverview();
+router.get("/sensors", isUser, async (req, res) => {
+  const sensors = await sensorController.getSensorOverview(req.user!.userId!);
   return res.json(sensors);
 });
 
-router.get("/sensors/:id", async (req, res) => {
-  const sensor = await sensorController.getSensor(parseInt(req.params.id));
-  if (sensor == undefined) {
-    return res.status(404).send({
-      message: "sensor not found",
-    });
-  }
+router.get("/sensors/:sensorId", isOwner, async (req, res) => {
+  const sensor = await sensorController.getSensor(parseInt(req.params.sensorId));
   return res.json(sensor);
 });
 
@@ -28,8 +27,8 @@ router.get("/sensors/:id", async (req, res) => {
 // -> 400 message: invalid endDate, data: {}
 // -> 400 message: invalid maxDataPoints, data: {}
 // -> 200 message: data found, data: data
-router.get("/sensors/:id/history", async (req, res) => {
-  const { id } = req.params;
+router.get("/sensors/:sensorId/history", isOwner, async (req, res) => {
+  const sensorId = parseInt(req.params.sensorId);
   const { startDate, endDate, maxDataPoints } = req.query;
   // check if startDate, endDate and maxDataPoints are valid
   if (isNaN(Number(startDate))) {
@@ -51,7 +50,7 @@ router.get("/sensors/:id/history", async (req, res) => {
   const parsedEndDate = new Date(Number(endDate));
   const parsedMaxDataPoints = Math.floor(Number(maxDataPoints));
   const history = await sensorController.getSensorHistory(
-    Number(id),
+    sensorId,
     parsedStartDate,
     parsedEndDate,
     parsedMaxDataPoints
@@ -64,20 +63,28 @@ router.get("/sensors/:id/history", async (req, res) => {
   return res.json(history);
 });
 
-router.get("/sensors/:id/value-distribution", async (req, res) => {
+router.get("/sensors/:sensorId/value-distribution", isOwner, async (req, res) => {
   const distribution = await sensorController.getSensorValueDistribution(
-    parseInt(req.params.id)
+    parseInt(req.params.sensorId)
   );
   return res.json(distribution);
 });
 
-router.post("/sensors/:id/config", async (req, res) => {
-  const config = req.body; // TODO validate
+router.post("/sensors/:sensorId/config", isOwner, validate(z.object({
+  body: sensorConfigurationDTOSchema,
+})), async (req, res) => {
+  const config = req.body;
   const sensor = await sensorController.updateSensorConfig(
-    parseInt(req.params.id),
+    parseInt(req.params.sensorId),
     config
   );
-  // TODO 404 if does not exist
+  return res.json(sensor);
+});
+
+router.post("/sensors", validate(z.object({
+  body: sensorConfigurationDTOSchema,
+})), async (req, res) => {
+  const sensor = await sensorController.create(req.user?.userId!, req.body);
   return res.json(sensor);
 });
 

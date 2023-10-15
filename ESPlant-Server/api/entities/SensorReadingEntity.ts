@@ -1,10 +1,22 @@
-import { SensorConfigurationDTO, SensorReadingDTO } from "../types/api";
+import { z } from "zod";
+import { SensorReadingDTO } from "../types/api";
+import SensorEntity from "./SensorEntity";
+
+export const espSensorReadingSchema = z.object({
+  sensorAddress: z.number(),
+  water: z.number(),
+  voltage: z.number(),
+  duration: z.number(),
+  rssi: z.number(),
+  measurementDuration: z.number(),
+});
+
+export type ESPSensorReadingDTO = z.infer<typeof espSensorReadingSchema>;
 
 export default class SensorReadingEntity {
   constructor(
     public id: number,
     public sensorAddress: number,
-    public plantName: string,
     public date: number | string,
     public water: number,
     public voltage: number | null,
@@ -14,18 +26,18 @@ export default class SensorReadingEntity {
   ) {}
 
   public static toDTO(
-    entity: SensorReadingEntity,
-    config: SensorConfigurationDTO
+    reading: SensorReadingEntity,
+    sensor: SensorEntity
   ): SensorReadingDTO {
     return {
-      id: entity.id,
-      timestamp: new Date(entity.date),
-      water: entity.water,
+      id: reading.id,
+      timestamp: new Date(reading.date),
+      water: reading.water,
       availableWaterCapacity:
-        (entity.water - config.permanentWiltingPoint) /
-        (config.fieldCapacity - config.permanentWiltingPoint),
-      voltage: entity.voltage ?? undefined,
-      rssi: entity.rssi,
+        (reading.water - sensor.permanentWiltingPoint) /
+        (sensor.fieldCapacity - sensor.permanentWiltingPoint),
+      voltage: reading.voltage ?? undefined,
+      rssi: reading.rssi,
     };
   }
 }
