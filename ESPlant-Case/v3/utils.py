@@ -98,3 +98,49 @@ def extrude_part(dir: cq.Selector, part: cq.Workplane, length: int):
     extruded_part = pending_wires.extrude(length)
     pending_wires.plane.zDir = cq.Vector(0, 0, 1)
     return extruded_part
+
+def get_width_direction(dir: cq.Selector):
+    if dir == ">Z" or dir == "<Z":
+        return "X"
+    if dir == ">X" or dir == "<X":
+        return "Y"
+    if dir == ">Y" or dir == "<Y":
+        return "X"
+    
+def get_height_direction(dir: cq.Selector):
+    if dir == ">Z" or dir == "<Z":
+        return "Y"
+    if dir == ">X" or dir == "<X":
+        return "Z"
+    if dir == ">Y" or dir == "<Y":
+        return "Z"
+    
+def extrude_part_width(part: cq.Workplane, min_width: int, dir: cq.Selector):
+    direction = get_width_direction(dir)
+    bounding_box = part.val().BoundingBox()
+    if direction == "X":
+        width = bounding_box.xlen
+    if direction == "Y":
+        width = bounding_box.ylen
+    if direction == "Z":
+        width = bounding_box.zlen
+    if width < min_width:
+        extrusion_length = min_width - width
+        part = part.union(extrude_part(f">{direction}", part, extrusion_length/2))
+        part = part.union(extrude_part(f"<{direction}", part, extrusion_length/2))
+    return part
+
+def extrude_part_height(part: cq.Workplane, min_height: int, dir: cq.Selector):
+    direction = get_height_direction(dir)
+    bounding_box = part.val().BoundingBox()
+    if direction == "X":
+        height = bounding_box.xlen
+    if direction == "Y":
+        height = bounding_box.ylen
+    if direction == "Z":
+        height = bounding_box.zlen
+    if height < min_height:
+        extrusion_length = min_height - height
+        part = part.union(extrude_part(f">{direction}", part, extrusion_length/2))
+        part = part.union(extrude_part(f"<{direction}", part, extrusion_length/2))
+    return part
