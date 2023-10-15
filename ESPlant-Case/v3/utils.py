@@ -80,22 +80,24 @@ def load_parts(parts_exclude: List[str] = []):
 
     return parts, part_bounding_boxes, part_names
 
-def extrude_part(dir: cq.Selector, part: cq.Workplane, length: int):
-    pending_wires = part.faces(dir).wires().toPending()
-    if dir == ">Z":
+def extrude_part_faces(selector: cq.Selector, part: cq.Workplane, until: int | cq.Face, faces_selector: cq.Selector = None):
+    if faces_selector is None:
+        faces_selector = selector
+    pending_wires = part.faces(faces_selector).wires().toPending()
+    if selector == ">Z":
         direction = cq.Vector(0, 0, 1)
-    if dir == "<Z":
+    if selector == "<Z":
         direction = cq.Vector(0, 0, -1)
-    if dir == ">X":
+    if selector == ">X":
         direction = cq.Vector(1, 0, 0)
-    if dir == "<X":
+    if selector == "<X":
         direction = cq.Vector(-1, 0, 0)
-    if dir == ">Y":
+    if selector == ">Y":
         direction = cq.Vector(0, 1, 0)
-    if dir == "<Y":
+    if selector == "<Y":
         direction = cq.Vector(0, -1, 0)
     pending_wires.plane.zDir = direction
-    extruded_part = pending_wires.extrude(length)
+    extruded_part = pending_wires.extrude(until)
     pending_wires.plane.zDir = cq.Vector(0, 0, 1)
     return extruded_part
 
@@ -126,8 +128,8 @@ def extrude_part_width(part: cq.Workplane, min_width: int, dir: cq.Selector):
         width = bounding_box.zlen
     if width < min_width:
         extrusion_length = min_width - width
-        part = part.union(extrude_part(f">{direction}", part, extrusion_length/2))
-        part = part.union(extrude_part(f"<{direction}", part, extrusion_length/2))
+        part = part.union(extrude_part_faces(f">{direction}", part, extrusion_length/2))
+        part = part.union(extrude_part_faces(f"<{direction}", part, extrusion_length/2))
     return part
 
 def extrude_part_height(part: cq.Workplane, min_height: int, dir: cq.Selector):
@@ -141,6 +143,6 @@ def extrude_part_height(part: cq.Workplane, min_height: int, dir: cq.Selector):
         height = bounding_box.zlen
     if height < min_height:
         extrusion_length = min_height - height
-        part = part.union(extrude_part(f">{direction}", part, extrusion_length/2))
-        part = part.union(extrude_part(f"<{direction}", part, extrusion_length/2))
+        part = part.union(extrude_part_faces(f">{direction}", part, extrusion_length/2))
+        part = part.union(extrude_part_faces(f"<{direction}", part, extrusion_length/2))
     return part
