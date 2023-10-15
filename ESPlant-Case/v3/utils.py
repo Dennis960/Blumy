@@ -79,3 +79,22 @@ def load_parts(parts_exclude: List[str] = []):
         part_bounding_boxes.append(bounding_box_part)
 
     return parts, part_bounding_boxes, part_names
+
+def extrude_part(dir: cq.Selector, part: cq.Workplane, length: int):
+    pending_wires = part.faces(dir).wires().toPending()
+    if dir == ">Z":
+        direction = cq.Vector(0, 0, 1)
+    if dir == "<Z":
+        direction = cq.Vector(0, 0, -1)
+    if dir == ">X":
+        direction = cq.Vector(1, 0, 0)
+    if dir == "<X":
+        direction = cq.Vector(-1, 0, 0)
+    if dir == ">Y":
+        direction = cq.Vector(0, 1, 0)
+    if dir == "<Y":
+        direction = cq.Vector(0, -1, 0)
+    pending_wires.plane.zDir = direction
+    extruded_part = pending_wires.extrude(length)
+    pending_wires.plane.zDir = cq.Vector(0, 0, 1)
+    return extruded_part
