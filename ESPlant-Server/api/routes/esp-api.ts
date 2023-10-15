@@ -1,6 +1,12 @@
 import { Router } from "express";
+import { z } from "zod";
 import SensorController from "../controllers/SensorController.js";
-import SensorReadingEntity from "../entities/SensorReadingEntity.js";
+import {
+  ESPSensorReadingDTO,
+  espSensorReadingSchema,
+} from "../entities/SensorReadingEntity.js";
+import validate from "../middlewares/validate.js";
+import { isSensor } from "../middlewares/authenticated.js";
 
 const router = Router();
 const dataController = new SensorController();
@@ -16,21 +22,25 @@ const dataController = new SensorController();
 // }
 // -> 400 message: sensorAddress and water are required, data: {}
 // -> 200 message: data added, data: data
-router.post("/data", async (req, res) => {
-  const dataObj: SensorReadingEntity = req.body;
+router.post(
+  "/data",
+  isSensor,
+  validate(
+    z.object({
+      body: espSensorReadingSchema,
+    })
+  ),
+  async (req, res) => {
+    const dataObj: ESPSensorReadingDTO = req.body;
+    if (dataObj.sensorAddress != req.user?.sensorId) {
+      return res.status(403).send({
+        message: "unauthorized",
+      });
+    }
 
-  if (dataObj.sensorAddress == undefined || dataObj.water == undefined) {
-    return res.status(400).send({
-      message: "sensorAddress and water are required",
-      data: {},
-    });
+    const data = await dataController.addSensorData(dataObj);
+    return res.send(data);
   }
-
-  const data = await dataController.addSensorData(dataObj);
-  return res.send({
-    message: "data added",
-    data,
-  });
-});
+);
 
 export default router;

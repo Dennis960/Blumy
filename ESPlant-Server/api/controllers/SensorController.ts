@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import {
   PlantHealthDTO,
   RSSIHistoryEntry,
@@ -13,7 +14,8 @@ import {
 import SensorDataRepository from "../repositories/SensorDataRepository.js";
 import SensorRepository from "../repositories/SensorRepository.js";
 import SensorService from "../services/SensorService.js";
-import SensorReadingEntity from "../entities/SensorReadingEntity.js";
+import { ESPSensorReadingDTO } from "../entities/SensorReadingEntity.js";
+import SensorEntity from "../entities/SensorEntity.js";
 
 const OFFLINE_TIMEOUT = 120 * 60 * 1000; // 2 hours
 
@@ -55,10 +57,11 @@ export default class SensorController {
   }
 
   public async getSensor(id: number): Promise<SensorDTO | undefined> {
-    const config = await SensorService.getConfiguration(id);
-    if (config == undefined) {
+    const sensorEntity = await SensorRepository.getById(id);
+    if (sensorEntity == undefined) {
       return undefined;
     }
+    const config = SensorEntity.toDTO(sensorEntity);
 
     const sensorData = await SensorService.getRecentReadings(id);
 
@@ -90,8 +93,8 @@ export default class SensorController {
     };
   }
 
-  public async getSensorOverview(): Promise<SensorOverviewDTO> {
-    const sensorsIds = await SensorRepository.getAll();
+  public async getSensorOverview(ownerId: number): Promise<SensorOverviewDTO> {
+    const sensorsIds = await SensorRepository.getAllForOwner(ownerId);
 
     const sensors = await Promise.all(
       sensorsIds.map(
@@ -169,17 +172,16 @@ export default class SensorController {
     };
   }
 
-  public async addSensorData(data: SensorReadingEntity) {
-    const sensor = await SensorRepository.getById(data.sensorAddress);
-    if (!sensor) {
-      // create sensor
-      const createdSensor = await SensorRepository.create(data.sensorAddress);
-      if (createdSensor == undefined) {
-        throw new Error("could not create sensor");
-      }
-    }
-    // add data
-    return await SensorDataRepository.create(data);
+  public async addSensorData(data: ESPSensorReadingDTO) {
+    return await SensorDataRepository.create({
+      sensorAddress: data.sensorAddress,
+      date: Date.now(),
+      water: data.water,
+      voltage: data.voltage,
+      duration: data.duration,
+      rssi: data.rssi,
+      measurementDuration: data.measurementDuration,
+    });
   }
 
   public async getSensorValueDistribution(
@@ -206,6 +208,28 @@ export default class SensorController {
     sensorId: number,
     config: SensorConfigurationDTO
   ): Promise<SensorConfigurationDTO> {
-    return await SensorService.setConfiguration(sensorId, config);
+    const sensorEntityPartial = await SensorEntity.fromDTO(sensorId, config);
+    const sensorEntity = await SensorRepository.update(
+      sensorId,
+      sensorEntityPartial
+    );
+    return SensorEntity.toDTO(sensorEntity);
+  }
+
+  public async create(ownerId: number, config: SensorConfigurationDTO) {
+    const token = crypto.randomBytes(32).toString("hex");
+    const sensorEntityPartial = await SensorEntity.fromDTO(0, config);
+    const creatingSensorEntity = {
+      ...sensorEntityPartial,
+      sensorAddress: undefined,
+      owner: ownerId,
+      token,
+    };
+    const sensorEntity = await SensorRepository.create(creatingSensorEntity);
+
+    return {
+      token,
+      sensor: SensorEntity.toDTO(sensorEntity),
+    };
   }
 }

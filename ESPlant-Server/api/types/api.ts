@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export interface SensorReadingDTO {
   id: number;
   timestamp: Date;
@@ -7,22 +9,24 @@ export interface SensorReadingDTO {
   rssi: number;
 }
 
-export interface SensorConfigurationDTO {
-  name: string;
-  imageUrl: string; // data URL for now
-  fieldCapacity: number; // max water value
+export const sensorConfigurationDTOSchema = z.object({
+  name: z.string(),
+  imageUrl: z.string(), // data URL for now
   /*
    * Typical permanent wilting points:
    *   26-32% of field capacity for fine-textured soil
    *   10-15% of field capacity for coarse-textured soil
    * ref. https://www.sciencedirect.com/science/article/pii/B9780128117484000170
    */
-  permanentWiltingPoint: number; // min water value
+  fieldCapacity: z.number(), // max water value
+  permanentWiltingPoint: z.number(), // min water value
   // difference between fc and pwp in %: available water capacity
   // thresholds for available water capacity
-  upperThreshold: number;
-  lowerThreshold: number;
-}
+  upperThreshold: z.number(),
+  lowerThreshold: z.number(),
+});
+
+export type SensorConfigurationDTO = z.infer<typeof sensorConfigurationDTOSchema>;
 
 export interface RSSIHistoryEntry {
   timestamp: Date;

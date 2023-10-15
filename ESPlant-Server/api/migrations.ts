@@ -1,6 +1,4 @@
-import Knex from "knex";
-import knexfile from "./knexfile.js";
-export const knex = Knex(knexfile.development);
+import { knex } from "./config/knex.js";
 
 const createSensorTableStatement = `CREATE TABLE IF NOT EXISTS sensor (
   sensor_address INTEGER PRIMARY KEY NOT NULL,
@@ -225,9 +223,38 @@ const migrations = [
   },
   {
     name: "sensor_add_image",
+    statements: ["ALTER TABLE sensor ADD COLUMN image BLOB;"],
+  },
+  {
+    name: "add_sessions",
     statements: [
-      "ALTER TABLE sensor ADD COLUMN image BLOB;",
+      `CREATE TABLE IF NOT EXISTS sessions (
+      sid TEXT PRIMARY KEY NOT NULL,
+      sess TEXT NOT NULL,
+      expired INTEGER NOT NULL
+      );`,
     ],
+  },
+  {
+    name: "add_user",
+    statements: [
+      `CREATE TABLE IF NOT EXISTS user (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        googleId TEXT NOT NULL
+      );`,
+    ],
+  },
+  {
+    name: "add_sensor_owner",
+    statements: [
+      `ALTER TABLE sensor ADD COLUMN owner INTEGER;`,
+      // FIXME add foreign key later
+      //`ALTER TABLE sensor FOREIGN KEY (owner) REFERENCES user(id);`,
+    ],
+  },
+  {
+    name: "drop_plant_name",
+    statements: [`ALTER TABLE data DROP COLUMN plantName;`],
   },
 ];
 
