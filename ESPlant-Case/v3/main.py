@@ -21,13 +21,12 @@ filename = "ESPlant-Case/v3/ESPlant-Case.step"
 # minimum_width = 0.5
 minimum_wall_thickness = 1.5
 # closure_tolerance = 0.5
-# hole_tolerance = 0.1
+hole_tolerance = 0.1
 board_tolerance_xy = 1.5
 board_tolerance_z = 0.5
 part_tolerance = 1
 
 fixation_hole_diameter = 2.0
-fixation_hole_tolerance = 0
 
 case_hole_extrusion_size = 50
 
@@ -76,7 +75,6 @@ for i in range(len(parts_raw)):
         orig_shape: TopoDS_Shape = parts_raw[i].val().wrapped
         explorer = TopExp_Explorer(orig_shape, TopAbs_WIRE)
         wires = []
-        i = 0
         while explorer.More():
             wire: TopoDS_Wire = explorer.Current()
             edgeExplorer = TopExp_Explorer(wire, TopAbs_EDGE)
@@ -95,7 +93,6 @@ for i in range(len(parts_raw)):
                 isCircleWire = True
             wires.append({"wire": wire, "edges": edges, "isCircle": isCircle, "diameter": diameter})
             explorer.Next()
-            i += 1
         
         # find the wires with the most edges, those are the outline wires
         wires.sort(key=lambda wire: len(wire["edges"]), reverse=True)
@@ -108,24 +105,22 @@ for i in range(len(parts_raw)):
         # get distance between the two faces
         outline_distance = outline_faces[1].Center().z - outline_faces[0].Center().z
         # offset the first face and extrude it until the second face
-        outlineWorplane = cq.Workplane(outline_faces[0])
-        outlineExtrusion = outlineWorplane.wires().toPending().offset2D(board_tolerance_xy, kind="intersection").extrude(outline_distance + board_tolerance_z)
-        show_object(outlineExtrusion, name="outlineExtrusion")
+        outline_worplane = cq.Workplane(outline_faces[0])
+        outline_extrusion = outline_worplane.wires().toPending().offset2D(board_tolerance_xy, kind="intersection").extrude(outline_distance + board_tolerance_z)
 
         # find all wires with a diameter of fixation_hole_diameter
         fixation_hole_wires = []
         for wire in wires:
             if wire["isCircle"] and wire["diameter"] == fixation_hole_diameter:
                 fixation_hole_wires.append(wire)
-        # display those
+        # create a new circle at the same position with a smaller diameter and cut it out from the outline extrusion
         for wire in fixation_hole_wires:
-            fixation_hole_wire = cq.Wire(wire["wire"])
-            outlineExtrusion = outlineExtrusion.add(fixation_hole_wire).cutThruAll()
-            show_object(cq.Wire(wire["wire"]), name="fixation_hole_wire")
-        
-        # TODO add holes
-
-        parts_boxes[i] = outlineExtrusion
+            edge: TopoDS_Edge = wire["edges"][0]
+            curveAdaptor = BRepAdaptor_Curve(edge)
+            circle_center = curveAdaptor.Circle().Location()
+            radius = curveAdaptor.Circle().Radius()
+            outline_extrusion = outline_extrusion.moveTo(circle_center.X(), circle_center.Y()).circle(radius - hole_tolerance).cutThruAll()
+        parts_boxes[i] = outline_extrusion
     else:
         parts_boxes[i] = parts_boxes[i].union(parts_boxes[i].faces("<Z").shell(part_tolerance, kind="intersection"))
 
