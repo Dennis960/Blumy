@@ -72,6 +72,7 @@ def part_indices_of(name_re: str):
 
 for i in range(len(parts_raw)):
     if any(part_keep_shape in parts_names[i] for part_keep_shape in parts_to_keep_original_shape):
+        # TODO extract this as a pcb specific function as it won't work for any other shape
         orig_shape: TopoDS_Shape = parts_raw[i].val().wrapped
         explorer = TopExp_Explorer(orig_shape, TopAbs_WIRE)
         wires = []
@@ -95,6 +96,8 @@ for i in range(len(parts_raw)):
             explorer.Next()
         
         # find the wires with the most edges, those are the outline wires
+        # TODO this won't work for all shapes, better approach would be to find the wires that
+        # enclose the most area
         wires.sort(key=lambda wire: len(wire["edges"]), reverse=True)
         outline_wires = wires[:2]
 
