@@ -7,6 +7,11 @@ from components import battery_springs
 import cadquery as cq
 from board_converter import convert_if_needed
 import re
+from OCP.TopoDS import TopoDS_Shape, TopoDS_Wire, TopoDS_Edge
+from OCP.TopExp import TopExp_Explorer
+from OCP.TopAbs import TopAbs_EDGE, TopAbs_WIRE
+from OCP.BRepAdaptor import BRepAdaptor_Curve
+from OCP.GeomAbs import GeomAbs_Circle
 
 # Converts the pcb board and generates the parts.json file if it doesn't exist yet
 convert_if_needed()
@@ -17,15 +22,26 @@ filename = "ESPlant-Case/v3/ESPlant-Case.step"
 minimum_wall_thickness = 1.5
 # closure_tolerance = 0.5
 # hole_tolerance = 0.1
-# board_tolerance_xy = 1.5
+board_tolerance_xy = 1.5
 board_tolerance_z = 0.5
 part_tolerance = 1
+
+fixation_hole_diameter = 2.0
+fixation_hole_tolerance = 0
 
 case_hole_extrusion_size = 50
 
 HOLE = None
-parts_to_exclude = ["PinHeader"]
+# List of all parts that should not be included when generating the case
+parts_to_exclude_from_pcb = ["PinHeader"]
+# List of all parts that have an irregular shape and should not be averaged to a box
 parts_to_keep_original_shape = ["PCB"]
+# List of all parts that need a hole in the bottom case
+# Name to find the part (empty for all parts)
+# Direction where the hole should be
+# Length of the hole (HOLE means through the entire case, else it is just an indentation)
+# Offset in x/y/z direction
+# Minimum width/height of the hole (e.g. for the micro-usb port we need a bigger hole because the rubber of the cable is thicker)
 parts_to_extrude_for_case_bottom = [
     {"name": "", "direction": ">Z", "length": board_tolerance_z},
     {"name": "", "direction": "<Z", "length": board_tolerance_z},
@@ -47,7 +63,7 @@ board = board.union(battery_springs)
 
 
 ###----------------- Board + Components (Boxes) -----------------###
-parts_raw, parts_boxes, parts_names = load_parts(parts_exclude=parts_to_exclude)
+parts_raw, parts_boxes, parts_names = load_parts(parts_exclude=parts_to_exclude_from_pcb)
 
 def part_indices_of(name_re: str):
     """
@@ -57,7 +73,59 @@ def part_indices_of(name_re: str):
 
 for i in range(len(parts_raw)):
     if any(part_keep_shape in parts_names[i] for part_keep_shape in parts_to_keep_original_shape):
-        parts_boxes[i] = extrude_part_faces("<Z", parts_raw[i], board_tolerance_z)
+        orig_shape: TopoDS_Shape = parts_raw[i].val().wrapped
+        explorer = TopExp_Explorer(orig_shape, TopAbs_WIRE)
+        wires = []
+        i = 0
+        while explorer.More():
+            wire: TopoDS_Wire = explorer.Current()
+            edgeExplorer = TopExp_Explorer(wire, TopAbs_EDGE)
+            edges = []
+            diameter = -1
+            while edgeExplorer.More():
+                shape: TopoDS_Shape = edgeExplorer.Current()
+                edge: TopoDS_Edge = cq.Edge(shape).wrapped
+                edges.append(edge)
+                edgeExplorer.Next()
+                curveAdaptor = BRepAdaptor_Curve(edge)
+                isCircle = curveAdaptor.GetType() == GeomAbs_Circle
+                if isCircle:
+                    diameter = curveAdaptor.Circle().Radius() * 2
+            if len(edges) == 1 and isCircle:
+                isCircleWire = True
+            wires.append({"wire": wire, "edges": edges, "isCircle": isCircle, "diameter": diameter})
+            explorer.Next()
+            i += 1
+        
+        # find the wires with the most edges, those are the outline wires
+        wires.sort(key=lambda wire: len(wire["edges"]), reverse=True)
+        outline_wires = wires[:2]
+
+        outline_faces: list[cq.Face] = []
+        for wire in outline_wires:
+            outline_face = cq.Face.makeFromWires(cq.Wire(wire["wire"]))
+            outline_faces.append(outline_face)
+        # get distance between the two faces
+        outline_distance = outline_faces[1].Center().z - outline_faces[0].Center().z
+        # offset the first face and extrude it until the second face
+        outlineWorplane = cq.Workplane(outline_faces[0])
+        outlineExtrusion = outlineWorplane.wires().toPending().offset2D(board_tolerance_xy, kind="intersection").extrude(outline_distance + board_tolerance_z)
+        show_object(outlineExtrusion, name="outlineExtrusion")
+
+        # find all wires with a diameter of fixation_hole_diameter
+        fixation_hole_wires = []
+        for wire in wires:
+            if wire["isCircle"] and wire["diameter"] == fixation_hole_diameter:
+                fixation_hole_wires.append(wire)
+        # display those
+        for wire in fixation_hole_wires:
+            fixation_hole_wire = cq.Wire(wire["wire"])
+            outlineExtrusion = outlineExtrusion.add(fixation_hole_wire).cutThruAll()
+            show_object(cq.Wire(wire["wire"]), name="fixation_hole_wire")
+        
+        # TODO add holes
+
+        parts_boxes[i] = outlineExtrusion
     else:
         parts_boxes[i] = parts_boxes[i].union(parts_boxes[i].faces("<Z").shell(part_tolerance, kind="intersection"))
 
