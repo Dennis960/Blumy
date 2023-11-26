@@ -13,3 +13,4 @@ RUN pip install ocp_vscode ocp cadquery --break-system-packages
 RUN apt-get install -y git
 RUN git clone https://github.com/CadQuery/OCP-stubs
 RUN cd OCP-stubs && python3 setup.py install
+RUN apt-get install -y python-is-python3
