@@ -2,20 +2,41 @@
 import os
 import FreeCAD # /usr/lib/freecad/lib must be added to $PYTHONPATH
 import Import
+import logging
 
-case_dir = "ESPlant-Case/v3/"
-kicad_nightly_cli_cmd = "kicad-cli-nightly pcb export step ESPlant-Board/ESPlant-Board.kicad_pcb --drill-origin --no-dnp --subst-models -o " + case_dir + "ESPlant-Board.step"
+def convert(kicad_pcb_path, cache_dir = "parts/", uses_kicad_nightly_cli = True, force_reconvert = False):
+    """
+    Converts the kicad_pcb file to a step file and exports all parts as step files.
+    Uses the kicad-cli and FreeCAD.\n
+    Takes the path to the kicad_pcb file as argument.\n
+    :param kicad_pcb_path: Path to the kicad_pcb file
+    :param cache_dir: Path to the cache directory where the parts are saved as step files
+    :param uses_kicad_nightly_cli: Whether to use kicad-cli or kica-cli-nightly
 
-board_path = case_dir + "ESPlant-Board.step"
-parts_folder = case_dir + "parts/"
+    :return: Path to the generated board.step file
+    """
+    base_dir = os.path.dirname(os.path.realpath(__file__)) + "/"
+    cache_dir = os.path.join(base_dir, cache_dir)
 
-def convert():
-    # run kicad-cli-nightly
-    os.system(kicad_nightly_cli_cmd)
+    board_path = os.path.join(cache_dir, "board.step")
+    kicad_nightly_cli_cmd = f"kicad-cli-nightly pcb export step {kicad_pcb_path} --drill-origin --no-dnp --subst-models -o {board_path}"
+    kicad_cli_cmd = f"kicad-cli pcb export step {kicad_pcb_path} --drill-origin --subst-models -o {board_path}" # --no-dnp is not supported in kicad-cli yet
+    cmd = kicad_nightly_cli_cmd if uses_kicad_nightly_cli else kicad_cli_cmd
 
     # create folder
-    if not os.path.exists(parts_folder):
-        os.makedirs(parts_folder)
+    if not os.path.exists(cache_dir):
+        logging.info("Creating part cache directory")
+        os.makedirs(cache_dir)
+    else:
+        if not force_reconvert:
+            logging.info("Already converted")
+            return board_path
+        else:
+            logging.info("Converting again")
+        
+    # run the command to convert the kicad_pcb file to a step file
+    logging.info("Converting " + kicad_pcb_path + " to " + board_path)
+    os.system(cmd)
 
     FreeCAD.newDocument("board")
     Import.insert(board_path, "board")
@@ -28,8 +49,8 @@ def convert():
 
     for part in parts:
         part_name = part.Label
-        Import.export([part], parts_folder + part_name + ".step")
-        print("Exported " + part_name + ".step")
+        Import.export([part], cache_dir + part_name + ".step")
+        logging.info("Exported " + part_name + ".step")
         parts_data.append({
             "name": part_name,
             "file": part_name + ".step",
@@ -46,15 +67,9 @@ def convert():
 
     # write parts.json
     import json
-    with open(parts_folder + "parts.json", "w") as f:
+    with open(cache_dir + "parts.json", "w") as f:
         json.dump(parts_data, f)
 
-    print("Exported parts.json")
-
-    print("Done")
-
-def convert_if_needed():
-    if not os.path.exists(parts_folder + "parts.json") or not os.path.exists(board_path):
-        convert()
-    else:
-        print("Already converted")
+    logging.info("Exported parts.json")
+    logging.info("Done")
+    return board_path
