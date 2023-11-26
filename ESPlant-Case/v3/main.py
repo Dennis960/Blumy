@@ -2,67 +2,96 @@ try:
     from ocp_vscode import show_object
 except ImportError:
     show_object = lambda *any: None
-from utils import load_parts, extrude_part_faces, extrude_part_width, extrude_part_height
+from part_loader import load_parts
 from components import battery_springs
 import cadquery as cq
-from board_converter import convert_if_needed
+from board_converter import convert
 import re
+from dataclasses import dataclass
+from typing import List
+from my_part import Part
+from utils import quaternion_to_axis_angle, extrude_part_faces, extrude_part_width, extrude_part_height
+from pcb import Vector
+from enum import Enum
 from OCP.TopoDS import TopoDS_Shape, TopoDS_Wire, TopoDS_Edge
 from OCP.TopExp import TopExp_Explorer
 from OCP.TopAbs import TopAbs_EDGE, TopAbs_WIRE
 from OCP.BRepAdaptor import BRepAdaptor_Curve
 from OCP.GeomAbs import GeomAbs_Circle
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
+class HOLE_TYPE(Enum):
+    HOLE = "HOLE"
+class DIMENSION_TYPE(Enum):
+    AUTO = "AUTO"
+class ALIGNMENT(Enum):
+    POSITIVE = "POSITIVE"
+    NEGATIVE = "NEGATIVE"
+
 # Converts the pcb board and generates the parts.json file if it doesn't exist yet
-convert_if_needed()
+board_step_path = convert("ESPlant-Board/ESPlant-Board.kicad_pcb")
+
+@dataclass
+class PartSetting:
+    name: str
+    direction: cq.Selector = None
+    length: float | HOLE_TYPE = None
+    offset_x: float = 0
+    offset_y: float = 0
+    offset_z: float = 0
+    width: float = DIMENSION_TYPE.AUTO
+    height: float = DIMENSION_TYPE.AUTO
 
 ###----------------- Settings -----------------###
-filename = "ESPlant-Case/v3/ESPlant-Case.step"
-# minimum_width = 0.5
 minimum_wall_thickness = 1.5
-# closure_tolerance = 0.5
 hole_tolerance = 0.1
-board_tolerance_xy = 1.5
-board_tolerance_z = 0.5
+board_tolerance = Vector(1.5, 1.5, 0.5)
 part_tolerance = 1
 
+use_fixation_holes = True
 fixation_hole_diameter = 2.0
 
 case_hole_extrusion_size = 50
 
-HOLE = None
-# List of all parts that should not be included when generating the case
+# List of all parts that should be ignored when generating the case
 parts_to_exclude_from_pcb = ["PinHeader"]
 # List of all parts that have an irregular shape and should not be averaged to a box
-parts_to_keep_original_shape = ["PCB"]
+PCB_PART_NAME = "PCB"
 # List of all parts that need a hole in the bottom case
 # Name to find the part (empty for all parts)
 # Direction where the hole should be
 # Length of the hole (HOLE means through the entire case, else it is just an indentation)
 # Offset in x/y/z direction
 # Minimum width/height of the hole (e.g. for the micro-usb port we need a bigger hole because the rubber of the cable is thicker)
-parts_to_extrude_for_case_bottom = [
-    {"name": "", "direction": ">Z", "length": board_tolerance_z},
-    {"name": "", "direction": "<Z", "length": board_tolerance_z},
-    {"name": "MICRO-USB", "direction": ">X", "length": HOLE, "min_width": 11, "min_height": 6.5},
-    {"name": "SW-SMD_4P", "direction": ">Z", "length": HOLE},
-    {"name": "SW-SMD_MK", "direction": ">Z", "length": HOLE, "offset_y": -2, "min_height": 10},
-    {"name": "LED", "direction": ">Z", "length": HOLE},
-    {"name": "ALS-PT19","direction": ">Z", "length": HOLE},
-    {"name": "PCB","direction": "<Z", "length": HOLE},
-    {"name": "ESP","direction": "<Z", "length": HOLE},
-    {"name": "ESP","direction": ">Z", "length": 2},
+part_settings: List[PartSetting] = [
+    PartSetting("", ">Z", board_tolerance.z),
+    PartSetting("", "<Z", board_tolerance.z),
+    PartSetting("MICRO-USB", ">X", HOLE_TYPE.HOLE, width=11, height=6.5),
+    PartSetting("SW-SMD_4P", ">Z", HOLE_TYPE.HOLE),
+    PartSetting("SW-SMD_MK", ">Z", HOLE_TYPE.HOLE, offset_y=-2, height=10),
+    PartSetting("LED", ">Z", HOLE_TYPE.HOLE),
+    PartSetting("ALS-PT19", ">Z", HOLE_TYPE.HOLE),
+    PartSetting("PCB", "<Z", HOLE_TYPE.HOLE),
+    PartSetting("ESP", "<Z", HOLE_TYPE.HOLE),
+    PartSetting("ESP", ">Z", 2),
 ]
 
-case_height = 62
+# Optional: Specify the max size and offset of the case (for letting a part of the pcb stick out)
+case_dimension = {"x": DIMENSION_TYPE.AUTO, "y": 62, "z": DIMENSION_TYPE.AUTO}
+case_offset = {"x": 0, "y": ALIGNMENT.POSITIVE, "z": 0}
 
 ###----------------- Board + Components (Original) -----------------###
-board = cq.importers.importStep("ESPlant-Case/v3/ESPlant-Board.step")
+board = cq.importers.importStep(board_step_path)
 board = board.union(battery_springs)
 
 
 ###----------------- Board + Components (Boxes) -----------------###
-parts_raw, parts_boxes, parts_names = load_parts(parts_exclude=parts_to_exclude_from_pcb)
+parts = load_parts(exclude=parts_to_exclude_from_pcb)
+parts_raw = [part.cq_object for part in parts]
+parts_boxes = [part.cq_bounding_box for part in parts]
+parts_names = [part.name for part in parts]
 
 def part_indices_of(name_re: str):
     """
@@ -70,8 +99,8 @@ def part_indices_of(name_re: str):
     """
     return [i for i, part_name in enumerate(parts_names) if re.match(f".*{name_re}.*", part_name)]
 
-for i in range(len(parts_raw)):
-    if any(part_keep_shape in parts_names[i] for part_keep_shape in parts_to_keep_original_shape):
+for i in range(len(parts)):
+    if PCB_PART_NAME in parts[i].name:
         # TODO extract this as a pcb specific function as it won't work for any other shape
         orig_shape: TopoDS_Shape = parts_raw[i].val().wrapped
         explorer = TopExp_Explorer(orig_shape, TopAbs_WIRE)
@@ -109,7 +138,7 @@ for i in range(len(parts_raw)):
         outline_distance = outline_faces[1].Center().z - outline_faces[0].Center().z
         # offset the first face and extrude it until the second face
         outline_worplane = cq.Workplane(outline_faces[0])
-        outline_extrusion = outline_worplane.wires().toPending().offset2D(board_tolerance_xy, kind="intersection").extrude(outline_distance + board_tolerance_z)
+        outline_extrusion = outline_worplane.wires().toPending().offset2D(board_tolerance.x, kind="intersection").extrude(outline_distance + board_tolerance.z)
 
         # find all wires with a diameter of fixation_hole_diameter
         fixation_hole_wires = []
@@ -129,24 +158,19 @@ for i in range(len(parts_raw)):
 
 parts_hole_extrusions = []
 
-for part_to_extrude in parts_to_extrude_for_case_bottom:
-    part_name = part_to_extrude["name"]
-    extrude_dir = part_to_extrude["direction"]
-    is_hole_extrusion = part_to_extrude["length"] is HOLE
-    extrude_len = case_hole_extrusion_size if is_hole_extrusion else part_to_extrude["length"]
+for part_setting in part_settings:
+    part_name = part_setting.name
+    extrude_dir = part_setting.direction
+    is_hole_extrusion = part_setting.length is HOLE_TYPE.HOLE
+    extrude_len = case_hole_extrusion_size if is_hole_extrusion else part_setting.length
     part_indices = part_indices_of(part_name)
     for part_index in part_indices:
         extrusion = extrude_part_faces(extrude_dir, parts_boxes[part_index], extrude_len)
-        if "min_width" in part_to_extrude:
-            extrusion = extrude_part_width(extrusion, part_to_extrude["min_width"], extrude_dir)
-        if "min_height" in part_to_extrude:
-            extrusion = extrude_part_height(extrusion, part_to_extrude["min_height"], extrude_dir)
-        if "offset_x" in part_to_extrude:
-            extrusion = extrusion.translate((part_to_extrude["offset_x"], 0, 0))
-        if "offset_y" in part_to_extrude:
-            extrusion = extrusion.translate((0, part_to_extrude["offset_y"], 0))
-        if "offset_z" in part_to_extrude:
-            extrusion = extrusion.translate((0, 0, part_to_extrude["offset_z"]))
+        if part_setting.width is not DIMENSION_TYPE.AUTO:
+            extrusion = extrude_part_width(extrusion, part_setting.width, extrude_dir)
+        if part_setting.height is not DIMENSION_TYPE.AUTO:
+            extrusion = extrude_part_height(extrusion, part_setting.height, extrude_dir)
+        extrusion = extrusion.translate((part_setting.offset_x, part_setting.offset_y, part_setting.offset_z))
         if is_hole_extrusion:
             parts_hole_extrusions.append(extrusion)
         else:
@@ -162,8 +186,18 @@ part_union = part_union.union(battery_springs)
 # get bounding box of all parts
 part_union_bounding_box = part_union.val().BoundingBox()
 part_union_center = part_union.val().CenterOfBoundBox()
-part_union_box = cq.Workplane("XY").box(part_union_bounding_box.xlen, case_height, part_union_bounding_box.zlen).translate((part_union_center.x, part_union_center.y, part_union_center.z))
-part_union_box = part_union_box.translate((0, part_union_bounding_box.ylen / 2 - case_height/2, 0))
+case_dimension = {
+    "x": part_union_bounding_box.xlen if case_dimension["x"] is DIMENSION_TYPE.AUTO else case_dimension["x"],
+    "y": part_union_bounding_box.ylen if case_dimension["y"] is DIMENSION_TYPE.AUTO else case_dimension["y"],
+    "z": part_union_bounding_box.zlen if case_dimension["z"] is DIMENSION_TYPE.AUTO else case_dimension["z"],
+}
+case_offset = {
+    "x": part_union_bounding_box.xlen / 2 - case_dimension["x"] /2 if case_offset["x"] is ALIGNMENT.POSITIVE else - part_union_bounding_box.xlen / 2 + case_dimension["x"] /2 if case_offset["x"] is ALIGNMENT.NEGATIVE else case_offset["x"],
+    "y": part_union_bounding_box.ylen / 2 - case_dimension["y"] /2 if case_offset["y"] is ALIGNMENT.POSITIVE else - part_union_bounding_box.ylen / 2 + case_dimension["y"] /2 if case_offset["y"] is ALIGNMENT.NEGATIVE else case_offset["y"],
+    "z": part_union_bounding_box.zlen / 2 - case_dimension["z"] /2 if case_offset["z"] is ALIGNMENT.POSITIVE else - part_union_bounding_box.zlen / 2 + case_dimension["z"] /2 if case_offset["z"] is ALIGNMENT.NEGATIVE else case_offset["z"],
+}
+part_union_box = cq.Workplane("XY").box(case_dimension["x"], case_dimension["y"], case_dimension["z"]).translate((part_union_center.x, part_union_center.y, part_union_center.z))
+part_union_box = part_union_box.translate((case_offset["x"], case_offset["y"], case_offset["z"]))
 part_union_shell = part_union_box.faces("<Z").shell(minimum_wall_thickness, kind="intersection")
 
 part_union_shell = part_union_shell.union(extrude_part_faces("<Z", part_union_shell, 8, faces_selector=">Z[-2]"))
@@ -176,13 +210,9 @@ for part_hole_extrusion in parts_hole_extrusions:
 # TODO use holes to fixate the case
 
 ###----------------- Preview -----------------###
-# for part_name, bounding_box_part in zip(part_names, part_bounding_boxes):
-#     show_object(bounding_box_part, name=part_name)
-# show_object(battery_springs, name="battery_springs")
 show_object(board, name="board")
-# show_object(parts, name="parts")
 # show_object(part_union, name="part_union")
 show_object(part_union_shell, name="case_bottom")
 
 ###----------------- Export -----------------###
-cq.Assembly(part_union_shell).save(filename)
+# cq.Assembly(part_union_shell).save(filename)

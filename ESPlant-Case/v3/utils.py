@@ -28,58 +28,6 @@ def quaternion_to_axis_angle(x, y, z, w):
         z = z / s
     return ((0, 0, 0), (x, y, z), math.degrees(angle))
 
-
-@dataclass
-class Part:
-    name: str
-    file: str
-    abs_file_path: str
-    posx: float
-    posy: float
-    posz: float
-    rotx: float
-    roty: float
-    rotz: float
-    rotw: float
-
-def load_part_data(parts_directory="parts"):
-    with open(path + "/" + parts_directory + "/parts.json") as f:
-        part_data: List[Part] = [Part(**item, abs_file_path="") for item in json.load(f)]
-    for part in part_data:
-        part.abs_file_path = path + "/" + parts_directory + "/" + part.file
-    return part_data
-
-def import_part_step(part: Part):
-    """
-    Import a part from a STEP file and apply the part's position and rotation.
-    :param part: Part object
-    :return: cadquery.Workplane object
-    """
-    part_step = cq.importers.importStep(part.abs_file_path)
-    axis_angle_rotation = quaternion_to_axis_angle(part.rotx, part.roty, part.rotz, part.rotw)
-    if axis_angle_rotation[2] != 0:
-        part_step = part_step.rotate(axisStartPoint=axis_angle_rotation[0], axisEndPoint=axis_angle_rotation[1], angleDegrees=axis_angle_rotation[2])
-    return part_step.translate((part.posx, part.posy, part.posz))
-
-def load_parts(parts_exclude: List[str] = []):
-    part_data = load_part_data()
-    parts: List[cq.Workplane] = []
-    part_bounding_boxes: List[cq.Workplane] = []
-    part_names: List[str] = []
-
-    for part in part_data:
-        if any(part_exclude in part.name for part_exclude in parts_exclude):
-            continue
-        part_names.append(part.name)
-        part_step = import_part_step(part)
-        part_step_center = part_step.val().CenterOfBoundBox()
-        parts.append(part_step)
-        bounding_box = part_step.val().BoundingBox()
-        bounding_box_part = cq.Workplane("XY").box(bounding_box.xlen, bounding_box.ylen, bounding_box.zlen).translate((part_step_center.x, part_step_center.y, part_step_center.z))
-        part_bounding_boxes.append(bounding_box_part)
-
-    return parts, part_bounding_boxes, part_names
-
 def extrude_part_faces(selector: cq.Selector, part: cq.Workplane, until: int | cq.Face, faces_selector: cq.Selector = None):
     if faces_selector is None:
         faces_selector = selector
