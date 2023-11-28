@@ -36,8 +36,8 @@ part_settings: List[PartSetting] = [
 ]
 
 # Optional: Specify the max size and offset of the case (for letting a part of the pcb stick out)
-bottom_case_dimension = {"x": DIMENSION_TYPE.AUTO, "y": 62, "z": DIMENSION_TYPE.AUTO}
-bottom_case_offset = {"x": 0, "y": ALIGNMENT.POSITIVE, "z": 0}
+bottom_case_dimension = (DIMENSION_TYPE.AUTO, 62, DIMENSION_TYPE.AUTO)
+bottom_case_offset = (0, ALIGNMENT.POSITIVE, 0)
 
 list_of_additional_parts: List[Part] = [
     Part("Battery Springs", battery_springs.val().BoundingBox(), battery_springs, battery_springs),
