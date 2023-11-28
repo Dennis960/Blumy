@@ -1,48 +1,19 @@
-try:
-    from ocp_vscode import show_object
-except ImportError:
-    show_object = lambda *any: None
+from ocp_vscode import show_object
 from part_loader import load_parts
 from components import battery_springs
 import cadquery as cq
 from board_converter import convert
-import re
-from dataclasses import dataclass
 from typing import List
-from utils import extrude_part_faces, extrude_part_width, extrude_part_height
+from utils import extrude_part_faces
 from pcb import make_offset_shape
 from geometry import Vector
-from enum import Enum
-from OCP.TopoDS import TopoDS_Shape, TopoDS_Wire, TopoDS_Edge
-from OCP.TopExp import TopExp_Explorer
-from OCP.TopAbs import TopAbs_EDGE, TopAbs_WIRE
-from OCP.BRepAdaptor import BRepAdaptor_Curve
-from OCP.GeomAbs import GeomAbs_Circle
+from cq_part import PartSetting, HOLE_TYPE, DIMENSION_TYPE, ALIGNMENT
 
 import logging
 logging.basicConfig(level=logging.INFO)
 
-class HOLE_TYPE(Enum):
-    HOLE = "HOLE"
-class DIMENSION_TYPE(Enum):
-    AUTO = "AUTO"
-class ALIGNMENT(Enum):
-    POSITIVE = "POSITIVE"
-    NEGATIVE = "NEGATIVE"
-
 # Converts the pcb board and generates the parts.json file if it doesn't exist yet
 board_step_path = convert("ESPlant-Board/ESPlant-Board.kicad_pcb")
-
-@dataclass
-class PartSetting:
-    name: str
-    direction: cq.Selector = None
-    length: float | HOLE_TYPE = None
-    offset_x: float = 0
-    offset_y: float = 0
-    offset_z: float = 0
-    width: float = DIMENSION_TYPE.AUTO
-    height: float = DIMENSION_TYPE.AUTO
 
 ###----------------- Settings -----------------###
 minimum_wall_thickness = 1.5
@@ -52,8 +23,6 @@ part_tolerance = 1
 
 use_fixation_holes = True
 fixation_hole_diameter = 2.0
-
-case_hole_extrusion_size = 50
 
 # List of all parts that should be ignored when generating the case
 parts_to_ignore_in_case_generation = ["PinHeader"]
@@ -96,25 +65,10 @@ for part in part_list.parts:
     else:
         part.cq_bounding_box = part.cq_bounding_box.union(part.cq_bounding_box.faces("<Z").shell(part_tolerance, kind="intersection"))
 
-parts_hole_extrusions = []
-
 for part_setting in part_settings:
-    part_name = part_setting.name
-    extrude_dir = part_setting.direction
-    is_hole_extrusion = part_setting.length is HOLE_TYPE.HOLE
-    extrude_len = case_hole_extrusion_size if is_hole_extrusion else part_setting.length
-    parts = part_list.find_all_by_name_regex(part_name)
+    parts = part_list.find_all_by_name_regex(part_setting.name)
     for part in parts:
-        extrusion = extrude_part_faces(extrude_dir, part.cq_bounding_box, extrude_len)
-        if part_setting.width is not DIMENSION_TYPE.AUTO:
-            extrusion = extrude_part_width(extrusion, part_setting.width, extrude_dir)
-        if part_setting.height is not DIMENSION_TYPE.AUTO:
-            extrusion = extrude_part_height(extrusion, part_setting.height, extrude_dir)
-        extrusion = extrusion.translate((part_setting.offset_x, part_setting.offset_y, part_setting.offset_z))
-        if is_hole_extrusion:
-            parts_hole_extrusions.append(extrusion)
-        else:
-            part.cq_bounding_box = part.cq_bounding_box.union(extrusion)
+        part.apply_setting(part_setting)
 
 # combine all parts into one object
 part_union = cq.Workplane("XY")
@@ -144,10 +98,9 @@ part_union_shell = part_union_shell.union(extrude_part_faces("<Z", part_union_sh
 
 # cut out holes and parts
 part_union_shell = part_union_shell.cut(part_union)
-for part_hole_extrusion in parts_hole_extrusions:
-    part_union_shell = part_union_shell.cut(part_hole_extrusion)
-
-# TODO use holes to fixate the case
+for part in part_list.parts:
+    if part.hole_cq_object is not None:
+        part_union_shell = part_union_shell.cut(part.hole_cq_object)
 
 ###----------------- Preview -----------------###
 show_object(board, name="board")
