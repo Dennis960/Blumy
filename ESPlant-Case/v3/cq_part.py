@@ -9,13 +9,19 @@ from pcb import make_offset_shape
 case_hole_extrusion_size = 1000
 PCB_PART_NAME = "PCB"
 
+
 class HOLE_TYPE(Enum):
     HOLE = "HOLE"
+
+
 class DIMENSION_TYPE(Enum):
     AUTO = "AUTO"
+
+
 class ALIGNMENT(Enum):
     POSITIVE = "POSITIVE"
     NEGATIVE = "NEGATIVE"
+
 
 @dataclass
 class PartSetting:
@@ -28,6 +34,7 @@ class PartSetting:
     width: float | DIMENSION_TYPE = DIMENSION_TYPE.AUTO
     height: float | DIMENSION_TYPE = DIMENSION_TYPE.AUTO
 
+
 @dataclass
 class Part:
     name: str
@@ -38,19 +45,29 @@ class Part:
 
     def apply_setting(self, part_setting: PartSetting):
         is_hole_extrusion = part_setting.length is HOLE_TYPE.HOLE
-        extrude_len = case_hole_extrusion_size if is_hole_extrusion else part_setting.length
-        extrusion = extrude_part_faces(part_setting.top_direction, self.cq_bounding_box, extrude_len)
+        extrude_len = (
+            case_hole_extrusion_size if is_hole_extrusion else part_setting.length
+        )
+        extrusion = extrude_part_faces(
+            part_setting.top_direction, self.cq_bounding_box, extrude_len
+        )
         if part_setting.width is not DIMENSION_TYPE.AUTO:
-            extrusion = extrude_part_width(extrusion, part_setting.width, part_setting.top_direction)
+            extrusion = extrude_part_width(
+                extrusion, part_setting.width, part_setting.top_direction
+            )
         if part_setting.height is not DIMENSION_TYPE.AUTO:
-            extrusion = extrude_part_height(extrusion, part_setting.height, part_setting.top_direction)
-        extrusion = extrusion.translate((part_setting.offset_x, part_setting.offset_y, part_setting.offset_z))
+            extrusion = extrude_part_height(
+                extrusion, part_setting.height, part_setting.top_direction
+            )
+        extrusion = extrusion.translate(
+            (part_setting.offset_x, part_setting.offset_y, part_setting.offset_z)
+        )
         if is_hole_extrusion:
             self.hole_cq_object = self.cq_bounding_box.union(extrusion)
         else:
             self.cq_bounding_box = self.cq_bounding_box.union(extrusion)
 
-                
+
 class PartList:
     def __init__(self, parts: List[Part]):
         self.parts = parts
@@ -63,33 +80,52 @@ class PartList:
         Get the indices of all parts that include the given regular expression.
         """
         return [part for part in self.parts if re.match(f".*{regex}.*", part.name)]
-    
+
     def find_all_index_by_name_regex(self, regex: str):
         """
         Get the indices of all parts that include the given regular expression.
         """
-        return [i for i, part_name in enumerate(self.parts) if re.match(f".*{regex}.*", part_name)]
-    
+        return [
+            i
+            for i, part_name in enumerate(self.parts)
+            if re.match(f".*{regex}.*", part_name)
+        ]
+
     def apply_part_tolerances(self, part_tolerance: float):
         for part in self.parts:
             if PCB_PART_NAME in part.name:
                 continue
             else:
-                part.cq_bounding_box = part.cq_bounding_box.union(part.cq_bounding_box.faces("<Z").shell(part_tolerance, kind="intersection"))
+                part.cq_bounding_box = part.cq_bounding_box.union(
+                    part.cq_bounding_box.faces("<Z").shell(
+                        part_tolerance, kind="intersection"
+                    )
+                )
 
-    def apply_pcb_tolerance(self, board_tolerance: float, use_fixation_holes: bool, fixation_hole_diameter: float, hole_tolerance: float):
+    def apply_pcb_tolerance(
+        self,
+        board_tolerance: float,
+        use_fixation_holes: bool,
+        fixation_hole_diameter: float,
+        hole_tolerance: float,
+    ):
         pcbs = self.find_all_by_name_regex(PCB_PART_NAME)
         if len(pcbs) == 0:
             raise Exception(f"Could not find any part with name {PCB_PART_NAME}")
         for pcb in pcbs:
-            pcb.cq_bounding_box = make_offset_shape(pcb.cq_object, board_tolerance, use_fixation_holes, fixation_hole_diameter, hole_tolerance)
+            pcb.cq_bounding_box = make_offset_shape(
+                pcb.cq_object,
+                board_tolerance,
+                use_fixation_holes,
+                fixation_hole_diameter,
+                hole_tolerance,
+            )
 
     def apply_settings(self, part_settings: List[PartSetting]):
         for part_setting in part_settings:
             parts = self.find_all_by_name_regex(part_setting.name_regex)
             for part in parts:
                 part.apply_setting(part_setting)
-        
 
     def get_bounding_box_union(self):
         # combine all parts into one object

@@ -7,6 +7,7 @@ from OCP.BRepAdaptor import BRepAdaptor_Curve
 from OCP.GeomAbs import GeomAbs_Circle
 from geometry import Vector
 
+
 @dataclass
 class WireData:
     ocp_wire: TopoDS_Wire
@@ -14,7 +15,14 @@ class WireData:
     isCircle: bool
     diameter: float
 
-def make_offset_shape(cq_object: cq.Workplane, board_tolerance: Vector, use_fixation_holes: bool, fixation_hole_diameter: float, hole_tolerance: float):
+
+def make_offset_shape(
+    cq_object: cq.Workplane,
+    board_tolerance: Vector,
+    use_fixation_holes: bool,
+    fixation_hole_diameter: float,
+    hole_tolerance: float,
+):
     if board_tolerance.x != board_tolerance.y:
         raise Exception("Different tolerances for x and y are not supported")
     orig_shape: TopoDS_Shape = cq_object.val().wrapped
@@ -39,7 +47,7 @@ def make_offset_shape(cq_object: cq.Workplane, board_tolerance: Vector, use_fixa
             isCircleWire = True
         wires.append(WireData(ocp_wire, ocp_edges, isCircleWire, diameter))
         explorer.Next()
-    
+
     # find the wires with the most edges, those are the outline wires
     # TODO this won't work for all shapes, better approach would be to find the wires that
     # enclose the most area
@@ -54,7 +62,12 @@ def make_offset_shape(cq_object: cq.Workplane, board_tolerance: Vector, use_fixa
     outline_distance = outline_faces[1].Center().z - outline_faces[0].Center().z
     # offset the first face and extrude it until the second face
     outline_worplane = cq.Workplane(outline_faces[0])
-    outline_extrusion = outline_worplane.wires().toPending().offset2D(board_tolerance.x, kind="intersection").extrude(outline_distance + board_tolerance.z)
+    outline_extrusion = (
+        outline_worplane.wires()
+        .toPending()
+        .offset2D(board_tolerance.x, kind="intersection")
+        .extrude(outline_distance + board_tolerance.z)
+    )
 
     if use_fixation_holes:
         # find all wires with a diameter of fixation_hole_diameter
@@ -68,5 +81,9 @@ def make_offset_shape(cq_object: cq.Workplane, board_tolerance: Vector, use_fixa
             curveAdaptor = BRepAdaptor_Curve(edge)
             circle_center = curveAdaptor.Circle().Location()
             radius = curveAdaptor.Circle().Radius()
-            outline_extrusion = outline_extrusion.moveTo(circle_center.X(), circle_center.Y()).circle(radius - hole_tolerance).cutThruAll()
+            outline_extrusion = (
+                outline_extrusion.moveTo(circle_center.X(), circle_center.Y())
+                .circle(radius - hole_tolerance)
+                .cutThruAll()
+            )
     return outline_extrusion
