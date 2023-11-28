@@ -26,8 +26,8 @@ fixation_hole_diameter = 2.0
 
 parts_to_ignore_in_case_generation = ["PinHeader"]
 part_settings: List[PartSetting] = [
-    PartSetting("(?:(?!Battery Springs).)*", ">Z", pcb_tolerance.z),
-    PartSetting("(?:(?!Battery Springs).)*", "<Z", pcb_tolerance.z),
+    PartSetting(".*", ">Z", pcb_tolerance.z),
+    PartSetting(".*", "<Z", pcb_tolerance.z),
     PartSetting(".*MICRO-USB.*", ">X", HOLE_TYPE.HOLE, width=11, height=6.5),
     PartSetting(".*SW-SMD_4P.*", ">Z", HOLE_TYPE.HOLE),
     PartSetting(".*SW-SMD_MK.*", ">Z", HOLE_TYPE.HOLE, offset_y=-2, height=10),
