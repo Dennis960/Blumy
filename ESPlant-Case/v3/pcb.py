@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 import cadquery as cq
-from part_loader import Part
 from OCP.TopoDS import TopoDS_Shape, TopoDS_Wire, TopoDS_Edge
 from OCP.TopExp import TopExp_Explorer
 from OCP.TopAbs import TopAbs_EDGE, TopAbs_WIRE
