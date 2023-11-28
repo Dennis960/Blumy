@@ -88,8 +88,14 @@ class PartList:
         return [
             i
             for i, part_name in enumerate(self.parts)
-            if re.match(f".*{regex}.*", part_name)
+            if re.match(regex, part_name)
         ]
+    
+    def find_all_pcbs(self):
+        pcbs = self.find_all_by_name_regex(PCB_PART_NAME)
+        if len(pcbs) == 0:
+            raise Exception(f"Could not find any part with name {PCB_PART_NAME}")
+        return pcbs
 
     def apply_part_tolerances(self, part_tolerance: float):
         for part in self.parts:
@@ -109,9 +115,7 @@ class PartList:
         fixation_hole_diameter: float,
         hole_tolerance: float,
     ):
-        pcbs = self.find_all_by_name_regex(PCB_PART_NAME)
-        if len(pcbs) == 0:
-            raise Exception(f"Could not find any part with name {PCB_PART_NAME}")
+        pcbs = self.find_all_pcbs()
         for pcb in pcbs:
             pcb.cq_bounding_box = make_offset_shape(
                 pcb.cq_object,

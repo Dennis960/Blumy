@@ -25,44 +25,55 @@ class BottomCase:
         self.union_of_bounding_boxes = self.part_list.get_bounding_box_union()
         self.bottom_case_bounding_box = self.union_of_bounding_boxes.val().BoundingBox()
 
+    def calculate_dimension(self, bb_len, dim_len):
+        if dim_len is DIMENSION_TYPE.AUTO:
+            return bb_len
+        else:
+            return dim_len
+
     def override_dimension(self, bottom_case_dimension: Dimension):
         self.bottom_case_dimension = (
-            self.bottom_case_bounding_box.xlen
-            if bottom_case_dimension[0] is DIMENSION_TYPE.AUTO
-            else bottom_case_dimension[0],
-            self.bottom_case_bounding_box.ylen
-            if bottom_case_dimension[1] is DIMENSION_TYPE.AUTO
-            else bottom_case_dimension[1],
-            self.bottom_case_bounding_box.zlen
-            if bottom_case_dimension[2] is DIMENSION_TYPE.AUTO
-            else bottom_case_dimension[2],
+            self.calculate_dimension(
+                self.bottom_case_bounding_box.xlen, bottom_case_dimension[0]
+            ),
+            self.calculate_dimension(
+                self.bottom_case_bounding_box.ylen, bottom_case_dimension[1]
+            ),
+            self.calculate_dimension(
+                self.bottom_case_bounding_box.zlen, bottom_case_dimension[2]
+            ),
         )
         # Update the offset for the new dimension
         self.override_offset(self.bottom_case_offset)
 
+    def calculate_offset(self, bb_len, dim_len, off_val):
+        if off_val is ALIGNMENT.POSITIVE:
+            return bb_len / 2 - dim_len / 2
+        elif off_val is ALIGNMENT.NEGATIVE:
+            return -bb_len / 2 + dim_len / 2
+        else:
+            return off_val
+
     def override_offset(self, bottom_case_offset: Offset):
         self.bottom_case_offset = (
-            self.bottom_case_bounding_box.xlen / 2 - self.bottom_case_dimension[0] / 2
-            if bottom_case_offset[0] is ALIGNMENT.POSITIVE
-            else -self.bottom_case_bounding_box.xlen / 2
-            + self.bottom_case_dimension[0] / 2
-            if bottom_case_offset[0] is ALIGNMENT.NEGATIVE
-            else bottom_case_offset[0],
-            self.bottom_case_bounding_box.ylen / 2 - self.bottom_case_dimension[1] / 2
-            if bottom_case_offset[1] is ALIGNMENT.POSITIVE
-            else -self.bottom_case_bounding_box.ylen / 2
-            + self.bottom_case_dimension[1] / 2
-            if bottom_case_offset[1] is ALIGNMENT.NEGATIVE
-            else bottom_case_offset[1],
-            self.bottom_case_bounding_box.zlen / 2 - self.bottom_case_dimension[2] / 2
-            if bottom_case_offset[2] is ALIGNMENT.POSITIVE
-            else -self.bottom_case_bounding_box.zlen / 2
-            + self.bottom_case_dimension[2] / 2
-            if bottom_case_offset[2] is ALIGNMENT.NEGATIVE
-            else bottom_case_offset[2],
+            self.calculate_offset(
+                self.bottom_case_bounding_box.xlen,
+                self.bottom_case_dimension[0],
+                bottom_case_offset[0],
+            ),
+            self.calculate_offset(
+                self.bottom_case_bounding_box.ylen,
+                self.bottom_case_dimension[1],
+                bottom_case_offset[1],
+            ),
+            self.calculate_offset(
+                self.bottom_case_bounding_box.zlen,
+                self.bottom_case_dimension[2],
+                bottom_case_offset[2],
+            ),
         )
 
-    def generate_case(self, case_wall_thickness):
+    def generate_case(self, case_wall_thickness, floor_height):
         bottom_case_center = self.union_of_bounding_boxes.val().CenterOfBoundBox()
         bottom_case_box = (
             cq.Workplane("XY")
@@ -79,7 +90,9 @@ class BottomCase:
         )
 
         bottom_case_shell = bottom_case_shell.union(
-            extrude_part_faces(bottom_case_shell, "<Z", 8, faces_selector=">Z[-2]")
+            extrude_part_faces(
+                bottom_case_shell, "<Z", floor_height, faces_selector=">Z[-2]"
+            )
         )
 
         # cut out holes and parts
