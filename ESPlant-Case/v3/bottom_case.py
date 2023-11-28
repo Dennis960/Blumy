@@ -79,7 +79,7 @@ class BottomCase:
         )
 
         bottom_case_shell = bottom_case_shell.union(
-            extrude_part_faces("<Z", bottom_case_shell, 8, faces_selector=">Z[-2]")
+            extrude_part_faces(bottom_case_shell, "<Z", 8, faces_selector=">Z[-2]")
         )
 
         # cut out holes and parts

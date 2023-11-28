@@ -1,8 +1,5 @@
 import math
-from dataclasses import dataclass
-import json
 import os
-from typing import List
 import cadquery as cq
 
 path = os.path.dirname(os.path.abspath(__file__))
@@ -31,8 +28,8 @@ def quaternion_to_axis_angle(x, y, z, w):
 
 
 def extrude_part_faces(
-    selector: cq.Selector,
     part: cq.Workplane,
+    selector: cq.Selector,
     until: int | cq.Face,
     faces_selector: cq.Selector = None,
 ):
@@ -87,10 +84,10 @@ def extrude_part_width(part: cq.Workplane, min_width: int, dir: cq.Selector):
     if width < min_width:
         extrusion_length = min_width - width
         part = part.union(
-            extrude_part_faces(f">{direction}", part, extrusion_length / 2)
+            extrude_part_faces(part, f">{direction}", extrusion_length / 2)
         )
         part = part.union(
-            extrude_part_faces(f"<{direction}", part, extrusion_length / 2)
+            extrude_part_faces(part, f"<{direction}", extrusion_length / 2)
         )
     return part
 
@@ -107,9 +104,9 @@ def extrude_part_height(part: cq.Workplane, min_height: int, dir: cq.Selector):
     if height < min_height:
         extrusion_length = min_height - height
         part = part.union(
-            extrude_part_faces(f">{direction}", part, extrusion_length / 2)
+            extrude_part_faces(part, f">{direction}", extrusion_length / 2)
         )
         part = part.union(
-            extrude_part_faces(f"<{direction}", part, extrusion_length / 2)
+            extrude_part_faces(part, f"<{direction}", extrusion_length / 2)
         )
     return part
