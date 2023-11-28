@@ -14,6 +14,7 @@ logging.basicConfig(level=logging.INFO)
 
 ### ----------------- Settings -----------------###
 case_wall_thickness = 1.5
+case_floor_height = 8 + 1.6
 hole_fit_tolerance = 0.1
 pcb_tolerance = Vector(
     1.5, 1.5, 0.5
@@ -25,16 +26,16 @@ fixation_hole_diameter = 2.0
 
 parts_to_ignore_in_case_generation = ["PinHeader"]
 part_settings: List[PartSetting] = [
-    PartSetting("", ">Z", pcb_tolerance.z),
-    PartSetting("", "<Z", pcb_tolerance.z),
-    PartSetting("MICRO-USB", ">X", HOLE_TYPE.HOLE, width=11, height=6.5),
-    PartSetting("SW-SMD_4P", ">Z", HOLE_TYPE.HOLE),
-    PartSetting("SW-SMD_MK", ">Z", HOLE_TYPE.HOLE, offset_y=-2, height=10),
-    PartSetting("LED", ">Z", HOLE_TYPE.HOLE),
-    PartSetting("ALS-PT19", ">Z", HOLE_TYPE.HOLE),
-    PartSetting("PCB", "<Z", HOLE_TYPE.HOLE),
-    PartSetting("ESP", "<Z", HOLE_TYPE.HOLE),
-    PartSetting("ESP", ">Z", 2),
+    PartSetting("(?:(?!Battery Springs).)*", ">Z", pcb_tolerance.z),
+    PartSetting("(?:(?!Battery Springs).)*", "<Z", pcb_tolerance.z),
+    PartSetting(".*MICRO-USB.*", ">X", HOLE_TYPE.HOLE, width=11, height=6.5),
+    PartSetting(".*SW-SMD_4P.*", ">Z", HOLE_TYPE.HOLE),
+    PartSetting(".*SW-SMD_MK.*", ">Z", HOLE_TYPE.HOLE, offset_y=-2, height=10),
+    PartSetting(".*LED.*", ">Z", HOLE_TYPE.HOLE),
+    PartSetting(".*ALS-PT19.*", ">Z", HOLE_TYPE.HOLE),
+    PartSetting(".*PCB.*", "<Z", HOLE_TYPE.HOLE),
+    PartSetting(".*ESP.*", "<Z", HOLE_TYPE.HOLE),
+    PartSetting(".*ESP.*", ">Z", 2),
 ]
 
 # Optional: Specify the max size and offset of the case (for letting a part of the pcb stick out)
@@ -74,12 +75,13 @@ part_list.apply_settings(part_settings)
 bottom_case = BottomCase(part_list)
 bottom_case.override_dimension(bottom_case_dimension)
 bottom_case.override_offset(bottom_case_offset)
-bottom_case_cq_object = bottom_case.generate_case(case_wall_thickness)
+bottom_case_cq_object = bottom_case.generate_case(
+    case_wall_thickness, case_floor_height
+)
 
 ### ----------------- Preview -----------------###
 show_object(original_board, name="board")
-# show_object(part_union, name="part_union")
 show_object(bottom_case_cq_object, name="case_bottom")
 
 ### ----------------- Export -----------------###
-# cq.Assembly(part_union_shell).save(filename)
+# cq.Assembly(bottom_case_cq_object).save(filename)
