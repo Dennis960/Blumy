@@ -49,7 +49,7 @@ class Part:
             case_hole_extrusion_size if is_hole_extrusion else part_setting.length
         )
         extrusion = extrude_part_faces(
-            part_setting.top_direction, self.cq_bounding_box, extrude_len
+            self.cq_bounding_box, part_setting.top_direction, extrude_len
         )
         if part_setting.width is not DIMENSION_TYPE.AUTO:
             extrusion = extrude_part_width(
