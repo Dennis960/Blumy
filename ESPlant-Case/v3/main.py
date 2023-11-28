@@ -9,9 +9,9 @@ from board_converter import convert
 import re
 from dataclasses import dataclass
 from typing import List
-from my_part import Part
-from utils import quaternion_to_axis_angle, extrude_part_faces, extrude_part_width, extrude_part_height
-from pcb import Vector
+from utils import extrude_part_faces, extrude_part_width, extrude_part_height
+from pcb import make_offset_shape
+from geometry import Vector
 from enum import Enum
 from OCP.TopoDS import TopoDS_Shape, TopoDS_Wire, TopoDS_Edge
 from OCP.TopExp import TopExp_Explorer
@@ -56,7 +56,7 @@ fixation_hole_diameter = 2.0
 case_hole_extrusion_size = 50
 
 # List of all parts that should be ignored when generating the case
-parts_to_exclude_from_pcb = ["PinHeader"]
+parts_to_ignore_in_case_generation = ["PinHeader"]
 # List of all parts that have an irregular shape and should not be averaged to a box
 PCB_PART_NAME = "PCB"
 # List of all parts that need a hole in the bottom case
@@ -88,73 +88,13 @@ board = board.union(battery_springs)
 
 
 ###----------------- Board + Components (Boxes) -----------------###
-parts = load_parts(exclude=parts_to_exclude_from_pcb)
-parts_raw = [part.cq_object for part in parts]
-parts_boxes = [part.cq_bounding_box for part in parts]
-parts_names = [part.name for part in parts]
+part_list = load_parts(exclude=parts_to_ignore_in_case_generation)
 
-def part_indices_of(name_re: str):
-    """
-    Get the indices of all parts that include the given regular expression.
-    """
-    return [i for i, part_name in enumerate(parts_names) if re.match(f".*{name_re}.*", part_name)]
-
-for i in range(len(parts)):
-    if PCB_PART_NAME in parts[i].name:
-        # TODO extract this as a pcb specific function as it won't work for any other shape
-        orig_shape: TopoDS_Shape = parts_raw[i].val().wrapped
-        explorer = TopExp_Explorer(orig_shape, TopAbs_WIRE)
-        wires = []
-        while explorer.More():
-            wire: TopoDS_Wire = explorer.Current()
-            edgeExplorer = TopExp_Explorer(wire, TopAbs_EDGE)
-            edges = []
-            diameter = -1
-            while edgeExplorer.More():
-                shape: TopoDS_Shape = edgeExplorer.Current()
-                edge: TopoDS_Edge = cq.Edge(shape).wrapped
-                edges.append(edge)
-                edgeExplorer.Next()
-                curveAdaptor = BRepAdaptor_Curve(edge)
-                isCircle = curveAdaptor.GetType() == GeomAbs_Circle
-                if isCircle:
-                    diameter = curveAdaptor.Circle().Radius() * 2
-            if len(edges) == 1 and isCircle:
-                isCircleWire = True
-            wires.append({"wire": wire, "edges": edges, "isCircle": isCircle, "diameter": diameter})
-            explorer.Next()
-        
-        # find the wires with the most edges, those are the outline wires
-        # TODO this won't work for all shapes, better approach would be to find the wires that
-        # enclose the most area
-        wires.sort(key=lambda wire: len(wire["edges"]), reverse=True)
-        outline_wires = wires[:2]
-
-        outline_faces: list[cq.Face] = []
-        for wire in outline_wires:
-            outline_face = cq.Face.makeFromWires(cq.Wire(wire["wire"]))
-            outline_faces.append(outline_face)
-        # get distance between the two faces
-        outline_distance = outline_faces[1].Center().z - outline_faces[0].Center().z
-        # offset the first face and extrude it until the second face
-        outline_worplane = cq.Workplane(outline_faces[0])
-        outline_extrusion = outline_worplane.wires().toPending().offset2D(board_tolerance.x, kind="intersection").extrude(outline_distance + board_tolerance.z)
-
-        # find all wires with a diameter of fixation_hole_diameter
-        fixation_hole_wires = []
-        for wire in wires:
-            if wire["isCircle"] and wire["diameter"] == fixation_hole_diameter:
-                fixation_hole_wires.append(wire)
-        # create a new circle at the same position with a smaller diameter and cut it out from the outline extrusion
-        for wire in fixation_hole_wires:
-            edge: TopoDS_Edge = wire["edges"][0]
-            curveAdaptor = BRepAdaptor_Curve(edge)
-            circle_center = curveAdaptor.Circle().Location()
-            radius = curveAdaptor.Circle().Radius()
-            outline_extrusion = outline_extrusion.moveTo(circle_center.X(), circle_center.Y()).circle(radius - hole_tolerance).cutThruAll()
-        parts_boxes[i] = outline_extrusion
+for part in part_list.parts:
+    if PCB_PART_NAME in part.name:
+        part.cq_bounding_box = make_offset_shape(part.cq_object, board_tolerance, use_fixation_holes, fixation_hole_diameter, hole_tolerance)
     else:
-        parts_boxes[i] = parts_boxes[i].union(parts_boxes[i].faces("<Z").shell(part_tolerance, kind="intersection"))
+        part.cq_bounding_box = part.cq_bounding_box.union(part.cq_bounding_box.faces("<Z").shell(part_tolerance, kind="intersection"))
 
 parts_hole_extrusions = []
 
@@ -163,9 +103,9 @@ for part_setting in part_settings:
     extrude_dir = part_setting.direction
     is_hole_extrusion = part_setting.length is HOLE_TYPE.HOLE
     extrude_len = case_hole_extrusion_size if is_hole_extrusion else part_setting.length
-    part_indices = part_indices_of(part_name)
-    for part_index in part_indices:
-        extrusion = extrude_part_faces(extrude_dir, parts_boxes[part_index], extrude_len)
+    parts = part_list.find_all_by_name_regex(part_name)
+    for part in parts:
+        extrusion = extrude_part_faces(extrude_dir, part.cq_bounding_box, extrude_len)
         if part_setting.width is not DIMENSION_TYPE.AUTO:
             extrusion = extrude_part_width(extrusion, part_setting.width, extrude_dir)
         if part_setting.height is not DIMENSION_TYPE.AUTO:
@@ -174,12 +114,12 @@ for part_setting in part_settings:
         if is_hole_extrusion:
             parts_hole_extrusions.append(extrusion)
         else:
-            parts_boxes[part_index] = parts_boxes[part_index].union(extrusion)
+            part.cq_bounding_box = part.cq_bounding_box.union(extrusion)
 
 # combine all parts into one object
 part_union = cq.Workplane("XY")
-for part in parts_boxes:
-    part_union = part_union.union(part)
+for part in part_list.parts:
+    part_union = part_union.union(part.cq_bounding_box)
 part_union = part_union.union(battery_springs)
 
 ###----------------- Case -----------------###

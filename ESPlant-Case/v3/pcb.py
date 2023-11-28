@@ -1,17 +1,13 @@
 from dataclasses import dataclass
 import cadquery as cq
-from my_part import Part
+from part_loader import Part
 from OCP.TopoDS import TopoDS_Shape, TopoDS_Wire, TopoDS_Edge
 from OCP.TopExp import TopExp_Explorer
 from OCP.TopAbs import TopAbs_EDGE, TopAbs_WIRE
 from OCP.BRepAdaptor import BRepAdaptor_Curve
 from OCP.GeomAbs import GeomAbs_Circle
+from geometry import Vector
 
-@dataclass
-class Vector:
-    x: float
-    y: float
-    z: float
 @dataclass
 class WireData:
     ocp_wire: TopoDS_Wire
@@ -19,10 +15,10 @@ class WireData:
     isCircle: bool
     diameter: float
 
-def make_offset_shape(part: Part, board_tolerance: Vector, use_fixation_holes: bool, fixation_hole_diameter: float, hole_tolerance: float):
+def make_offset_shape(cq_object: cq.Workplane, board_tolerance: Vector, use_fixation_holes: bool, fixation_hole_diameter: float, hole_tolerance: float):
     if board_tolerance.x != board_tolerance.y:
         raise Exception("Different tolerances for x and y are not supported")
-    orig_shape: TopoDS_Shape = part.cq_object.val().wrapped
+    orig_shape: TopoDS_Shape = cq_object.val().wrapped
     explorer = TopExp_Explorer(orig_shape, TopAbs_WIRE)
     wires: list[WireData] = []
     while explorer.More():

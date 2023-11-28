@@ -4,10 +4,33 @@ import json
 import os
 from typing import List
 import cadquery as cq
-from my_part import Part
 import logging
+import re
 
 path = os.path.dirname(os.path.realpath(__file__))
+
+@dataclass
+class Part:
+    name: str
+    bound_box: cq.BoundBox
+    cq_bounding_box: cq.Workplane
+    cq_object: cq.Workplane
+
+class PartList:
+    def __init__(self, parts: List[Part]):
+        self.parts = parts
+
+    def find_all_by_name_regex(self, regex: str):
+        """
+        Get the indices of all parts that include the given regular expression.
+        """
+        return [part for part in self.parts if re.match(f".*{regex}.*", part.name)]
+    
+    def find_all_index_by_name_regex(self, regex: str):
+        """
+        Get the indices of all parts that include the given regular expression.
+        """
+        return [i for i, part_name in enumerate(self.parts) if re.match(f".*{regex}.*", part_name)]
 
 @dataclass
 class PartDetails:
@@ -87,4 +110,4 @@ def load_parts(exclude: List[str] = []):
         bounding_boxes.append(bounding_box_part)
         parts.append(Part(part_details.name, bounding_box, bounding_box_part, part_step))
     logging.info(f"Loaded parts: {names}")
-    return parts
+    return PartList(parts)
