@@ -7,6 +7,7 @@ import cadquery as cq
 
 path = os.path.dirname(os.path.abspath(__file__))
 
+
 def quaternion_to_axis_angle(x, y, z, w):
     """
     Convert quaternion to axis-angle representation
@@ -28,7 +29,13 @@ def quaternion_to_axis_angle(x, y, z, w):
         z = z / s
     return ((0, 0, 0), (x, y, z), math.degrees(angle))
 
-def extrude_part_faces(selector: cq.Selector, part: cq.Workplane, until: int | cq.Face, faces_selector: cq.Selector = None):
+
+def extrude_part_faces(
+    selector: cq.Selector,
+    part: cq.Workplane,
+    until: int | cq.Face,
+    faces_selector: cq.Selector = None,
+):
     if faces_selector is None:
         faces_selector = selector
     pending_wires = part.faces(faces_selector).wires().toPending()
@@ -49,6 +56,7 @@ def extrude_part_faces(selector: cq.Selector, part: cq.Workplane, until: int | c
     pending_wires.plane.zDir = cq.Vector(0, 0, 1)
     return extruded_part
 
+
 def get_width_direction(dir: cq.Selector):
     if dir == ">Z" or dir == "<Z":
         return "X"
@@ -56,7 +64,8 @@ def get_width_direction(dir: cq.Selector):
         return "Y"
     if dir == ">Y" or dir == "<Y":
         return "X"
-    
+
+
 def get_height_direction(dir: cq.Selector):
     if dir == ">Z" or dir == "<Z":
         return "Y"
@@ -64,7 +73,8 @@ def get_height_direction(dir: cq.Selector):
         return "Z"
     if dir == ">Y" or dir == "<Y":
         return "Z"
-    
+
+
 def extrude_part_width(part: cq.Workplane, min_width: int, dir: cq.Selector):
     direction = get_width_direction(dir)
     bounding_box = part.val().BoundingBox()
@@ -76,9 +86,14 @@ def extrude_part_width(part: cq.Workplane, min_width: int, dir: cq.Selector):
         width = bounding_box.zlen
     if width < min_width:
         extrusion_length = min_width - width
-        part = part.union(extrude_part_faces(f">{direction}", part, extrusion_length/2))
-        part = part.union(extrude_part_faces(f"<{direction}", part, extrusion_length/2))
+        part = part.union(
+            extrude_part_faces(f">{direction}", part, extrusion_length / 2)
+        )
+        part = part.union(
+            extrude_part_faces(f"<{direction}", part, extrusion_length / 2)
+        )
     return part
+
 
 def extrude_part_height(part: cq.Workplane, min_height: int, dir: cq.Selector):
     direction = get_height_direction(dir)
@@ -91,6 +106,10 @@ def extrude_part_height(part: cq.Workplane, min_height: int, dir: cq.Selector):
         height = bounding_box.zlen
     if height < min_height:
         extrusion_length = min_height - height
-        part = part.union(extrude_part_faces(f">{direction}", part, extrusion_length/2))
-        part = part.union(extrude_part_faces(f"<{direction}", part, extrusion_length/2))
+        part = part.union(
+            extrude_part_faces(f">{direction}", part, extrusion_length / 2)
+        )
+        part = part.union(
+            extrude_part_faces(f"<{direction}", part, extrusion_length / 2)
+        )
     return part

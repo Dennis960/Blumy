@@ -1,10 +1,16 @@
 # run this file in sudo docker run -it --name freecad amrit3701/freecad-cli:0.21-amd64 bash
 import os
-import FreeCAD # /usr/lib/freecad/lib must be added to $PYTHONPATH
+import FreeCAD  # /usr/lib/freecad/lib must be added to $PYTHONPATH
 import Import
 import logging
 
-def convert(kicad_pcb_path, cache_dir = "parts/", uses_kicad_nightly_cli = True, force_reconvert = False):
+
+def convert(
+    kicad_pcb_path,
+    cache_dir="parts/",
+    uses_kicad_nightly_cli=True,
+    force_reconvert=False,
+):
     """
     Converts the kicad_pcb file to a step file and exports all parts as step files.
     Uses the kicad-cli and FreeCAD.\n
@@ -20,7 +26,7 @@ def convert(kicad_pcb_path, cache_dir = "parts/", uses_kicad_nightly_cli = True,
 
     board_path = os.path.join(cache_dir, "board.step")
     kicad_nightly_cli_cmd = f"kicad-cli-nightly pcb export step {kicad_pcb_path} --drill-origin --no-dnp --subst-models -o {board_path}"
-    kicad_cli_cmd = f"kicad-cli pcb export step {kicad_pcb_path} --drill-origin --subst-models -o {board_path}" # --no-dnp is not supported in kicad-cli yet
+    kicad_cli_cmd = f"kicad-cli pcb export step {kicad_pcb_path} --drill-origin --subst-models -o {board_path}"  # --no-dnp is not supported in kicad-cli yet
     cmd = kicad_nightly_cli_cmd if uses_kicad_nightly_cli else kicad_cli_cmd
 
     # create folder
@@ -33,7 +39,7 @@ def convert(kicad_pcb_path, cache_dir = "parts/", uses_kicad_nightly_cli = True,
             return board_path
         else:
             logging.info("Converting again")
-        
+
     # run the command to convert the kicad_pcb file to a step file
     logging.info("Converting " + kicad_pcb_path + " to " + board_path)
     os.system(cmd)
@@ -51,22 +57,25 @@ def convert(kicad_pcb_path, cache_dir = "parts/", uses_kicad_nightly_cli = True,
         part_name = part.Label
         Import.export([part], cache_dir + part_name + ".step")
         logging.info("Exported " + part_name + ".step")
-        parts_data.append({
-            "name": part_name,
-            "file": part_name + ".step",
-            "posx": part.Placement.Base.x,
-            "posy": part.Placement.Base.y,
-            "posz": part.Placement.Base.z,
-            "rotx": part.Placement.Rotation.Q[0],
-            "roty": part.Placement.Rotation.Q[1],
-            "rotz": part.Placement.Rotation.Q[2],
-            "rotw": part.Placement.Rotation.Q[3],
-        })
+        parts_data.append(
+            {
+                "name": part_name,
+                "file": part_name + ".step",
+                "posx": part.Placement.Base.x,
+                "posy": part.Placement.Base.y,
+                "posz": part.Placement.Base.z,
+                "rotx": part.Placement.Rotation.Q[0],
+                "roty": part.Placement.Rotation.Q[1],
+                "rotz": part.Placement.Rotation.Q[2],
+                "rotw": part.Placement.Rotation.Q[3],
+            }
+        )
 
     FreeCAD.closeDocument("board")
 
     # write parts.json
     import json
+
     with open(cache_dir + "parts.json", "w") as f:
         json.dump(parts_data, f)
 

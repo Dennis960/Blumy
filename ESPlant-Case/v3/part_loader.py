@@ -9,6 +9,7 @@ from cq_part import Part, PartList
 
 path = os.path.dirname(os.path.realpath(__file__))
 
+
 @dataclass
 class PartDetails:
     name: str
@@ -45,14 +46,18 @@ def quaternion_to_axis_angle(x, y, z, w):
         z = z / s
     return ((0, 0, 0), (x, y, z), math.degrees(angle))
 
+
 def load_part_data(parts_directory="parts"):
-    json_path = path + '/' + parts_directory + '/parts.json'
+    json_path = path + "/" + parts_directory + "/parts.json"
     logging.info(f"Loading part data from {json_path}")
     with open(json_path) as f:
-        part_data: List[PartDetails] = [PartDetails(**item, abs_file_path="") for item in json.load(f)]
+        part_data: List[PartDetails] = [
+            PartDetails(**item, abs_file_path="") for item in json.load(f)
+        ]
     for part in part_data:
         part.abs_file_path = path + "/" + parts_directory + "/" + part.file
     return part_data
+
 
 def import_part_step(part: PartDetails):
     """
@@ -62,10 +67,17 @@ def import_part_step(part: PartDetails):
     """
     logging.debug(f"Importing part {part.name} from {part.abs_file_path} into cadquery")
     part_step = cq.importers.importStep(part.abs_file_path)
-    axis_angle_rotation = quaternion_to_axis_angle(part.rotx, part.roty, part.rotz, part.rotw)
+    axis_angle_rotation = quaternion_to_axis_angle(
+        part.rotx, part.roty, part.rotz, part.rotw
+    )
     if axis_angle_rotation[2] != 0:
-        part_step = part_step.rotate(axisStartPoint=axis_angle_rotation[0], axisEndPoint=axis_angle_rotation[1], angleDegrees=axis_angle_rotation[2])
+        part_step = part_step.rotate(
+            axisStartPoint=axis_angle_rotation[0],
+            axisEndPoint=axis_angle_rotation[1],
+            angleDegrees=axis_angle_rotation[2],
+        )
     return part_step.translate((part.posx, part.posy, part.posz))
+
 
 def load_parts(exclude: List[str] = []):
     part_data = load_part_data()
@@ -83,8 +95,14 @@ def load_parts(exclude: List[str] = []):
         part_step_center = part_step.val().CenterOfBoundBox()
         cq_objects.append(part_step)
         bounding_box = part_step.val().BoundingBox()
-        bounding_box_part = cq.Workplane("XY").box(bounding_box.xlen, bounding_box.ylen, bounding_box.zlen).translate((part_step_center.x, part_step_center.y, part_step_center.z))
+        bounding_box_part = (
+            cq.Workplane("XY")
+            .box(bounding_box.xlen, bounding_box.ylen, bounding_box.zlen)
+            .translate((part_step_center.x, part_step_center.y, part_step_center.z))
+        )
         bounding_boxes.append(bounding_box_part)
-        parts.append(Part(part_details.name, bounding_box, bounding_box_part, part_step))
+        parts.append(
+            Part(part_details.name, bounding_box, bounding_box_part, part_step)
+        )
     logging.info(f"Loaded parts: {names}")
     return PartList(parts)

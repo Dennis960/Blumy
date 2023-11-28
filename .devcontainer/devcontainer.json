@@ -12,7 +12,8 @@
 				"GitHub.copilot-chat",
 				"bernhard-42.ocp-cad-viewer",
 				"ms-python.python",
-				"Gruntfuggly.triggertaskonsave"
+				"Gruntfuggly.triggertaskonsave",
+				"ms-python.autopep8"
 			]
 		}
 	}
