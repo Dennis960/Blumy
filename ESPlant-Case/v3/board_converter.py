@@ -55,7 +55,7 @@ def convert(
 
     for part in parts:
         part_name = part.Label
-        Import.export([part], cache_dir + part_name + ".step")
+        Import.export([part], os.path.join(cache_dir, part_name + ".step"))
         logging.info("Exported " + part_name + ".step")
         parts_data.append(
             {
@@ -76,7 +76,7 @@ def convert(
     # write parts.json
     import json
 
-    with open(cache_dir + "parts.json", "w") as f:
+    with open(os.path.join(cache_dir, "parts.json"), "w") as f:
         json.dump(parts_data, f)
 
     logging.info("Exported parts.json")

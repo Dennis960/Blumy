@@ -47,15 +47,15 @@ def quaternion_to_axis_angle(x, y, z, w):
     return ((0, 0, 0), (x, y, z), math.degrees(angle))
 
 
-def load_part_data(parts_directory="parts"):
-    json_path = path + "/" + parts_directory + "/parts.json"
+def load_part_data(parts_directory: str):
+    json_path = os.path.join(path, parts_directory, "parts.json")
     logging.info(f"Loading part data from {json_path}")
     with open(json_path) as f:
         part_data: List[PartDetails] = [
             PartDetails(**item, abs_file_path="") for item in json.load(f)
         ]
     for part in part_data:
-        part.abs_file_path = path + "/" + parts_directory + "/" + part.file
+        part.abs_file_path = os.path.join(path, parts_directory, part.file)
     return part_data
 
 
@@ -79,8 +79,8 @@ def import_part_step(part: PartDetails):
     return part_step.translate((part.posx, part.posy, part.posz))
 
 
-def load_parts(exclude: List[str] = []):
-    part_data = load_part_data()
+def load_parts(exclude: List[str] = [], parts_directory="parts"):
+    part_data = load_part_data(parts_directory)
     cq_objects: List[cq.Workplane] = []
     bounding_boxes: List[cq.Workplane] = []
     names: List[str] = []
