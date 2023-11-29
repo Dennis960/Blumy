@@ -14,3 +14,5 @@ RUN apt-get install -y git
 RUN git clone https://github.com/CadQuery/OCP-stubs
 RUN cd OCP-stubs && python3 setup.py install
 RUN apt-get install -y python-is-python3
+
+RUN apt-get install -y redis python3-flask python3-celery python3-redis

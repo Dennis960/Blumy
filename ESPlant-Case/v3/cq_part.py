@@ -110,7 +110,7 @@ class PartList:
 
     def apply_pcb_tolerance(
         self,
-        board_tolerance: float,
+        board_tolerance: cq.Vector,
         use_fixation_holes: bool,
         fixation_hole_diameter: float,
         hole_tolerance: float,
