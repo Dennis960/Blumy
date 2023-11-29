@@ -14,16 +14,20 @@ logging.basicConfig(level=logging.INFO)
 
 ### ----------------- Settings -----------------###
 case_wall_thickness = 1.5
-case_floor_height = 8 + 1.6
-hole_fit_tolerance = 0.1
+case_floor_max_thickness = 8 + 1.6
+
+# Optional: Specify the max size and offset of the case (for letting a part of the pcb stick out)
+bottom_case_dimension = (DIMENSION_TYPE.AUTO, 62, DIMENSION_TYPE.AUTO)
+bottom_case_offset = (0, ALIGNMENT.POSITIVE, 0)
+
+should_use_fixation_holes = True
+fixation_hole_tolerance = 0.1
+fixation_hole_diameter = 2.0
+
 pcb_tolerance = Vector(
     1.5, 1.5, 0.5
 )  # having different tolerances for x and y is not supported
 part_tolerance = 1
-
-should_use_fixation_holes = True
-fixation_hole_diameter = 2.0
-
 parts_to_ignore_in_case_generation = ["PinHeader"]
 part_settings: List[PartSetting] = [
     PartSetting(".*", ">Z", pcb_tolerance.z),
@@ -38,9 +42,6 @@ part_settings: List[PartSetting] = [
     PartSetting(".*ESP.*", ">Z", 2),
 ]
 
-# Optional: Specify the max size and offset of the case (for letting a part of the pcb stick out)
-bottom_case_dimension = (DIMENSION_TYPE.AUTO, 62, DIMENSION_TYPE.AUTO)
-bottom_case_offset = (0, ALIGNMENT.POSITIVE, 0)
 
 list_of_additional_parts: List[Part] = [
     Part(
@@ -67,7 +68,7 @@ for additional_part in list_of_additional_parts:
     part_list.add_part(additional_part)
 part_list.apply_part_tolerances(part_tolerance)
 part_list.apply_pcb_tolerance(
-    pcb_tolerance, should_use_fixation_holes, fixation_hole_diameter, hole_fit_tolerance
+    pcb_tolerance, should_use_fixation_holes, fixation_hole_diameter, fixation_hole_tolerance
 )
 part_list.apply_settings(part_settings)
 
@@ -76,7 +77,7 @@ bottom_case = BottomCase(part_list)
 bottom_case.override_dimension(bottom_case_dimension)
 bottom_case.override_offset(bottom_case_offset)
 bottom_case_cq_object = bottom_case.generate_case(
-    case_wall_thickness, case_floor_height
+    case_wall_thickness, case_floor_max_thickness
 )
 
 ### ----------------- Preview -----------------###
