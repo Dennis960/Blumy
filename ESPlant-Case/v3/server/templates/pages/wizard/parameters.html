@@ -1,0 +1,95 @@
+{% extends 'partials/base.html' %}
+{% block title %}Case Generator - Configuration{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-sm">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Configure Case</a>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <form action="{{ url_for('wizard.generate_bottom_case') }}" method="POST">
+                    <button class="btn btn-primary" type="submit">Generate Bottom Case</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="mt-5 container">
+    <form action="{{ url_for('wizard.set_parameters') }}" method="POST">
+        <h3>Case Dimensions</h3>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="case_wall_thickness" class="form-label">Case Wall Thickness</label>
+                    <input type="number" step="any" class="form-control" id="case_wall_thickness" name="case_wall_thickness" value="{{ config.case_wall_thickness }}">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="case_floor_height" class="form-label">Case Floor Height</label>
+                    <input type="number" step="any" class="form-control" id="case_floor_height" name="case_floor_height" value="{{ config.case_floor_height }}">
+                </div>
+            </div>
+        </div>
+
+        <h3>Tolerances</h3>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="pcb_tolerance_x" class="form-label">PCB Tolerance X</label>
+                    <input type="number" step="any" class="form-control" id="pcb_tolerance_x" name="pcb_tolerance_x" value="{{ config.pcb_tolerance[0] }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="pcb_tolerance_y" class="form-label">PCB Tolerance Y</label>
+                    <input type="number" step="any" class="form-control" id="pcb_tolerance_y" name="pcb_tolerance_y" value="{{ config.pcb_tolerance[1] }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="pcb_tolerance_z" class="form-label">PCB Tolerance Z</label>
+                    <input type="number" step="any" class="form-control" id="pcb_tolerance_z" name="pcb_tolerance_z" value="{{ config.pcb_tolerance[2] }}">
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="hole_fit_tolerance" class="form-label">Hole Fit Tolerance</label>
+                    <input type="number" step="any" class="form-control" id="hole_fit_tolerance" name="hole_fit_tolerance" value="{{ config.hole_fit_tolerance }}">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="part_tolerance" class="form-label">Part Tolerance</label>
+                    <input type="number" step="any" class="form-control" id="part_tolerance" name="part_tolerance" value="{{ config.part_tolerance }}">
+                </div>
+            </div>
+        </div>
+
+        <h3>Fixation Holes</h3>
+
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="mb-3">
+                    <input type="checkbox" class="form-check-input" id="should_use_fixation_holes" name="should_use_fixation_holes" {% if config.should_use_fixation_holes %}checked{% endif %}>
+                    <label for="should_use_fixation_holes" class="form-check-label">Should Use Fixation Holes</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="fixation_hole_diameter" class="form-label">Fixation Hole Diameter</label>
+                    <input type="number" step="any" class="form-control" id="fixation_hole_diameter" name="fixation_hole_diameter" value="{{ config.fixation_hole_diameter }}">
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Save</button>
+    </form>
+</div>
+{% endblock %}

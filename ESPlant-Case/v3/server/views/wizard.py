@@ -2,6 +2,7 @@ import os
 import glob
 import uuid
 import shutil
+import pickle
 import zipfile
 from flask import Blueprint, request, session, render_template, url_for, redirect
 from werkzeug.utils import secure_filename
@@ -10,6 +11,15 @@ from cq_part import PartSetting, HOLE_TYPE, DIMENSION_TYPE, ALIGNMENT
 from .. import parameters
 from .. import utils
 from .. import tasks
+
+
+# TODO unsafe - do not use pickle and do not store this on the client
+def read_config() -> parameters.CaseConfiguration:
+    return pickle.loads(session["config"])
+
+def write_config(c: parameters.CaseConfiguration):
+    session["config"] = pickle.dumps(c)
+
 
 bp = Blueprint("wizard", __name__, url_prefix="/wizard")
 
@@ -53,22 +63,6 @@ def upload_board():
 
     tasks.run_convert.delay(directory_path, filename)
     session["file"] = file_uuid
-    return redirect(url_for("wizard.view_board"))
-
-
-@bp.route("/board")
-def view_board():
-    return render_template("./pages/wizard/view_board.html", glb_path=url_for("files.serve_board", id=session["file"]))
-
-
-@bp.route("/bottom-case", methods=["POST"])
-def generate_bottom_case():
-    id = session["file"]
-
-    if id is None:
-        return "Does not exist"
-
-    root_path = utils.get_upload_directory(id)
 
     pcb_tolerance=(1.5, 1.5, 0.5)
     config = parameters.CaseConfiguration(
@@ -96,14 +90,77 @@ def generate_bottom_case():
         bottom_case_offset=(0, ALIGNMENT.POSITIVE, 0),
         list_of_additional_parts=[]
     )
+    write_config(config)
+    return redirect(url_for("wizard.view_board"))
 
-    tasks.run_generate_bottom_case.delay(root_path, config)
+
+@bp.route("/board")
+def view_board():
+    return render_template("./pages/wizard/board.html", glb_path=url_for("files.serve_board", id=session["file"]))
+
+
+@bp.route("/parameters", methods=["POST"])
+def set_parameters():
+    previous_config = read_config()
+
+    case_wall_thickness = float(request.form['case_wall_thickness'])
+    case_floor_height = float(request.form['case_floor_height'])
+    hole_fit_tolerance = float(request.form['hole_fit_tolerance'])
+    pcb_tolerance_x = float(request.form['pcb_tolerance_x'])
+    pcb_tolerance_y = float(request.form['pcb_tolerance_y'])
+    pcb_tolerance_z = float(request.form['pcb_tolerance_z'])
+    pcb_tolerance = (pcb_tolerance_x, pcb_tolerance_y, pcb_tolerance_z)
+    part_tolerance = float(request.form['part_tolerance'])
+    should_use_fixation_holes = 'should_use_fixation_holes' in request.form
+    fixation_hole_diameter = float(request.form['fixation_hole_diameter'])
+
+    config = parameters.CaseConfiguration(
+        case_wall_thickness,
+        case_floor_height,
+        hole_fit_tolerance,
+        pcb_tolerance,
+        part_tolerance,
+        should_use_fixation_holes,
+        fixation_hole_diameter,
+        # not supported yet:
+        previous_config.parts_to_ignore_in_case_generation,
+        previous_config.part_settings,
+        previous_config.bottom_case_dimension,
+        previous_config.bottom_case_offset,
+        previous_config.list_of_additional_parts
+    )
+
+    write_config(config)
+
+    return redirect(url_for("wizard.view_parameters"))
+
+
+@bp.route("/parameters")
+def view_parameters():
+    return render_template("./pages/wizard/parameters.html", config=read_config())
+
+
+@bp.route("/bottom-case", methods=["POST"])
+def generate_bottom_case():
+    id = session["file"]
+
+    if id is None:
+        return "Does not exist"
+
+    root_path = utils.get_upload_directory(id)
+
+    # TODO instead of overwriting, create versioned files
+    export_path = os.path.join(root_path, "bottom-case.glb")
+    if os.path.exists(export_path):
+        os.remove(export_path)
+
+    tasks.run_generate_bottom_case.delay(root_path, read_config())
     return redirect(url_for("wizard.view_bottom_case"))
 
 
 @bp.route("/bottom-case")
 def view_bottom_case():
-    return render_template("./pages/wizard/view_bottom_case.html", glb_path=url_for("files.serve_bottom_case", id=session["file"]))
+    return render_template("./pages/wizard/bottom_case.html", glb_path=url_for("files.serve_bottom_case", id=session["file"]))
 
 
 @bp.route("/finish", methods=["POST"])
