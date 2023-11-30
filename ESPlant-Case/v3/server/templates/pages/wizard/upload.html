@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container">
     <h1 class="mt-5">File Upload</h1>
-    <form action="{{ url_for('wizard.view_board') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ url_for('wizard.upload_board') }}" method="POST" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="file" class="form-label">Upload a KiCad PCB file:</label>
             <input type="file" class="form-control" id="file" name="file" accept="application/zip,.kicad_pcb" required>

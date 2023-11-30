@@ -3,7 +3,7 @@ import glob
 import uuid
 import shutil
 import zipfile
-from flask import Blueprint, request, session, render_template, url_for
+from flask import Blueprint, request, session, render_template, url_for, redirect
 from werkzeug.utils import secure_filename
 from cq_part import PartSetting, HOLE_TYPE, DIMENSION_TYPE, ALIGNMENT
 
@@ -17,8 +17,9 @@ bp = Blueprint("wizard", __name__, url_prefix="/wizard")
 def upload():
     return render_template("./pages/wizard/upload.html")
 
+
 @bp.route("/board", methods=["POST"])
-def view_board():
+def upload_board():
     file = request.files["file"]
 
     if not file:
@@ -52,10 +53,16 @@ def view_board():
 
     tasks.run_convert.delay(directory_path, filename)
     session["file"] = file_uuid
-    return render_template("./pages/wizard/view_board.html", glb_path=url_for("files.serve_board", id=file_uuid))
+    return redirect(url_for("wizard.view_board"))
+
+
+@bp.route("/board")
+def view_board():
+    return render_template("./pages/wizard/view_board.html", glb_path=url_for("files.serve_board", id=session["file"]))
+
 
 @bp.route("/bottom-case", methods=["POST"])
-def view_bottom_case():
+def generate_bottom_case():
     id = session["file"]
 
     if id is None:
@@ -91,7 +98,12 @@ def view_bottom_case():
     )
 
     tasks.run_generate_bottom_case.delay(root_path, config)
-    return render_template("./pages/wizard/view_bottom_case.html", glb_path=url_for("files.serve_bottom_case", id=id))
+    return redirect(url_for("wizard.view_bottom_case"))
+
+
+@bp.route("/bottom-case")
+def view_bottom_case():
+    return render_template("./pages/wizard/view_bottom_case.html", glb_path=url_for("files.serve_bottom_case", id=session["file"]))
 
 
 @bp.route("/finish", methods=["POST"])
