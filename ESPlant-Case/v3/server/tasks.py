@@ -45,6 +45,7 @@ def run_generate_bottom_case(root_path: str, config: parameters.CaseConfiguratio
 
     assembly = cq.Assembly()
     assembly.add(bottom_case_cq_object)
+
     export_path = os.path.join(root_path, "bottom-case.glb")
     assembly.save(export_path, "GLTF", tolerance=0.1, angularTolerance=0.1) # TODO tolerances
 
