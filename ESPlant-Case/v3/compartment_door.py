@@ -1,18 +1,12 @@
 import cadquery as cq
 from ocp_vscode import show_object
 from typing import Literal, List
+from dataclasses import dataclass, field
 
-
-def generate_compartment_door(compartment_door_dimensions: cq.Vector = (50, 60, 1.5),
-                              fitting_arm_thickness: float = 1.5,
-                              fitting_arm_height: float = 10,
-                              fitting_arm_width: float = 8,
-                              tab_dimension: cq.Vector = (3, 3),
-                              snap_joint_face_selectors: List[Literal["+Y", "-Y", "+X", "-X"]] = [
-                                  "+Y"],
-                              tabs_face_selector: Literal["<Y", ">Y", "<X", ">X"] = "<Y") -> cq.Workplane:
+@dataclass
+class CompartmentDoorSettings:
     """
-    Generates a compartment door with snap joints and tabs
+    The settings for the compartment door
     :param compartment_door_dimensions: The dimensions of the compartment door, meaning the width, height and thickness excluding the fitting arm and tabs
     :param fitting_arm_thickness: The thickness of the fitting arm. Thicker means thicker snap joints and more tension
     :param fitting_arm_height: How deep the fitting arm goes into the case. Higher (meaning deeper) means more suspension
@@ -23,6 +17,22 @@ def generate_compartment_door(compartment_door_dimensions: cq.Vector = (50, 60, 
                                       Multiple face selectors can be used by passing a list of face selectors
     :param tabs_face_selector: The face selector of the face of the compartment door where the tabs should be placed. Only one face can be selected. Uses the cadquery face selectors (eg. >Y means the face on the positive y axis)
                                Should be placed on the opposite side of the snap joints
+    """
+    compartment_door_dimensions: cq.Vector = (50, 60, 1.5)
+    fitting_arm_thickness: float = 1.5
+    fitting_arm_height: float = 10
+    fitting_arm_width: float = 8
+    tab_dimension: cq.Vector = (3, 3)
+    snap_joint_face_selectors: List[Literal["+Y", "-Y", "+X", "-X"]] = field(default_factory=lambda: ["+Y"])
+    tabs_face_selector: Literal["<Y", ">Y", "<X", ">X"] = "<Y"
+
+    def __post_init__(self):
+        self.snap_joint_face_selector = " or ".join(self.snap_joint_face_selectors)
+
+def generate_compartment_door(settings: CompartmentDoorSettings) -> cq.Workplane:
+    """
+    Generates a compartment door with snap joints and tabs
+    :param settings: The settings for the compartment door (see CompartmentDoorSettings for more information)
     :return: The compartment door as a cadquery Workplane
 
     Example:
@@ -30,10 +40,17 @@ def generate_compartment_door(compartment_door_dimensions: cq.Vector = (50, 60, 
     .. code-block:: python
     
             from ocp_vscode import show_object
-            from compartment_door import generate_compartment_door
+            from compartment_door import generate_compartment_door, CompartmentDoorSettings
     
-            show_object(generate_compartment_door())
+            show_object(generate_compartment_door(CompartmentDoorSettings()))
     """
+    compartment_door_dimensions = settings.compartment_door_dimensions
+    fitting_arm_thickness = settings.fitting_arm_thickness
+    fitting_arm_height = settings.fitting_arm_height
+    fitting_arm_width = settings.fitting_arm_width
+    tab_dimension = settings.tab_dimension
+    snap_joint_face_selectors = settings.snap_joint_face_selectors
+    tabs_face_selector = settings.tabs_face_selector
 
     snap_joint_face_selector = " or ".join(snap_joint_face_selectors)
 
@@ -61,6 +78,14 @@ def generate_compartment_door(compartment_door_dimensions: cq.Vector = (50, 60, 
         .rect(fitting_arm_width/1.5, fitting_arm_width)
         .cutBlind(fitting_arm_height / 3)
         # fitting_arm_snap_joint
+        .tag("a")
+        .faces("<Z[-1]")
+        .transformed(offset=(0, 0, fitting_arm_height / 3))
+        .moveTo(3.5 * fitting_arm_thickness + 1, 0)
+        .rect(fitting_arm_thickness, fitting_arm_width) # TODO change these dimensions
+        .extrude(fitting_arm_thickness) # TODO change these dimensions
+        .workplaneFromTagged("a")
+        # fitting_arm_snap_joint
         .center(3 * fitting_arm_thickness + 0.5, 0)
         .move(0, -fitting_arm_width/2)
         .line(0, -fitting_arm_thickness)
@@ -85,5 +110,8 @@ def generate_compartment_door(compartment_door_dimensions: cq.Vector = (50, 60, 
         .extrude(tab_dimension[1], both=True)
     )
 
+# def generate_compartment_door_cutout(settings: CompartmentDoorSettings):
 
-show_object(generate_compartment_door(snap_joint_face_selectors=["+X", "-X"], tabs_face_selector="<Y"))
+
+
+show_object(generate_compartment_door(CompartmentDoorSettings(snap_joint_face_selectors=["+X", "-X"], tabs_face_selector="<Y")))
