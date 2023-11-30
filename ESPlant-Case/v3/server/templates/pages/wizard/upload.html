@@ -7,7 +7,7 @@
     <form action="{{ url_for('wizard.view_board') }}" method="POST" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="file" class="form-label">Upload a KiCad PCB file:</label>
-            <input type="file" class="form-control" id="file" name="file" required>
+            <input type="file" class="form-control" id="file" name="file" accept="application/zip,.kicad_pcb" required>
         </div>
         <button type="submit" class="btn btn-primary">Upload</button>
     </form>

@@ -1,6 +1,8 @@
 import os
+import glob
 import uuid
-import time
+import shutil
+import zipfile
 from flask import Blueprint, request, session, render_template, url_for
 from werkzeug.utils import secure_filename
 from cq_part import PartSetting, HOLE_TYPE, DIMENSION_TYPE, ALIGNMENT
@@ -28,6 +30,26 @@ def view_board():
     os.makedirs(directory_path)
     file_path = os.path.join(directory_path, filename)
     file.save(file_path)
+
+    if zipfile.is_zipfile(file_path):
+        with zipfile.ZipFile(file_path, "r") as zip_ref:
+            zip_ref.extractall(directory_path) # TODO ensure secure unpack
+
+        os.remove(file_path)
+
+        # if the zip contains (just) a single folder, move all its contents up
+        extracted_dirs = glob.glob(os.path.join(directory_path, '*'))
+        if len(extracted_dirs) == 1 and os.path.isdir(extracted_dirs[0]):
+            for file_path in glob.glob(os.path.join(extracted_dirs[0], '*')):
+                shutil.move(file_path, directory_path)
+            os.rmdir(extracted_dirs[0])
+
+        # use first .kicad_pcb file
+        filename = next(glob.iglob(os.path.join(directory_path, '*.kicad_pcb')), '')
+
+        if not filename.endswith('.kicad_pcb'):
+            return 'No Kicad PCB file was found in the archive!'
+
     tasks.run_convert.delay(directory_path, filename)
     session["file"] = file_uuid
     return render_template("./pages/wizard/view_board.html", glb_path=url_for("files.serve_board", id=file_uuid))
