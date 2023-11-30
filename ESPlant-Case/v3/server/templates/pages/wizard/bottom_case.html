@@ -1,14 +1,17 @@
 {% extends 'partials/base.html' %}
-{% block title %}Case Generator - Board Preview{% endblock %}
+{% block title %}Case Generator - Bottom Case Preview{% endblock %}
 
 {% block content %}
 <nav class="navbar navbar-expand-sm">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Preview your Board</a>
+        <a class="navbar-brand" href="#">Preview your Bottom Case</a>
         <ul class="navbar-nav ml-auto">
+            <li class="nav-item me-3">
+                <a href="{{ url_for('wizard.view_parameters') }}" class="btn btn-secondary">Back</a>
+            </li>
             <li class="nav-item">
-                <form action="{{ url_for('wizard.view_bottom_case') }}" method="POST" enctype="multipart/form-data">
-                    <button class="btn btn-primary" type="submit">Continue</button>
+                <form action="{{ url_for('wizard.confirm') }}" method="POST">
+                    <button class="btn btn-primary" type="submit">Finish</button>
                 </form>
             </li>
         </ul>
