@@ -1,0 +1,19 @@
+{% extends 'partials/base.html' %}
+{% block title %}Case Generator - Case Download{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-sm">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Download Case</a>
+    </div>
+</nav>
+
+<div class="mt-5 container">
+    <div class="row">
+        <div class="col-md-6">
+            <a href="{{ url_for('projects.bottom_case', format='step', project_id=project_id, version=version) }}" class="btn btn-primary">Download STEP</a>
+            <a href="{{ url_for('projects.bottom_case', format='stl', project_id=project_id, version=version) }}" class="btn btn-primary">Download STL</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
