@@ -15,7 +15,9 @@
                 "worker",
                 "worker",
                 "--loglevel",
-                "info"
+                "info",
+                "--concurrency",
+                "1"
             ],
             "justMyCode": true
         },

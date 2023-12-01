@@ -12,6 +12,10 @@ job "casemaker" {
 
   group "web" {
     # run both server and worker on the same node so that they can share the upload directory
+    ephemeral_disk {
+      migrate = true
+      size = 4096
+    }
 
     constraint {
       attribute = "${node.class}"
@@ -41,7 +45,7 @@ job "casemaker" {
       driver = "docker"
 
       env {
-        FLASK_UPLOAD_ROOT = "/data/upload"
+        FLASK_UPLOAD_ROOT = "${NOMAD_ALLOC_DIR}/data/uploads"
         FLASK_SECRET_KEY = "changeme"
       }
 
@@ -50,10 +54,6 @@ job "casemaker" {
         ports = ["http"]
         command = "/home/appuser/.local/bin/flask"
         args = ["--app", "server", "run", "--host", "0.0.0.0", "--port", "${NOMAD_PORT_http}"]
-
-        volumes = [
-          "casemaker-upload:/data/upload"
-        ]
       }
 
       # FIXME containers do not respect host's DNS settings
@@ -81,17 +81,13 @@ job "casemaker" {
       driver = "docker"
 
       env {
-        FLASK_UPLOAD_ROOT = "/data/upload"
+        FLASK_UPLOAD_ROOT = "${NOMAD_ALLOC_DIR}/data/uploads"
       }
 
       config {
         image = "ghcr.io/dennis960/casemaker:${var.tag}"
         command = "/home/appuser/.local/bin/celery"
-        args = ["-A", "worker", "worker", "--loglevel", "info"]
-
-        volumes = [
-          "casemaker-upload:/data/upload"
-        ]
+        args = ["-A", "worker", "worker", "--loglevel", "info", "--concurrency", "1"]
       }
 
       # FIXME containers do not respect host's DNS settings
@@ -109,9 +105,9 @@ job "casemaker" {
       }
 
       resources {
-        cpu = 128
-        memory = 512
-        memory_max = 512
+        cpu = 128 # very bursty, uses all resources available
+        memory = 1024 # 384-512 base load, up to 1024 when converting
+        memory_max = 1280
       }
     }
   }
@@ -144,7 +140,6 @@ job "casemaker" {
     }
 
     ephemeral_disk {
-      sticky = true
       migrate = true
       size = 2048
     }
@@ -153,7 +148,7 @@ job "casemaker" {
       driver = "docker"
 
       config {
-        image = "redis:7.0-alpine"
+        image = "redis:7.2-alpine"
         args = [ "/usr/local/etc/redis/redis.conf" ]
 
         volumes = [
@@ -175,6 +170,7 @@ job "casemaker" {
 
       template {
         data = <<-EOF
+          dir {{ env "NOMAD_ALLOC_DIR" }}/data
           port {{ env "NOMAD_PORT_db" }}
           maxmemory {{ env "NOMAD_MEMORY_LIMIT" }}mb
           maxmemory-policy allkeys-lru
