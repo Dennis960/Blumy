@@ -6,29 +6,29 @@ from part_loader import load_parts
 from bottom_case import BottomCase
 
 from board_converter import convert
-from . import parameters
+from . import utils
 
 @shared_task
-def run_convert(root_path: str, file_name: str):
+def run_convert(project_id: str, file_name: str):
     start = time.time()
-    print("converting " + root_path + " " + file_name)
-    board_step_path = convert(os.path.join(root_path, file_name), os.path.join(root_path, "cache"))
+    print("converting " + project_id + " " + file_name)
+    root_path = utils.get_project_directory(project_id)
+    board_step_path = convert(os.path.join(root_path, file_name), utils.get_project_cache_path(project_id))
     original_board = cq.importers.importStep(board_step_path)
     assembly = cq.Assembly()
     assembly.add(original_board)
-    export_path = os.path.join(root_path, "board.glb")
-    assembly.save(export_path, "GLTF", tolerance=0.1, angularTolerance=0.1) # TODO tolerances
-    print("converted " + export_path + " in " + str(time.time() - start) + "s")
+    assembly.save(utils.get_project_export_glb_path(project_id), "GLTF", tolerance=0.1, angularTolerance=0.1) # TODO tolerances
+    print("converted " + project_id + " in " + str(time.time() - start) + "s")
 
 
 @shared_task
-def run_generate_bottom_case(root_path: str, config: parameters.CaseConfiguration):
+def run_generate_bottom_case(project_id: str, version: int):
     start = time.time()
-    print("generating bottom case " + root_path)
+    print("generating bottom case " + project_id)
 
-    parts_path = os.path.join(root_path, "cache")
+    config = utils.read_config(project_id, version)
 
-    part_list = load_parts(exclude=config.parts_to_ignore_in_case_generation, parts_directory=parts_path)
+    part_list = load_parts(exclude=config.parts_to_ignore_in_case_generation, parts_directory=utils.get_project_cache_path(project_id))
     for additional_part in config.list_of_additional_parts:
         part_list.add_part(additional_part)
     part_list.apply_part_tolerances(config.part_tolerance)
@@ -46,7 +46,9 @@ def run_generate_bottom_case(root_path: str, config: parameters.CaseConfiguratio
     assembly = cq.Assembly()
     assembly.add(bottom_case_cq_object)
 
-    export_path = os.path.join(root_path, "bottom-case.glb")
-    assembly.save(export_path, "GLTF", tolerance=0.1, angularTolerance=0.1) # TODO tolerances
+    export_base = utils.get_project_version_export_base_path(project_id, version)
+    assembly.save(export_base + ".glb", "GLTF")
+    assembly.save(export_base + ".step", "STEP")
+    assembly.save(export_base + ".stl", "STL")
 
     print("generated bottom case in " + str(time.time() - start) + "s")

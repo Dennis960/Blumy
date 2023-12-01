@@ -33,10 +33,9 @@ def create_app() -> Flask:
     def index() -> str:
         return render_template("pages/index.html")
 
-    from .views import files, wizard
+    from .views import projects
 
-    app.register_blueprint(files.bp)
-    app.register_blueprint(wizard.bp)
+    app.register_blueprint(projects.bp)
     return app
 
 
