@@ -11,12 +11,7 @@ def create_app() -> Flask:
         CELERY=dict(
             broker_url="redis://localhost",
             result_backend="redis://localhost",
-            task_ignore_result=True,
-            # use pickle so we can pass the whole config object
-            task_serializer="pickle",
-            event_serializer="pickle",
-            result_serializer="pickle",
-            accept_content=['application/json', 'application/x-python-serialize']
+            task_ignore_result=True
         ),
         UPLOAD_ROOT="./upload",
         SECRET_KEY="changeme"
