@@ -3,7 +3,25 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="mt-5">Welcome</h1>
-    <a class="btn btn-primary" href="{{ url_for('projects.upload') }}">Start</a>
+    <h1 class="mt-5">PCB Enclosure Generator</h1>
+
+    <div class="mt-5 row">
+        <div class="col-lg-4 mb-4 text-center">
+            <h3 class="h5">Custom Case Design</h3>
+            <p>Generate custom 3D cases based on your KiCad PCB files. No need for manual design, save time and effort.</p>
+        </div>
+        <div class="col-lg-4 mb-4 text-center">
+            <h3 class="h5">Instant Previews</h3>
+            <p>Visualize the case design in browser before 3D printing.</p>
+        </div>
+        <div class="col-lg-4 mb-4 text-center">
+            <h3 class="h5">Export Formats</h3>
+            <p>Get STEP or STL files that are ready for 3D printing. Download and start manufacturing your custom cases.</p>
+        </div>
+    </div>
+
+    <div class="mt-3 row">
+        <a class="btn btn-primary" href="{{ url_for('projects.upload') }}">Start</a>
+    </div>
 </div>
 {% endblock %}
