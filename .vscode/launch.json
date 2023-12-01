@@ -12,7 +12,7 @@
             "cwd": "${workspaceFolder}/ESPlant-Case/v3",
             "args": [
                 "-A",
-                "converter",
+                "worker",
                 "worker",
                 "--loglevel",
                 "info"
