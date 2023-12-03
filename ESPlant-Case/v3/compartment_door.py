@@ -182,8 +182,8 @@ class CompartmentDoor:
         t = self._tolerances
         fitting_arm_box_small = (cq.Workplane(face)
                                  .workplane()
-                                 .transformed(offset=(0, 0.5 * s.compartment_door_dimensions.z, -t.fitting_arm_tolerance - t.compartment_door_tolerance), rotate=(90, 0, 0))
-                                 .box(s.fitting_arm_width, (5 + s.fitting_arm_distance_factor) * s.fitting_arm_thickness + 2 * s.fitting_arm_angle_offset + t.fitting_arm_tolerance, s.fitting_arm_height + 2 * t.fitting_arm_tolerance, centered=(True, False, False))
+                                 .transformed(offset=(0, -0.5 * s.compartment_door_dimensions.z, 0), rotate=(90, 0, 0))
+                                 .box(s.fitting_arm_width + 2*t.fitting_arm_tolerance, (5 + s.fitting_arm_distance_factor) * s.fitting_arm_thickness + 2 * s.fitting_arm_angle_offset + t.fitting_arm_tolerance, s.fitting_arm_height + t.fitting_arm_tolerance - t.compartment_door_tolerance - s.compartment_door_dimensions.z, centered=(True, False, False))
                                  )
         return fitting_arm_box_small.union(
             fitting_arm_box_small.faces(
