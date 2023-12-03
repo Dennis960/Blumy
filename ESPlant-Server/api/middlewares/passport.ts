@@ -27,7 +27,11 @@ router.use(
     }),
   })
 );
-router.use(passport.initialize());
-router.use(passport.session());
+try {
+  router.use(passport.initialize());
+  router.use(passport.session());
+} catch (error) {
+  console.error(error);
+}
 
 export default router;
