@@ -8,10 +8,10 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 
 if (GOOGLE_CLIENT_ID == undefined) {
-  console.error("GOOGLE_CLIENT_ID must be set");
+  throw new Error("GOOGLE_CLIENT_ID must be set");
 }
 if (GOOGLE_CLIENT_SECRET == undefined) {
-  console.error("GOOGLE_CLIENT_SECRET must be set");
+  throw new Error("GOOGLE_CLIENT_SECRET must be set");
 }
 
 interface AuthenticatedUser {
