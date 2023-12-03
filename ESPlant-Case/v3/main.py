@@ -18,8 +18,8 @@ case_wall_thickness = 1.5
 case_floor_max_thickness = 8 + 1.6
 
 # Optional: Specify the max size and offset of the case (for letting a part of the pcb stick out)
-bottom_case_dimension = (DIMENSION_TYPE.AUTO, 62, DIMENSION_TYPE.AUTO)
-bottom_case_offset = (0, ALIGNMENT.POSITIVE, 0)
+bottom_case_dimension = (DIMENSION_TYPE.AUTO, 62, 12)
+bottom_case_offset = (0, ALIGNMENT.POSITIVE, ALIGNMENT.POSITIVE)
 
 should_use_fixation_holes = True
 fixation_hole_tolerance = 0.1
@@ -103,7 +103,7 @@ compartment_door.flip()
 compartment_door.move(
     bottom_case_open_face_bb.center.x,
     bottom_case_open_face_bb.center.y,
-    0.5 * compartment_door_settings.compartment_door_dimensions.z - pcb_thickness
+    bottom_case_open_face_bb.center.z + 0.5 * case_wall_thickness,
 )
 
 bottom_case_cq_object = bottom_case_cq_object.union(compartment_door.frame).cut(
