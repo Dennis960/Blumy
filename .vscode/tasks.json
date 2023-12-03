@@ -12,6 +12,18 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "python-start-helper",
+            "type": "shell",
+            "command": "python3",
+            "args": [
+                "${workspaceFolder}/ESPlant-Case/v3/compartment_door.py"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

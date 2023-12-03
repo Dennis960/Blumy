@@ -118,4 +118,5 @@ show_all({
 })
 
 ### ----------------- Export -----------------###
-# cq.Assembly(bottom_case_cq_object).save(filename)
+cq.Assembly(bottom_case_cq_object.mirror("XY")).save("Case-Bottom.vrml")
+cq.Assembly(compartment_door.door).save("Compartment-Door.vrml")
