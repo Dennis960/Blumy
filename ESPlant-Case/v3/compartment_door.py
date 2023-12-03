@@ -181,6 +181,7 @@ def generate_compartment_door_with_tolerance(settings: CompartmentDoorSettings =
             .box(s.tab_dimension[0] + 2 * t.tab_tolerance, s.compartment_door_dimensions.z + 2 * t.tab_tolerance, s.tab_dimension[1] + 2 * t.tab_tolerance, centered=(True, False, True))
             )
 
+
 def generate_compartment_door_frame(settings: CompartmentDoorSettings = CompartmentDoorSettings(), tolerances: CompartmentDoorTolerances = CompartmentDoorTolerances()) -> cq.Workplane:
     s = settings
     t = tolerances
