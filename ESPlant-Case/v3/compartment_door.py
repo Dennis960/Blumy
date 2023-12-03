@@ -39,6 +39,11 @@ class CompartmentDoorSettings:
     def __post_init__(self):
         self.snap_joint_face_selector = " or ".join(
             self.snap_joint_face_selectors)
+        if not type(self.tab_dimension) == cq.Vector:
+            self.tab_dimension = cq.Vector(self.tab_dimension)
+        if not type(self.compartment_door_dimensions) == cq.Vector:
+            self.compartment_door_dimensions = cq.Vector(
+                self.compartment_door_dimensions)
 
 
 @dataclass
@@ -154,7 +159,7 @@ class CompartmentDoor:
                 .line(s.tab_spacing_factor * s.compartment_door_dimensions.x, 0, forConstruction=True)
                 .vertices()
                 .tag("tab_points")
-                .box(s.tab_dimension[0], s.compartment_door_dimensions.z, s.tab_dimension[1], centered=(True, False, True))
+                .box(s.tab_dimension.x, s.compartment_door_dimensions.z, s.tab_dimension.y, centered=(True, False, True))
                 )
 
     def generate_compartment_door_with_tolerance(self) -> cq.Workplane:
@@ -169,7 +174,7 @@ class CompartmentDoor:
                 .workplaneFromTagged("tab_points")
                 .vertices(tag="tab_points")
                 .translate((0, 0, -t.tab_tolerance))
-                .box(s.tab_dimension[0] + 2 * t.tab_tolerance, s.compartment_door_dimensions.z + 2 * t.tab_tolerance, s.tab_dimension[1] + 2 * t.tab_tolerance, centered=(True, False, True))
+                .box(s.tab_dimension.x + 2 * t.tab_tolerance, s.compartment_door_dimensions.z + 2 * t.tab_tolerance, s.tab_dimension.y + 2 * t.tab_tolerance, centered=(True, False, True))
                 )
 
     def _generate_fitting_arm_box(self, face: cq.cq.CQObject) -> cq.Workplane:
