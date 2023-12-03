@@ -42,6 +42,9 @@ part_settings: List[PartSetting] = [
     PartSetting(".*ESP.*", "<Z", HOLE_TYPE.HOLE),
     PartSetting(".*ESP.*", ">Z", 2),
 ]
+pcb_thickness = 1.6
+pcb_thickness = 1.6
+pcb_thickness = 1.6
 
 
 list_of_additional_parts: List[Part] = [
@@ -100,11 +103,12 @@ compartment_door.flip()
 compartment_door.move(
     bottom_case_open_face_bb.center.x,
     bottom_case_open_face_bb.center.y,
-    bottom_case_open_face_bb.center.z + 0.5 *
-    compartment_door_settings.compartment_door_dimensions.z
+    0.5 * compartment_door_settings.compartment_door_dimensions.z - pcb_thickness
 )
 
-bottom_case_cq_object = bottom_case_cq_object.union(compartment_door.frame).cut(compartment_door.door_with_tolerance)
+bottom_case_cq_object = bottom_case_cq_object.union(compartment_door.frame).cut(
+    compartment_door.door_with_tolerance).cut(bottom_case.get_cuts())
+compartment_door.door = compartment_door.door.cut(original_board)
 
 ### ----------------- Preview -----------------###
 show_all({
