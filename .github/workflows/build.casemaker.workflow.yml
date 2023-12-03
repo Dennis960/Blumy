@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "ESPlant-Case/v3/**"
+      - ".github/workflows/build.casemaker.workflow.yml"
 
 jobs:
   build:
