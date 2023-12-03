@@ -1,7 +1,7 @@
 import { Router } from "express";
 import session from "express-session";
 import KnexSessionStoreFactory from "connect-session-knex";
-import passport from "../config/passport.js";
+// import passport from "../config/passport.js";
 import { knex } from "../config/knex.js";
 
 const SESSION_SECRET = process.env.SESSION_SECRET!;
@@ -27,7 +27,7 @@ router.use(
     }),
   })
 );
-router.use(passport.initialize());
-router.use(passport.session());
+// router.use(passport.initialize());
+// router.use(passport.session());
 
 export default router;
