@@ -73,6 +73,17 @@ class BottomCase:
             ),
         )
 
+    def get_cuts(self):
+        """
+        Returns a cq object that is the union of all objects that need to be cut out of the bottom case
+        Including holes and parts
+        """
+        cuts = self.union_of_bounding_boxes
+        for part in self.part_list.parts:
+            if part.hole_cq_object is not None:
+                cuts = cuts.union(part.hole_cq_object)
+        return cuts
+
     def generate_case(self, case_wall_thickness, floor_height):
         bottom_case_center = self.union_of_bounding_boxes.val().CenterOfBoundBox()
         bottom_case_box = (
@@ -96,8 +107,5 @@ class BottomCase:
         )
 
         # cut out holes and parts
-        bottom_case_shell = bottom_case_shell.cut(self.union_of_bounding_boxes)
-        for part in self.part_list.parts:
-            if part.hole_cq_object is not None:
-                bottom_case_shell = bottom_case_shell.cut(part.hole_cq_object)
+        bottom_case_shell = bottom_case_shell.cut(self.get_cuts())
         return bottom_case_shell
