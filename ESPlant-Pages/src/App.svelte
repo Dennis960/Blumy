@@ -69,6 +69,14 @@
   <div class="vrml-container">
     <VrmlViewer src="/pages/ESPlant-Board/ESPlant-Board.wrl"/>
   </div>
+  <h1>ESPlant-Board v2.0 3d case</h1>
+  <div class="vrml-container">
+    <VrmlViewer src="/pages/Case-Bottom.vrml"/>
+  </div>
+  <h1>ESPlant-Board v2.0 3d compartment door</h1>
+  <div class="vrml-container">
+    <VrmlViewer src="/pages/Compartment-Door.vrml"/>
+  </div>
   <h1>ESPlant-Board v1.0 Schematic</h1>
   <img
     src="/pages/ESPlant-Board/ESPlant-Board.svg"
