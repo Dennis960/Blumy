@@ -224,6 +224,16 @@ class CompartmentDoor:
         recessed_edge = self._generate_recessed_edge()
         fitting_arm_boxes = self._generate_fitting_arm_boxes()
         return recessed_edge.union(fitting_arm_boxes).cut(self.door_with_tolerance)
+    
+    def move(self, x: float = 0, y: float = 0, z: float = 0) -> None:
+        self.door = self.door.translate((x, y, z))
+        self.door_with_tolerance = self.door_with_tolerance.translate((x, y, z))
+        self.frame = self.frame.translate((x, y, z))
+
+    def flip(self) -> None:
+        self.door = self.door.mirror("XY")
+        self.door_with_tolerance = self.door_with_tolerance.mirror("XY")
+        self.frame = self.frame.mirror("XY")
 
 
 if __name__ == "__main__":

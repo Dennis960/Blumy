@@ -1,4 +1,4 @@
-from ocp_vscode import show_object
+from ocp_vscode import show_all
 from part_loader import load_parts
 from components import battery_springs
 import cadquery as cq
@@ -7,6 +7,7 @@ from typing import List
 from geometry import Vector
 from cq_part import PartSetting, HOLE_TYPE, DIMENSION_TYPE, ALIGNMENT, Part
 from bottom_case import BottomCase
+from compartment_door import CompartmentDoor, CompartmentDoorSettings, CompartmentDoorTolerances
 
 import logging
 
@@ -80,9 +81,37 @@ bottom_case_cq_object = bottom_case.generate_case(
     case_wall_thickness, case_floor_max_thickness
 )
 
+bottom_case_bounds = bottom_case_cq_object.val().BoundingBox()
+bottom_case_open_face_bb = bottom_case_cq_object.faces(
+    "<Z").val().BoundingBox()
+
+compartment_door_settings = CompartmentDoorSettings(
+    compartment_door_dimensions=(
+        bottom_case_open_face_bb.xlen - 2 * case_wall_thickness, bottom_case_open_face_bb.ylen - 2 * case_wall_thickness, 1.5),
+    tab_spacing_factor=0.8
+)
+compartment_door_tolerance = CompartmentDoorTolerances()
+compartment_door = CompartmentDoor(
+    compartment_door_settings, compartment_door_tolerance)
+
+# flip the compartment door
+compartment_door.flip()
+# move the compartment door to the top of the case
+compartment_door.move(
+    bottom_case_open_face_bb.center.x,
+    bottom_case_open_face_bb.center.y,
+    bottom_case_open_face_bb.center.z + 0.5 *
+    compartment_door_settings.compartment_door_dimensions.z
+)
+
+bottom_case_cq_object = bottom_case_cq_object.union(compartment_door.frame).cut(compartment_door.door_with_tolerance)
+
 ### ----------------- Preview -----------------###
-show_object(original_board, name="board")
-show_object(bottom_case_cq_object, name="case_bottom")
+show_all({
+    "board": original_board,
+    "case_bottom": bottom_case_cq_object,
+    "compartment_door": compartment_door.door,
+})
 
 ### ----------------- Export -----------------###
 # cq.Assembly(bottom_case_cq_object).save(filename)
