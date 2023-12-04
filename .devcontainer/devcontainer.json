@@ -17,5 +17,6 @@
 				"ms-python.autopep8"
 			]
 		}
-	}
+	},
+	"containerUser": "root"
 }
