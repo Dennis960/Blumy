@@ -38,5 +38,6 @@ app.use((req, res) => {
   res.status(404).send("Sorry, but this page does not exist.");
 });
 
-app.listen(PORT);
-console.log(`Server listening on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});

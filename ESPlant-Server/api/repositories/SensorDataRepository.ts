@@ -11,7 +11,10 @@ export default class SensorDataRepository {
     data: Omit<SensorReadingEntity, "id">
   ): Promise<number | undefined> {
     data.date = Date.now();
-    return knex<SensorReadingEntity>("data").insert(data).returning("id");
+    return knex<SensorReadingEntity>("data").insert({
+      id: undefined,
+      ...data
+    }).returning("id");
   }
 
   /**

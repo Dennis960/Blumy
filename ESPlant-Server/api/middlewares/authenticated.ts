@@ -2,7 +2,6 @@ import { RequestHandler } from "express";
 import SensorRepository from "../repositories/SensorRepository.js";
 
 export const isAuthenticated: RequestHandler = (req, res, next) => {
-  console.log("isAuthenticated", req.user)
   if (!req.isAuthenticated()) {
     return res.status(401).send({
       message: "unauthorized",
@@ -12,7 +11,6 @@ export const isAuthenticated: RequestHandler = (req, res, next) => {
 };
 
 export const isUser: RequestHandler = (req, res, next) => {
-  console.log("isUser", req.user)
   if (req.user?.kind != "user") {
     return res.status(403).send({
       message: "unauthorized",

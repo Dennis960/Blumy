@@ -9,6 +9,15 @@ import SuperJSON from 'superjson';
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'https://esplant.hoppingadventure.com/api';
 
+export async function ensureLoggedIn() {
+	await fetch(`${BASE_URL}/profile`)
+		.then((response) => {
+			if (response.status == 401) {
+				window.location.href = `${BASE_URL}/auth/google`;
+			}
+		})
+}
+
 export async function fetchSensorOverview(): Promise<SensorOverviewDTO> {
 	return await fetch(`${BASE_URL}/sensors`)
 		.then((response) => response.text())

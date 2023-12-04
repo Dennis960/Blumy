@@ -6,10 +6,13 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
+	import { ensureLoggedIn } from '$lib/api';
 
 	onMount(async () => {
 		// @ts-ignore
 		await import('@tabler/core/dist/js/tabler.js');
+
+		await ensureLoggedIn();
 	});
 
 	export let data;
