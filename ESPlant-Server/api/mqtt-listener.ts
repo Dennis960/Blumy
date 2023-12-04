@@ -1,6 +1,6 @@
 import mqtt from 'mqtt';
 import SensorController from './controllers/SensorController.js';
-import SensorReadingEntity, { ESPSensorReadingDTO } from './entities/SensorReadingEntity.js';
+import { ESPSensorReadingDTO } from './entities/SensorReadingEntity.js';
 
 const client = mqtt.connect(process.env.MQTT_URL || 'mqtt://localhost:1883');
 client.on('connect', () => {

@@ -24,19 +24,22 @@ const dataController = new SensorController();
 // -> 200 message: data added, data: data
 router.post(
   "/data",
-  isSensor,
+  // isSensor,
   validate(
     z.object({
       body: espSensorReadingSchema,
     })
   ),
   async (req, res) => {
+    // TODO for backwards compatibility, sensor auth is not enabled yet
     const dataObj: ESPSensorReadingDTO = req.body;
+    /*
     if (dataObj.sensorAddress != req.user?.sensorId) {
       return res.status(403).send({
         message: "unauthorized",
       });
     }
+    */
 
     const data = await dataController.addSensorData(dataObj);
     return res.send(data);
