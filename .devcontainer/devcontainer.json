@@ -1,6 +1,6 @@
 {
 	"build": {
-		"dockerfile": "../ESPlant-Case/v3/Dockerfile"
+		"dockerfile": "./Dockerfile"
 	},
 	"name": "ESPlant-Case container",
 	"postStartCommand": "/usr/bin/redis-server",
@@ -17,6 +17,5 @@
 				"ms-python.autopep8"
 			]
 		}
-	},
-	"containerUser": "root"
+	}
 }
