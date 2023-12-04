@@ -6,6 +6,7 @@ const config: Record<string, Knex.Config> = {
     connection: {
       filename: "../data/sensor.sqlite",
     },
+    useNullAsDefault: true,
   },
 };
 
