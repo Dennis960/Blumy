@@ -30,7 +30,6 @@ class BatteryHolderSettings:
 class BatteryHolderTolerances:
     battery_diameter_tolerance: float = 1
     battery_length_tolerance: float = 3
-    # press_fit_tolerance: float = 0.1 TODO add
 
 
 def generate_batteries(settings: BatteryHolderSettings, tolerances: BatteryHolderTolerances) -> cq.Workplane:
