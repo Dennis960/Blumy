@@ -36,6 +36,12 @@ class CompartmentDoorSettings:
                                             "+X", "-X"]] = field(default_factory=lambda: ["+Y"])
     tabs_face_selector: Literal["<Y", ">Y", "<X", ">X"] = "<Y"
 
+    text_size: float = 10
+    frame_text_size: float = 5
+    text_thickness: float = 0.5
+    compartment_door_text: str = ""
+    frame_text: str = ""
+
     def __post_init__(self):
         self.snap_joint_face_selector = " or ".join(
             self.snap_joint_face_selectors)
@@ -167,6 +173,13 @@ class CompartmentDoor:
                                 .tag("tab_points")
                                 .box(s.tab_dimension.x, s.compartment_door_dimensions.z, s.tab_dimension.y, centered=(True, False, True))
                                 )
+        if s.compartment_door_text:
+            compartment_door = (compartment_door
+                                .faces("-Z")
+                                .first()
+                                .workplane(centerOption="CenterOfBoundBox")
+                                .text(s.compartment_door_text, s.text_size, -s.text_thickness, combine="c")
+                                )
         return compartment_door
 
     def generate_compartment_door_with_tolerance(self) -> cq.Workplane:
@@ -203,11 +216,19 @@ class CompartmentDoor:
 
     def _generate_fitting_arm_boxes(self) -> cq.Workplane:
         s = self._settings
-        return (cq.Workplane("XY")
-                .box(s.compartment_door_dimensions.x, s.compartment_door_dimensions.y, s.compartment_door_dimensions.z)
-                .faces(s.snap_joint_face_selector)
-                .each(lambda face: self._generate_fitting_arm_box(face).val(), combine="a")
-                )
+        fitting_arm_boxes = (cq.Workplane("XY")
+                             .box(s.compartment_door_dimensions.x, s.compartment_door_dimensions.y, s.compartment_door_dimensions.z)
+                             .faces(s.snap_joint_face_selector)
+                             .each(lambda face: self._generate_fitting_arm_box(face).val(), combine="a")
+                             )
+        if s.frame_text:
+            fitting_arm_boxes = (fitting_arm_boxes
+                                 .faces("-Z")
+                                 .last()
+                                 .workplane(centerOption="CenterOfBoundBox")
+                                 .text(s.frame_text, s.frame_text_size, -s.text_thickness, combine="c")
+                                 )
+        return fitting_arm_boxes
 
     def _generate_recessed_edge(self) -> cq.Workplane:
         s = self._settings
@@ -279,24 +300,27 @@ if __name__ == "__main__":
             20, 20, 1.5), tab_dimension=(3, 4), tab_spacing_factor=0.6),
         CompartmentDoorSettings(compartment_door_dimensions=(
             20, 20, 1.5), fitting_arm_distance_factor=3),
-        CompartmentDoorSettings(compartment_door_dimensions=(
-            20, 20, 1.5), recessed_edge_width=0.5),
         # TODO fix fitting arm with different thickness
+        # CompartmentDoorSettings(compartment_door_dimensions=(
+        #     20, 20, 1.5), recessed_edge_width=0.5),
+        # TODO fix recessed edge width
         # CompartmentDoorSettings(compartment_door_dimensions=(20, 20, 1.5), fitting_arm_thickness=0.5, fitting_arm_height=5, fitting_arm_width=10),
     ]
     list_of_tolerances: List[CompartmentDoorTolerances] = [
         CompartmentDoorTolerances(),
         CompartmentDoorTolerances(),
         CompartmentDoorTolerances(),
-        CompartmentDoorTolerances(),
+        CompartmentDoorTolerances(compartment_door_tolerance=0.1),
         CompartmentDoorTolerances(tab_tolerance=0.1),
         CompartmentDoorTolerances(fitting_arm_tolerance=0.1),
-        CompartmentDoorTolerances(compartment_door_tolerance=0.1),
+        # TODO fix recessed edge width
         # TODO fix fitting arm with different thickness
         # CompartmentDoorTolerances()
     ]
 
     for i, (settings, tolerances) in enumerate(zip(list_of_settings, list_of_tolerances)):
+        settings.frame_text = str(i)
+        settings.compartment_door_text = str(i)
         compartmentDoor = CompartmentDoor(settings, tolerances)
         compartment_door_filename = f"compartment_door_{i}.step"
         compartment_door_frame_with_walls_filename = f"compartment_door_frame_with_walls_{i}.step"
