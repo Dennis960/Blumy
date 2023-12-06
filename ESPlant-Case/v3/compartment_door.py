@@ -66,6 +66,9 @@ class CompartmentDoor:
         self.door = self.generate_compartment_door()
         self.door_with_tolerance = self.generate_compartment_door_with_tolerance()
         self.frame = self.generate_compartment_door_frame()
+        self.compartment_door_frame_walls = self.generate_compartment_door_frame_walls()
+        self.compartment_door_frame_with_walls = self.frame.union(
+            self.compartment_door_frame_walls)
 
     def _generate_fitting_arm(self, face: cq.Workplane) -> cq.Workplane:
         s = self._settings
@@ -147,35 +150,43 @@ class CompartmentDoor:
     def generate_compartment_door(self) -> cq.Workplane:
         s = self._settings
         t = self._tolerances
-        return (cq.Workplane("XY")
-                .box(s.compartment_door_dimensions.x - 2 * t.compartment_door_tolerance,
-                     s.compartment_door_dimensions.y - 2 * t.compartment_door_tolerance, s.compartment_door_dimensions.z)
-                .tag("compartment_door")
-                .faces(s.snap_joint_face_selector, tag="compartment_door")
-                .each(lambda face: self._generate_fitting_arm(face).val(), combine="a")
-                .faces(s.tabs_face_selector, tag="compartment_door")
-                .workplane()
-                .move(-0.5 * s.tab_spacing_factor * s.compartment_door_dimensions.x, -1.5 * s.compartment_door_dimensions.z)
-                .line(s.tab_spacing_factor * s.compartment_door_dimensions.x, 0, forConstruction=True)
-                .vertices()
-                .tag("tab_points")
-                .box(s.tab_dimension.x, s.compartment_door_dimensions.z, s.tab_dimension.y, centered=(True, False, True))
-                )
+        compartment_door = (cq.Workplane("XY")
+                            .box(s.compartment_door_dimensions.x - 2 * t.compartment_door_tolerance,
+                                 s.compartment_door_dimensions.y - 2 * t.compartment_door_tolerance, s.compartment_door_dimensions.z)
+                            .tag("compartment_door")
+                            .faces(s.snap_joint_face_selector, tag="compartment_door")
+                            .each(lambda face: self._generate_fitting_arm(face).val(), combine="a")
+                            )
+        if s.tabs_face_selector:
+            compartment_door = (compartment_door
+                                .faces(s.tabs_face_selector, tag="compartment_door")
+                                .workplane()
+                                .move(-0.5 * s.tab_spacing_factor * s.compartment_door_dimensions.x, -1.5 * s.compartment_door_dimensions.z)
+                                .line(s.tab_spacing_factor * s.compartment_door_dimensions.x, 0, forConstruction=True)
+                                .vertices()
+                                .tag("tab_points")
+                                .box(s.tab_dimension.x, s.compartment_door_dimensions.z, s.tab_dimension.y, centered=(True, False, True))
+                                )
+        return compartment_door
 
     def generate_compartment_door_with_tolerance(self) -> cq.Workplane:
         s = self._settings
         t = self._tolerances
-        return (self.generate_compartment_door()
-                .workplaneFromTagged("compartment_door")
-                .box(s.compartment_door_dimensions.x, s.compartment_door_dimensions.y, s.compartment_door_dimensions.z)
-                .tag("compartment_door_with_tolerance")
-                .faces(s.snap_joint_face_selector, tag="compartment_door")
-                .each(lambda face: self._generate_fitting_arm_tolerance(face).val(), combine="a")
-                .workplaneFromTagged("tab_points")
-                .vertices(tag="tab_points")
-                .translate((0, 0, -t.tab_tolerance))
-                .box(s.tab_dimension.x + 2 * t.tab_tolerance, s.compartment_door_dimensions.z + 2 * t.tab_tolerance, s.tab_dimension.y + 2 * t.tab_tolerance, centered=(True, False, True))
-                )
+        compartment_door = (self.generate_compartment_door()
+                            .workplaneFromTagged("compartment_door")
+                            .box(s.compartment_door_dimensions.x, s.compartment_door_dimensions.y, s.compartment_door_dimensions.z)
+                            .tag("compartment_door_with_tolerance")
+                            .faces(s.snap_joint_face_selector, tag="compartment_door")
+                            .each(lambda face: self._generate_fitting_arm_tolerance(face).val(), combine="a")
+                            )
+        if s.tabs_face_selector:
+            compartment_door = (compartment_door
+                                .workplaneFromTagged("tab_points")
+                                .vertices(tag="tab_points")
+                                .translate((0, 0, -t.tab_tolerance))
+                                .box(s.tab_dimension.x + 2 * t.tab_tolerance, s.compartment_door_dimensions.z + 2 * t.tab_tolerance, s.tab_dimension.y + 2 * t.tab_tolerance, centered=(True, False, True))
+                                )
+        return compartment_door
 
     def _generate_fitting_arm_box(self, face: cq.cq.CQObject) -> cq.Workplane:
         s = self._settings
@@ -224,10 +235,11 @@ class CompartmentDoor:
         recessed_edge = self._generate_recessed_edge()
         fitting_arm_boxes = self._generate_fitting_arm_boxes()
         return recessed_edge.union(fitting_arm_boxes).cut(self.door_with_tolerance)
-    
+
     def move(self, x: float = 0, y: float = 0, z: float = 0) -> None:
         self.door = self.door.translate((x, y, z))
-        self.door_with_tolerance = self.door_with_tolerance.translate((x, y, z))
+        self.door_with_tolerance = self.door_with_tolerance.translate(
+            (x, y, z))
         self.frame = self.frame.translate((x, y, z))
 
     def flip(self) -> None:
@@ -235,16 +247,65 @@ class CompartmentDoor:
         self.door_with_tolerance = self.door_with_tolerance.mirror("XY")
         self.frame = self.frame.mirror("XY")
 
+    def generate_compartment_door_frame_walls(self) -> cq.Workplane:
+        """
+        This method is used to test the compartment door frame without printing an entire case
+        """
+        s = self._settings
+        t = self._tolerances
+        return (cq.Workplane("XY")
+                .transformed(offset=(0, 0, 0.5 * s.compartment_door_dimensions.z))
+                .rect(s.compartment_door_dimensions.x, s.compartment_door_dimensions.y)
+                .extrude(-s.fitting_arm_height - t.fitting_arm_tolerance - s.fitting_arm_frame_thickness + t.compartment_door_tolerance)
+                .faces("|Z")
+                .shell(s.recessed_edge_width, kind="intersection")
+                .cut(self.door_with_tolerance)
+                )
+
 
 if __name__ == "__main__":
     import ocp_vscode
-    compartmentDoorSettings = CompartmentDoorSettings(
-        snap_joint_face_selectors=["+X", "-X", "+Y"], tabs_face_selector="<Y")
-    compartmentDoorTolerances = CompartmentDoorTolerances()
-    compartmentDoor = CompartmentDoor(
-        compartmentDoorSettings, compartmentDoorTolerances)
+
+    list_of_settings: List[CompartmentDoorSettings] = [
+        CompartmentDoorSettings(compartment_door_dimensions=(20, 20, 1.5), snap_joint_face_selectors=[
+                                "+X", "-X", "+Y"], tabs_face_selector="<Y"),
+        CompartmentDoorSettings(compartment_door_dimensions=(
+            24, 20, 1.5), fitting_arm_angle_offset=0),
+        CompartmentDoorSettings(compartment_door_dimensions=(20, 20, 1.5), snap_joint_face_selectors=[
+                                "+X", "-X", "+Y", "-Y"], tabs_face_selector=""),
+        CompartmentDoorSettings(compartment_door_dimensions=(
+            20, 20, 1.5), fitting_arm_thickness=2, fitting_arm_height=12),
+        CompartmentDoorSettings(compartment_door_dimensions=(
+            20, 20, 1.5), tab_dimension=(3, 4), tab_spacing_factor=0.6),
+        CompartmentDoorSettings(compartment_door_dimensions=(
+            20, 20, 1.5), fitting_arm_distance_factor=3),
+        CompartmentDoorSettings(compartment_door_dimensions=(
+            20, 20, 1.5), recessed_edge_width=0.5),
+        # TODO fix fitting arm with different thickness
+        # CompartmentDoorSettings(compartment_door_dimensions=(20, 20, 1.5), fitting_arm_thickness=0.5, fitting_arm_height=5, fitting_arm_width=10),
+    ]
+    list_of_tolerances: List[CompartmentDoorTolerances] = [
+        CompartmentDoorTolerances(),
+        CompartmentDoorTolerances(),
+        CompartmentDoorTolerances(),
+        CompartmentDoorTolerances(),
+        CompartmentDoorTolerances(tab_tolerance=0.1),
+        CompartmentDoorTolerances(fitting_arm_tolerance=0.1),
+        CompartmentDoorTolerances(compartment_door_tolerance=0.1),
+        # TODO fix fitting arm with different thickness
+        # CompartmentDoorTolerances()
+    ]
+
+    for i, (settings, tolerances) in enumerate(zip(list_of_settings, list_of_tolerances)):
+        compartmentDoor = CompartmentDoor(settings, tolerances)
+        compartment_door_filename = f"compartment_door_{i}.step"
+        compartment_door_frame_with_walls_filename = f"compartment_door_frame_with_walls_{i}.step"
+        cq.Assembly(compartmentDoor.door.mirror("XY")
+                    ).save(compartment_door_filename)
+        cq.Assembly(compartmentDoor.compartment_door_frame_with_walls).save(
+            compartment_door_frame_with_walls_filename)
+
     ocp_vscode.show_all({
         "compartment_door": compartmentDoor.door,
-        "compartment_door_with_tolerance": compartmentDoor.door_with_tolerance,
-        "compartment_door_frame": compartmentDoor.frame
+        "compartment_door_frame_with_walls": compartmentDoor.compartment_door_frame_with_walls
     })
