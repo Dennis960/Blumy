@@ -1,10 +1,9 @@
-from ocp_vscode import show_all
 from part_loader import load_parts
 from components import battery_springs
 import cadquery as cq
 from board_converter import convert
 from typing import List
-from geometry import Vector
+from geometry import Vector  # TODO replace all Vector with cq.Vector
 from cq_part import PartSetting, HOLE_TYPE, DIMENSION_TYPE, ALIGNMENT, Part
 from bottom_case import BottomCase
 from compartment_door import CompartmentDoor, CompartmentDoorSettings
@@ -18,6 +17,9 @@ logging.basicConfig(level=logging.INFO)
 
 @dataclass
 class CasemakerSettings:
+    kicad_pcb_path: str = "ESPlant-Board/ESPlant-Board.kicad_pcb"
+    cache_directory: str = "parts"
+
     case_wall_thickness = 1.5
     case_floor_max_thickness = 8 + 1.6
 
@@ -63,15 +65,18 @@ class CasemakerSettings:
 
 
 class Casemaker:
-    def __init__(self, settings: CasemakerSettings = CasemakerSettings()):
+    def __init__(self, settings: CasemakerSettings = CasemakerSettings(), compartment_door_settings: CompartmentDoorSettings = None, battery_holder_settings: BatteryHolderSettings = BatteryHolderSettings()):
         self.settings = settings
+        self.compartment_door_settings = compartment_door_settings
+        self.battery_holder_settings = battery_holder_settings
         s = self.settings
-
+        
+        # TODO extract all code below to separate callable functions for possible performance improvements by using caches
         self.original_board = self.load_original_board()
 
         ### ----------------- Board + Components (Boxes) -----------------###
-        # TODO extract to a separate function
-        part_list = load_parts(exclude=s.parts_to_ignore_in_case_generation)
+        part_list = load_parts(
+            exclude=s.parts_to_ignore_in_case_generation, parts_directory=s.cache_directory)
         for additional_part in s.list_of_additional_parts:
             part_list.add_part(additional_part)
         part_list.apply_part_tolerances(s.part_tolerance)
@@ -81,7 +86,7 @@ class Casemaker:
         part_list.apply_settings(s.part_settings)
 
         ### ----------------- Case -----------------###
-        # TODO create a BottomCaseSettings class and move the bottom case settings there, then extract the settings to CasemakerSettings
+        # TODO create a BottomCaseSettings dataclass and move the bottom case settings there, then extract the settings to CasemakerSettings
         self.bottom_case = BottomCase(part_list)
         self.bottom_case.override_dimension(s.bottom_case_dimension)
         self.bottom_case.override_offset(s.bottom_case_offset)
@@ -93,11 +98,12 @@ class Casemaker:
             "<Z").val().BoundingBox()
 
         # TODO extract compartment door settings to CasemakerSettings, compartment door should be optional and individually configurable
-        compartment_door_settings = CompartmentDoorSettings(
-            compartment_door_dimensions=(
-                bottom_case_open_face_bb.xlen - 2 * s.case_wall_thickness, bottom_case_open_face_bb.ylen - 2 * s.case_wall_thickness, 1.5),
-            tab_spacing_factor=0.8
-        )
+        if compartment_door_settings is None:
+            compartment_door_settings = CompartmentDoorSettings(
+                compartment_door_dimensions=(
+                    bottom_case_open_face_bb.xlen - 2 * s.case_wall_thickness, bottom_case_open_face_bb.ylen - 2 * s.case_wall_thickness, 1.5),
+                tab_spacing_factor=0.8
+            )
         self.compartment_door = CompartmentDoor(compartment_door_settings)
 
         # flip the compartment door
@@ -116,9 +122,7 @@ class Casemaker:
 
         ### ----------------- Battery Holder -----------------###
         # TODO refactoring needed, and battery holder should be optional and individually configurable
-        self.battery_holder = BatteryHolder(
-            BatteryHolderSettings(front_wall_thickness=2.5,
-                                  back_wall_thickness=1.5, insertable_springs_thickness=1, polartiy_text_spacing=0.3, battery_length_tolerance=4))
+        self.battery_holder = BatteryHolder(self.battery_holder_settings)
         self.battery_holder.battery_holder = (self.battery_holder.battery_holder
                                               .rotate((0, 0, 0), (0, 1, 0), 180)
                                               .translate((
@@ -137,7 +141,8 @@ class Casemaker:
 
     def load_original_board(self) -> cq.Workplane:
         # Converts the pcb board and generates the parts.json file if it doesn't exist yet
-        board_step_path = convert("ESPlant-Board/ESPlant-Board.kicad_pcb")
+        board_step_path = convert(
+            self.settings.kicad_pcb_path, self.settings.cache_directory)
         original_board = cq.importers.importStep(board_step_path)
         for additional_part in self.settings.list_of_additional_parts:
             original_board = original_board.union(
@@ -146,8 +151,14 @@ class Casemaker:
 
 
 if __name__ == "__main__":
-    ### ----------------- Preview -----------------###
-    casemaker = Casemaker(CasemakerSettings())
+    from ocp_vscode import show_all
+
+    casemaker = Casemaker(CasemakerSettings(), None,
+                          BatteryHolderSettings(front_wall_thickness=2.5,
+                                                back_wall_thickness=1.5,
+                                                insertable_springs_thickness=1,
+                                                polartiy_text_spacing=0.3,
+                                                battery_length_tolerance=4))
     show_all({
         "board": casemaker.original_board,
         "case_bottom": casemaker.bottom_case_cq_object,

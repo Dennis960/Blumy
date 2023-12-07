@@ -1,10 +1,7 @@
 {
     "triggerTaskOnSave.tasks": {
-        "python-main": [
-            "ESPlant-Case/**/main.py"
-        ],
-        "python-start-helper": [
-            "ESPlant-Case/**/compartment_door.py"
+        "python-casemaker": [
+            "ESPlant-Case/**/casemaker.py"
         ]
     },
     "editor.selectionClipboard": false
