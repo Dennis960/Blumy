@@ -62,26 +62,6 @@ def load_part_data(parts_directory: str):
     return part_data
 
 
-def import_part_step(part: PartDetails):
-    """
-    Import a part from a STEP file and apply the part's position and rotation.
-    :param part: Part object
-    :return: cadquery.Workplane object
-    """
-    logging.debug(f"Importing part {part.name} from {part.abs_file_path} into cadquery")
-    part_step = cq.importers.importStep(part.abs_file_path)
-    axis_angle_rotation = quaternion_to_axis_angle(
-        part.rotx, part.roty, part.rotz, part.rotw
-    )
-    if axis_angle_rotation[2] != 0:
-        part_step = part_step.rotate(
-            axisStartPoint=axis_angle_rotation[0],
-            axisEndPoint=axis_angle_rotation[1],
-            angleDegrees=axis_angle_rotation[2],
-        )
-    return part_step.translate((part.posx, part.posy, part.posz))
-
-
 def load_parts(exclude: List[str] = [], parts_directory="parts"):
     part_data = load_part_data(parts_directory)
     cq_objects: List[cq.Workplane] = []
@@ -94,7 +74,7 @@ def load_parts(exclude: List[str] = [], parts_directory="parts"):
         if any(part_exclude in part_details.name for part_exclude in exclude):
             continue
         names.append(part_details.name)
-        part_step = import_part_step(part_details)
+        part_step = cq.importers.importStep(part_details.abs_file_path)
         part_step_center = part_step.val().CenterOfBoundBox()
         cq_objects.append(part_step)
         bounding_box = part_step.val().BoundingBox()
