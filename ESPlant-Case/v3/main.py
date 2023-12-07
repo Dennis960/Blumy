@@ -85,7 +85,6 @@ bottom_case_cq_object = bottom_case.generate_case(
     case_wall_thickness, case_floor_max_thickness
 )
 
-bottom_case_bounds = bottom_case_cq_object.val().BoundingBox()
 bottom_case_open_face_bb = bottom_case_cq_object.faces(
     "<Z").val().BoundingBox()
 
