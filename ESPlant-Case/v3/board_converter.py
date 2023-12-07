@@ -8,7 +8,7 @@ from OCP.BRepBndLib import BRepBndLib
 from OCP.STEPCAFControl import STEPCAFControl_Reader
 from OCP.TCollection import TCollection_ExtendedString
 from OCP.TDataStd import TDataStd_Name
-from OCP.TDF import TDF_ChildIterator, TDF_LabelSequence
+from OCP.TDF import TDF_ChildIterator, TDF_LabelSequence, TDF_Label
 from OCP.TDocStd import TDocStd_Document
 from OCP.TopoDS import TopoDS_Shape
 from OCP.XCAFDoc import XCAFDoc_DocumentTool
@@ -96,15 +96,18 @@ def extract_shapes_from_step_file(board_path: str):
         if shapeTool.IsShape_s(label):
             shape = shapeTool.GetShape_s(label)
 
-            nameAttribute = TDataStd_Name()
-            if label.FindAttribute(TDataStd_Name.GetID_s(), nameAttribute):
-                name = nameAttribute.Get().ToExtString()
-                newName = name
-                i = 1
-                while newName in shapes:
-                    newName = name + str(i)
-                    i += 1
-                shapes[name] = shape
+            refLabel = TDF_Label()
+            nameAttr = TDataStd_Name()
+            if shapeTool.GetReferredShape_s(label, refLabel):
+                if refLabel.FindAttribute(TDataStd_Name.GetID_s(), nameAttr):
+                    name = nameAttr.Get().ToExtString()
+
+            newName = name
+            i = 1
+            while newName in shapes:
+                newName = name + f" ({i})"
+                i += 1
+            shapes[newName] = shape
         else:
             logging.info(f"Label {label} is not a shape")
     return shapes

@@ -75,12 +75,13 @@ def load_parts(exclude: List[str] = [], parts_directory="parts"):
             continue
         names.append(part_details.name)
         part_step = cq.importers.importStep(part_details.abs_file_path)
+        part_step_center = part_step.val().CenterOfBoundBox()
         cq_objects.append(part_step)
         bounding_box = part_step.val().BoundingBox()
         bounding_box_part = (
             cq.Workplane("XY")
-            .box(part_details.sizex, part_details.sizey, part_details.sizez)
-            .translate((part_details.posx, part_details.posy, part_details.posz))
+            .box(bounding_box.xlen, bounding_box.ylen, bounding_box.zlen)
+            .translate((part_step_center.x, part_step_center.y, part_step_center.z))
         )
         bounding_boxes.append(bounding_box_part)
         parts.append(
