@@ -22,6 +22,9 @@ class PartDetails:
     roty: float
     rotz: float
     rotw: float
+    sizex: float
+    sizey: float
+    sizez: float
 
 
 def quaternion_to_axis_angle(x, y, z, w):
