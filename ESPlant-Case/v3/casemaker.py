@@ -39,16 +39,17 @@ class CasemakerSettings:
     part_settings: List[PartSetting] = field(default_factory=lambda: [
         PartSetting(".*", ">Z", 0.5),
         PartSetting(".*", "<Z", 0.5),
-        PartSetting("USB1", ">X", HOLE_TYPE.HOLE, width=11, height=6.5),
-        PartSetting("(U3)|(U4)", ">Z", HOLE_TYPE.HOLE),
-        PartSetting("U8", ">Z", HOLE_TYPE.HOLE, offset_y=-2, height=10),
-        PartSetting("(D1)|(D3)|(U6)", ">Z", HOLE_TYPE.HOLE),
+        PartSetting(".*MICRO-USB.*", ">X",
+                    HOLE_TYPE.HOLE, width=11, height=6.5),
+        PartSetting(".*SW-SMD_4P.*", ">Z", HOLE_TYPE.HOLE),
+        PartSetting(".*SW-SMD_MK.*", ">Z", HOLE_TYPE.HOLE,
+                    offset_y=-2, height=10),
+        PartSetting(".*LED.*", ">Z", HOLE_TYPE.HOLE),
+        PartSetting(".*ALS-PT19.*", ">Z", HOLE_TYPE.HOLE),
         PartSetting(f".*{PCB_PART_NAME}.*", "<Z", HOLE_TYPE.HOLE),
-        PartSetting("U13", "<Z", HOLE_TYPE.HOLE),
-        PartSetting("U13", ">Z", 2),
+        PartSetting(".*ESP.*", "<Z", HOLE_TYPE.HOLE),
+        PartSetting(".*ESP.*", ">Z", 2),
     ])
-    pcb_thickness = 1.6
-    pcb_thickness = 1.6
     pcb_thickness = 1.6
 
     list_of_additional_parts: List[Part] = field(default_factory=lambda: [

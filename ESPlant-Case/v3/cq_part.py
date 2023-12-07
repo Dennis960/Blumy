@@ -7,7 +7,7 @@ from utils import extrude_part_faces, extrude_part_width, extrude_part_height
 from pcb import make_offset_shape
 
 case_hole_extrusion_size = 1000
-PCB_PART_NAME = r"\=\>\["
+PCB_PART_NAME = "PCB"
 
 
 class HOLE_TYPE(Enum):
