@@ -7,8 +7,8 @@ from typing import List
 from geometry import Vector
 from cq_part import PartSetting, HOLE_TYPE, DIMENSION_TYPE, ALIGNMENT, Part
 from bottom_case import BottomCase
-from compartment_door import CompartmentDoor, CompartmentDoorSettings, CompartmentDoorTolerances
-from battery_holder import BatteryHolderSettings, BatteryHolderTolerances, BatteryHolder
+from compartment_door import CompartmentDoor, CompartmentDoorSettings
+from battery_holder import BatteryHolderSettings, BatteryHolder
 
 import logging
 
@@ -94,9 +94,7 @@ compartment_door_settings = CompartmentDoorSettings(
         bottom_case_open_face_bb.xlen - 2 * case_wall_thickness, bottom_case_open_face_bb.ylen - 2 * case_wall_thickness, 1.5),
     tab_spacing_factor=0.8
 )
-compartment_door_tolerance = CompartmentDoorTolerances()
-compartment_door = CompartmentDoor(
-    compartment_door_settings, compartment_door_tolerance)
+compartment_door = CompartmentDoor(compartment_door_settings)
 
 # flip the compartment door
 compartment_door.flip()
@@ -116,8 +114,7 @@ compartment_door.door = compartment_door.door.cut(original_board)
 
 battery_holder = BatteryHolder(
     BatteryHolderSettings(front_wall_thickness=2.5,
-                          back_wall_thickness=1.5, insertable_springs_thickness=1, polartiy_text_spacing=0.3),
-    BatteryHolderTolerances(battery_length_tolerance=4))
+                          back_wall_thickness=1.5, insertable_springs_thickness=1, polartiy_text_spacing=0.3, battery_length_tolerance=4))
 battery_holder.battery_holder = (battery_holder.battery_holder
                                  .rotate((0, 0, 0), (0, 1, 0), 180)
                                  .translate((
