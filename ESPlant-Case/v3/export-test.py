@@ -3,9 +3,11 @@ import cadquery as cq
 from typing import List
 from compartment_door import CompartmentDoor, CompartmentDoorSettings
 from battery_holder import BatteryHolder, BatteryHolderSettings
+from casemaker import Casemaker
 
 parts = {}
 
+# Compartment Door
 compartment_door_settings: List[CompartmentDoorSettings] = [
     CompartmentDoorSettings(compartment_door_dimensions=(20, 20, 1.5), snap_joint_face_selectors=[
                             "+X", "-X", "+Y"], tabs_face_selector="<Y"),
@@ -65,18 +67,22 @@ for i, settings in enumerate(battery_holder_settings):
         f"battery_holder_{i}": battery_holder.battery_holder,
     }
 
-# Casemaker TODO
-# CasemakerSettings = CasemakerSettings()
-# CasemakerTolerances = CasemakerTolerances()
-# casemaker = Casemaker(CasemakerSettings, CasemakerTolerances)
-# cq.Assembly(casemaker.case_bottom).save("case_bottom.step")
-# cq.Assembly(casemaker.compartment_door).save("compartment_door.step")
-# cq.Assembly(casemaker.battery_holder).save("battery_holder.step")
-# parts |= {
-#     "case_bottom": casemaker.case_bottom,
-#     "compartment_door": casemaker.compartment_door,
-#     "battery_holder": casemaker.battery_holder,
-# }
+# Casemaker
+casemaker = Casemaker()
+casemaker.battery_holder.battery_holder = casemaker.battery_holder.battery_holder.mirror("XY")
+casemaker.bottom_case_cq_object = casemaker.bottom_case_cq_object.mirror("XY")
+cq.Assembly(casemaker.bottom_case_cq_object).save("Case-Bottom.step")
+cq.Assembly(casemaker.compartment_door.door).save("Compartment-Door.step")
+cq.Assembly(casemaker.battery_holder.battery_holder).save("Battery-Holder.step")
+cq.Assembly(casemaker.case_preview).save("Case-preview-DO-NOT-PRINT.step")
+
+parts |= {
+    "Case-Bottom": casemaker.bottom_case_cq_object,
+    "Compartment-Door": casemaker.compartment_door.door,
+    "Battery-Holder": casemaker.battery_holder.battery_holder,
+    "Case-preview-DO-NOT-PRINT": casemaker.case_preview,
+}
+
 
 total_translation = 0
 for name, part in parts.items():
