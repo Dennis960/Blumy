@@ -2,23 +2,11 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "python-main",
+            "label": "python-casemaker",
             "type": "shell",
             "command": "python3",
             "args": [
-                "${workspaceFolder}/ESPlant-Case/v3/main.py"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        },
-        {
-            "label": "python-start-helper",
-            "type": "shell",
-            "command": "python3",
-            "args": [
-                "${workspaceFolder}/ESPlant-Case/v3/compartment_door.py"
+                "${workspaceFolder}/ESPlant-Case/v3/casemaker.py"
             ],
             "group": {
                 "kind": "build",
