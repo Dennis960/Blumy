@@ -258,12 +258,18 @@ class CompartmentDoor:
         return recessed_edge.union(fitting_arm_boxes).cut(self.door_with_tolerance)
 
     def move(self, x: float = 0, y: float = 0, z: float = 0) -> None:
+        """
+        Note: This method will be removed in the future
+        """
         self.door = self.door.translate((x, y, z))
         self.door_with_tolerance = self.door_with_tolerance.translate(
             (x, y, z))
         self.frame = self.frame.translate((x, y, z))
 
     def flip(self) -> None:
+        """
+        Note: This method will be removed in the future
+        """
         self.door = self.door.mirror("XY")
         self.door_with_tolerance = self.door_with_tolerance.mirror("XY")
         self.frame = self.frame.mirror("XY")
@@ -287,49 +293,9 @@ class CompartmentDoor:
 if __name__ == "__main__":
     import ocp_vscode
 
-    list_of_settings: List[CompartmentDoorSettings] = [
-        CompartmentDoorSettings(compartment_door_dimensions=(20, 20, 1.5), snap_joint_face_selectors=[
-                                "+X", "-X", "+Y"], tabs_face_selector="<Y"),
-        CompartmentDoorSettings(compartment_door_dimensions=(
-            24, 20, 1.5), fitting_arm_angle_offset=0),
-        CompartmentDoorSettings(compartment_door_dimensions=(20, 20, 1.5), snap_joint_face_selectors=[
-                                "+X", "-X", "+Y", "-Y"], tabs_face_selector=""),
-        CompartmentDoorSettings(compartment_door_dimensions=(
-            20, 20, 1.5), fitting_arm_thickness=2, fitting_arm_height=12),
-        CompartmentDoorSettings(compartment_door_dimensions=(
-            20, 20, 1.5), tab_dimension=(3, 4), tab_spacing_factor=0.6),
-        CompartmentDoorSettings(compartment_door_dimensions=(
-            20, 20, 1.5), fitting_arm_distance_factor=3),
-        # TODO fix fitting arm with different thickness
-        # CompartmentDoorSettings(compartment_door_dimensions=(
-        #     20, 20, 1.5), recessed_edge_width=0.5),
-        # TODO fix recessed edge width
-        # CompartmentDoorSettings(compartment_door_dimensions=(20, 20, 1.5), fitting_arm_thickness=0.5, fitting_arm_height=5, fitting_arm_width=10),
-    ]
-    list_of_tolerances: List[CompartmentDoorTolerances] = [
-        CompartmentDoorTolerances(),
-        CompartmentDoorTolerances(),
-        CompartmentDoorTolerances(),
-        CompartmentDoorTolerances(compartment_door_tolerance=0.1),
-        CompartmentDoorTolerances(tab_tolerance=0.1),
-        CompartmentDoorTolerances(fitting_arm_tolerance=0.1),
-        # TODO fix recessed edge width
-        # TODO fix fitting arm with different thickness
-        # CompartmentDoorTolerances()
-    ]
-
-    for i, (settings, tolerances) in enumerate(zip(list_of_settings, list_of_tolerances)):
-        settings.frame_text = str(i)
-        settings.compartment_door_text = str(i)
-        compartmentDoor = CompartmentDoor(settings, tolerances)
-        compartment_door_filename = f"compartment_door_{i}.step"
-        compartment_door_frame_with_walls_filename = f"compartment_door_frame_with_walls_{i}.step"
-        cq.Assembly(compartmentDoor.door.mirror("XY")
-                    ).save(compartment_door_filename)
-        cq.Assembly(compartmentDoor.compartment_door_frame_with_walls).save(
-            compartment_door_frame_with_walls_filename)
-
+    compartment_door = CompartmentDoor()
     ocp_vscode.show_all({
-        "compartment_door": compartmentDoor.door,
-        "compartment_door_frame_with_walls": compartmentDoor.compartment_door_frame_with_walls
+        "compartment_door": compartment_door.door,
+        "compartment_door_frame_with_walls": compartment_door.compartment_door_frame_with_walls,
+        "compartment_door_frame": compartment_door.frame
     })

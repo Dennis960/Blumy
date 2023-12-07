@@ -8,7 +8,7 @@ from geometry import Vector
 from cq_part import PartSetting, HOLE_TYPE, DIMENSION_TYPE, ALIGNMENT, Part
 from bottom_case import BottomCase
 from compartment_door import CompartmentDoor, CompartmentDoorSettings, CompartmentDoorTolerances
-from battery_holder import BatteryHolderSettings, BatteryHolderTolerances, generate_battery_holder
+from battery_holder import BatteryHolderSettings, BatteryHolderTolerances, BatteryHolder
 
 import logging
 
@@ -114,32 +114,36 @@ compartment_door.door = compartment_door.door.cut(original_board)
 
 ### ----------------- Battery Holder -----------------###
 
-battery_holder = generate_battery_holder(
-    BatteryHolderSettings(), BatteryHolderTolerances())
-battery_holder = (battery_holder
-                  .rotate((0, 0, 0), (0, 1, 0), 180)
-                  .translate((
-                      bottom_case_open_face_bb.center.x,
-                      bottom_case_open_face_bb.center.y + 1.5,
-                      bottom_case_open_face_bb.zmin))
-                  )
-battery_holder = battery_holder.cut(original_board)
+battery_holder = BatteryHolder(
+    BatteryHolderSettings(front_wall_thickness=2.5,
+                          back_wall_thickness=1.5, insertable_springs_thickness=1, polartiy_text_spacing=0.3),
+    BatteryHolderTolerances(battery_length_tolerance=4))
+battery_holder.battery_holder = (battery_holder.battery_holder
+                                 .rotate((0, 0, 0), (0, 1, 0), 180)
+                                 .translate((
+                                     bottom_case_open_face_bb.center.x,
+                                     bottom_case_open_face_bb.center.y + 1.5,
+                                     bottom_case_open_face_bb.zmin))
+                                 )
+battery_holder.battery_holder = battery_holder.battery_holder.cut(
+    original_board)
 
 ### ----------------- Preview -----------------###
 show_all({
     "board": original_board,
     "case_bottom": bottom_case_cq_object,
     "compartment_door": compartment_door.door,
-    "battery_holder": battery_holder,
+    "battery_holder": battery_holder.battery_holder,
 })
 
 ### ----------------- Export -----------------###
 cq.Assembly(bottom_case_cq_object.mirror("XY")).save("Case-Bottom.step")
 cq.Assembly(compartment_door.door).save("Compartment-Door.step")
-cq.Assembly(battery_holder.mirror("XY")).save("Battery-Holder.step")
+cq.Assembly(battery_holder.battery_holder.mirror(
+    "XY")).save("Battery-Holder.step")
 cq.Assembly(bottom_case_cq_object
             .union(original_board)
             .union(bottom_case_cq_object)
             .union(compartment_door.door)
-            .union(battery_holder)
-            ).save("Case.step")
+            .union(battery_holder.battery_holder)
+            ).save("Case-do-not-print.step")
