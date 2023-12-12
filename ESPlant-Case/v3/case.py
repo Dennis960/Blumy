@@ -1,7 +1,7 @@
 import cadquery as cq
 from utils import extrude_part_faces
 from board import Board
-from settings import ALIGNMENT, DIMENSION_TYPE, Offset, Dimension, CaseSettings
+from settings import ALIGNMENT, DIMENSION_TYPE, Offset, Dimension, CaseSettings, SIDE
 
 
 class Case:
@@ -23,6 +23,7 @@ class Case:
         self.case_cq_object = self.generate_case(
             case_settings.case_wall_thickness, case_settings.case_floor_pad
         )
+        self.case_outer_bounding_box = self.case_cq_object.val().BoundingBox()
 
     def calculate_dimension(self, bb_len, dim_len):
         if dim_len is DIMENSION_TYPE.AUTO:
@@ -77,9 +78,7 @@ class Case:
         Returns a cq object that is the union of all objects that need to be cut out of the bottom case
         Including holes and parts
         """
-        cuts = self.union_of_bounding_boxes
-        cuts = cuts.union(self.board.get_holes_union())
-        return cuts
+        return self.union_of_bounding_boxes.union(self.board.get_holes_union())
 
     def generate_case(self, case_wall_thickness, floor_height):
         case_center = self.union_of_bounding_boxes.val().CenterOfBoundBox()
@@ -106,3 +105,26 @@ class Case:
         # cut out holes and parts
         case_shell = case_shell.cut(self.get_cuts())
         return case_shell
+
+    def get_dimension_of_side(self, side: SIDE) -> tuple[float, float]:
+        if side is SIDE.BOTTOM or side is SIDE.TOP:
+            return (self.case_outer_bounding_box.xlen, self.case_outer_bounding_box.ylen)
+        elif side is SIDE.LEFT or side is SIDE.RIGHT:
+            return (self.case_outer_bounding_box.zlen, self.case_outer_bounding_box.ylen)
+        elif side is SIDE.FRONT or side is SIDE.BACK:
+            return (self.case_outer_bounding_box.xlen, self.case_outer_bounding_box.zlen)
+
+    def get_center_of_side(self, side: SIDE) -> cq.Vector:
+        center = self.case_outer_bounding_box.center
+        if side is SIDE.LEFT:
+            return cq.Vector(center.x - self.case_outer_bounding_box.xlen / 2, center.y, center.z)
+        elif side is SIDE.RIGHT:
+            return cq.Vector(center.x + self.case_outer_bounding_box.xlen / 2, center.y, center.z)
+        elif side is SIDE.FRONT:
+            return cq.Vector(center.x, center.y + self.case_outer_bounding_box.ylen / 2, center.z)
+        elif side is SIDE.BACK:
+            return cq.Vector(center.x, center.y - self.case_outer_bounding_box.ylen / 2, center.z)
+        elif side is SIDE.TOP:
+            return cq.Vector(center.x, center.y, center.z + self.case_outer_bounding_box.zlen / 2)
+        elif side is SIDE.BOTTOM:
+            return cq.Vector(center.x, center.y, center.z - self.case_outer_bounding_box.zlen / 2)

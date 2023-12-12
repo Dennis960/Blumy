@@ -9,10 +9,9 @@ from settings import BoardSettings, HOLE_TYPE, DIMENSION_TYPE, PCB_PART_NAME, ca
 
 
 class Board:
-    def __init__(self, shapes_dict: dict[str, TopoDS_Shape], board_name: str, board_settings: BoardSettings = BoardSettings()):
-        self._board_name = board_name
-        self._board_cq_object, self._shapes_dict = self._remove_board_from_shapes_dict(
-            shapes_dict)
+    def __init__(self, board_shape: TopoDS_Shape, shapes_dict: dict[str, TopoDS_Shape], board_settings: BoardSettings = BoardSettings()):
+        self._board_cq_object = cq.Workplane(cq.Shape.cast(board_shape))
+        self._shapes_dict = shapes_dict
         self._cq_object_dict = {name: cq.Workplane(cq.Shape.cast(
             shape)) for name, shape in self._shapes_dict.items()}
         self._bounding_box_dict = {name: cq.Shape.cast(
@@ -60,15 +59,6 @@ class Board:
                 part_settings.append(part_settings.pop(i + offset))
                 offset -= 1
         return part_settings
-
-    def _remove_board_from_shapes_dict(self, shapes_dict: dict[str, TopoDS_Shape]) -> tuple[cq.Workplane, dict[str, TopoDS_Shape]]:
-        board_cq_object: cq.Workplane
-        for name, shape in shapes_dict.items():
-            if self._board_name in name:
-                board_cq_object = cq.Workplane(cq.Shape.cast(shape))
-                del shapes_dict[name]
-                break
-        return board_cq_object, shapes_dict
 
     def _get_cq_object_with_part_tolerance_dict(self) -> dict[str, cq.Workplane]:
         s = self._board_settings

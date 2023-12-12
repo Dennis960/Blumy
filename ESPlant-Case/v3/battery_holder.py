@@ -107,6 +107,16 @@ class BatteryHolder:
             battery_holder = battery_holder.union(polarity_text)
         return battery_holder
 
+    def translate(self, vec: cq.cq.VectorLike):
+        self.battery_holder = self.battery_holder.translate(vec)
+        self.batteries = self.batteries.translate(vec)
+
+    def rotate(self, axisStartPoint: cq.cq.VectorLike, axisEndPoint: cq.cq.VectorLike, angleDegrees: float):
+        self.battery_holder = self.battery_holder.rotate(
+            axisStartPoint, axisEndPoint, angleDegrees)
+        self.batteries = self.batteries.rotate(
+            axisStartPoint, axisEndPoint, angleDegrees)
+
 
 if __name__ == "__main__":
     import ocp_vscode
