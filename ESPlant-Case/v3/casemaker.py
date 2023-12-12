@@ -30,6 +30,7 @@ class CasemakerSettings:
     should_use_fixation_holes = True
     fixation_hole_tolerance = 0.1
     fixation_hole_diameter = 2.0
+    fixation_hole_bigger_diameter = 5.0
 
     pcb_tolerance = Vector(
         1.5, 1.5, 0.5
@@ -79,7 +80,8 @@ class Casemaker:
             part_list.add_part(additional_part)
         part_list.apply_part_tolerances(s.part_tolerance)
         part_list.apply_pcb_tolerance(
-            s.pcb_tolerance, s.should_use_fixation_holes, s.fixation_hole_diameter, s.fixation_hole_tolerance
+            s.pcb_tolerance, s.should_use_fixation_holes, s.fixation_hole_diameter, s.fixation_hole_tolerance,
+            s.fixation_hole_bigger_diameter, s.pcb_thickness, s.pcb_tolerance.x
         )
         part_list.apply_settings(s.part_settings)
 
@@ -144,7 +146,7 @@ class Casemaker:
         original_board = cq.importers.importStep(board_step_path)
         for additional_part in self.settings.list_of_additional_parts:
             original_board = original_board.union(
-                additional_part.cq_object)
+                additional_part.load_cq_object)
         return original_board
 
 

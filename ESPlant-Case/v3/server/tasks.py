@@ -33,7 +33,8 @@ def run_generate_bottom_case(project_id: str, version: int):
         part_list.add_part(additional_part)
     part_list.apply_part_tolerances(config.part_tolerance)
     part_list.apply_pcb_tolerance(
-        cq.Vector(config.pcb_tolerance), config.should_use_fixation_holes, config.fixation_hole_diameter, config.hole_fit_tolerance
+        cq.Vector(config.pcb_tolerance), config.should_use_fixation_holes, config.fixation_hole_diameter, config.hole_fit_tolerance,
+            5, 1.6, 0.5 # TODO add these values to config
     )
     part_list.apply_settings(config.part_settings)
     bottom_case = BottomCase(part_list)

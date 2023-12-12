@@ -2,7 +2,8 @@ import math
 from dataclasses import dataclass
 import json
 import os
-from typing import List
+from typing import List, Callable
+from functools import partial
 import cadquery as cq
 import logging
 from cq_part import Part, PartList
@@ -64,8 +65,6 @@ def load_part_data(parts_directory: str):
 
 def load_parts(exclude: List[str] = [], parts_directory="parts"):
     part_data = load_part_data(parts_directory)
-    cq_objects: List[cq.Workplane] = []
-    bounding_boxes: List[cq.Workplane] = []
     names: List[str] = []
     parts: List[Part] = []
 
@@ -74,18 +73,21 @@ def load_parts(exclude: List[str] = [], parts_directory="parts"):
         if any(part_exclude in part_details.name for part_exclude in exclude):
             continue
         names.append(part_details.name)
-        part_step = cq.importers.importStep(part_details.abs_file_path)
-        part_step_center = part_step.val().CenterOfBoundBox()
-        cq_objects.append(part_step)
-        bounding_box = part_step.val().BoundingBox()
+        load_cq_object = partial(
+            cq.importers.importStep, part_details.abs_file_path)
+        part_step_center = cq.Vector(
+            part_details.posx, part_details.posy, part_details.posz)
+        bounding_box = cq.Workplane("XY").box(
+            part_details.sizex, part_details.sizey, part_details.sizez
+        ).translate((part_step_center.x, part_step_center.y, part_step_center.z)).val().BoundingBox()
         bounding_box_part = (
             cq.Workplane("XY")
             .box(bounding_box.xlen, bounding_box.ylen, bounding_box.zlen)
             .translate((part_step_center.x, part_step_center.y, part_step_center.z))
         )
-        bounding_boxes.append(bounding_box_part)
         parts.append(
-            Part(part_details.name, bounding_box, bounding_box_part, part_step)
+            Part(part_details.name, bounding_box,
+                 bounding_box_part, load_cq_object)
         )
     logging.info(f"Loaded parts: {names}")
     return PartList(parts)
