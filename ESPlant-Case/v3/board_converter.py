@@ -1,10 +1,7 @@
 import os
 import logging
-import cadquery as cq
-import json
 
-from OCP import Bnd, IFSelect
-from OCP.BRepBndLib import BRepBndLib
+from OCP import IFSelect
 from OCP.STEPCAFControl import STEPCAFControl_Reader
 from OCP.TCollection import TCollection_ExtendedString
 from OCP.TDataStd import TDataStd_Name
@@ -19,18 +16,18 @@ def convert(
     cache_dir="parts/",
     uses_kicad_nightly_cli=True,
     force_reconvert=False,
-):
+    # It should be unique, so that it doesn't conflict with other parts
+    board_name="__B$O$A$R$D__",
+) -> dict[str, TopoDS_Shape]:
     """
-    Converts the kicad_pcb file to a step file and exports all parts as step files.
-    Uses the kicad-cli and FreeCAD.\n
-    Takes the path to the kicad_pcb file as argument.\n
+    Converts the kicad_pcb file to a step file and loads the individual components as TopoDS_Shape into a dictionary.\n
     :param kicad_pcb_path: Path to the kicad_pcb file
-    :param cache_dir: Path to the cache directory where the parts are saved as step files
+    :param cache_dir: Path to the cache directory where the board is saved as step file
     :param uses_kicad_nightly_cli: Whether to use kicad-cli or kica-cli-nightly
     :param force_reconvert: Whether to force reconvert the step data
-    :param rerun_kicad_cli: Whether to rerun the kicad-cli command
+    :param board_name: Name of the board shape
 
-    :return: Path to the generated board.step file
+    :return: A dictionary of names and TopoDS_Shape objects. The board is saved with name board_name.
     """
     base_dir = os.path.dirname(os.path.realpath(__file__)) + "/"
     cache_dir = os.path.join(base_dir, cache_dir)
@@ -38,19 +35,11 @@ def convert(
     board_path = os.path.join(cache_dir, "board.step")
 
     cache_already_exists = create_cache_dir(cache_dir)
-    if cache_already_exists and not force_reconvert:
-        logging.info("Cache already exists, skipping conversion")
-        return board_path
+    if not cache_already_exists or force_reconvert:
+        convert_kicad_pcb_to_step(
+            kicad_pcb_path, board_path, uses_kicad_nightly_cli)
 
-    convert_kicad_pcb_to_step(
-        kicad_pcb_path, board_path, uses_kicad_nightly_cli)
-
-    shapes = extract_shapes_from_step_file(board_path)
-
-    export_parts_json(shapes, cache_dir)
-
-    logging.info("Done")
-    return board_path
+    return extract_shapes_from_step_file(board_path, board_name)
 
 
 def create_cache_dir(cache_dir: str):
@@ -71,7 +60,7 @@ def convert_kicad_pcb_to_step(kicad_pcb_path: str, step_path: str, uses_kicad_ni
     os.system(cmd)
 
 
-def extract_shapes_from_step_file(board_path: str):
+def extract_shapes_from_step_file(board_path: str, board_name: str):
     doc = TDocStd_Document(TCollection_ExtendedString("doc"))
     reader = STEPCAFControl_Reader()
     status = reader.ReadFile(board_path)
@@ -88,6 +77,7 @@ def extract_shapes_from_step_file(board_path: str):
     if freeShapes.Length() != 1:
         logging.error(f"Expected 1 free shape, found {freeShapes.Length()}")
         exit()
+    shapes[board_name] = shapeTool.GetShape_s(freeShapes.Value(1))
 
     tdf_iterator = TDF_ChildIterator(freeShapes.Value(1))
     while tdf_iterator.More():
@@ -111,38 +101,6 @@ def extract_shapes_from_step_file(board_path: str):
         else:
             logging.info(f"Label {label} is not a shape")
     return shapes
-
-def export_parts_json(shapes: dict[str, TopoDS_Shape], cache_dir: str):
-    parts_data = []
-    for name, shape in shapes.items():
-        transformation = shape.Location().Transformation()
-        translation = transformation.TranslationPart()
-        rotation = transformation.GetRotation()
-        boundingBox = Bnd.Bnd_Box()
-        BRepBndLib.Add_s(shape, boundingBox)
-        xmin, ymin, zmin, xmax, ymax, zmax = boundingBox.Get()
-        cq.Assembly(cq.Workplane(cq.Shape.cast(shape))).save(os.path.join(cache_dir, name + ".step"))
-        parts_data.append(
-            {
-                "name": name,
-                "file": name + ".step",
-                "posx": translation.X(),
-                "posy": translation.Y(),
-                "posz": translation.Z(),
-                "rotx": rotation.X(),
-                "roty": rotation.Y(),
-                "rotz": rotation.Z(),
-                "rotw": rotation.W(),
-                "sizex": xmax - xmin,
-                "sizey": ymax - ymin,
-                "sizez": zmax - zmin,
-            }
-        )
-
-    with open(os.path.join(cache_dir, "parts.json"), "w") as f:
-        json.dump(parts_data, f)
-
-    logging.info("Exported parts.json")
 
 
 if __name__ == "__main__":

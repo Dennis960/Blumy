@@ -5,7 +5,6 @@ from OCP.TopExp import TopExp_Explorer
 from OCP.TopAbs import TopAbs_EDGE, TopAbs_WIRE
 from OCP.BRepAdaptor import BRepAdaptor_Curve
 from OCP.GeomAbs import GeomAbs_Circle
-from geometry import Vector
 
 
 @dataclass
@@ -18,7 +17,7 @@ class WireData:
 
 def make_offset_shape(
     cq_object: cq.Workplane,
-    board_tolerance: Vector,
+    board_tolerance: cq.Vector,
     use_fixation_holes: bool,
     fixation_hole_diameter: float,
     hole_tolerance: float,

@@ -5,7 +5,7 @@ import shutil
 import zipfile
 from flask import Blueprint, request, render_template, url_for, redirect, send_file
 from werkzeug.utils import secure_filename
-from cq_part import PartSetting, HOLE_TYPE, DIMENSION_TYPE, ALIGNMENT
+from board import PartSetting, HOLE_TYPE, DIMENSION_TYPE, ALIGNMENT
 
 from .. import parameters
 from .. import utils
