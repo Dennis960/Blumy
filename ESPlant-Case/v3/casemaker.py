@@ -58,29 +58,61 @@ class CasemakerLoader:
 
 
 class Casemaker:
+    """
+    Do not use this class directly if you don't know what you are doing.\n
+    Use the CasemakerLoader class instead.
+    """
+
     def __init__(self, board_shape: TopoDS_Shape, shapes_dict: dict[str, TopoDS_Shape]):
         self.board_shape = board_shape
         self.shapes_dict = shapes_dict
-        self.board: Board = None
-        self.case: Case = None
+
+    def generate_board(self, board_settings: BoardSettings = BoardSettings()):
+        """
+        Generates a board object from the board shape and the shapes dictionary.
+        """
+        self.board = Board(self.board_shape, self.shapes_dict, board_settings)
+        return CasemakerWithBoard(self.board_shape, self.shapes_dict, self.board)
+
+
+class CasemakerWithBoard:
+    """
+    Do not use this class directly if you don't know what you are doing.\n
+    Use the CasemakerLoader class instead.
+    """
+
+    def __init__(self, board_shape: TopoDS_Shape, shapes_dict: dict[str, TopoDS_Shape], board: Board):
+        self.board_shape = board_shape
+        self.shapes_dict = shapes_dict
+        self.board = board
+
+    def generate_case(self, case_settings: CaseSettings = CaseSettings()):
+        """
+        Generates a case object using information from the board object.
+        """
+        self.case = Case(self.board, case_settings)
+        return CasemakerWithCase(self.board_shape, self.shapes_dict, self.board, self.case)
+
+
+class CasemakerWithCase:
+    """
+    Do not use this class directly if you don't know what you are doing.\n
+    Use the CasemakerLoader class instead.
+    """
+
+    def __init__(self, board_shape: TopoDS_Shape, shapes_dict: dict[str, TopoDS_Shape], board: Board, case: Case):
+        self.board_shape = board_shape
+        self.shapes_dict = shapes_dict
+        self.board = board
+        self.case = case
         self.compartment_door: CompartmentDoor = None
         self.battery_holder: BatteryHolder = None
 
-    def generate_board(self, board_settings: BoardSettings = BoardSettings()):
-        self.board = Board(self.board_shape, self.shapes_dict, board_settings)
-        return self
-
-    def generate_case(self, case_settings: CaseSettings = CaseSettings()):
-        if (self.board is None):
-            raise Exception(
-                "Call generate_board before calling generate_case")
-        self.case = Case(self.board, case_settings)
-        return self
-
     def add_compartment_door(self, side: SIDE, compartment_door_settings: CompartmentDoorSettings = CompartmentDoorSettings()):
-        if (self.case is None):
-            raise Exception(
-                "Call generate_case before calling add_compartment_door")
+        """
+        Adds a compartment door to the case at the specified side.
+        Currently only one compartment door can be added per case.
+        """
         face_width, face_height = self.case.get_dimension_of_side(side)
 
         # set the dimensions of the compartment door to match the dimensions of the face where it is placed
@@ -105,9 +137,10 @@ class Casemaker:
         return self
 
     def add_battery_holder(self, side: SIDE, battery_holder_settings: BatteryHolderSettings = None):
-        if (self.case is None):
-            raise Exception(
-                "Call generate_case before calling add_battery_holder")
+        """
+        Adds a battery holder to the case at the specified side.
+        Currently only one battery holder can be added per case.
+        """
         self.battery_holder = BatteryHolder(battery_holder_settings)
 
         # rotate the battery holder to match the side
@@ -154,4 +187,5 @@ if __name__ == "__main__":
         "case_bottom": casemaker.case.case_cq_object,
         "compartment_door": casemaker.compartment_door.door,
         "battery_holder": casemaker.battery_holder.battery_holder,
+        # "batteries": casemaker.battery_holder.batteries,
     })
