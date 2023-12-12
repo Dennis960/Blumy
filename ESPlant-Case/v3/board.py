@@ -97,7 +97,7 @@ class Board:
         return make_offset_shape(
             pcb_cq_object,
             s.pcb_tolerance, s.should_use_fixation_holes, s.fixation_hole_diameter, s.fixation_hole_tolerance,
-            s.fixation_hole_bigger_diameter, s.pcb_thickness, s.pcb_tolerance.x
+            s.fixation_hole_pad_diameter, s.pcb_thickness, s.pcb_tolerance.x
         )
 
     def _apply_settings_to_cq_object_with_part_tolerance_dict(self) -> tuple[dict[str, cq.Workplane], dict[str, cq.Workplane]]:

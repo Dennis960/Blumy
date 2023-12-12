@@ -21,7 +21,7 @@ def make_offset_shape(
     use_fixation_holes: bool,
     fixation_hole_diameter: float,
     hole_tolerance: float,
-    fixation_hole_bigger_diameter: float,
+    fixation_hole_pad_diameter: float,
     pcb_thickness: float,
     pcb_tolerance: float,
 ):
@@ -93,7 +93,7 @@ def make_offset_shape(
                 .cutBlind(pcb_thickness + pcb_tolerance)
                 .workplane()
                 .moveTo(circle_center.X(), circle_center.Y())
-                .circle(fixation_hole_bigger_diameter / 2)
+                .circle(fixation_hole_pad_diameter / 2)
                 .cutBlind(100)
             )
     return outline_extrusion
