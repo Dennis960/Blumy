@@ -28,6 +28,15 @@ class ALIGNMENT(Enum):
     NEGATIVE = "NEGATIVE"
 
 
+class SIDE(Enum):
+    TOP = ">Z"
+    BOTTOM = "<Z"
+    LEFT = "<X"
+    RIGHT = ">X"
+    FRONT = ">Y"
+    BACK = "<Y"
+
+
 Dimension = NewType(
     "BottomCaseDimension",
     tuple[float | DIMENSION_TYPE, float |
@@ -49,6 +58,15 @@ class PartSetting:
     offset_z: float = 0
     width: float | DIMENSION_TYPE = DIMENSION_TYPE.AUTO
     height: float | DIMENSION_TYPE = DIMENSION_TYPE.AUTO
+
+
+@dataclass
+class CaseSettings:
+    case_wall_thickness = 1.5
+    case_floor_max_thickness = 8 + 1.6
+    # Optional: Specify the max size and offset of the case (for letting a part of the pcb stick out)
+    bottom_case_dimension = (DIMENSION_TYPE.AUTO, 62, 12)
+    bottom_case_offset = (0, ALIGNMENT.POSITIVE, ALIGNMENT.POSITIVE)
 
 
 @dataclass
@@ -169,25 +187,3 @@ class BatteryHolderSettings:
 
     battery_diameter_tolerance: float = 1
     battery_length_tolerance: float = 1
-
-
-@dataclass
-class CasemakerSettings:
-    kicad_pcb_path: str = "ESPlant-Board/ESPlant-Board.kicad_pcb"
-    cache_directory: str = "parts"
-
-    case_wall_thickness = 1.5
-    case_floor_max_thickness = 8 + 1.6
-    parts_to_ignore_in_case_generation = ["PinHeader"]
-
-    # Optional: Specify the max size and offset of the case (for letting a part of the pcb stick out)
-    bottom_case_dimension = (DIMENSION_TYPE.AUTO, 62, 12)
-    bottom_case_offset = (0, ALIGNMENT.POSITIVE, ALIGNMENT.POSITIVE)
-
-    board_settings: BoardSettings = field(
-        default_factory=lambda: BoardSettings())
-
-    # Not yet supported
-    compartment_door_settings: CompartmentDoorSettings = None
-
-    battery_holder_settings: BatteryHolderSettings = BatteryHolderSettings()
