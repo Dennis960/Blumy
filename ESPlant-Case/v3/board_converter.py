@@ -14,6 +14,7 @@ from OCP.XCAFDoc import XCAFDoc_DocumentTool
 def convert(
     kicad_pcb_path,
     cache_dir="parts/",
+    exclude: list[str] = [],
     uses_kicad_nightly_cli=True,
     force_reconvert=False,
     # It should be unique, so that it doesn't conflict with other parts
@@ -23,6 +24,7 @@ def convert(
     Converts the kicad_pcb file to a step file and loads the individual components as TopoDS_Shape into a dictionary.\n
     :param kicad_pcb_path: Path to the kicad_pcb file
     :param cache_dir: Path to the cache directory where the board is saved as step file
+    :param exclude: List of part names to exclude from the conversion
     :param uses_kicad_nightly_cli: Whether to use kicad-cli or kica-cli-nightly
     :param force_reconvert: Whether to force reconvert the step data
     :param board_name: Name of the board shape
@@ -39,7 +41,7 @@ def convert(
         convert_kicad_pcb_to_step(
             kicad_pcb_path, board_path, uses_kicad_nightly_cli)
 
-    return extract_shapes_from_step_file(board_path, board_name)
+    return extract_shapes_from_step_file(board_path, board_name, exclude)
 
 
 def create_cache_dir(cache_dir: str):
@@ -60,7 +62,7 @@ def convert_kicad_pcb_to_step(kicad_pcb_path: str, step_path: str, uses_kicad_ni
     os.system(cmd)
 
 
-def extract_shapes_from_step_file(board_path: str, board_name: str):
+def extract_shapes_from_step_file(board_path: str, board_name: str, exclude: list[str]) -> dict[str, TopoDS_Shape]:
     doc = TDocStd_Document(TCollection_ExtendedString("doc"))
     reader = STEPCAFControl_Reader()
     status = reader.ReadFile(board_path)
@@ -91,12 +93,14 @@ def extract_shapes_from_step_file(board_path: str, board_name: str):
             if shapeTool.GetReferredShape_s(label, refLabel):
                 if refLabel.FindAttribute(TDataStd_Name.GetID_s(), nameAttr):
                     name = nameAttr.Get().ToExtString()
-
             newName = name
             i = 1
             while newName in shapes:
                 newName = name + f" ({i})"
                 i += 1
+            if any([exclude_name in newName for exclude_name in exclude]):
+                logging.info(f"Excluding {name}")
+                continue
             shapes[newName] = shape
         else:
             logging.info(f"Label {label} is not a shape")
