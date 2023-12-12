@@ -1,6 +1,7 @@
 import math
 import os
 import cadquery as cq
+from settings import SIDE
 
 path = os.path.dirname(os.path.abspath(__file__))
 
@@ -110,3 +111,18 @@ def extrude_part_height(part: cq.Workplane, min_height: int, dir: cq.Selector):
             extrude_part_faces(part, f"<{direction}", extrusion_length / 2)
         )
     return part
+
+
+def get_rotation_for_side(side: SIDE) -> tuple[cq.cq.VectorLike, cq.cq.VectorLike, float]:
+    if side is SIDE.BOTTOM:
+        return ((0, 0, 0), (0, 1, 0), 180)
+    elif side is SIDE.LEFT:
+        return ((0, 0, 0), (0, 1, 0), -90)
+    elif side is SIDE.RIGHT:
+        return ((0, 0, 0), (0, 1, 0), 90)
+    elif side is SIDE.TOP:
+        pass
+    elif side is SIDE.FRONT:
+        return ((0, 0, 0), (1, 0, 0), -90)
+    elif side is SIDE.BACK:
+        return ((0, 0, 0), (1, 0, 0), 90)

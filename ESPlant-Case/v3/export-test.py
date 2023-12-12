@@ -107,14 +107,11 @@ cq.Assembly(casemaker.compartment_door.door).save(
     f"Compartment-Door{export_file_extension}")
 cq.Assembly(casemaker.battery_holder.battery_holder).save(
     f"Battery-Holder{export_file_extension}")
-cq.Assembly(casemaker.case_preview).save(
-    f"Case-preview-DO-NOT-PRINT{export_file_extension}")
 
 parts |= {
     "Case-Bottom": casemaker.case.case_cq_object,
     "Compartment-Door": casemaker.compartment_door.door,
     "Battery-Holder": casemaker.battery_holder.battery_holder,
-    "Case-preview-DO-NOT-PRINT": casemaker.case_preview,
 }
 
 
