@@ -3,7 +3,7 @@ import time
 import cadquery as cq
 from celery import shared_task
 from part_loader import load_parts
-from bottom_case import BottomCase
+from case import Case
 
 from board_converter import convert
 from . import utils
@@ -37,7 +37,7 @@ def run_generate_bottom_case(project_id: str, version: int):
             5, 1.6, 0.5 # TODO add these values to config
     )
     part_list.apply_settings(config.part_settings)
-    bottom_case = BottomCase(part_list)
+    bottom_case = Case(part_list)
     bottom_case.override_dimension(config.bottom_case_dimension)
     bottom_case.override_offset(config.bottom_case_offset)
     bottom_case_cq_object = bottom_case.generate_case(
