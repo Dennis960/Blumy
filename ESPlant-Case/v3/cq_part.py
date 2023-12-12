@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import re
-from typing import List, Literal
+from typing import List, Literal, Callable
 import cadquery as cq
 from enum import Enum
 from utils import extrude_part_faces, extrude_part_width, extrude_part_height
@@ -40,7 +40,7 @@ class Part:
     name: str
     bound_box: cq.BoundBox
     cq_bounding_box: cq.Workplane
-    cq_object: cq.Workplane
+    load_cq_object: Callable[[], cq.Workplane]
     hole_cq_object: cq.Workplane = None
 
     def apply_setting(self, part_setting: PartSetting):
@@ -114,15 +114,21 @@ class PartList:
         use_fixation_holes: bool,
         fixation_hole_diameter: float,
         hole_tolerance: float,
+        fixation_hole_bigger_diameter: float,
+        pcb_thickness: float,
+        pcb_tolerance: float,
     ):
         pcbs = self.find_all_pcbs()
         for pcb in pcbs:
             pcb.cq_bounding_box = make_offset_shape(
-                pcb.cq_object,
+                pcb.load_cq_object(),
                 board_tolerance,
                 use_fixation_holes,
                 fixation_hole_diameter,
                 hole_tolerance,
+                fixation_hole_bigger_diameter,
+                pcb_thickness,
+                pcb_tolerance,
             )
 
     def apply_settings(self, part_settings: List[PartSetting]):
