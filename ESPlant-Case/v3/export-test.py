@@ -4,7 +4,7 @@ from typing import List
 from compartment_door import CompartmentDoor
 from battery_holder import BatteryHolder
 from casemaker import CasemakerLoader
-from settings import SIDE, CompartmentDoorSettings, BatteryHolderSettings
+from settings import SIDE, CompartmentDoorSettings, BatteryHolderSettings, CaseSettings, ALIGNMENT, DIMENSION_TYPE
 from components import battery_springs
 
 export_file_extension = ".step"
@@ -83,7 +83,10 @@ casemaker = (CasemakerLoader()
              .exclude_parts("PinHeader")
              .load_kicad_pcb("ESPlant-Board/ESPlant-Board.kicad_pcb")
              .generate_board()
-             .generate_case()
+             .generate_case(CaseSettings(
+                 case_dimension=(DIMENSION_TYPE.AUTO, 62, 12),
+                 case_offset=(0, ALIGNMENT.POSITIVE, ALIGNMENT.POSITIVE)
+             ))
              .add_compartment_door(SIDE.BOTTOM, CompartmentDoorSettings(
                  tab_spacing_factor=0.8,
              ))

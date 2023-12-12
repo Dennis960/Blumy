@@ -1,10 +1,10 @@
 from OCP.TopoDS import TopoDS_Shape
 from board_converter import BoardConverter
 from case import Case
-from compartment_door import CompartmentDoor, CompartmentDoorSettings
+from compartment_door import CompartmentDoor
 from battery_holder import BatteryHolderSettings, BatteryHolder
 from board import Board
-from settings import CaseSettings, BoardSettings, SIDE
+from settings import CaseSettings, BoardSettings, CompartmentDoorSettings, ALIGNMENT, DIMENSION_TYPE, SIDE
 from components import battery_springs
 from cadquery import Vector
 
@@ -174,7 +174,10 @@ if __name__ == "__main__":
                  })
                  .load_kicad_pcb("ESPlant-Board/ESPlant-Board.kicad_pcb")
                  .generate_board()
-                 .generate_case()
+                 .generate_case(CaseSettings(
+                     case_dimension=(DIMENSION_TYPE.AUTO, 62, 12),
+                     case_offset=(0, ALIGNMENT.POSITIVE, ALIGNMENT.POSITIVE)
+                 ))
                  .add_compartment_door(SIDE.BOTTOM, CompartmentDoorSettings(
                      tab_spacing_factor=0.8,
                  ))

@@ -21,7 +21,7 @@ class Case:
             case_settings.case_dimension)
         self.override_offset(case_settings.case_offset)
         self.case_cq_object = self.generate_case(
-            case_settings.case_wall_thickness, case_settings.case_floor_max_thickness
+            case_settings.case_wall_thickness, case_settings.case_floor_pad
         )
 
     def calculate_dimension(self, bb_len, dim_len):
