@@ -1,38 +1,18 @@
 from board_converter import convert
-from board import DIMENSION_TYPE, ALIGNMENT
 from bottom_case import BottomCase
 from compartment_door import CompartmentDoor, CompartmentDoorSettings
 from battery_holder import BatteryHolderSettings, BatteryHolder
-from dataclasses import dataclass, field
-from board import BoardSettings, Board
+from board import Board
+from settings import CasemakerSettings
 
 import logging
 
 logging.basicConfig(level=logging.INFO)
 
 
-@dataclass
-class CasemakerSettings:
-    kicad_pcb_path: str = "ESPlant-Board/ESPlant-Board.kicad_pcb"
-    cache_directory: str = "parts"
-
-    case_wall_thickness = 1.5
-    case_floor_max_thickness = 8 + 1.6
-    parts_to_ignore_in_case_generation = ["PinHeader"]
-
-    # Optional: Specify the max size and offset of the case (for letting a part of the pcb stick out)
-    bottom_case_dimension = (DIMENSION_TYPE.AUTO, 62, 12)
-    bottom_case_offset = (0, ALIGNMENT.POSITIVE, ALIGNMENT.POSITIVE)
-
-    board_settings: BoardSettings = field(
-        default_factory=lambda: BoardSettings())
-
-
 class Casemaker:
-    def __init__(self, settings: CasemakerSettings = CasemakerSettings(), compartment_door_settings: CompartmentDoorSettings = None, battery_holder_settings: BatteryHolderSettings = BatteryHolderSettings()):
+    def __init__(self, settings: CasemakerSettings = CasemakerSettings()):
         self.settings = settings
-        self.compartment_door_settings = compartment_door_settings
-        self.battery_holder_settings = battery_holder_settings
         s = self.settings
 
         board_name = "__B$O$A$R$D__"
@@ -56,6 +36,7 @@ class Casemaker:
             "<Z").val().BoundingBox()
 
         # TODO extract compartment door settings to CasemakerSettings, compartment door should be optional and individually configurable
+        compartment_door_settings = None  # s.compartment_door_settings
         if compartment_door_settings is None:
             compartment_door_settings = CompartmentDoorSettings(
                 compartment_door_dimensions=(
@@ -80,7 +61,8 @@ class Casemaker:
 
         ### ----------------- Battery Holder -----------------###
         # TODO refactoring needed, and battery holder should be optional and individually configurable
-        self.battery_holder = BatteryHolder(self.battery_holder_settings)
+        self.battery_holder = BatteryHolder(
+            self.settings.battery_holder_settings)
         self.battery_holder.battery_holder = (self.battery_holder.battery_holder
                                               .rotate((0, 0, 0), (0, 1, 0), 180)
                                               .translate((
@@ -101,12 +83,14 @@ class Casemaker:
 if __name__ == "__main__":
     from ocp_vscode import show_all
 
-    casemaker = Casemaker(CasemakerSettings(), None,
-                          BatteryHolderSettings(front_wall_thickness=2.5,
-                                                back_wall_thickness=1.5,
-                                                insertable_springs_thickness=1,
-                                                polartiy_text_spacing=0.3,
-                                                battery_length_tolerance=4))
+    casemaker = Casemaker(CasemakerSettings(
+        battery_holder_settings=BatteryHolderSettings(
+            front_wall_thickness=2.5,
+            back_wall_thickness=1.5,
+            insertable_springs_thickness=1,
+            polartiy_text_spacing=0.3,
+            battery_length_tolerance=4))
+    )
     show_all({
         "board": casemaker.board._board_cq_object,
         "case_bottom": casemaker.bottom_case_cq_object,

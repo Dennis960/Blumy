@@ -1,75 +1,12 @@
-from dataclasses import dataclass, field
-from components import battery_springs
 from OCP.TopoDS import TopoDS_Shape
 from pcb import make_offset_shape
 from functools import cache
 from typing import List
 import cadquery as cq
 import re
-from dataclasses import dataclass
-from typing import Literal
-from enum import Enum
 from utils import extrude_part_faces, extrude_part_width, extrude_part_height
+from settings import BoardSettings, HOLE_TYPE, DIMENSION_TYPE, PCB_PART_NAME, case_hole_extrusion_size, PartSetting
 
-case_hole_extrusion_size = 1000
-PCB_PART_NAME = "PCB"
-
-
-class HOLE_TYPE(Enum):
-    HOLE = "HOLE"
-
-
-class DIMENSION_TYPE(Enum):
-    AUTO = "AUTO"
-
-
-class ALIGNMENT(Enum):
-    POSITIVE = "POSITIVE"
-    NEGATIVE = "NEGATIVE"
-
-
-@dataclass
-class PartSetting:
-    name_regex: str
-    top_direction: Literal[">X", ">Y", ">Z", "<X", "<Y", "<Z"]
-    length: float | HOLE_TYPE = None
-    offset_x: float = 0
-    offset_y: float = 0
-    offset_z: float = 0
-    width: float | DIMENSION_TYPE = DIMENSION_TYPE.AUTO
-    height: float | DIMENSION_TYPE = DIMENSION_TYPE.AUTO
-
-
-@dataclass
-class BoardSettings:
-    should_use_fixation_holes = True
-    fixation_hole_tolerance = 0.1
-    fixation_hole_diameter = 2.0
-    fixation_hole_bigger_diameter = 5.0
-
-    pcb_tolerance = cq.Vector(
-        1.5, 1.5, 0.5
-    )  # having different tolerances for x and y is not supported
-    part_tolerance = 1
-    part_settings: List[PartSetting] = field(default_factory=lambda: [
-        PartSetting(".*", ">Z", 0.5),
-        PartSetting(".*", "<Z", 0.5),
-        PartSetting(".*MICRO-USB.*", ">X",
-                    HOLE_TYPE.HOLE, width=11, height=6.5),
-        PartSetting(".*SW-SMD_4P.*", ">Z", HOLE_TYPE.HOLE),
-        PartSetting(".*SW-SMD_MK.*", ">Z", HOLE_TYPE.HOLE,
-                    offset_y=-2, height=10),
-        PartSetting(".*LED.*", ">Z", HOLE_TYPE.HOLE),
-        PartSetting(".*ALS-PT19.*", ">Z", HOLE_TYPE.HOLE),
-        PartSetting(f".*{PCB_PART_NAME}.*", "<Z", HOLE_TYPE.HOLE),
-        PartSetting(".*ESP.*", "<Z", HOLE_TYPE.HOLE),
-        PartSetting(".*ESP.*", ">Z", 2),
-    ])
-    pcb_thickness = 1.6
-
-    additional_parts_dict: dict[str, TopoDS_Shape] = field(default_factory=lambda: {
-        "Battery Springs": battery_springs.val().wrapped
-    })
 
 
 class Board:
