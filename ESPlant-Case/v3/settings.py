@@ -2,8 +2,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Literal, NewType
 import cadquery as cq
-from OCP.TopoDS import TopoDS_Shape
-from components import battery_springs
 
 
 case_hole_extrusion_size = 1000
@@ -38,12 +36,12 @@ class SIDE(Enum):
 
 
 Dimension = NewType(
-    "BottomCaseDimension",
+    "CaseDimension",
     tuple[float | DIMENSION_TYPE, float |
           DIMENSION_TYPE, float | DIMENSION_TYPE],
 )
 Offset = NewType(
-    "BottomCaseOffset", tuple[float | ALIGNMENT,
+    "CaseOffset", tuple[float | ALIGNMENT,
                               float | ALIGNMENT, float | ALIGNMENT]
 )
 
@@ -65,8 +63,8 @@ class CaseSettings:
     case_wall_thickness = 1.5
     case_floor_max_thickness = 8 + 1.6
     # Optional: Specify the max size and offset of the case (for letting a part of the pcb stick out)
-    bottom_case_dimension = (DIMENSION_TYPE.AUTO, 62, 12)
-    bottom_case_offset = (0, ALIGNMENT.POSITIVE, ALIGNMENT.POSITIVE)
+    case_dimension = (DIMENSION_TYPE.AUTO, 62, 12)
+    case_offset = (0, ALIGNMENT.POSITIVE, ALIGNMENT.POSITIVE)
 
 
 @dataclass
@@ -95,10 +93,6 @@ class BoardSettings:
         PartSetting(".*ESP.*", ">Z", 2),
     ])
     pcb_thickness = 1.6
-
-    additional_parts_dict: dict[str, TopoDS_Shape] = field(default_factory=lambda: {
-        "Battery Springs": battery_springs.val().wrapped
-    })
 
 
 @dataclass

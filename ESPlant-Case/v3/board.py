@@ -8,12 +8,11 @@ from utils import extrude_part_faces, extrude_part_width, extrude_part_height
 from settings import BoardSettings, HOLE_TYPE, DIMENSION_TYPE, PCB_PART_NAME, case_hole_extrusion_size, PartSetting
 
 
-
 class Board:
     def __init__(self, shapes_dict: dict[str, TopoDS_Shape], board_name: str, board_settings: BoardSettings = BoardSettings()):
         self._board_name = board_name
         self._board_cq_object, self._shapes_dict = self._remove_board_from_shapes_dict(
-            shapes_dict | board_settings.additional_parts_dict)
+            shapes_dict)
         self._cq_object_dict = {name: cq.Workplane(cq.Shape.cast(
             shape)) for name, shape in self._shapes_dict.items()}
         self._bounding_box_dict = {name: cq.Shape.cast(
