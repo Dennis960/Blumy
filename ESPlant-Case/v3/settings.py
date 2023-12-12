@@ -101,7 +101,6 @@ class BoardSettings:
     :param pcb_tolerance: Tolerance for the PCB board (Vector).
     :param part_tolerance: Tolerance which will be applied to all parts.
     :param part_settings: List of PartSettings.
-    :param pcb_thickness: Thickness of the PCB board. TODO: this is already calculated automatically in the pcb.py file, so that could be used instead.
     """
     should_use_fixation_holes: bool = True
     fixation_hole_tolerance: float = 0.1
@@ -126,7 +125,6 @@ class BoardSettings:
         PartSetting(".*ESP.*", "<Z", HOLE_TYPE.HOLE),
         PartSetting(".*ESP.*", ">Z", 2),
     ])
-    pcb_thickness: float = 1.6
 
 
 @dataclass
