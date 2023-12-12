@@ -1,20 +1,22 @@
 import cadquery as cq
-from cq_part import DIMENSION_TYPE, ALIGNMENT, PartList
 from utils import extrude_part_faces
 from typing import NewType
+from board import Board, DIMENSION_TYPE, ALIGNMENT
 
 Dimension = NewType(
     "BottomCaseDimension",
-    tuple[float | DIMENSION_TYPE, float | DIMENSION_TYPE, float | DIMENSION_TYPE],
+    tuple[float | DIMENSION_TYPE, float |
+          DIMENSION_TYPE, float | DIMENSION_TYPE],
 )
 Offset = NewType(
-    "BottomCaseOffset", tuple[float | ALIGNMENT, float | ALIGNMENT, float | ALIGNMENT]
+    "BottomCaseOffset", tuple[float | ALIGNMENT,
+                              float | ALIGNMENT, float | ALIGNMENT]
 )
 
 
 class BottomCase:
-    def __init__(self, part_list: PartList):
-        self.part_list = part_list
+    def __init__(self, board: Board):
+        self.board = board
         self.bottom_case_dimension: Dimension = (
             DIMENSION_TYPE.AUTO,
             DIMENSION_TYPE.AUTO,
@@ -22,7 +24,7 @@ class BottomCase:
         )
         self.bottom_case_offset: Offset = (0, 0, 0)
         # union_of_bounding_boxes is the union of all bounding boxes of all parts with their tolerances and offsets
-        self.union_of_bounding_boxes = self.part_list.get_bounding_box_union()
+        self.union_of_bounding_boxes = self.board.get_cq_objects_with_tolerances_union()
         self.bottom_case_bounding_box = self.union_of_bounding_boxes.val().BoundingBox()
 
     def calculate_dimension(self, bb_len, dim_len):
@@ -79,9 +81,7 @@ class BottomCase:
         Including holes and parts
         """
         cuts = self.union_of_bounding_boxes
-        for part in self.part_list.parts:
-            if part.hole_cq_object is not None:
-                cuts = cuts.union(part.hole_cq_object)
+        cuts = cuts.union(self.board.get_holes_union())
         return cuts
 
     def generate_case(self, case_wall_thickness, floor_height):
