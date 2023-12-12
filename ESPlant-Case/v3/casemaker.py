@@ -84,23 +84,50 @@ class Casemaker:
         if (self.case is None):
             raise Exception(
                 "Call generate_case before calling add_compartment_door")
-        # TODO implement side
         self.case_open_face_bb = self.case.case_cq_object.faces(
-            "<Z").val().BoundingBox()
+            side.value).val().BoundingBox()
+
+        if side is SIDE.BOTTOM or side is SIDE.TOP:
+            face_width = self.case_open_face_bb.xlen
+            face_height = self.case_open_face_bb.ylen
+        elif side is SIDE.LEFT or side is SIDE.RIGHT:
+            face_width = self.case_open_face_bb.zlen
+            face_height = self.case_open_face_bb.ylen
+        elif side is SIDE.FRONT or side is SIDE.BACK:
+            face_width = self.case_open_face_bb.xlen
+            face_height = self.case_open_face_bb.zlen
 
         compartment_door_settings.compartment_door_dimensions = Vector(
-            self.case_open_face_bb.xlen - 2 * self.case.settings.case_wall_thickness, self.case_open_face_bb.ylen - 2 * self.case.settings.case_wall_thickness, 1.5)
+            face_width - 2 * self.case.settings.case_wall_thickness, face_height - 2 * self.case.settings.case_wall_thickness, 1.5)
 
         self.compartment_door = CompartmentDoor(compartment_door_settings)
+        self.compartment_door.move(
+            0, 0, -0.5 * self.case.settings.case_wall_thickness)
 
-        # flip the compartment door
-        self.compartment_door.flip()
-        # move the compartment door to the top of the case
+        # rotate the compartment door to match the side
+        if side is SIDE.BOTTOM:
+            self.compartment_door.rotate(
+                (0, 0, 0), (0, 1, 0), 180)
+        elif side is SIDE.LEFT:
+            self.compartment_door.rotate(
+                (0, 0, 0), (0, 1, 0), -90)
+        elif side is SIDE.RIGHT:
+            self.compartment_door.rotate(
+                (0, 0, 0), (0, 1, 0), 90)
+        elif side is SIDE.TOP:
+            pass
+        elif side is SIDE.FRONT:
+            self.compartment_door.rotate(
+                (0, 0, 0), (1, 0, 0), -90)
+        elif side is SIDE.BACK:
+            self.compartment_door.rotate(
+                (0, 0, 0), (1, 0, 0), 90)
+
+        # move the compartment door to the correct position
         self.compartment_door.move(
             self.case_open_face_bb.center.x,
             self.case_open_face_bb.center.y,
-            self.case_open_face_bb.center.z + 0.5 *
-            self.case.settings.case_wall_thickness,
+            self.case_open_face_bb.center.z,
         )
 
         self.case.case_cq_object = self.case.case_cq_object.union(self.compartment_door.frame).cut(
@@ -148,13 +175,16 @@ if __name__ == "__main__":
                  .load_kicad_pcb("ESPlant-Board/ESPlant-Board.kicad_pcb")
                  .generate_board()
                  .generate_case()
-                 .add_compartment_door(SIDE.BOTTOM)
+                 .add_compartment_door(SIDE.BOTTOM, CompartmentDoorSettings(
+                     tab_spacing_factor=0.8,
+                 ))
                  .add_battery_holder(SIDE.BOTTOM, BatteryHolderSettings(
                      front_wall_thickness=2.5,
                      back_wall_thickness=1.5,
                      insertable_springs_thickness=1,
                      polartiy_text_spacing=0.3,
-                     battery_length_tolerance=4))
+                     battery_length_tolerance=4
+                 ))
                  )
 
     show_all({
