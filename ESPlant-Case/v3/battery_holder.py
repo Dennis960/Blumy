@@ -1,46 +1,9 @@
 import cadquery as cq
-from dataclasses import dataclass
-from enum import Enum
+from settings import BatteryHolderSettings, TextDirection
 
 
 # TODO Future improvements:
 # Selectable battery types (AA, AAA)
-
-class TextDirection(Enum):
-    CUT = 0
-    EXTRUDE = 1
-
-
-@dataclass
-class BatteryHolderSettings:
-    battery_diameter: float = 10.5
-    battery_length: float = 44.5
-    number_of_batteries: int = 2
-
-    floor_thickness: float = 1.5
-
-    outer_wall_height: float = 8
-    outer_wall_thickness: float = 1.5
-    inner_wall_height: float = 5
-    inner_wall_thickness: float = 1.5
-    front_wall_height: float = 11
-    front_wall_thickness: float = 5
-    back_wall_height: float = 11
-    back_wall_thickness: float = 5
-
-    insertable_springs_thickness: float = 4
-
-    center_text: str = "AAA"
-    text_size: float = 5
-    text_thickness: float = 0.5
-
-    flip_polarity: bool = False
-    polarity_text_direction: TextDirection = TextDirection.CUT
-    polartiy_text_spacing: float = 0.4
-
-    battery_diameter_tolerance: float = 1
-    battery_length_tolerance: float = 1
-
 
 class BatteryHolder:
     def __init__(self, settings: BatteryHolderSettings = BatteryHolderSettings()):

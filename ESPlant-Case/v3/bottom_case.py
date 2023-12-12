@@ -1,17 +1,7 @@
 import cadquery as cq
 from utils import extrude_part_faces
-from typing import NewType
-from board import Board, DIMENSION_TYPE, ALIGNMENT
-
-Dimension = NewType(
-    "BottomCaseDimension",
-    tuple[float | DIMENSION_TYPE, float |
-          DIMENSION_TYPE, float | DIMENSION_TYPE],
-)
-Offset = NewType(
-    "BottomCaseOffset", tuple[float | ALIGNMENT,
-                              float | ALIGNMENT, float | ALIGNMENT]
-)
+from board import Board
+from settings import ALIGNMENT, DIMENSION_TYPE, Offset, Dimension
 
 
 class BottomCase:
