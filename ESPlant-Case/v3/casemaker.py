@@ -20,7 +20,7 @@ class CasemakerLoader:
         self._exclude: list[str] = []
         self._additional_parts: dict[str, TopoDS_Shape] = {}
 
-    def exclude_parts(self, *exclude):
+    def exclude_parts(self, *exclude: list[str]):
         """
         Set the parts to exclude from the casemaker.
         :param exclude: List of part names to exclude. Does not need to be the full name, only a part of it.
@@ -37,17 +37,17 @@ class CasemakerLoader:
         self._additional_parts = additional_parts
         return self
 
-    def load_kicad_pcb(self, kicad_pcb_path: str):
+    def load_kicad_pcb(self, kicad_pcb_path: str, step_path: str = "board.step"):
         """
         Loads the kicad_pcb file and creates a Casemaker object from it.
         """
-        board_shape, shapes_dict = (BoardConverter(self.cache_directory)
+        board_shape, shapes_dict = (BoardConverter(self.cache_directory, step_path)
                                     .exclude_parts(*self._exclude)
                                     .from_kicad_pcb(kicad_pcb_path)
                                     )
         return Casemaker(board_shape, shapes_dict)
 
-    def load_step_file(self, step_path: str):
+    def load_step_file(self, step_path: str = "board.step"):
         """
         Loads the step file and creates a Casemaker object from it.
         """

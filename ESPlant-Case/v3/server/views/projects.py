@@ -5,9 +5,7 @@ import shutil
 import zipfile
 from flask import Blueprint, request, render_template, url_for, redirect, send_file
 from werkzeug.utils import secure_filename
-from board import PartSetting, HOLE_TYPE, DIMENSION_TYPE, ALIGNMENT
-
-from .. import parameters
+import settings
 from .. import utils
 from .. import tasks
 
@@ -62,32 +60,7 @@ def upload_board():
 
     tasks.run_convert.delay(directory_path, filename)
 
-    pcb_tolerance=(1.5, 1.5, 0.5)
-    config = parameters.CaseConfiguration(
-        case_wall_thickness=1.5,
-        case_floor_height=8 + 1.6,
-        hole_fit_tolerance=0.1,
-        pcb_tolerance=pcb_tolerance,
-        part_tolerance=1,
-        should_use_fixation_holes=True,
-        fixation_hole_diameter=2.0,
-        parts_to_ignore_in_case_generation=["PinHeader"],
-        part_settings=[
-            PartSetting(".*", ">Z", pcb_tolerance[2]),
-            PartSetting(".*", "<Z", pcb_tolerance[2]),
-            PartSetting(".*MICRO-USB.*", ">X", HOLE_TYPE.HOLE, width=11, height=6.5),
-            PartSetting(".*SW-SMD_4P.*", ">Z", HOLE_TYPE.HOLE),
-            PartSetting(".*SW-SMD_MK.*", ">Z", HOLE_TYPE.HOLE, offset_y=-2, height=10),
-            PartSetting(".*LED.*", ">Z", HOLE_TYPE.HOLE),
-            PartSetting(".*ALS-PT19.*", ">Z", HOLE_TYPE.HOLE),
-            PartSetting(".*PCB.*", "<Z", HOLE_TYPE.HOLE),
-            PartSetting(".*ESP.*", "<Z", HOLE_TYPE.HOLE),
-            PartSetting(".*ESP.*", ">Z", 2),
-        ],
-        bottom_case_dimension=(DIMENSION_TYPE.AUTO, 62, DIMENSION_TYPE.AUTO),
-        bottom_case_offset=(0, ALIGNMENT.POSITIVE, 0),
-        list_of_additional_parts=[]
-    )
+    config = settings.CaseSettings()
 
     version = incremented_version()
     utils.write_config(project_id, version, config)
@@ -119,7 +92,7 @@ def set_parameters(project_id: str):
     should_use_fixation_holes = 'should_use_fixation_holes' in request.form
     fixation_hole_diameter = float(request.form['fixation_hole_diameter'])
 
-    config = parameters.CaseConfiguration(
+    config = settings.CaseSettings(
         case_wall_thickness,
         case_floor_height,
         hole_fit_tolerance,
