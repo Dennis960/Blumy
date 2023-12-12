@@ -17,7 +17,7 @@ class CasemakerLoader:
     Helper class to load different file formats and create a Casemaker object from it.
     """
 
-    def __init__(self, cache_directory: str):
+    def __init__(self, cache_directory: str = "parts"):
         self.cache_directory = cache_directory
         self._exclude: list[str] = []
         self._additional_parts: dict[str, TopoDS_Shape] = {}
@@ -167,7 +167,7 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
 
-    casemaker = (CasemakerLoader("parts")
+    casemaker = (CasemakerLoader()
                  .exclude_parts("PinHeader")
                  .load_additional_parts({
                      "BatterySprings": battery_springs.val().wrapped,

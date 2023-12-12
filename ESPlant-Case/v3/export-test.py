@@ -1,9 +1,11 @@
 import ocp_vscode
 import cadquery as cq
 from typing import List
-from compartment_door import CompartmentDoor, CompartmentDoorSettings
-from battery_holder import BatteryHolder, BatteryHolderSettings
-from casemaker import Casemaker, CasemakerSettings
+from compartment_door import CompartmentDoor
+from battery_holder import BatteryHolder
+from casemaker import CasemakerLoader
+from settings import SIDE, CompartmentDoorSettings, BatteryHolderSettings
+from components import battery_springs
 
 export_file_extension = ".step"
 
@@ -49,7 +51,8 @@ compartment_door = CompartmentDoor(
     CompartmentDoorSettings(compartment_door_text="sideways"))
 compartment_door.door = compartment_door.door.rotate(
     (0, 0, 0), (0, 1, 0), 90)
-cq.Assembly(compartment_door.door).save(f"compartment_door_sideways{export_file_extension}")
+cq.Assembly(compartment_door.door).save(
+    f"compartment_door_sideways{export_file_extension}")
 parts |= {
     "compartment_door_sideways": compartment_door.door,
 }
@@ -73,24 +76,40 @@ for i, settings in enumerate(battery_holder_settings):
         f"battery_holder_{i}": battery_holder.battery_holder,
     }
 
-# Casemaker
-casemaker = Casemaker(CasemakerSettings(), None,
-                      BatteryHolderSettings(front_wall_thickness=2.5,
-                                            back_wall_thickness=1.5,
-                                            insertable_springs_thickness=1,
-                                            polartiy_text_spacing=0.3,
-                                            battery_length_tolerance=4))
+# Casemaker TODO replace with new api
+casemaker = (CasemakerLoader()
+             .load_additional_parts({
+                 "BatterySprings": battery_springs.val().wrapped,
+             })
+             .exclude_parts("PinHeader")
+             .load_kicad_pcb("ESPlant-Board/ESPlant-Board.kicad_pcb")
+             .generate_board()
+             .generate_case()
+             .add_compartment_door(SIDE.BOTTOM, CompartmentDoorSettings(
+                 tab_spacing_factor=0.8,
+             ))
+             .add_battery_holder(SIDE.BOTTOM, BatteryHolderSettings(
+                 front_wall_thickness=2.5,
+                 back_wall_thickness=1.5,
+                 insertable_springs_thickness=1,
+                 polartiy_text_spacing=0.3,
+                 battery_length_tolerance=4
+             ))
+             )
 casemaker.battery_holder.battery_holder = casemaker.battery_holder.battery_holder.mirror(
     "XY")
-casemaker.bottom_case_cq_object = casemaker.bottom_case_cq_object.mirror("XY")
-cq.Assembly(casemaker.bottom_case_cq_object).save(f"Case-Bottom{export_file_extension}")
-cq.Assembly(casemaker.compartment_door.door).save(f"Compartment-Door{export_file_extension}")
+casemaker.case.case_cq_object = casemaker.case.case_cq_object.mirror("XY")
+cq.Assembly(casemaker.case.case_cq_object).save(
+    f"Case-Bottom{export_file_extension}")
+cq.Assembly(casemaker.compartment_door.door).save(
+    f"Compartment-Door{export_file_extension}")
 cq.Assembly(casemaker.battery_holder.battery_holder).save(
     f"Battery-Holder{export_file_extension}")
-cq.Assembly(casemaker.case_preview).save(f"Case-preview-DO-NOT-PRINT{export_file_extension}")
+cq.Assembly(casemaker.case_preview).save(
+    f"Case-preview-DO-NOT-PRINT{export_file_extension}")
 
 parts |= {
-    "Case-Bottom": casemaker.bottom_case_cq_object,
+    "Case-Bottom": casemaker.case.case_cq_object,
     "Compartment-Door": casemaker.compartment_door.door,
     "Battery-Holder": casemaker.battery_holder.battery_holder,
     "Case-preview-DO-NOT-PRINT": casemaker.case_preview,
