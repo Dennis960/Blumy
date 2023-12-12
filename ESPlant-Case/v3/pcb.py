@@ -22,7 +22,6 @@ def make_offset_shape(
     fixation_hole_diameter: float,
     hole_tolerance: float,
     fixation_hole_pad_diameter: float,
-    pcb_thickness: float,
     pcb_tolerance: float,
 ):
     if board_tolerance.x != board_tolerance.y:
@@ -61,7 +60,7 @@ def make_offset_shape(
         outline_face = cq.Face.makeFromWires(cq.Wire(wire.ocp_wire))
         outline_faces.append(outline_face)
     # get distance between the two faces
-    outline_distance = outline_faces[1].Center(
+    pcb_thickness = outline_faces[1].Center(
     ).z - outline_faces[0].Center().z
     # offset the first face and extrude it until the second face
     outline_worplane = cq.Workplane(outline_faces[0])
@@ -69,7 +68,7 @@ def make_offset_shape(
         outline_worplane.wires()
         .toPending()
         .offset2D(board_tolerance.x, kind="intersection")
-        .extrude(outline_distance + board_tolerance.z)
+        .extrude(pcb_thickness + board_tolerance.z)
     )
 
     if use_fixation_holes:
