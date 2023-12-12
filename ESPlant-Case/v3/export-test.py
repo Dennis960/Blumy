@@ -76,7 +76,6 @@ for i, settings in enumerate(battery_holder_settings):
         f"battery_holder_{i}": battery_holder.battery_holder,
     }
 
-# Casemaker TODO replace with new api
 casemaker = (CasemakerLoader()
              .load_additional_parts({
                  "BatterySprings": battery_springs.val().wrapped,
