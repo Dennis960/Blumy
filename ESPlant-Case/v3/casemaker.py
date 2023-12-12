@@ -38,7 +38,8 @@ class Casemaker:
         board_name = "__B$O$A$R$D__"
 
         self.shapes_dict = convert(
-            self.settings.kicad_pcb_path, self.settings.cache_directory, board_name=board_name)
+            self.settings.kicad_pcb_path, self.settings.cache_directory, board_name=board_name,
+            exclude=s.parts_to_ignore_in_case_generation)
 
         self.board = Board(self.shapes_dict, board_name, s.board_settings)
 
@@ -75,7 +76,7 @@ class Casemaker:
         self.bottom_case_cq_object = self.bottom_case_cq_object.union(self.compartment_door.frame).cut(
             self.compartment_door.door_with_tolerance).cut(self.bottom_case.get_cuts())
         self.compartment_door.door = self.compartment_door.door.cut(
-            self.board._board_cq_object)
+            self.board.get_pcb_cq_object_with_tolerance())
 
         ### ----------------- Battery Holder -----------------###
         # TODO refactoring needed, and battery holder should be optional and individually configurable
@@ -88,10 +89,10 @@ class Casemaker:
                                                   bottom_case_open_face_bb.zmin))
                                               )
         self.battery_holder.battery_holder = self.battery_holder.battery_holder.cut(
-            self.board._board_cq_object)
+            self.board.get_pcb_cq_object_with_tolerance())
 
         self.case_preview = (self.bottom_case_cq_object
-                             .union(self.board._board_cq_object)
+                             .union(self.board.get_pcb_cq_object_with_tolerance())
                              .union(self.bottom_case_cq_object)
                              .union(self.compartment_door.door)
                              .union(self.battery_holder.battery_holder))

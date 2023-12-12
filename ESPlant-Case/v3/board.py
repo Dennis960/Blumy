@@ -86,6 +86,7 @@ class Board:
         self._board_settings = board_settings
         self._board_settings.part_settings = self._move_hole_settings_to_end(
             self._board_settings.part_settings)
+        self._pcb_cq_object_with_tolerance = self.get_pcb_cq_object_with_tolerance()
         self._cq_object_with_part_tolerance_dict = self._get_cq_object_with_part_tolerance_dict()
         self._cq_object_with_part_tolerance_and_applied_settings_dict, self._hole_dict = self._apply_settings_to_cq_object_with_part_tolerance_dict()
 
@@ -138,7 +139,7 @@ class Board:
         cq_object_with_tolerance_dict = {}
         for name in self._shapes_dict.keys():
             if PCB_PART_NAME in name:
-                cq_object_with_tolerance = self._get_pcb_cq_object_with_tolerance()
+                cq_object_with_tolerance = self._pcb_cq_object_with_tolerance
             else:
                 bounding_box_cq_object = self._bounding_box_cq_object_dict[name]
                 cq_object_with_tolerance = bounding_box_cq_object.union(
@@ -149,7 +150,11 @@ class Board:
             cq_object_with_tolerance_dict[name] = cq_object_with_tolerance
         return cq_object_with_tolerance_dict
 
-    def _get_pcb_cq_object_with_tolerance(self):
+    @cache
+    def get_pcb_cq_object_with_tolerance(self):
+        """
+        Returns the pcb cq object with the tolerance applied as well as the fixation holes
+        """
         s = self._board_settings
         pcb_cq_object = self._cq_object_dict[self._find_all_names_by_name_regex(PCB_PART_NAME)[
             0]]
