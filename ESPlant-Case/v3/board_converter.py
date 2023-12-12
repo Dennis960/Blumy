@@ -12,14 +12,14 @@ from OCP.XCAFDoc import XCAFDoc_DocumentTool
 
 
 class BoardConverter:
-    def __init__(self, cache_dir="parts/"):
+    def __init__(self, cache_dir="parts/", step_path="board.step"):
         """
         :param cache_dir: Path to the cache directory where the board is saved as step file
         """
         self.base_dir = os.path.dirname(os.path.realpath(__file__)) + "/"
         self.cache_dir = os.path.join(self.base_dir, cache_dir)
         self.cache_already_exists = self._create_cache_dir()
-        self.step_path = os.path.join(self.cache_dir, "board.step")
+        self.step_path = os.path.join(self.cache_dir, step_path)
         self.exclude: list[str] = []
 
     def exclude_parts(self, *exclude):
