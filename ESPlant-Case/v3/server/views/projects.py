@@ -5,7 +5,7 @@ import shutil
 import zipfile
 from flask import Blueprint, request, render_template, url_for, redirect, send_file
 from werkzeug.utils import secure_filename
-import settings
+from .. import parameters
 from .. import utils
 from .. import tasks
 
@@ -60,7 +60,20 @@ def upload_board():
 
     tasks.run_convert.delay(directory_path, filename)
 
-    config = settings.CaseSettings()
+    config = parameters.CaseConfiguration(
+        case_wall_thickness = 1,
+        case_floor_height = 1,
+        hole_fit_tolerance =1 ,
+        pcb_tolerance = (1, 1, 1),
+        part_tolerance = 1,
+        should_use_fixation_holes = True,
+        fixation_hole_diameter = 1,
+        parts_to_ignore_in_case_generation = [],
+        part_settings = [],
+        bottom_case_dimension = ("2", 1, "2"),
+        bottom_case_offset = (1, "2", 1),
+        list_of_additional_parts = []
+    )
 
     version = incremented_version()
     utils.write_config(project_id, version, config)
@@ -92,7 +105,7 @@ def set_parameters(project_id: str):
     should_use_fixation_holes = 'should_use_fixation_holes' in request.form
     fixation_hole_diameter = float(request.form['fixation_hole_diameter'])
 
-    config = settings.CaseSettings(
+    config = parameters.CaseConfiguration(
         case_wall_thickness,
         case_floor_height,
         hole_fit_tolerance,
