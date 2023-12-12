@@ -1,6 +1,7 @@
 import cadquery as cq
 from settings import CompartmentDoorSettings
 
+
 class CompartmentDoor:
     def __init__(self, settings: CompartmentDoorSettings = CompartmentDoorSettings()):
         self._settings = settings
@@ -203,6 +204,15 @@ class CompartmentDoor:
         self.door = self.door.mirror("XY")
         self.door_with_tolerance = self.door_with_tolerance.mirror("XY")
         self.frame = self.frame.mirror("XY")
+
+    def rotate(self, axisStart: cq.cq.VectorLike = (0, 0, 0), axisEnd: cq.cq.VectorLike = (0, 0, 0), angleDegrees: float = 0) -> None:
+        """
+        Note: This method will be removed in the future
+        """
+        self.door = self.door.rotate(axisStart, axisEnd, angleDegrees)
+        self.door_with_tolerance = self.door_with_tolerance.rotate(
+            axisStart, axisEnd, angleDegrees)
+        self.frame = self.frame.rotate(axisStart, axisEnd, angleDegrees)
 
     def generate_compartment_door_frame_walls(self) -> cq.Workplane:
         """
