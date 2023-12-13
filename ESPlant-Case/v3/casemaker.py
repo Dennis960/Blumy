@@ -218,7 +218,7 @@ if __name__ == "__main__":
                  )
 
     show_all({
-        "board": casemaker.board._board_cq_object,
+        "board": casemaker.board.board_cq_object,
         "case_bottom": casemaker.case.case_cq_object,
         "compartment_door": casemaker.compartment_door.door,
         "battery_holder": casemaker.battery_holder.battery_holder,
