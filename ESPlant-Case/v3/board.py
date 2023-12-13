@@ -7,6 +7,8 @@ import re
 from utils import extrude_part_faces, extrude_part_width, extrude_part_height
 from settings import BoardSettings, HOLE_TYPE, DIMENSION_TYPE, PCB_PART_NAME, case_hole_extrusion_size, PartSetting
 
+import logging
+
 
 class Board:
     def __init__(self, board_shape: TopoDS_Shape, shapes_dict: dict[str, TopoDS_Shape], board_settings: BoardSettings = BoardSettings()):
@@ -30,6 +32,7 @@ class Board:
         """
         Returns a cq object that can be cut out of the case to make space for the board and components with their tolerances
         """
+        logging.info("Creating cq objects with tolerances union")
         cq_objects_with_tolerances_union = cq.Workplane("XY")
         for cq_object_with_part_tolerance in self._cq_object_with_part_tolerance_and_applied_settings_dict.values():
             cq_objects_with_tolerances_union = cq_objects_with_tolerances_union.union(
@@ -41,18 +44,22 @@ class Board:
         """
         Returns a cq object that can be cut out of the case to create the holes
         """
+        logging.info("Creating holes union")
         holes_union = cq.Workplane("XY")
         for hole_cq_object in self._hole_dict.values():
             holes_union = holes_union.union(hole_cq_object)
         return holes_union
 
     def _find_all_cq_objects_by_name_regex(self, regex: str):
+        logging.info(f"Finding all cq objects by name regex: {regex}")
         return [cq_object for name, cq_object in self._cq_object_dict.items() if re.match(f".*{regex}.*", name)]
 
     def _find_all_names_by_name_regex(self, regex: str):
+        logging.info(f"Finding all names by name regex: {regex}")
         return [name for name in self._shapes_dict.keys() if re.match(f".*{regex}.*", name)]
 
     def _move_hole_settings_to_end(self, part_settings: List[PartSetting]):
+        logging.info("Moving hole settings to end")
         offset = 0
         for i in range(len(part_settings)):
             if part_settings[i + offset].length is HOLE_TYPE.HOLE:
@@ -61,6 +68,7 @@ class Board:
         return part_settings
 
     def _get_cq_object_with_part_tolerance_dict(self) -> dict[str, cq.Workplane]:
+        logging.info("Getting cq object with part tolerance dict")
         s = self._board_settings
         cq_object_with_tolerance_dict = {}
         for name in self._shapes_dict.keys():
@@ -81,6 +89,7 @@ class Board:
         """
         Returns the pcb cq object with the tolerance applied as well as the fixation holes
         """
+        logging.info("Getting pcb cq object with tolerance")
         s = self._board_settings
         pcb_cq_object = self._cq_object_dict[self._find_all_names_by_name_regex(PCB_PART_NAME)[
             0]]
@@ -91,6 +100,8 @@ class Board:
         )
 
     def _apply_settings_to_cq_object_with_part_tolerance_dict(self) -> tuple[dict[str, cq.Workplane], dict[str, cq.Workplane]]:
+        logging.info(
+            "Applying settings to cq object with part tolerance dict")
         cq_object_with_part_tolerance_dict = self._cq_object_with_part_tolerance_dict.copy()
         hole_cq_objects_dict: dict[str, cq.Workplane] = {}
         for part_setting in self._board_settings.part_settings:
@@ -98,6 +109,8 @@ class Board:
             for name in names:
                 cq_object_with_applied_setting = cq_object_with_part_tolerance_dict[name]
                 if part_setting.length is not HOLE_TYPE.HOLE:
+                    logging.info(
+                        f"Applying setting to {name}: {part_setting}")
                     cq_object_with_applied_setting = self._apply_setting_to_cq_object(
                         cq_object_with_applied_setting, part_setting)
                     cq_object_with_part_tolerance_dict[name] = cq_object_with_applied_setting
@@ -113,6 +126,7 @@ class Board:
         return cq_object_with_part_tolerance_dict, hole_cq_objects_dict
 
     def _apply_setting_to_cq_object(self, cq_object: cq.Workplane, part_setting: PartSetting):
+        logging.info(f"Applying setting to cq object: {part_setting}")
         is_hole_extrusion = part_setting.length is HOLE_TYPE.HOLE
         extrude_len = (
             case_hole_extrusion_size if is_hole_extrusion else part_setting.length
@@ -138,6 +152,8 @@ class Board:
         return extrusion
 
     def _convert_bounding_box_dict_to_bounding_box_cq_object_dict(self, bounding_box_dict: dict[str, cq.BoundBox]) -> dict[str, cq.Workplane]:
+        logging.info(
+            "Converting bounding box dict to bounding box cq object dict")
         return {name:
                 cq.Workplane("XY").box(
                     bounding_box.xlen,
