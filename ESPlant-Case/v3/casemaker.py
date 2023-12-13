@@ -71,8 +71,8 @@ class Casemaker:
         """
         Generates a board object from the board shape and the shapes dictionary.
         """
-        self.board = Board(self.board_shape, self.shapes_dict, board_settings)
-        return CasemakerWithBoard(self.board_shape, self.shapes_dict, self.board)
+        board = Board(self.board_shape, self.shapes_dict, board_settings)
+        return CasemakerWithBoard(self.board_shape, self.shapes_dict, board)
 
 
 class CasemakerWithBoard:
@@ -90,8 +90,8 @@ class CasemakerWithBoard:
         """
         Generates a case object using information from the board object.
         """
-        self.case = Case(self.board, case_settings)
-        return CasemakerWithCase(self.board_shape, self.shapes_dict, self.board, self.case)
+        case = Case(self.board, case_settings)
+        return CasemakerWithCase(self.board_shape, self.shapes_dict, self.board, case)
 
 
 class CasemakerWithCase:
