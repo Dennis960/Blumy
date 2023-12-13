@@ -9,6 +9,9 @@ from components import battery_springs
 from cadquery import Vector
 from utils import get_rotation_for_side
 
+import serializer
+serializer.register()
+
 
 class CasemakerLoader:
     """
@@ -16,45 +19,41 @@ class CasemakerLoader:
     """
 
     def __init__(self, cache_directory: str = "parts"):
-        self.cache_directory = cache_directory
-        self._exclude: list[str] = []
-        self._additional_parts: dict[str, TopoDS_Shape] = {}
+        self.cache_dir = cache_directory
 
-    def exclude_parts(self, *exclude: list[str]):
-        """
-        Set the parts to exclude from the casemaker.
-        :param exclude: List of part names to exclude. Does not need to be the full name, only a part of it.
-        (e.g. "PinHeader" will exclude all parts that contain "PinHeader" in their name, such as "PinHeader_1x2")
-        """
-        self._exclude = exclude
-        return self
-
-    def load_additional_parts(self, additional_parts: dict[str, TopoDS_Shape]):
-        """
-        Loads additional parts into the casemaker.
-        :param additional_parts: A dictionary of names and TopoDS_Shape objects.
-        """
-        self._additional_parts = additional_parts
-        return self
-
-    def load_kicad_pcb(self, kicad_pcb_path: str, step_path: str = "board.step"):
+    def load_kicad_pcb(self, kicad_pcb_path: str, step_file: str = "board.step"):
         """
         Loads the kicad_pcb file and creates a Casemaker object from it.
-        """
-        board_shape, shapes_dict = (BoardConverter(self.cache_directory, step_path)
-                                    .exclude_parts(*self._exclude)
-                                    .from_kicad_pcb(kicad_pcb_path)
-                                    )
-        return Casemaker(board_shape, shapes_dict)
 
-    def load_step_file(self, step_path: str = "board.step"):
+        :param kicad_pcb_path: Absolute path to the kicad_pcb file
+        :param step_file: Name of the file in the cache directory
+        """
+        board_shape, shapes_dict = (BoardConverter(self.cache_dir)
+                                    .from_kicad_pcb(kicad_pcb_path, step_file)
+                                    )
+        return Casemaker(board_shape, shapes_dict, self.cache_dir)
+
+    def load_step_file(self, step_file: str = "board.step"):
         """
         Loads the step file and creates a Casemaker object from it.
+
+        :param step_file: Name of the file in the cache directory
         """
-        board_shape, shapes_dict = (BoardConverter(self.cache_directory)
-                                    .from_step_file(step_path)
+        board_shape, shapes_dict = (BoardConverter(self.cache_dir)
+                                    .from_step_file(step_file)
                                     )
-        return Casemaker(board_shape, shapes_dict)
+        return Casemaker(board_shape, shapes_dict, self.cache_dir)
+
+    def load_pickle(self, pickle_file: str = "board.pickle"):
+        """
+        Loads the pickle file and creates a Casemaker object from it.
+
+        :param pickle_file: Name of the pickle file
+        """
+        board_shape, shapes_dict = (BoardConverter(self.cache_dir)
+                                    .from_pickle(pickle_file)
+                                    )
+        return Casemaker(board_shape, shapes_dict, self.cache_dir)
 
 
 class Casemaker:
@@ -63,16 +62,45 @@ class Casemaker:
     Use the CasemakerLoader class instead.
     """
 
-    def __init__(self, board_shape: TopoDS_Shape, shapes_dict: dict[str, TopoDS_Shape]):
+    def __init__(self, board_shape: TopoDS_Shape, shapes_dict: dict[str, TopoDS_Shape], cache_dir: str = "parts"):
         self.board_shape = board_shape
         self.shapes_dict = shapes_dict
+        self.cache_dir = cache_dir
 
-    def generate_board(self, board_settings: BoardSettings = BoardSettings()):
+    def generate_board(self, board_settings: BoardSettings = BoardSettings(), exclude: list[str] = [], additional_parts: dict[str, TopoDS_Shape] = {}):
         """
-        Generates a board object from the board shape and the shapes dictionary.
+        Generates a board object from the board shape and the shapes dictionary with the specified settings.
+
+        :param board_settings: The settings for the board object.
+        :param exclude: List of part names to exclude. Does not need to be the full name, only a part of it.
+        (e.g. "PinHeader" will exclude all parts that contain "PinHeader" in their name, such as "PinHeader_1x2")
+        :param additional_parts: A dictionary of names and TopoDS_Shape objects to add to the shapes dictionary.
         """
-        board = Board(self.board_shape, self.shapes_dict, board_settings)
+        shapes_dict = {**self.shapes_dict, **additional_parts}
+        shapes_dict = {name: shape for name,
+                       shape in shapes_dict.items() if not any(ex in name for ex in exclude)}
+        board = Board(self.board_shape, shapes_dict, board_settings)
         return CasemakerWithBoard(self.board_shape, self.shapes_dict, board)
+
+    def save_pickle(self, pickle_file: str = "board.pickle"):
+        """
+        Saves the board_shape and shapes_dict to a pickle file.
+
+        :param pickle_file: Name of the pickle file
+        """
+        BoardConverter(self.cache_dir).save_to_pickle(
+            self.board_shape, self.shapes_dict, pickle_file)
+        return self
+
+    def save_step_file(self, step_file: str = "board-saved.step"):
+        """
+        Saves the board_shape as a step file. The step file generated by this function CAN NOT BE LOADED by the from_step_file function.
+
+        :param step_file: Name of the step file
+        """
+        BoardConverter(self.cache_dir).save_to_step_file(
+            self.board_shape, self.shapes_dict, step_file)
+        return self
 
 
 class CasemakerWithBoard:
@@ -156,16 +184,23 @@ class CasemakerWithCase:
 if __name__ == "__main__":
     from ocp_vscode import show_all
     import logging
+    import os
 
     logging.basicConfig(level=logging.INFO)
 
+    if not os.path.exists("parts/board.pickle"):
+        CasemakerLoader().load_kicad_pcb(
+            "ESPlant-Board/ESPlant-Board.kicad_pcb").save_pickle()
+
     casemaker = (CasemakerLoader()
-                 .exclude_parts("PinHeader")
-                 .load_additional_parts({
+                 .load_pickle("board.pickle")
+                 # .load_kicad_pcb("ESPlant-Board/ESPlant-Board.kicad_pcb")
+                 # .load_step_file("board.step")
+                 # .save_step_file("board-saved.step")
+                 # .save_pickle("board.pickle")
+                 .generate_board(BoardSettings(), exclude=["PinHeader"], additional_parts={
                      "BatterySprings": battery_springs.val().wrapped,
                  })
-                 .load_kicad_pcb("ESPlant-Board/ESPlant-Board.kicad_pcb")
-                 .generate_board()
                  .generate_case(CaseSettings(
                      case_dimension=(DIMENSION_TYPE.AUTO, 62, 12),
                      case_offset=(0, ALIGNMENT.POSITIVE, ALIGNMENT.POSITIVE)
