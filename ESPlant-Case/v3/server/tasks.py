@@ -2,16 +2,14 @@ import os
 import time
 from celery import shared_task
 import cadquery as cq
-from casemaker import CasemakerLoader
-
-# Monkey patches cadquery to fix a bug using _bool_op
-from . import workarround_bool_op_error
 
 from . import utils
 
 
 @shared_task
 def run_convert(project_id: str, file_name: str):
+    # Needs to be imported here to avoid segmentation faults caused by _bool_op, see https://github.com/CadQuery/cadquery/issues/1354, https://github.com/celery/celery/issues/3398
+    from casemaker import CasemakerLoader
     start = time.time()
     print("converting " + project_id + " " + file_name)
     root_path = utils.get_project_directory(project_id)
@@ -29,6 +27,8 @@ def run_convert(project_id: str, file_name: str):
 
 @shared_task
 def run_generate_bottom_case(project_id: str, version: int):
+    # Needs to be imported here to avoid segmentation faults caused by _bool_op, see https://github.com/CadQuery/cadquery/issues/1354, https://github.com/celery/celery/issues/3398
+    from casemaker import CasemakerLoader
     start = time.time()
     print("generating bottom case " + project_id)
 
