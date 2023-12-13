@@ -14,7 +14,8 @@
 				"bernhard-42.ocp-cad-viewer",
 				"ms-python.python",
 				"Gruntfuggly.triggertaskonsave",
-				"ms-python.autopep8"
+				"ms-python.autopep8",
+				"wholroyd.jinja"
 			]
 		}
 	}
