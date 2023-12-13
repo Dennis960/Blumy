@@ -134,21 +134,33 @@ class BoardConverter:
         with open(pickle_path, "wb") as file:
             pickle.dump((board_shape, shapes_dict), file)
 
-    def save_to_step_file(self, board_shape: TopoDS_Shape, shapes_dict: dict[str, TopoDS_Shape], step_file: str = "board.step"):
+    def _create_assembly(self, shapes_dict: dict[str, TopoDS_Shape]) -> cq.Assembly:
         """
-        Creates an assembly where the board_shape is the parent and the shapes_dict are the children.\n
-        Saves the assembly as a step file.
+        Creates an assembly where the shapes_dict shapes are the children with their corresponding names.
+
         :param board_shape: The board shape
-        :param step_file: Name of the file to be saved in the cache directory
+        :param shapes_dict: The dictionary of names and TopoDS_Shape objects.
         """
-        step_path = os.path.join(self.cache_dir, step_file)
-        assembly = cq.Assembly(
-            # cq.Workplane(cq.Shape(board_shape)),
-            name=step_file.split(".")[0]
-        )
+        assembly = cq.Assembly(name="board")
         for name, shape in shapes_dict.items():
             assembly = assembly.add(cq.Workplane(cq.Shape(shape)), name=name)
-        assembly.save(step_path, exportType="STEP")
+        return assembly
+
+    def save_assembly(self, shapes_dict: dict[str, TopoDS_Shape], assembly_file: str, exportType: cq.exporters.ExportLiterals | None = None, tolerance: float = 0.1, angularTolerance: float = 0.1):
+        """
+        Creates an assembly where the board_shape is the parent and the shapes_dict are the children.\n
+        Save assembly to a file.
+
+        :shapes_dict: The dictionary of names and TopoDS_Shape objects.
+        :param assembly_file: Name of the file to be saved in the cache directory
+        :param tolerance: the deflection tolerance, in model units. Only used for GLTF, VRML. Default 0.1.
+        :param angularTolerance: the angular tolerance, in radians. Only used for GLTF, VRML. Default 0.1.
+        :param exportType: export format (default: None, results in format being inferred form the path)
+        """
+        assembly_path = os.path.join(self.cache_dir, assembly_file)
+        assembly = self._create_assembly(shapes_dict)
+        assembly.save(assembly_path, exportType=exportType,
+                      tolerance=tolerance, angularTolerance=angularTolerance)
 
     def from_pickle(self, pickle_file: str = "board.pickle") -> tuple[TopoDS_Shape, dict[str, TopoDS_Shape]]:
         """
