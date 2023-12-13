@@ -13,7 +13,7 @@ USER appuser
 
 RUN pip install --user numpy --upgrade && \
     pip install --user \
-    ocp_vscode ocp cadquery https://github.com/CadQuery/OCP-stubs/archive/refs/tags/7.7.0.zip flask celery redis
+    ocp_vscode ocp https://github.com/CadQuery/cadquery/archive/79e64e557e87d63b84c1c8a60c0df8e941a1a4a1.zip https://github.com/CadQuery/OCP-stubs/archive/refs/tags/7.7.0.zip flask celery redis
 
 COPY ./ /app
 WORKDIR /app
