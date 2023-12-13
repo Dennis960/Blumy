@@ -16,7 +16,7 @@ def run_convert(project_id: str, file_name: str):
     casemaker = CasemakerLoader(utils.get_project_cache_path(project_id)).load_kicad_pcb(
         os.path.join(root_path, file_name), "board.step")
     casemaker_with_board = casemaker.generate_board()
-    board = casemaker_with_board.board._board_cq_object
+    board = casemaker_with_board.board.board_cq_object
 
     print("saving " + project_id + " " + file_name)
     assembly = cq.Assembly(board, name="board")

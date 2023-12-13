@@ -12,7 +12,7 @@ import logging
 
 class Board:
     def __init__(self, board_shape: TopoDS_Shape, shapes_dict: dict[str, TopoDS_Shape], board_settings: BoardSettings = BoardSettings()):
-        self._board_cq_object = cq.Workplane(cq.Shape.cast(board_shape))
+        self.board_cq_object = cq.Workplane(cq.Shape.cast(board_shape))
         self._shapes_dict = shapes_dict
         self._cq_object_dict = {name: cq.Workplane(cq.Shape.cast(
             shape)) for name, shape in self._shapes_dict.items()}
