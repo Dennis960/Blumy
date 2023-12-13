@@ -15,7 +15,7 @@
 				"ms-python.python",
 				"Gruntfuggly.triggertaskonsave",
 				"ms-python.autopep8",
-				"wholroyd.jinja"
+				"samuelcolvin.jinjahtml"
 			]
 		}
 	}
