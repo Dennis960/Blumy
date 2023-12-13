@@ -4,6 +4,9 @@ from celery import shared_task
 import cadquery as cq
 from casemaker import CasemakerLoader
 
+# Monkey patches cadquery to fix a bug using _bool_op
+from . import workarround_bool_op_error
+
 from . import utils
 
 
