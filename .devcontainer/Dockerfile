@@ -12,5 +12,4 @@ RUN pip install numpy --upgrade && \
     pip install \
     ocp_vscode==1.2.2 ocp cadquery https://github.com/CadQuery/OCP-stubs/archive/refs/tags/7.7.0.zip flask celery redis
 
-COPY ./ /app
-WORKDIR /app
+ENV PYTHONPATH=/workspaces/ESPlant/ESPlant-Casemaker:/workspaces/ESPlant/ESPlant-Casemaker/casemaker:$PYTHONPATH

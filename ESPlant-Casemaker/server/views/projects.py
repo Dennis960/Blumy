@@ -7,7 +7,7 @@ from flask import Blueprint, request, render_template, url_for, redirect, send_f
 from werkzeug.utils import secure_filename
 from .. import parameters
 from .. import utils
-from .. import tasks
+from celery_worker import tasks
 
 
 def get_version():

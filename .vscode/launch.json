@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "module": "celery",
-            "cwd": "${workspaceFolder}/ESPlant-Case/v3",
+            "cwd": "${workspaceFolder}/ESPlant-Casemaker/celery_worker",
             "args": [
                 "-A",
                 "worker",
@@ -26,7 +26,7 @@
             "type": "python",
             "request": "launch",
             "module": "flask",
-            "cwd": "${workspaceFolder}/ESPlant-Case/v3",
+            "cwd": "${workspaceFolder}/ESPlant-Casemaker",
             "env": {
                 "FLASK_APP": "server",
                 "FLASK_DEBUG": "1"

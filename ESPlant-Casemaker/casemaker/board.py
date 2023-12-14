@@ -1,9 +1,9 @@
 from OCP.TopoDS import TopoDS_Shape
-from pcb import make_offset_shape
 from functools import cache
 from typing import List
 import cadquery as cq
 import re
+from pcb import make_offset_shape
 from utils import extrude_part_faces, extrude_part_width, extrude_part_height
 from settings import BoardSettings, HOLE_TYPE, DIMENSION_TYPE, PCB_PART_NAME, case_hole_extrusion_size, PartSetting
 

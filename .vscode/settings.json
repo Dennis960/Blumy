@@ -1,7 +1,7 @@
 {
     "triggerTaskOnSave.tasks": {
         "python-casemaker": [
-            "ESPlant-Case/**/casemaker.py"
+            "ESPlant-Casemaker/casemaker/casemaker.py"
         ]
     },
     "editor.selectionClipboard": false

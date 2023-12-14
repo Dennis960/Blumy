@@ -6,7 +6,7 @@
             "type": "shell",
             "command": "python3",
             "args": [
-                "${workspaceFolder}/ESPlant-Case/v3/casemaker.py"
+                "${workspaceFolder}/ESPlant-Casemaker/casemaker/casemaker.py"
             ],
             "group": {
                 "kind": "build",
