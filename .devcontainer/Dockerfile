@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/devcontainers/base:ubuntu
 
 RUN apt-get update && \
-    apt-get install -y gpg-agent python-is-python3 redis software-properties-common python3-pip && \
+    apt-get install -y gpg-agent python-is-python3 redis software-properties-common python3-pip npm && \
     add-apt-repository --yes ppa:kicad/kicad-dev-nightly && \
     apt-get update && \
     apt-get install --install-recommends -y kicad-nightly && \
@@ -11,5 +11,7 @@ RUN apt-get update && \
 RUN pip install numpy --upgrade && \
     pip install \
     ocp_vscode==1.2.2 ocp cadquery https://github.com/CadQuery/OCP-stubs/archive/refs/tags/7.7.0.zip flask celery redis
+
+RUN npm install -g @types/three
 
 ENV PYTHONPATH=/workspaces/ESPlant/ESPlant-Casemaker:/workspaces/ESPlant/ESPlant-Casemaker/casemaker:$PYTHONPATH
