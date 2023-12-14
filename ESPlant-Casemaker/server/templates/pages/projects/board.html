@@ -7,12 +7,15 @@
         <a class="navbar-brand" href="#">Preview your Board</a>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a href="{{ url_for('projects.view_parameters', project_id=project_id, version=version) }}" class="btn btn-primary">Continue</a>
+                <a href="{{ url_for('projects.view_parameters', project_id=project_id, version=version) }}"
+                    class="btn btn-primary">Continue</a>
             </li>
         </ul>
     </div>
 </nav>
 
+<div id="component_name" style="display:inline">No component highlighted</div>
+<div id="selected_components" style="display:inline">No component selected</div>
 <div id="container"></div>
 
 <style>
