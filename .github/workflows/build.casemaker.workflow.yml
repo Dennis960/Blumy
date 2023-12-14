@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "ESPlant-Case/v3/**"
+      - "ESPlant-Casemaker/*"
       - ".github/workflows/build.casemaker.workflow.yml"
 
 jobs:
@@ -42,7 +42,7 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: ./ESPlant-Case/v3
+          context: ./ESPlant-Casemaker
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
