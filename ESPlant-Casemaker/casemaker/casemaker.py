@@ -1,4 +1,5 @@
 from OCP.TopoDS import TopoDS_Shape
+from cadquery import Vector
 from board_converter import BoardConverter
 from case import Case
 from compartment_door import CompartmentDoor
@@ -6,11 +7,10 @@ from battery_holder import BatteryHolderSettings, BatteryHolder
 from board import Board
 from settings import CaseSettings, BoardSettings, CompartmentDoorSettings, ALIGNMENT, DIMENSION_TYPE, SIDE
 from components import battery_springs
-from cadquery import Vector
 from utils import get_rotation_for_side
 
-import serializer
-serializer.register()
+from serializer import register
+register()
 
 
 class CasemakerLoader:

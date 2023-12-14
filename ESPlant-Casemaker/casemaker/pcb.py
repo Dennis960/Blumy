@@ -5,8 +5,8 @@ from OCP.TopExp import TopExp_Explorer
 from OCP.TopAbs import TopAbs_EDGE, TopAbs_WIRE
 from OCP.BRepAdaptor import BRepAdaptor_Curve
 from OCP.GeomAbs import GeomAbs_Circle
-from OCP.BRepBuilderAPI import BRepBuilderAPI_MakeFace, BRepBuilderAPI
-from OCP.BRepGProp import BRepGProp, BRepGProp_Face
+from OCP.BRepBuilderAPI import BRepBuilderAPI_MakeFace
+from OCP.BRepGProp import BRepGProp
 from OCP.GProp import GProp_GProps
 
 import logging
@@ -64,7 +64,8 @@ def make_offset_shape(
         isCircleWire = False
         if len(ocp_edges) == 1 and isCircle:
             isCircleWire = True
-        wires.append(WireData(ocp_wire, ocp_edges, isCircleWire, diameter, enclosed_area))
+        wires.append(WireData(ocp_wire, ocp_edges,
+                     isCircleWire, diameter, enclosed_area))
         explorer.Next()
 
     # find the wires that enclose the most area

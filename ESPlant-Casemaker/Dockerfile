@@ -17,3 +17,5 @@ RUN pip install --user numpy --upgrade && \
 
 COPY ./ /app
 WORKDIR /app
+
+ENV PYTHONPATH=/app:/app/casemaker

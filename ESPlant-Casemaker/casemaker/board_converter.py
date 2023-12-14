@@ -11,9 +11,9 @@ from OCP.TopoDS import TopoDS_Shape
 from OCP.XCAFDoc import XCAFDoc_DocumentTool
 
 import pickle
-import serializer
 import cadquery as cq
-serializer.register()
+from serializer import register
+register()
 
 
 class BoardConverter:
