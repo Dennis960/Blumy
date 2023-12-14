@@ -6,5 +6,7 @@
         }
     }
 </script>
-<script type="module" src="gtlf_renderer.js">
+<script>
+    const glb_path = "{{ glb_path }}"
 </script>
+<script type="module" src="{{ url_for('static', filename='gltf_renderer.js') }}"></script>
