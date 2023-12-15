@@ -72,23 +72,6 @@
             </div>
         </div>
 
-        <h3>Fixation Holes</h3>
-
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <div class="mb-3">
-                    <input type="checkbox" class="form-check-input" id="should_use_fixation_holes" name="should_use_fixation_holes" {% if config.should_use_fixation_holes %}checked{% endif %}>
-                    <label for="should_use_fixation_holes" class="form-check-label">Should Use Fixation Holes</label>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <label for="fixation_hole_diameter" class="form-label">Fixation Hole Diameter</label>
-                    <input type="number" step="any" class="form-control" id="fixation_hole_diameter" name="fixation_hole_diameter" value="{{ config.fixation_hole_diameter }}">
-                </div>
-            </div>
-        </div>
-
         <button class="btn btn-primary" type="submit">Save</button>
     </form>
 </div>

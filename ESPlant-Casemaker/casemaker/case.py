@@ -1,37 +1,37 @@
 import cadquery as cq
 from utils import extrude_part_faces
 from board import Board
-from settings import ALIGNMENT, DIMENSION_TYPE, Offset, Dimension, CaseSettings, SIDE
+from settings import Offset, Dimension, CaseSettings, SIDE
 
 
 class Case:
     def __init__(self, board: Board, case_settings: CaseSettings = CaseSettings()):
         self.board = board
         self.case_dimension: Dimension = (
-            DIMENSION_TYPE.AUTO,
-            DIMENSION_TYPE.AUTO,
-            DIMENSION_TYPE.AUTO,
+            "Auto",
+            "Auto",
+            "Auto",
         )
         self.settings = case_settings
         self.case_offset: Offset = (0, 0, 0)
         # union_of_bounding_boxes is the union of all bounding boxes of all parts with their tolerances and offsets
         self.union_of_bounding_boxes = self.board.get_cq_objects_with_tolerances_union()
         self.case_bounding_box = self.union_of_bounding_boxes.val().BoundingBox()
-        self.override_dimension(
+        self.overwrite_dimension(
             case_settings.case_dimension)
-        self.override_offset(case_settings.case_offset)
+        self.overwrite_offset(case_settings.case_offset)
         self.case_cq_object = self.generate_case(
             case_settings.case_wall_thickness, case_settings.case_floor_pad
         )
         self.case_outer_bounding_box = self.case_cq_object.val().BoundingBox()
 
     def calculate_dimension(self, bb_len, dim_len):
-        if dim_len is DIMENSION_TYPE.AUTO:
+        if dim_len == "Auto":
             return bb_len
         else:
             return dim_len
 
-    def override_dimension(self, case_dimension: Dimension):
+    def overwrite_dimension(self, case_dimension: Dimension):
         self.case_dimension = (
             self.calculate_dimension(
                 self.case_bounding_box.xlen, case_dimension[0]
@@ -44,17 +44,17 @@ class Case:
             ),
         )
         # Update the offset for the new dimension
-        self.override_offset(self.case_offset)
+        self.overwrite_offset(self.case_offset)
 
     def calculate_offset(self, bb_len, dim_len, off_val):
-        if off_val is ALIGNMENT.POSITIVE:
+        if off_val == "Positive":
             return bb_len / 2 - dim_len / 2
-        elif off_val is ALIGNMENT.NEGATIVE:
+        elif off_val == "Negative":
             return -bb_len / 2 + dim_len / 2
         else:
             return off_val
 
-    def override_offset(self, case_offset: Offset):
+    def overwrite_offset(self, case_offset: Offset):
         self.case_offset = (
             self.calculate_offset(
                 self.case_bounding_box.xlen,

@@ -2,10 +2,11 @@ from OCP.TopoDS import TopoDS_Shape
 from cadquery import Vector
 from board_converter import BoardConverter
 from case import Case
+from pcb import get_auto_detected_mounting_hole_settings
 from compartment_door import CompartmentDoor
-from battery_holder import BatteryHolderSettings, BatteryHolder
+from battery_holder import BatteryHolder
 from board import Board
-from settings import CaseSettings, BoardSettings, CompartmentDoorSettings, ALIGNMENT, DIMENSION_TYPE, SIDE
+from settings import *
 from components import battery_springs
 from utils import get_rotation_for_side
 
@@ -168,9 +169,10 @@ class CasemakerWithCase:
         self.compartment_door.translate(self.case.get_center_of_side(side))
 
         # unite the compartment door frame with the case
-        self.case.case_cq_object = self.case.case_cq_object.union(self.compartment_door.frame).cut(
-            self.compartment_door.door_with_tolerance).cut(self.case.get_cuts())
-        self.compartment_door.door = self.compartment_door.door.cut(
+        self.case.case_cq_object = self.case.case_cq_object.union(
+            self.compartment_door.frame.cut(self.case.get_cuts())).cut(
+            self.compartment_door.door_with_tolerance)
+        self.compartment_door.door_cq_object = self.compartment_door.door_cq_object.cut(
             self.board.get_pcb_cq_object_with_tolerance())
         return self
 
@@ -186,8 +188,74 @@ class CasemakerWithCase:
 
         self.battery_holder.translate(self.case.get_center_of_side(side))
 
-        self.battery_holder.battery_holder = self.battery_holder.battery_holder.cut(
+        self.battery_holder.battery_holder_cq_object = self.battery_holder.battery_holder_cq_object.cut(
             self.board.get_pcb_cq_object_with_tolerance())
+        return self
+
+    def add_auto_detected_mounting_holes(self, side: SIDE, mounting_hole_diameter: float = 2.0, default_mounting_hole_settings: MountingHoleSettings = MountingHoleSettings()):
+        """
+        Adds mounting holes to the case at the positions where the board has holes with the exact specified diameter.
+
+        :param mounting_hole_diameter: The diameter which the board holes need to have to be detected as mounting holes.
+        :param default_mounting_hole_settings: The default settings for the mounting holes. (the diameter will be overwritten)
+        """
+        default_mounting_hole_settings.diameter = mounting_hole_diameter
+        return self.add_mounting_holes(side, get_auto_detected_mounting_hole_settings(
+            self.board.pcb_cq_object, default_mounting_hole_settings))
+
+    def add_mounting_holes(self, side: Literal[SIDE.TOP, SIDE.BOTTOM], mounting_hole_settings_list: list[MountingHoleSettings]):
+        """
+        Adds mounting holes to the case with the specified settings.
+        """
+        print(mounting_hole_settings_list)
+        import ocp_vscode
+
+        pcb_cq_object_with_tolerance = self.board.get_pcb_cq_object_with_tolerance()
+        pcb_face = pcb_cq_object_with_tolerance.faces(
+            side.value).val()
+        pcb_with_tolerance_thickness = (
+            (1 if side is SIDE.BOTTOM else -1) * self.board.get_pcb_with_tolerance_thickness())
+        pcb_face_z = pcb_face.Center().z
+        case_wall_z = self.case.case_outer_bounding_box.zmin if side is SIDE.BOTTOM else self.case.case_outer_bounding_box.zmax
+        extrusion_length = case_wall_z - pcb_face_z
+
+        for mounting_hole_settings in mounting_hole_settings_list:
+            inner_diameter = mounting_hole_settings.diameter
+            outer_diameter = mounting_hole_settings.pad_diameter
+            if mounting_hole_settings.hole_type == "Through-Hole":
+                inner_diameter -= mounting_hole_settings.tolerance
+            elif mounting_hole_settings.hole_type == "Standoff":
+                inner_diameter += mounting_hole_settings.tolerance
+
+            outer_mounting_hole_cq_object = (cq.Workplane(pcb_face)
+                                             .workplane(centerOption="ProjectedOrigin")
+                                             .moveTo(mounting_hole_settings.position.x, mounting_hole_settings.position.y)
+                                             .circle(outer_diameter / 2)
+                                             .extrude(extrusion_length)
+                                             )
+
+            inner_mounting_hole_cq_object = (cq.Workplane(pcb_face)
+                                             .workplane(centerOption="ProjectedOrigin")
+                                             .tag("a")
+                                             .moveTo(mounting_hole_settings.position.x, mounting_hole_settings.position.y)
+                                             .circle(inner_diameter / 2)
+                                             .extrude(extrusion_length)
+                                             .workplaneFromTagged("a")
+                                             .moveTo(mounting_hole_settings.position.x, mounting_hole_settings.position.y)
+                                             .circle(inner_diameter / 2)
+                                             .extrude(pcb_with_tolerance_thickness)
+                                             )
+
+            if mounting_hole_settings.hole_type == "Through-Hole":
+                mounting_hole_cq_object = outer_mounting_hole_cq_object.union(
+                    inner_mounting_hole_cq_object)
+            elif mounting_hole_settings.hole_type == "Standoff":
+                mounting_hole_cq_object = outer_mounting_hole_cq_object.cut(
+                    inner_mounting_hole_cq_object)
+
+            self.case.case_cq_object = self.case.case_cq_object.union(
+                mounting_hole_cq_object)
+
         return self
 
 
@@ -213,8 +281,8 @@ if __name__ == "__main__":
                      "BatterySprings": battery_springs.val().wrapped,
                  })
                  .generate_case(CaseSettings(
-                     case_dimension=(DIMENSION_TYPE.AUTO, 62, 12),
-                     case_offset=(0, ALIGNMENT.POSITIVE, ALIGNMENT.POSITIVE)
+                     case_dimension=("Auto", 62, 12),
+                     case_offset=(0, "Positive", "Positive")
                  ))
                  .add_compartment_door(SIDE.BOTTOM, CompartmentDoorSettings(
                      tab_spacing_factor=0.8,
@@ -226,12 +294,29 @@ if __name__ == "__main__":
                      polartiy_text_spacing=0.3,
                      battery_length_tolerance=4
                  ))
+                 .add_auto_detected_mounting_holes(SIDE.TOP, mounting_hole_diameter=2.0)
+                 # .add_mounting_holes(SIDE.TOP, [
+                 #     MountingHoleSettings(
+                 #         diameter=3,
+                 #         position=(0, 0),
+                 #         hole_type="Through-Hole",
+                 #         pad_diameter=5,
+                 #         tolerance=0.2
+                 #     ),
+                 #     MountingHoleSettings(
+                 #         diameter=3,
+                 #         position=(10, 0),
+                 #         hole_type="Standoff",
+                 #         pad_diameter=5,
+                 #         tolerance=0.2
+                 #     )
+                 # ])
                  )
 
     show_all({
         "board": casemaker.board.board_cq_object,
-        "case_bottom": casemaker.case.case_cq_object,
-        "compartment_door": casemaker.compartment_door.door,
-        "battery_holder": casemaker.battery_holder.battery_holder,
-        # "batteries": casemaker.battery_holder.batteries,
+        "case": casemaker.case.case_cq_object,
+        "compartment_door": casemaker.compartment_door.door_cq_object,
+        "battery_holder": casemaker.battery_holder.battery_holder_cq_object,
+        # "batteries": casemaker.battery_holder.batteries_cq_object,
     })

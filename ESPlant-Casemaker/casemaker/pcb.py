@@ -9,7 +9,13 @@ from OCP.BRepBuilderAPI import BRepBuilderAPI_MakeFace
 from OCP.BRepGProp import BRepGProp
 from OCP.GProp import GProp_GProps
 
+from settings import MountingHoleSettings
+from functools import cache
 import logging
+
+# TODO check if this is needed
+# from serializer import register
+# register()
 
 
 @dataclass
@@ -29,23 +35,14 @@ def get_area_of_wire(wire: TopoDS_Wire):
     return gprop.Mass()
 
 
-def make_offset_shape(
-    cq_object: cq.Workplane,
-    board_tolerance: cq.Vector,
-    use_fixation_holes: bool,
-    fixation_hole_diameter: float,
-    hole_tolerance: float,
-    fixation_hole_pad_diameter: float,
-    pcb_tolerance: float,
-):
-    logging.info("Making offset shape")
-    if board_tolerance.x != board_tolerance.y:
-        raise Exception("Different tolerances for x and y are not supported")
-    logging.info("Getting original shape")
-    orig_shape: TopoDS_Shape = cq_object.val().wrapped
-    explorer = TopExp_Explorer(orig_shape, TopAbs_WIRE)
-    wires: list[WireData] = []
+@cache
+def get_wire_data_list(
+    pcb_cq_object: cq.Workplane,
+) -> list[WireData]:
+    orig_shape: TopoDS_Shape = pcb_cq_object.val().wrapped
+    wire_data_list: list[WireData] = []
     logging.info("Exploring wires")
+    explorer = TopExp_Explorer(orig_shape, TopAbs_WIRE)
     while explorer.More():
         ocp_wire: TopoDS_Wire = TopoDS.Wire_s(explorer.Current())
         edgeExplorer = TopExp_Explorer(ocp_wire, TopAbs_EDGE)
@@ -64,14 +61,29 @@ def make_offset_shape(
         isCircleWire = False
         if len(ocp_edges) == 1 and isCircle:
             isCircleWire = True
-        wires.append(WireData(ocp_wire, ocp_edges,
-                     isCircleWire, diameter, enclosed_area))
+        wire_data_list.append(WireData(ocp_wire, ocp_edges,
+                                       isCircleWire, diameter, enclosed_area))
         explorer.Next()
+    return wire_data_list
+
+
+def make_offset_shape(
+    pcb_cq_object: cq.Workplane,
+    board_tolerance: cq.Vector,
+):
+    logging.info("Making offset shape")
+    if board_tolerance.x != board_tolerance.y:
+        raise Exception("Different tolerances for x and y are not supported")
+
+    wire_data_list = get_wire_data_list(pcb_cq_object)
 
     # find the wires that enclose the most area
     logging.info("Sorting wires")
-    wires.sort(key=lambda wire: wire.enclosed_area, reverse=True)
-    outline_wires = wires[:2]
+    wire_data_list.sort(key=lambda wire: wire.enclosed_area, reverse=True)
+    outline_wires = wire_data_list[:2]
+
+    logging.info("Sorting outline_wires by center z position")
+    outline_wires.sort(key=lambda wire: cq.Wire(wire.ocp_wire).Center().z)
 
     logging.info("Creating faces for outline wires")
     outline_faces: list[cq.Face] = []
@@ -82,37 +94,44 @@ def make_offset_shape(
     pcb_thickness = outline_faces[1].Center(
     ).z - outline_faces[0].Center().z
     logging.info("Offsetting and extruding outline faces")
-    outline_worplane = cq.Workplane(outline_faces[0])
+    outline_worplane = cq.Workplane(outline_faces[0]).tag("a")
     outline_extrusion = (
         outline_worplane.wires()
         .toPending()
         .offset2D(board_tolerance.x, kind="intersection")
         .extrude(pcb_thickness + board_tolerance.z)
     )
-
-    if use_fixation_holes:
-        logging.info("Using fixation holes")
-        logging.info("Finding fixation hole wires with fixation hole diameter")
-        fixation_hole_wires: list[WireData] = []
-        for wire in wires:
-            if wire.isCircle and wire.diameter == fixation_hole_diameter:
-                fixation_hole_wires.append(wire)
-        logging.info("Cutting fixation holes")
-        outline_extrusion = outline_extrusion.tag("a")
-        for wire in fixation_hole_wires:
-            edge: TopoDS_Edge = wire.opc_edges[0]
-            curveAdaptor = BRepAdaptor_Curve(edge)
-            circle_center = curveAdaptor.Circle().Location()
-            radius = curveAdaptor.Circle().Radius()
-            outline_extrusion = (
-                outline_extrusion
-                .workplaneFromTagged("a")
-                .moveTo(circle_center.X(), circle_center.Y())
-                .circle(radius - hole_tolerance)
-                .cutBlind(pcb_thickness + pcb_tolerance)
-                .workplane()
-                .moveTo(circle_center.X(), circle_center.Y())
-                .circle(fixation_hole_pad_diameter / 2)
-                .cutBlind(100)
-            )
     return outline_extrusion
+
+
+def get_auto_detected_mounting_hole_settings(pcb_cq_object: cq.Workplane, default_mounting_hole_settings: MountingHoleSettings):
+    """
+    Returns a list of mounting hole settings that were auto detected using the default mounting hole diameter
+    """
+    logging.info("Finding mounting hole wires with mounting hole diameter")
+    mounting_hole_wires: list[WireData] = []
+    wire_data_list = get_wire_data_list(pcb_cq_object)
+    for wire in wire_data_list:
+        if wire.isCircle and wire.diameter == default_mounting_hole_settings.diameter:
+            mounting_hole_wires.append(wire)
+    logging.info("Sorting mounting hole wires by center z position")
+    mounting_hole_wires.sort(key=lambda wire: cq.Wire(
+        wire.ocp_wire).Center().z)
+    # remove last half of mounting hole wires to only get the bottom ones
+    mounting_hole_wires = mounting_hole_wires[:len(mounting_hole_wires) // 2]
+
+    logging.info("Generating mounting_hole_settings")
+    mounting_hole_settings: list[MountingHoleSettings] = []
+    for wire in mounting_hole_wires:
+        edge: TopoDS_Edge = wire.opc_edges[0]
+        curveAdaptor = BRepAdaptor_Curve(edge)
+
+        circle_center = curveAdaptor.Circle().Location()
+        radius = curveAdaptor.Circle().Radius()
+
+        mounting_hole_setting = default_mounting_hole_settings.clone()
+        mounting_hole_setting.position = cq.Vector(
+            circle_center.X(), circle_center.Y(), circle_center.Z())
+        mounting_hole_setting.diameter = radius * 2
+        mounting_hole_settings.append(mounting_hole_setting)
+    return mounting_hole_settings

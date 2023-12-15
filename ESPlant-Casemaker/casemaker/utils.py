@@ -113,16 +113,16 @@ def extrude_part_height(part: cq.Workplane, min_height: int, dir: cq.Selector):
     return part
 
 
-def get_rotation_for_side(side: SIDE) -> tuple[cq.cq.VectorLike, cq.cq.VectorLike, float]:
+def get_rotation_for_side(side: SIDE) -> tuple[cq.Vector, cq.Vector, float]:
     if side is SIDE.BOTTOM:
-        return ((0, 0, 0), (0, 1, 0), 180)
+        return (cq.Vector(0, 0, 0), cq.Vector(0, 1, 0), 180)
     elif side is SIDE.LEFT:
-        return ((0, 0, 0), (0, 1, 0), -90)
+        return (cq.Vector(0, 0, 0), cq.Vector(0, 1, 0), -90)
     elif side is SIDE.RIGHT:
-        return ((0, 0, 0), (0, 1, 0), 90)
+        return (cq.Vector(0, 0, 0), cq.Vector(0, 1, 0), 90)
     elif side is SIDE.TOP:
         pass
     elif side is SIDE.FRONT:
-        return ((0, 0, 0), (1, 0, 0), -90)
+        return (cq.Vector(0, 0, 0), cq.Vector(1, 0, 0), -90)
     elif side is SIDE.BACK:
-        return ((0, 0, 0), (1, 0, 0), 90)
+        return (cq.Vector(0, 0, 0), cq.Vector(1, 0, 0), 90)

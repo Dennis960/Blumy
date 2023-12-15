@@ -42,8 +42,6 @@ class CaseConfiguration:
         hole_fit_tolerance: float,
         pcb_tolerance: Tuple[float, float, float],
         part_tolerance: float,
-        should_use_fixation_holes: bool,
-        fixation_hole_diameter: float,
         parts_to_ignore_in_case_generation: List[str],
         part_settings: List[PartSetting],
         bottom_case_dimension: Tuple[str, float, str],
@@ -55,8 +53,6 @@ class CaseConfiguration:
         self.hole_fit_tolerance = hole_fit_tolerance
         self.pcb_tolerance = pcb_tolerance
         self.part_tolerance = part_tolerance
-        self.should_use_fixation_holes = should_use_fixation_holes
-        self.fixation_hole_diameter = fixation_hole_diameter
         self.parts_to_ignore_in_case_generation = parts_to_ignore_in_case_generation
         self.part_settings = part_settings
         self.bottom_case_dimension = bottom_case_dimension

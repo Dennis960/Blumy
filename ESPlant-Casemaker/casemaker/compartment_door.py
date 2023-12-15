@@ -4,8 +4,8 @@ from settings import CompartmentDoorSettings
 
 class CompartmentDoor:
     def __init__(self, settings: CompartmentDoorSettings = CompartmentDoorSettings()):
-        self._settings = settings
-        self.door = self.generate_compartment_door()
+        self.settings = settings
+        self.door_cq_object = self.generate_compartment_door()
         self.door_with_tolerance = self.generate_compartment_door_with_tolerance()
         self.frame = self.generate_compartment_door_frame()
         self.compartment_door_frame_walls = self.generate_compartment_door_frame_walls()
@@ -13,7 +13,7 @@ class CompartmentDoor:
             self.compartment_door_frame_walls)
 
     def _generate_fitting_arm(self, face: cq.Workplane) -> cq.Workplane:
-        s = self._settings
+        s = self.settings
         angle_part_height = s.fitting_arm_height - 1.5 * s.fitting_arm_thickness
         ratio = s.fitting_arm_angle_offset / angle_part_height
         return (cq.Workplane(face)
@@ -63,7 +63,7 @@ class CompartmentDoor:
                 )
 
     def _generate_fitting_arm_tolerance(self, face: cq.Workplane) -> cq.Workplane:
-        s = self._settings
+        s = self.settings
         return (self._generate_fitting_arm(face)
                 .workplaneFromTagged("fitting_arm_wire")
                 .wires(tag="fitting_arm_wire")
@@ -88,7 +88,7 @@ class CompartmentDoor:
                 )
 
     def generate_compartment_door(self) -> cq.Workplane:
-        s = self._settings
+        s = self.settings
         compartment_door = (cq.Workplane("XY")
                             .box(s.compartment_door_dimensions.x - 2 * s.compartment_door_tolerance,
                                  s.compartment_door_dimensions.y - 2 * s.compartment_door_tolerance, s.compartment_door_dimensions.z)
@@ -116,7 +116,7 @@ class CompartmentDoor:
         return compartment_door
 
     def generate_compartment_door_with_tolerance(self) -> cq.Workplane:
-        s = self._settings
+        s = self.settings
         compartment_door = (self.generate_compartment_door()
                             .workplaneFromTagged("compartment_door")
                             .box(s.compartment_door_dimensions.x, s.compartment_door_dimensions.y, s.compartment_door_dimensions.z)
@@ -134,7 +134,7 @@ class CompartmentDoor:
         return compartment_door
 
     def _generate_fitting_arm_box(self, face: cq.cq.CQObject) -> cq.Workplane:
-        s = self._settings
+        s = self.settings
         fitting_arm_box_small = (cq.Workplane(face)
                                  .workplane()
                                  .transformed(offset=(0, -0.5 * s.compartment_door_dimensions.z, 0), rotate=(90, 0, 0))
@@ -146,7 +146,7 @@ class CompartmentDoor:
         )
 
     def _generate_fitting_arm_boxes(self) -> cq.Workplane:
-        s = self._settings
+        s = self.settings
         fitting_arm_boxes = (cq.Workplane("XY")
                              .box(s.compartment_door_dimensions.x, s.compartment_door_dimensions.y, s.compartment_door_dimensions.z)
                              .faces(s.snap_joint_face_selector)
@@ -162,7 +162,7 @@ class CompartmentDoor:
         return fitting_arm_boxes
 
     def _generate_recessed_edge(self) -> cq.Workplane:
-        s = self._settings
+        s = self.settings
         loft = (cq.Workplane("XY")
                 .workplane(offset=-0.5 * s.compartment_door_dimensions.z)
                 .rect(s.compartment_door_dimensions.x - 2 * s.recessed_edge_width, s.compartment_door_dimensions.y - 2 * s.recessed_edge_width)
@@ -188,13 +188,14 @@ class CompartmentDoor:
         fitting_arm_boxes = self._generate_fitting_arm_boxes()
         return recessed_edge.union(fitting_arm_boxes).cut(self.door_with_tolerance)
 
-    def translate(self, vec: cq.cq.VectorLike = (0, 0, 0)) -> None:
-        self.door = self.door.translate(vec)
+    def translate(self, vec: cq.Vector = cq.Vector(0, 0, 0)) -> None:
+        self.door_cq_object = self.door_cq_object.translate(vec)
         self.door_with_tolerance = self.door_with_tolerance.translate(vec)
         self.frame = self.frame.translate(vec)
 
-    def rotate(self, axisStart: cq.cq.VectorLike = (0, 0, 0), axisEnd: cq.cq.VectorLike = (0, 0, 0), angleDegrees: float = 0) -> None:
-        self.door = self.door.rotate(axisStart, axisEnd, angleDegrees)
+    def rotate(self, axisStart: cq.Vector = cq.Vector(0, 0, 0), axisEnd: cq.Vector = cq.Vector(0, 0, 0), angleDegrees: float = 0) -> None:
+        self.door_cq_object = self.door_cq_object.rotate(
+            axisStart, axisEnd, angleDegrees)
         self.door_with_tolerance = self.door_with_tolerance.rotate(
             axisStart, axisEnd, angleDegrees)
         self.frame = self.frame.rotate(axisStart, axisEnd, angleDegrees)
@@ -203,7 +204,7 @@ class CompartmentDoor:
         """
         This method is used to test the compartment door frame without printing an entire case
         """
-        s = self._settings
+        s = self.settings
         return (cq.Workplane("XY")
                 .transformed(offset=(0, 0, 0.5 * s.compartment_door_dimensions.z))
                 .rect(s.compartment_door_dimensions.x, s.compartment_door_dimensions.y)
@@ -219,7 +220,7 @@ if __name__ == "__main__":
 
     compartment_door = CompartmentDoor()
     ocp_vscode.show_all({
-        "compartment_door": compartment_door.door,
+        "compartment_door": compartment_door.door_cq_object,
         "compartment_door_frame_with_walls": compartment_door.compartment_door_frame_with_walls,
         "compartment_door_frame": compartment_door.frame
     })
