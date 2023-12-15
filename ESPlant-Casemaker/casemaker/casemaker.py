@@ -133,6 +133,7 @@ class CasemakerWithBoard:
         Generates a case object using information from the board object.
         """
         case = Case(self.board, case_settings)
+        case.case_cq_object = case.case_cq_object.cut(case.get_cuts())
         return CasemakerWithCase(self.board_shape, self.shapes_dict, self.board, case)
 
 
@@ -173,7 +174,7 @@ class CasemakerWithCase:
 
         # unite the compartment door frame with the case
         self.case.case_cq_object = self.case.case_cq_object.union(
-            self.compartment_door.frame).cut(self.case.get_cuts()).cut(
+            self.compartment_door.frame).cut(
             self.compartment_door.door_with_tolerance)
         self.compartment_door.door_cq_object = self.compartment_door.door_cq_object.cut(
             self.case.get_cuts())
@@ -281,7 +282,7 @@ if __name__ == "__main__":
                      "BatterySprings": battery_springs.val().wrapped,
                  })
                  .generate_case(CaseSettings(
-                     case_dimension=("Auto", 62, 12),
+                     case_dimension=("Auto", 62, 11),
                      case_offset=(0, "Positive", "Positive")
                  ))
                  .add_compartment_door(SIDE.BOTTOM, CompartmentDoorSettings(

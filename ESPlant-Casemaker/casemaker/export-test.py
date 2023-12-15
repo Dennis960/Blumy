@@ -87,7 +87,7 @@ casemaker = (CasemakerLoader()
                  "BatterySprings": battery_springs.val().wrapped,
              })
              .generate_case(CaseSettings(
-                 case_dimension=("Auto", 62, 12),
+                 case_dimension=("Auto", 62, 11),
                  case_offset=(0, "Positive", "Positive")
              ))
              .add_compartment_door(SIDE.BOTTOM, CompartmentDoorSettings(

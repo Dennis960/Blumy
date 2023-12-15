@@ -101,11 +101,14 @@ class Board:
                 cq_object_with_tolerance = self._pcb_cq_object_with_tolerance
             else:
                 bounding_box_cq_object = self._bounding_box_cq_object_dict[name]
-                cq_object_with_tolerance = bounding_box_cq_object.union(
-                    bounding_box_cq_object.faces("<Z").shell(
-                        s.part_tolerance, kind="intersection"
+                if s.part_tolerance == 0:
+                    cq_object_with_tolerance = bounding_box_cq_object
+                else:
+                    cq_object_with_tolerance = bounding_box_cq_object.union(
+                        bounding_box_cq_object.shell(
+                            s.part_tolerance, kind="intersection"
+                        )
                     )
-                )
             cq_object_with_tolerance_dict[name] = cq_object_with_tolerance
         return cq_object_with_tolerance_dict
 
