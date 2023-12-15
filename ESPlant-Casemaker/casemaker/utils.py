@@ -41,15 +41,15 @@ def extrude_part_faces(
     pending_wires = part.faces(faces_selector).wires().toPending()
     if selector == ">Z":
         direction = cq.Vector(0, 0, 1)
-    if selector == "<Z":
+    elif selector == "<Z":
         direction = cq.Vector(0, 0, -1)
-    if selector == ">X":
+    elif selector == ">X":
         direction = cq.Vector(1, 0, 0)
-    if selector == "<X":
+    elif selector == "<X":
         direction = cq.Vector(-1, 0, 0)
-    if selector == ">Y":
+    elif selector == ">Y":
         direction = cq.Vector(0, 1, 0)
-    if selector == "<Y":
+    elif selector == "<Y":
         direction = cq.Vector(0, -1, 0)
     pending_wires.plane.zDir = direction
     extruded_part = pending_wires.extrude(until)

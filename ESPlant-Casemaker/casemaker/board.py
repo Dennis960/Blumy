@@ -99,6 +99,8 @@ class Board:
         for name in self._shapes_dict.keys():
             if PCB_PART_NAME in name:
                 cq_object_with_tolerance = self._pcb_cq_object_with_tolerance
+            elif any(part_without_tolerance in name for part_without_tolerance in s.parts_without_tolerances):
+                cq_object_with_tolerance = self._cq_object_dict[name]
             else:
                 bounding_box_cq_object = self._bounding_box_cq_object_dict[name]
                 if s.part_tolerance == 0:

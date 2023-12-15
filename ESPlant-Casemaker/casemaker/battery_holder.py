@@ -13,11 +13,11 @@ class BatteryHolder:
 
     def generate_batteries(self) -> cq.Workplane:
         s = self.settings
-        total_battery_width = s.battery_diameter + 2 * s.battery_diameter_tolerance
+        total_battery_width = s.battery.diameter + 2 * s.battery_diameter_tolerance
         all_batteries_width = s.number_of_batteries * total_battery_width
-        total_battery_length = s.battery_length + 2 * s.battery_length_tolerance
+        total_battery_length = s.battery.length + 2 * s.battery_length_tolerance
         batteries = (cq.Workplane("XY")
-                     .transformed(rotate=(90, 180, 0), offset=(0, -s.battery_length/2 - s.battery_length_tolerance, 0))
+                     .transformed(rotate=(90, 180, 0), offset=(0, -s.battery.length/2 - s.battery_length_tolerance, 0))
                      .center(-0.5 * all_batteries_width + 0.5 * total_battery_width, s.floor_thickness + 0.5 * total_battery_width)
                      .center(-total_battery_width, 0)
                      )
@@ -31,9 +31,9 @@ class BatteryHolder:
 
     def _generate_polarity_text(self) -> cq.Workplane:
         s = self.settings
-        total_battery_width = s.battery_diameter + 2 * s.battery_diameter_tolerance
+        total_battery_width = s.battery.diameter + 2 * s.battery_diameter_tolerance
         all_batteries_width = s.number_of_batteries * total_battery_width
-        total_battery_length = s.battery_length + 2 * s.battery_length_tolerance
+        total_battery_length = s.battery.length + 2 * s.battery_length_tolerance
 
         polarity_text = (cq.Workplane("XY")
                          .transformed(rotate=(0, 0, 90), offset=(0, 0, s.floor_thickness - (0 if s.polarity_text_direction == "Extrude" else s.text_thickness)))
@@ -53,13 +53,13 @@ class BatteryHolder:
 
     def generate_battery_holder(self) -> cq.Workplane:
         s = self.settings
-        total_battery_width = s.battery_diameter + 2 * s.battery_diameter_tolerance
+        total_battery_width = s.battery.diameter + 2 * s.battery_diameter_tolerance
         all_batteries_width = s.number_of_batteries * total_battery_width
         total_width = (all_batteries_width + 2 * s.outer_wall_thickness)
-        total_battery_length = s.battery_length + 2 * s.battery_length_tolerance
+        total_battery_length = s.battery.length + 2 * s.battery_length_tolerance
 
         battery_holder = (cq.Workplane("XY")
-                          .transformed(rotate=(90, 180, 0), offset=(0, -s.battery_length/2 - s.battery_length_tolerance, 0))
+                          .transformed(rotate=(90, 180, 0), offset=(0, -s.battery.length/2 - s.battery_length_tolerance, 0))
                           .move(-total_width / 2, 0)
                           .line(0, s.floor_thickness + s.outer_wall_height)
                           .line(s.outer_wall_thickness, 0)
@@ -94,7 +94,7 @@ class BatteryHolder:
                           .extrude(s.front_wall_thickness)
                           )
         insertable_springs = (cq.Workplane("XY")
-                                .transformed(rotate=(90, 180, 0), offset=(0, +s.battery_length/2 + s.battery_length_tolerance, s.floor_thickness))
+                                .transformed(rotate=(90, 180, 0), offset=(0, +s.battery.length/2 + s.battery_length_tolerance, s.floor_thickness))
                                 .rect(all_batteries_width, total_battery_width, centered=(True, False))
                                 .extrude(s.insertable_springs_thickness)
                               )

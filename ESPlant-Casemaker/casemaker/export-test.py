@@ -8,6 +8,7 @@ from compartment_door import CompartmentDoor
 from battery_holder import BatteryHolder
 from settings import *
 from components import battery_springs
+import esplant_default_settings
 
 export_file_extension = ".step"
 
@@ -83,24 +84,13 @@ for i, settings in enumerate(battery_holder_settings):
 casemaker = (CasemakerLoader()
              .load_pickle("board.pickle")
              .save_gltf_file("board.gltf")
-             .generate_board(BoardSettings(), exclude=["PinHeader"], additional_parts={
-                 "BatterySprings": battery_springs.val().wrapped,
+             .generate_board(esplant_default_settings.board_settings, additional_parts={
+                 "BatterySprings": battery_springs.val().wrapped
              })
-             .generate_case(CaseSettings(
-                 case_dimension=("Auto", 62, 11),
-                 case_offset=(0, "Positive", "Positive")
-             ))
-             .add_compartment_door(SIDE.BOTTOM, CompartmentDoorSettings(
-                 tab_spacing_factor=0.8,
-             ))
-             .add_battery_holder(SIDE.BOTTOM, BatteryHolderSettings(
-                 front_wall_thickness=2.5,
-                 back_wall_thickness=1.5,
-                 insertable_springs_thickness=1,
-                 polartiy_text_spacing=0.3,
-                 battery_length_tolerance=4
-             ))
-             .add_auto_detected_mounting_holes(SIDE.TOP, mounting_hole_diameter=2.0)
+             .generate_case(esplant_default_settings.case_settings)
+             .add_compartment_door(SIDE.BOTTOM, esplant_default_settings.compartment_door_settings)
+             .add_battery_holder(SIDE.BOTTOM, esplant_default_settings.battery_holder_settings)
+             .add_auto_detected_mounting_holes(SIDE.TOP, mounting_hole_diameter=esplant_default_settings.mounting_hole_diameter)
              )
 
 casemaker.battery_holder.battery_holder_cq_object = casemaker.battery_holder.battery_holder_cq_object.mirror(

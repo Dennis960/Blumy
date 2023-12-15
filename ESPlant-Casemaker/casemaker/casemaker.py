@@ -7,7 +7,6 @@ from compartment_door import CompartmentDoor
 from battery_holder import BatteryHolder
 from board import Board
 from settings import *
-from components import battery_springs
 from utils import get_rotation_for_side
 
 from serializer import register
@@ -68,7 +67,7 @@ class Casemaker:
         self.shapes_dict = shapes_dict
         self.cache_dir = cache_dir
 
-    def generate_board(self, board_settings: BoardSettings = BoardSettings(), exclude: list[str] = [], additional_parts: dict[str, TopoDS_Shape] = {}):
+    def generate_board(self, board_settings: BoardSettings = BoardSettings(), additional_parts: dict[str, TopoDS_Shape] = {}):
         """
         Generates a board object from the board shape and the shapes dictionary with the specified settings.
 
@@ -79,7 +78,7 @@ class Casemaker:
         """
         shapes_dict = {**self.shapes_dict, **additional_parts}
         shapes_dict = {name: shape for name,
-                       shape in shapes_dict.items() if not any(ex in name for ex in exclude)}
+                       shape in shapes_dict.items() if not any(ex in name for ex in board_settings.exclude)}
         for shape in additional_parts.values():
             self.board_shape = (cq.Workplane(cq.Shape.cast(
                 self.board_shape)).union(cq.Workplane(cq.Shape.cast(shape)))).val().wrapped
@@ -133,7 +132,6 @@ class CasemakerWithBoard:
         Generates a case object using information from the board object.
         """
         case = Case(self.board, case_settings)
-        case.case_cq_object = case.case_cq_object.cut(case.get_cuts())
         return CasemakerWithCase(self.board_shape, self.shapes_dict, self.board, case)
 
 
@@ -172,12 +170,16 @@ class CasemakerWithCase:
         # move the compartment door to the correct position
         self.compartment_door.translate(self.case.get_center_of_side(side))
 
-        # unite the compartment door frame with the case
+        # unite the compartment door frame with the case and keep tolerances to board
         self.case.case_cq_object = self.case.case_cq_object.union(
-            self.compartment_door.frame).cut(
+            self.compartment_door.frame.cut(self.board.get_cq_objects_with_tolerances_union())).cut(
             self.compartment_door.door_with_tolerance)
         self.compartment_door.door_cq_object = self.compartment_door.door_cq_object.cut(
             self.case.get_cuts())
+
+        if self.case.settings.should_cut_pcb_slot:
+            self.case.case_cq_object = self.case.case_cq_object.cut(
+                self.board.get_pcb_extrusion(self.case.settings.pcb_slot_side))
         return self
 
     def add_battery_holder(self, side: SIDE, battery_holder_settings: BatteryHolderSettings = None):
@@ -264,6 +266,7 @@ if __name__ == "__main__":
     from ocp_vscode import show_all
     import logging
     import os
+    import esplant_default_settings
 
     logging.basicConfig(level=logging.INFO)
 
@@ -278,40 +281,12 @@ if __name__ == "__main__":
                  # .save_step_file("board-saved.step")
                  # .save_pickle("board.pickle")
                  # .save_gltf_file("board.gltf")
-                 .generate_board(BoardSettings(), exclude=["PinHeader"], additional_parts={
-                     "BatterySprings": battery_springs.val().wrapped,
-                 })
-                 .generate_case(CaseSettings(
-                     case_dimension=("Auto", 62, 11),
-                     case_offset=(0, "Positive", "Positive")
-                 ))
-                 .add_compartment_door(SIDE.BOTTOM, CompartmentDoorSettings(
-                     tab_spacing_factor=0.8,
-                 ))
-                 .add_battery_holder(SIDE.BOTTOM, BatteryHolderSettings(
-                     front_wall_thickness=2.5,
-                     back_wall_thickness=1.5,
-                     insertable_springs_thickness=1,
-                     polartiy_text_spacing=0.3,
-                     battery_length_tolerance=4
-                 ))
-                 .add_auto_detected_mounting_holes(SIDE.TOP, mounting_hole_diameter=2.2)
-                 # .add_mounting_holes(SIDE.TOP, [
-                 #     MountingHoleSettings(
-                 #         diameter=3,
-                 #         position=(0, 0),
-                 #         hole_type="Through-Hole",
-                 #         pad_diameter=5,
-                 #         tolerance=0.2
-                 #     ),
-                 #     MountingHoleSettings(
-                 #         diameter=3,
-                 #         position=(10, 0),
-                 #         hole_type="Standoff",
-                 #         pad_diameter=5,
-                 #         tolerance=0.2
-                 #     )
-                 # ])
+                 .generate_board(esplant_default_settings.board_settings, esplant_default_settings.additional_parts)
+                 .generate_case(esplant_default_settings.case_settings)
+                 .add_compartment_door(SIDE.BOTTOM, esplant_default_settings.compartment_door_settings)
+                 .add_battery_holder(SIDE.BOTTOM, esplant_default_settings.battery_holder_settings)
+                 .add_auto_detected_mounting_holes(SIDE.TOP, mounting_hole_diameter=esplant_default_settings.mounting_hole_diameter)
+                 # .add_mounting_holes(SIDE.TOP, [...])
                  )
 
     show_all({

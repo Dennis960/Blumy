@@ -86,25 +86,16 @@ class BoardSettings:
     :param part_tolerance: Tolerance which will be applied to all parts.
     :param part_settings: List of PartSettings.
     :param pcb_part_name: Name of the PCB part.
+    :param exclude: List of part names which should be excluded from the case generation.
+    :param parts_without_tolerances: List of part names which should not have the part tolerance applied.
     """
     # having different tolerances for x and y is not supported
     pcb_tolerance: cq.Vector = cq.Vector(1.5, 1.5, 0.5)
     part_tolerance: float = 1
-    # TODO fix exception when list does not contain at least one .* regex
-    part_settings: list[PartSetting] = field(default_factory=lambda: [
-        PartSetting(".*", ">Z", 0.5),
-        PartSetting(".*", "<Z", 0.5),
-        PartSetting(".*MICRO-USB.*", ">X",
-                    "Hole", width=11, height=6.5),
-        PartSetting(".*SW-SMD_4P.*", ">Z", "Hole"),
-        PartSetting(".*SW-SMD_MK.*", ">Z", "Hole",
-                    offset_y=-2.1, height=10),
-        PartSetting(".*LED.*", ">Z", "Hole"),
-        PartSetting(".*ALS-PT19.*", ">Z", "Hole"),
-        PartSetting(".*ESP32.*", "<Z", 2),
-        PartSetting(".*ESP32.*", ">Z", 2),
-    ])
+    part_settings: list[PartSetting] = field(default_factory=lambda: [])
     pcb_part_name = PCB_PART_NAME
+    exclude: list[str] = field(default_factory=lambda: [])
+    parts_without_tolerances: list[str] = field(default_factory=lambda: [])
 
     def __post_init__(self):
         if not type(self.pcb_tolerance) == cq.Vector:
@@ -131,7 +122,8 @@ class MountingHoleSettings:
             position=self.position,
             diameter=self.diameter,
             pad_diameter=self.pad_diameter,
-            tolerance=self.tolerance
+            tolerance=self.tolerance,
+            hole_type=self.hole_type
         )
 
     def __post_init__(self):
@@ -145,6 +137,7 @@ class CompartmentDoorSettings:
     Settings for the compartment door.
 
     :param compartment_door_dimensions: The dimensions of the compartment door, meaning the width, height and thickness excluding the fitting arm(s)
+    When generating a compartment door with the Casemaker, this setting will be overwritten with the dimensions of the case
     :param fitting_arm_thickness: The thickness of the fitting arm. Thicker means thicker snap joints and more tension
     :param fitting_arm_height: How deep the fitting arm goes into the case. Higher (meaning deeper) means more suspension
     :param fitting_arm_width: How wide the fitting arm is. It is not recommended to have this value be greater than the width of the compartment door
@@ -197,12 +190,33 @@ class CompartmentDoorSettings:
 
 
 @dataclass
+class Battery:
+    """
+    :param diameter: Diameter of the battery.
+    :param length: Length of the battery.
+    """
+    diameter: float
+    length: float
+
+    def AA():
+        """
+        Returns a predefined AA battery.
+        """
+        return Battery(14.5, 50.5)
+
+    def AAA():
+        """
+        Returns a predefined AAA battery.
+        """
+        return Battery(10.5, 44.5)
+
+
+@dataclass
 class BatteryHolderSettings:
     """
     Settings for the battery holder.
 
-    :param battery_diameter: Diameter of a battery.
-    :param battery_length: Length of a battery.
+    :param battery: Battery to be used. Can be either a predefined battery or a custom (round) battery.
     :param number_of_batteries: Number of batteries.
     :param floor_thickness: Thickness of the floor.
     :param outer_wall_height: Height of the outer wall.
@@ -223,8 +237,7 @@ class BatteryHolderSettings:
     :param battery_diameter_tolerance: Tolerance for battery diameter.
     :param battery_length_tolerance: Tolerance for battery length.
     """
-    battery_diameter: float = 10.5
-    battery_length: float = 44.5
+    battery: Battery = Battery.AAA()
     number_of_batteries: int = 2
 
     floor_thickness: float = 1.5
