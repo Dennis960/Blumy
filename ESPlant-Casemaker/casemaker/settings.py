@@ -44,7 +44,7 @@ class PartSetting:
     """
     name_regex: str
     top_direction: Literal[">X", ">Y", ">Z", "<X", "<Y", "<Z"]
-    length: float | Literal["Hole"] = None
+    length: float | Literal["Hole"]
     offset_x: float = 0
     offset_y: float = 0
     offset_z: float = 0
@@ -63,7 +63,7 @@ class CaseSettings:
     :param case_offset: Offset of the case. Using "Positive" or "Negative" will align the case to the bounding box of the parts in the specified direction.
     """
     case_wall_thickness: float = 1.5
-    case_floor_pad: float = 8 + 1.6
+    case_floor_pad: float = 0
 
     case_dimension: Dimension = ("Auto", "Auto", "Auto")
     case_offset: Offset = (0, 0, 0)

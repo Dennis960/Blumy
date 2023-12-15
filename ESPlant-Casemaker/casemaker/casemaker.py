@@ -22,7 +22,7 @@ class CasemakerLoader:
     def __init__(self, cache_directory: str = "parts"):
         self.cache_dir = cache_directory
 
-    def load_kicad_pcb(self, kicad_pcb_path: str, step_file: str = "board.step"):
+    def load_kicad_pcb(self, kicad_pcb_path: str, step_file: str = "board.step", force_reconvert: bool = False):
         """
         Loads the kicad_pcb file and creates a Casemaker object from it.
 
@@ -30,7 +30,7 @@ class CasemakerLoader:
         :param step_file: Name of the file in the cache directory
         """
         board_shape, shapes_dict = (BoardConverter(self.cache_dir)
-                                    .from_kicad_pcb(kicad_pcb_path, step_file)
+                                    .from_kicad_pcb(kicad_pcb_path, step_file, force_reconvert=force_reconvert)
                                     )
         return Casemaker(board_shape, shapes_dict, self.cache_dir)
 
@@ -269,11 +269,11 @@ if __name__ == "__main__":
 
     casemaker = (CasemakerLoader()
                  .load_pickle("board.pickle")
-                 # .load_kicad_pcb("ESPlant-Board/ESPlant-Board.kicad_pcb")
+                 # .load_kicad_pcb("ESPlant-Board/ESPlant-Board.kicad_pcb", force_reconvert=True)
                  # .load_step_file("board.step")
                  # .save_step_file("board-saved.step")
                  # .save_pickle("board.pickle")
-                 .save_gltf_file("board.gltf")
+                 # .save_gltf_file("board.gltf")
                  .generate_board(BoardSettings(), exclude=["PinHeader"], additional_parts={
                      "BatterySprings": battery_springs.val().wrapped,
                  })
@@ -291,7 +291,7 @@ if __name__ == "__main__":
                      polartiy_text_spacing=0.3,
                      battery_length_tolerance=4
                  ))
-                 .add_auto_detected_mounting_holes(SIDE.TOP, mounting_hole_diameter=2.0)
+                 .add_auto_detected_mounting_holes(SIDE.TOP, mounting_hole_diameter=2.2)
                  # .add_mounting_holes(SIDE.TOP, [
                  #     MountingHoleSettings(
                  #         diameter=3,
