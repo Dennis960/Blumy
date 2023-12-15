@@ -93,7 +93,7 @@ def register():
 
 if __name__ == "__main__":
     register()
-    from casemaker import CasemakerLoader, Casemaker
+    from casemaker.casemaker import CasemakerLoader, Casemaker
     import time
     import ocp_vscode
     import pickle
@@ -112,7 +112,7 @@ if __name__ == "__main__":
 
     start = time.time()
     with open("board.pickle", "rb") as f:
-        board = pickle.load(f)
+        board: cq.Shape = pickle.load(f)
     print("loaded in " + str(time.time() - start) + "s")
     ocp_vscode.show_object(cq.Workplane(board))
 

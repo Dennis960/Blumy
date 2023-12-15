@@ -66,8 +66,6 @@ def upload_board():
         hole_fit_tolerance =1 ,
         pcb_tolerance = (1, 1, 1),
         part_tolerance = 1,
-        should_use_fixation_holes = True,
-        fixation_hole_diameter = 1,
         parts_to_ignore_in_case_generation = [],
         part_settings = [],
         bottom_case_dimension = ("2", 1, "2"),
@@ -102,8 +100,6 @@ def set_parameters(project_id: str):
     pcb_tolerance_z = float(request.form['pcb_tolerance_z'])
     pcb_tolerance = (pcb_tolerance_x, pcb_tolerance_y, pcb_tolerance_z)
     part_tolerance = float(request.form['part_tolerance'])
-    should_use_fixation_holes = 'should_use_fixation_holes' in request.form
-    fixation_hole_diameter = float(request.form['fixation_hole_diameter'])
 
     config = parameters.CaseConfiguration(
         case_wall_thickness,
@@ -111,8 +107,6 @@ def set_parameters(project_id: str):
         hole_fit_tolerance,
         pcb_tolerance,
         part_tolerance,
-        should_use_fixation_holes,
-        fixation_hole_diameter,
         # not supported yet:
         previous_config.parts_to_ignore_in_case_generation,
         previous_config.part_settings,

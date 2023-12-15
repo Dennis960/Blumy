@@ -1,5 +1,5 @@
 import cadquery as cq
-from settings import BatteryHolderSettings, TextDirection
+from settings import BatteryHolderSettings
 
 
 # TODO Future improvements:
@@ -7,12 +7,12 @@ from settings import BatteryHolderSettings, TextDirection
 
 class BatteryHolder:
     def __init__(self, settings: BatteryHolderSettings = BatteryHolderSettings()):
-        self._settings = settings
-        self.battery_holder = self.generate_battery_holder()
-        self.batteries = self.generate_batteries()
+        self.settings = settings
+        self.battery_holder_cq_object = self.generate_battery_holder()
+        self.batteries_cq_object = self.generate_batteries()
 
     def generate_batteries(self) -> cq.Workplane:
-        s = self._settings
+        s = self.settings
         total_battery_width = s.battery_diameter + 2 * s.battery_diameter_tolerance
         all_batteries_width = s.number_of_batteries * total_battery_width
         total_battery_length = s.battery_length + 2 * s.battery_length_tolerance
@@ -30,13 +30,13 @@ class BatteryHolder:
         return batteries
 
     def _generate_polarity_text(self) -> cq.Workplane:
-        s = self._settings
+        s = self.settings
         total_battery_width = s.battery_diameter + 2 * s.battery_diameter_tolerance
         all_batteries_width = s.number_of_batteries * total_battery_width
         total_battery_length = s.battery_length + 2 * s.battery_length_tolerance
 
         polarity_text = (cq.Workplane("XY")
-                         .transformed(rotate=(0, 0, 90), offset=(0, 0, s.floor_thickness - (0 if s.polarity_text_direction == TextDirection.EXTRUDE else s.text_thickness)))
+                         .transformed(rotate=(0, 0, 90), offset=(0, 0, s.floor_thickness - (0 if s.polarity_text_direction == "Extrude" else s.text_thickness)))
                          .center(0, all_batteries_width / 2 + 0.5 * total_battery_width)
                          )
         for i in range(s.number_of_batteries):
@@ -52,7 +52,7 @@ class BatteryHolder:
         return polarity_text
 
     def generate_battery_holder(self) -> cq.Workplane:
-        s = self._settings
+        s = self.settings
         total_battery_width = s.battery_diameter + 2 * s.battery_diameter_tolerance
         all_batteries_width = s.number_of_batteries * total_battery_width
         total_width = (all_batteries_width + 2 * s.outer_wall_thickness)
@@ -101,20 +101,21 @@ class BatteryHolder:
         batteries = self.generate_batteries()
         polarity_text = self._generate_polarity_text()
         battery_holder = battery_holder.cut(batteries).cut(insertable_springs)
-        if s.polarity_text_direction == TextDirection.CUT:
+        if s.polarity_text_direction == "Cut":
             battery_holder = battery_holder.cut(polarity_text)
         else:
             battery_holder = battery_holder.union(polarity_text)
         return battery_holder
 
-    def translate(self, vec: cq.cq.VectorLike):
-        self.battery_holder = self.battery_holder.translate(vec)
-        self.batteries = self.batteries.translate(vec)
+    def translate(self, vec: cq.Vector):
+        self.battery_holder_cq_object = self.battery_holder_cq_object.translate(
+            vec)
+        self.batteries_cq_object = self.batteries_cq_object.translate(vec)
 
-    def rotate(self, axisStartPoint: cq.cq.VectorLike, axisEndPoint: cq.cq.VectorLike, angleDegrees: float):
-        self.battery_holder = self.battery_holder.rotate(
+    def rotate(self, axisStartPoint: cq.Vector, axisEndPoint: cq.Vector, angleDegrees: float):
+        self.battery_holder_cq_object = self.battery_holder_cq_object.rotate(
             axisStartPoint, axisEndPoint, angleDegrees)
-        self.batteries = self.batteries.rotate(
+        self.batteries_cq_object = self.batteries_cq_object.rotate(
             axisStartPoint, axisEndPoint, angleDegrees)
 
 
@@ -124,6 +125,6 @@ if __name__ == "__main__":
     battery_holder = BatteryHolder()
 
     ocp_vscode.show_all({
-        "battery_holder": battery_holder.battery_holder,
-        "batteries": battery_holder.batteries,
+        "battery_holder": battery_holder.battery_holder_cq_object,
+        "batteries": battery_holder.batteries_cq_object,
     })

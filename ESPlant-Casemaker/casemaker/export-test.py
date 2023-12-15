@@ -1,10 +1,9 @@
 import ocp_vscode
 import cadquery as cq
-from typing import List
 from compartment_door import CompartmentDoor
 from battery_holder import BatteryHolder
 from casemaker import CasemakerLoader
-from settings import SIDE, CompartmentDoorSettings, BatteryHolderSettings, CaseSettings, ALIGNMENT, DIMENSION_TYPE
+from settings import SIDE, CompartmentDoorSettings, BatteryHolderSettings, CaseSettings
 from components import battery_springs
 
 export_file_extension = ".step"
@@ -12,7 +11,7 @@ export_file_extension = ".step"
 parts = {}
 
 # Compartment Door
-compartment_door_settings: List[CompartmentDoorSettings] = [
+compartment_door_settings: list[CompartmentDoorSettings] = [
     CompartmentDoorSettings(compartment_door_dimensions=(20, 20, 1.5), snap_joint_face_selectors=[
                             "+X", "-X", "+Y"], tabs_face_selector="<Y"),
     CompartmentDoorSettings(compartment_door_dimensions=(
@@ -38,27 +37,29 @@ for i, settings in enumerate(compartment_door_settings):
     compartment_door = CompartmentDoor(settings)
     compartment_door_filename = f"compartment_door_{i}{export_file_extension}"
     compartment_door_frame_with_walls_filename = f"compartment_door_frame_with_walls_{i}{export_file_extension}"
-    compartment_door.door = compartment_door.door.mirror("XY")
-    cq.Assembly(compartment_door.door).save(compartment_door_filename)
+    compartment_door.door_cq_object = compartment_door.door_cq_object.mirror(
+        "XY")
+    cq.Assembly(compartment_door.door_cq_object).save(
+        compartment_door_filename)
     cq.Assembly(compartment_door.compartment_door_frame_with_walls).save(
         compartment_door_frame_with_walls_filename)
     parts |= {
-        f"compartment_door_{i}": compartment_door.door,
+        f"compartment_door_{i}": compartment_door.door_cq_object,
         f"compartment_door_frame_with_walls_{i}": compartment_door.compartment_door_frame_with_walls,
     }
 
 compartment_door = CompartmentDoor(
     CompartmentDoorSettings(compartment_door_text="sideways"))
-compartment_door.door = compartment_door.door.rotate(
+compartment_door.door_cq_object = compartment_door.door_cq_object.rotate(
     (0, 0, 0), (0, 1, 0), 90)
-cq.Assembly(compartment_door.door).save(
+cq.Assembly(compartment_door.door_cq_object).save(
     f"compartment_door_sideways{export_file_extension}")
 parts |= {
-    "compartment_door_sideways": compartment_door.door,
+    "compartment_door_sideways": compartment_door.door_cq_object,
 }
 
 # Battery Holder
-battery_holder_settings: List[BatteryHolderSettings] = [
+battery_holder_settings: list[BatteryHolderSettings] = [
     BatteryHolderSettings(),
     BatteryHolderSettings(battery_length_tolerance=3),
     BatteryHolderSettings(battery_length_tolerance=0),
@@ -70,10 +71,10 @@ for i, settings in enumerate(battery_holder_settings):
     settings.center_text = str(i)
     battery_holder = BatteryHolder(settings)
     battery_holder_filename = f"battery_holder_{i}{export_file_extension}"
-    cq.Assembly(battery_holder.battery_holder).save(
+    cq.Assembly(battery_holder.battery_holder_cq_object).save(
         battery_holder_filename)
     parts |= {
-        f"battery_holder_{i}": battery_holder.battery_holder,
+        f"battery_holder_{i}": battery_holder.battery_holder_cq_object,
     }
 
 casemaker = (CasemakerLoader()
@@ -84,8 +85,8 @@ casemaker = (CasemakerLoader()
              .load_kicad_pcb("ESPlant-Board/ESPlant-Board.kicad_pcb")
              .generate_board()
              .generate_case(CaseSettings(
-                 case_dimension=(DIMENSION_TYPE.AUTO, 62, 12),
-                 case_offset=(0, ALIGNMENT.POSITIVE, ALIGNMENT.POSITIVE)
+                 case_dimension=("Auto", 62, 12),
+                 case_offset=(0, "Positive", "Positive")
              ))
              .add_compartment_door(SIDE.BOTTOM, CompartmentDoorSettings(
                  tab_spacing_factor=0.8,
