@@ -80,6 +80,9 @@ class Casemaker:
         shapes_dict = {**self.shapes_dict, **additional_parts}
         shapes_dict = {name: shape for name,
                        shape in shapes_dict.items() if not any(ex in name for ex in exclude)}
+        for shape in additional_parts.values():
+            self.board_shape = (cq.Workplane(cq.Shape.cast(
+                self.board_shape)).union(cq.Workplane(cq.Shape.cast(shape)))).val().wrapped
         board = Board(self.board_shape, shapes_dict, board_settings)
         return CasemakerWithBoard(self.board_shape, self.shapes_dict, board)
 
@@ -170,10 +173,10 @@ class CasemakerWithCase:
 
         # unite the compartment door frame with the case
         self.case.case_cq_object = self.case.case_cq_object.union(
-            self.compartment_door.frame.cut(self.case.get_cuts())).cut(
+            self.compartment_door.frame).cut(self.case.get_cuts()).cut(
             self.compartment_door.door_with_tolerance)
         self.compartment_door.door_cq_object = self.compartment_door.door_cq_object.cut(
-            self.board.get_pcb_cq_object_with_tolerance())
+            self.case.get_cuts())
         return self
 
     def add_battery_holder(self, side: SIDE, battery_holder_settings: BatteryHolderSettings = None):
@@ -189,7 +192,7 @@ class CasemakerWithCase:
         self.battery_holder.translate(self.case.get_center_of_side(side))
 
         self.battery_holder.battery_holder_cq_object = self.battery_holder.battery_holder_cq_object.cut(
-            self.board.get_pcb_cq_object_with_tolerance())
+            self.case.get_cuts())
         return self
 
     def add_auto_detected_mounting_holes(self, side: SIDE, mounting_hole_diameter: float = 2.0, default_mounting_hole_settings: MountingHoleSettings = MountingHoleSettings()):

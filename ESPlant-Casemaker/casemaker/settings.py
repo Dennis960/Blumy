@@ -61,12 +61,20 @@ class CaseSettings:
     :param case_floor_pad: Thickness of the case floor pad. How much the board sinks into the case. If set to 0, the board will float in the middle of the case.
     :param case_dimension: Overwrite the dimension of the case. "Auto" means to fit the case to the bounding box of the parts.
     :param case_offset: Offset of the case. Using "Positive" or "Negative" will align the case to the bounding box of the parts in the specified direction.
+
+    :param should_cut_pcb_slot: Whether to cut a slot for the PCB. If set to True and the pcb sticks out of the case,
+    the pcb can be inserted from the outside of the case. If False, the pcb can only be inserted if there is enough space and the pcb
+    only sticks out in one direction.
+    :param pcb_slot_side: The side of the case where the pcb slot should be cut. Only used if should_cut_pcb_slot is True.
     """
     case_wall_thickness: float = 1.5
     case_floor_pad: float = 0
 
     case_dimension: Dimension = ("Auto", "Auto", "Auto")
     case_offset: Offset = (0, 0, 0)
+
+    should_cut_pcb_slot: bool = True
+    pcb_slot_side: Literal[SIDE.TOP, SIDE.BOTTOM] = SIDE.BOTTOM
 
 
 @dataclass
@@ -82,6 +90,7 @@ class BoardSettings:
     # having different tolerances for x and y is not supported
     pcb_tolerance: cq.Vector = cq.Vector(1.5, 1.5, 0.5)
     part_tolerance: float = 1
+    # TODO fix exception when list is empty
     part_settings: list[PartSetting] = field(default_factory=lambda: [
         PartSetting(".*", ">Z", 0.5),
         PartSetting(".*", "<Z", 0.5),
@@ -92,9 +101,8 @@ class BoardSettings:
                     offset_y=-2.1, height=10),
         PartSetting(".*LED.*", ">Z", "Hole"),
         PartSetting(".*ALS-PT19.*", ">Z", "Hole"),
-        PartSetting(f".*{PCB_PART_NAME}.*", "<Z", "Hole"),
-        PartSetting(".*ESP.*", "<Z", "Hole"),
-        PartSetting(".*ESP.*", ">Z", 2),
+        PartSetting(".*ESP32.*", "<Z", 2),
+        PartSetting(".*ESP32.*", ">Z", 2),
     ])
     pcb_part_name = PCB_PART_NAME
 

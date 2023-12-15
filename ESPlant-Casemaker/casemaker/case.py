@@ -75,7 +75,7 @@ class Case:
 
     def get_cuts(self):
         """
-        Returns a cq object that is the union of all objects that need to be cut out of the bottom case
+        Returns a cq object that is the union of all objects that need to be cut out of the case
         Including holes and parts
         """
         return self.union_of_bounding_boxes.union(self.board.get_holes_union())
@@ -104,6 +104,11 @@ class Case:
 
         # cut out holes and parts
         case_shell = case_shell.cut(self.get_cuts())
+
+        # cut out pcb slot
+        if (self.settings.should_cut_pcb_slot):
+            case_shell = case_shell.cut(
+                self.board.get_pcb_extrusion(self.settings.pcb_slot_side))
         return case_shell
 
     def get_dimension_of_side(self, side: SIDE) -> tuple[float, float]:
