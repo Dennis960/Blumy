@@ -34,6 +34,8 @@ def extrude_part_faces(
     until: int | cq.Face,
     faces_selector: cq.Selector = None,
 ):
+    if (until == 0):
+        return part
     if faces_selector is None:
         faces_selector = selector
     pending_wires = part.faces(faces_selector).wires().toPending()
