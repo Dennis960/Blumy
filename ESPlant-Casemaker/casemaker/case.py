@@ -98,11 +98,12 @@ class Case:
             case_wall_thickness, kind="intersection"
         )
 
-        case_shell = case_shell.union(
-            extrude_part_faces(
-                case_shell, "<Z", floor_height, faces_selector=">Z[-2]"
+        if floor_height > 0:
+            case_shell = case_shell.union(
+                extrude_part_faces(
+                    case_shell, "<Z", floor_height, faces_selector=">Z[-2]"
+                )
             )
-        )
 
         # cut out holes and parts
         case_shell = case_shell.cut(self.get_cuts())
