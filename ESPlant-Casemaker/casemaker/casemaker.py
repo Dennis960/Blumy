@@ -207,17 +207,14 @@ class CasemakerWithCase:
         """
         Adds mounting holes to the case with the specified settings.
         """
-        print(mounting_hole_settings_list)
-        import ocp_vscode
-
         pcb_cq_object_with_tolerance = self.board.get_pcb_cq_object_with_tolerance()
         pcb_face = pcb_cq_object_with_tolerance.faces(
             side.value).val()
-        pcb_with_tolerance_thickness = (
-            (1 if side is SIDE.BOTTOM else -1) * self.board.get_pcb_with_tolerance_thickness())
+        pcb_with_tolerance_thickness = self.board.get_pcb_with_tolerance_thickness()
         pcb_face_z = pcb_face.Center().z
         case_wall_z = self.case.case_outer_bounding_box.zmin if side is SIDE.BOTTOM else self.case.case_outer_bounding_box.zmax
-        extrusion_length = case_wall_z - pcb_face_z
+        extrusion_length = (
+            pcb_face_z - case_wall_z if side is SIDE.BOTTOM else case_wall_z - pcb_face_z)
 
         for mounting_hole_settings in mounting_hole_settings_list:
             inner_diameter = mounting_hole_settings.diameter
@@ -243,7 +240,7 @@ class CasemakerWithCase:
                                              .workplaneFromTagged("a")
                                              .moveTo(mounting_hole_settings.position.x, mounting_hole_settings.position.y)
                                              .circle(inner_diameter / 2)
-                                             .extrude(pcb_with_tolerance_thickness)
+                                             .extrude(-pcb_with_tolerance_thickness)
                                              )
 
             if mounting_hole_settings.hole_type == "Through-Hole":
