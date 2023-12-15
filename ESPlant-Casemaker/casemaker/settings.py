@@ -90,7 +90,7 @@ class BoardSettings:
     # having different tolerances for x and y is not supported
     pcb_tolerance: cq.Vector = cq.Vector(1.5, 1.5, 0.5)
     part_tolerance: float = 1
-    # TODO fix exception when list is empty
+    # TODO fix exception when list does not contain at least one .* regex
     part_settings: list[PartSetting] = field(default_factory=lambda: [
         PartSetting(".*", ">Z", 0.5),
         PartSetting(".*", "<Z", 0.5),

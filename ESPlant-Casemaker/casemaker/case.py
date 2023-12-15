@@ -78,6 +78,8 @@ class Case:
         Returns a cq object that is the union of all objects that need to be cut out of the case
         Including holes and parts
         """
+        if len(self.board._hole_dict) == 0:
+            return self.union_of_bounding_boxes
         return self.union_of_bounding_boxes.union(self.board.get_holes_union())
 
     def generate_case(self, case_wall_thickness, floor_height):
