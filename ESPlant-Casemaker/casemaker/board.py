@@ -4,7 +4,8 @@ import cadquery as cq
 import re
 from pcb import make_offset_shape
 from utils import extrude_part_faces, extrude_part_width, extrude_part_height
-from settings import BoardSettings, PCB_PART_NAME, case_hole_extrusion_size, PartSetting
+from settings import BoardSettings, PCB_PART_NAME, case_hole_extrusion_size, PartSetting, SIDE
+from typing import Literal
 
 import logging
 
@@ -83,6 +84,13 @@ class Board:
                 part_settings.append(part_settings.pop(i + offset))
                 offset -= 1
         return part_settings
+
+    @cache
+    def get_pcb_extrusion(self, side: Literal[SIDE.TOP, SIDE.BOTTOM]):
+        """
+        Returns a cq object that can be cut out of the case to make space for inserting the pcb
+        """
+        return extrude_part_faces(self._pcb_cq_object_with_tolerance, side.value, case_hole_extrusion_size)
 
     def _get_cq_object_with_part_tolerance_dict(self) -> dict[str, cq.Workplane]:
         logging.info("Getting cq object with part tolerance dict")
