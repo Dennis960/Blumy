@@ -10,6 +10,8 @@ variable "domain" {
 job "casemaker" {
   datacenters = ["dc1"]
 
+  priority = 1
+
   group "web" {
     # run both server and worker on the same node so that they can share the upload directory
     ephemeral_disk {
