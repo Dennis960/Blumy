@@ -13,10 +13,6 @@ from settings import MountingHoleSettings
 from functools import cache
 import logging
 
-# TODO check if this is needed
-# from serializer import register
-# register()
-
 
 @dataclass
 class WireData:
