@@ -10,7 +10,7 @@ RUN apt-get update && \
 
 RUN pip install numpy --upgrade && \
     pip install \
-    ocp_vscode==1.2.2 ocp cadquery https://github.com/CadQuery/OCP-stubs/archive/refs/tags/7.7.0.zip flask celery redis
+    ocp_vscode ocp cadquery https://github.com/CadQuery/OCP-stubs/archive/refs/tags/7.7.0.zip flask celery redis
 
 RUN npm install -g @types/three
 
