@@ -206,6 +206,7 @@ class CasemakerWithCase:
         """
         Adds mounting holes to the case at the positions where the board has holes with the exact specified diameter.
 
+        :param side: The side where the mounting holes should be added.
         :param mounting_hole_diameter: The diameter which the board holes need to have to be detected as mounting holes.
         :param default_mounting_hole_settings: The default settings for the mounting holes. (the diameter will be overwritten)
         """
@@ -216,6 +217,9 @@ class CasemakerWithCase:
     def add_mounting_holes(self, side: Literal[SIDE.TOP, SIDE.BOTTOM], mounting_hole_settings_list: list[MountingHoleSettings]):
         """
         Adds mounting holes to the case with the specified settings.
+
+        :param side: The side where the mounting holes should be added.
+        :param mounting_hole_settings_list: The list of settings for the mounting holes. One setting is needed for each mounting hole.
         """
         pcb_cq_object_with_tolerance = self.board.get_pcb_cq_object_with_tolerance()
         pcb_face = pcb_cq_object_with_tolerance.faces(
