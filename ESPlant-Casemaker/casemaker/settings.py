@@ -151,13 +151,13 @@ class CompartmentDoorSettings:
 
     :param compartment_door_dimensions: The dimensions of the compartment door, meaning the width, height and thickness excluding the fitting arm(s)
     When generating a compartment door with the Casemaker, this setting will be overwritten with the dimensions of the case
-    :param fitting_arm_thickness: The thickness of the fitting arm. Thicker means thicker snap joints and more tension
+    :param fitting_arm_thickness: TODO: This setting currently does not work, leave it as default. The thickness of the fitting arm. Thicker means thicker snap joints and more tension
     :param fitting_arm_height: How deep the fitting arm goes into the case. Higher (meaning deeper) means more suspension
     :param fitting_arm_width: How wide the fitting arm is. It is not recommended to have this value be greater than the width of the compartment door
     :param fitting_arm_distance_factor: Distance factor for the fitting arm.
     :param tab_dimension: The dimensions of the tabs, meaning the width and height. Half of the height will be below the compartment door and the other half will stick out
                           The thickness of the tabs is the same as the thickness of the compartment door
-    :param recessed_edge_width: The width of the recessed edge. This is the amount of extra space on which the compartment door will be placed to not have it stick out and not have it fall in
+    :param recessed_edge_width: TODO: This setting currently does not work, leave it as default. The width of the recessed edge. This is the amount of extra space on which the compartment door will be placed to not have it stick out and not have it fall in
     :param snap_joint_face_selectors: The face selectors of the faces of the compartment door where the snap joints should be placed. Uses the cadquery face selectors (eg. +Y means the face on the positive y axis)
                                       Multiple face selectors can be used by passing a list of face selectors
     :param tabs_face_selector: The face selector of the face of the compartment door where the tabs should be placed. Only one face can be selected. Uses the cadquery face selectors (eg. >Y means the face on the positive y axis)
