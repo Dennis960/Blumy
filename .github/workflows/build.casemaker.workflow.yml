@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "ESPlant-Casemaker/*"
+      - "ESPlant-Casemaker/**"
       - ".github/workflows/build.casemaker.workflow.yml"
 
 jobs:
