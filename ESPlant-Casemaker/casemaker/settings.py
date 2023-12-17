@@ -16,13 +16,13 @@ class SIDE(Enum):
 
 
 Dimension = NewType(
-    "CaseDimension",
+    "Dimension",
     tuple[float | Literal["Auto"], float |
           Literal["Auto"], float | Literal["Auto"]],
 )
 Offset = NewType(
-    "CaseOffset", tuple[float | Literal["Positive", "Negative"],
-                        float | Literal["Positive", "Negative"], float | Literal["Positive", "Negative"]]
+    "Offset", tuple[float | Literal["Positive", "Negative"],
+                    float | Literal["Positive", "Negative"], float | Literal["Positive", "Negative"]]
 )
 
 
