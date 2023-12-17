@@ -123,7 +123,7 @@ def get_rotation_for_side(side: SIDE) -> tuple[cq.Vector, cq.Vector, float]:
     elif side is SIDE.RIGHT:
         return (cq.Vector(0, 0, 0), cq.Vector(0, 1, 0), 90)
     elif side is SIDE.TOP:
-        pass
+        return (cq.Vector(0, 0, 0), cq.Vector(1, 0, 0), 0)
     elif side is SIDE.FRONT:
         return (cq.Vector(0, 0, 0), cq.Vector(1, 0, 0), -90)
     elif side is SIDE.BACK:
