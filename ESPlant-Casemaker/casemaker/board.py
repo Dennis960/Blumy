@@ -4,7 +4,7 @@ import cadquery as cq
 import re
 from pcb import make_offset_shape
 from utils import extrude_part_faces, extrude_part_width, extrude_part_height
-from settings import BoardSettings, PCB_PART_NAME, case_hole_extrusion_size, PartSetting, PcbSlotSettings, SIDE
+from settings import BoardSettings, case_hole_extrusion_size, PartSetting, PcbSlotSettings, SIDE
 import projection
 
 import logging
@@ -134,7 +134,7 @@ class Board:
         s = self.settings
         cq_object_with_tolerance_dict = {}
         for name in self._shapes_dict.keys():
-            if PCB_PART_NAME in name:
+            if s.pcb_part_name in name:
                 cq_object_with_tolerance = self._pcb_cq_object_with_tolerance
             elif any(part_without_tolerance in name for part_without_tolerance in s.parts_without_tolerances):
                 cq_object_with_tolerance = self._cq_object_dict[name]

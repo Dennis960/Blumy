@@ -3,9 +3,7 @@ from enum import Enum
 from typing import Literal, NewType
 import cadquery as cq
 
-
 case_hole_extrusion_size = 1000
-PCB_PART_NAME = "PCB"
 
 
 class SIDE(Enum):
@@ -106,7 +104,7 @@ class BoardSettings:
     pcb_tolerance: cq.Vector = cq.Vector(1.5, 1.5, 0.5)
     part_tolerance: float = 1
     part_settings: list[PartSetting] = field(default_factory=lambda: [])
-    pcb_part_name = PCB_PART_NAME
+    pcb_part_name = "PCB"
     exclude: list[str] = field(default_factory=lambda: [])
     parts_without_tolerances: list[str] = field(default_factory=lambda: [])
 
