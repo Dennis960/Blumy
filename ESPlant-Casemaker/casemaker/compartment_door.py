@@ -7,9 +7,9 @@ class CompartmentDoor:
         self.settings = settings
         self.door_cq_object = self.generate_compartment_door()
         self.door_with_tolerance = self.generate_compartment_door_with_tolerance()
-        self.frame = self.generate_compartment_door_frame()
+        self.frame_cq_object = self.generate_compartment_door_frame()
         self.compartment_door_frame_walls = self.generate_compartment_door_frame_walls()
-        self.compartment_door_frame_with_walls = self.frame.union(
+        self.compartment_door_frame_with_walls = self.frame_cq_object.union(
             self.compartment_door_frame_walls)
 
     def _generate_fitting_arm(self, face: cq.Workplane) -> cq.Workplane:
@@ -191,14 +191,14 @@ class CompartmentDoor:
     def translate(self, vec: cq.Vector = cq.Vector(0, 0, 0)) -> None:
         self.door_cq_object = self.door_cq_object.translate(vec)
         self.door_with_tolerance = self.door_with_tolerance.translate(vec)
-        self.frame = self.frame.translate(vec)
+        self.frame_cq_object = self.frame_cq_object.translate(vec)
 
     def rotate(self, axisStart: cq.Vector = cq.Vector(0, 0, 0), axisEnd: cq.Vector = cq.Vector(0, 0, 0), angleDegrees: float = 0) -> None:
         self.door_cq_object = self.door_cq_object.rotate(
             axisStart, axisEnd, angleDegrees)
         self.door_with_tolerance = self.door_with_tolerance.rotate(
             axisStart, axisEnd, angleDegrees)
-        self.frame = self.frame.rotate(axisStart, axisEnd, angleDegrees)
+        self.frame_cq_object = self.frame_cq_object.rotate(axisStart, axisEnd, angleDegrees)
 
     def generate_compartment_door_frame_walls(self) -> cq.Workplane:
         """
@@ -222,5 +222,5 @@ if __name__ == "__main__":
     ocp_vscode.show_all({
         "compartment_door": compartment_door.door_cq_object,
         "compartment_door_frame_with_walls": compartment_door.compartment_door_frame_with_walls,
-        "compartment_door_frame": compartment_door.frame
+        "compartment_door_frame": compartment_door.frame_cq_object
     })
