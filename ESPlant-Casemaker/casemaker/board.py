@@ -4,7 +4,7 @@ import cadquery as cq
 import re
 from pcb import make_offset_shape
 from utils import extrude_part_faces, extrude_part_width, extrude_part_height
-from settings import BoardSettings, case_hole_extrusion_size, PartSetting, PcbSlotSettings, SIDE
+from settings import BoardSettings, PartSetting, PcbSlotSettings, SIDE
 import projection
 
 import logging
@@ -123,11 +123,11 @@ class Board:
             pcb_slot_settings.side
             projection_cq_object = projection_face.wires().toPending().extrude(
                 (1 if pcb_slot_settings.side == SIDE.TOP else -1) *
-                case_hole_extrusion_size
+                self.settings.case_hole_extrusion_length
             )
             return projection_cq_object
 
-        return extrude_part_faces(pcb_cq_object, pcb_slot_settings.side.value, case_hole_extrusion_size)
+        return extrude_part_faces(pcb_cq_object, pcb_slot_settings.side.value, self.settings.case_hole_extrusion_length)
 
     def _get_cq_object_with_part_tolerance_dict(self) -> dict[str, cq.Workplane]:
         logging.info("Getting cq object with part tolerance dict")
@@ -193,7 +193,7 @@ class Board:
         logging.info(f"Applying setting to cq object: {part_setting}")
         is_hole_extrusion = part_setting.length == "Hole"
         extrude_len = (
-            case_hole_extrusion_size if is_hole_extrusion else part_setting.length
+            self.settings.case_hole_extrusion_length if is_hole_extrusion else part_setting.length
         )
         extrusion = extrude_part_faces(
             cq_object, part_setting.top_direction, extrude_len
