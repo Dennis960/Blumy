@@ -186,7 +186,7 @@ class CasemakerWithCase:
 
         return self
 
-    def add_battery_holder(self, side: SIDE, battery_holder_settings: BatteryHolderSettings = None):
+    def add_battery_holder(self, side: SIDE, battery_holder_settings: BatteryHolderSettings = BatteryHolderSettings()):
         """
         Adds a battery holder to the case at the specified side.
         Currently only one battery holder can be added per case.
@@ -197,6 +197,7 @@ class CasemakerWithCase:
         self.battery_holder.rotate(*get_rotation_for_side(side))
 
         self.battery_holder.translate(self.case.get_center_of_side(side))
+        self.battery_holder.translate(battery_holder_settings.offset)
 
         self.battery_holder.battery_holder_cq_object = self.battery_holder.battery_holder_cq_object.cut(
             self.case.get_cuts())
