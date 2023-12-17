@@ -4,8 +4,8 @@ import cadquery as cq
 import re
 from pcb import make_offset_shape
 from utils import extrude_part_faces, extrude_part_width, extrude_part_height
-from settings import BoardSettings, PCB_PART_NAME, case_hole_extrusion_size, PartSetting, SIDE
-from typing import Literal
+from settings import BoardSettings, PCB_PART_NAME, case_hole_extrusion_size, PartSetting, PcbSlotSettings, SIDE
+import projection
 
 import logging
 
@@ -40,6 +40,18 @@ class Board:
             cq_objects_with_tolerances_union = cq_objects_with_tolerances_union.union(
                 cq_object_with_part_tolerance)
         return cq_objects_with_tolerances_union
+
+    @cache
+    def get_bounding_box_cq_objects_union(self):
+        """
+        Returns the union of all bounding boxes without tolerance
+        """
+        logging.info("Creating bounding box cq objects union")
+        bounding_box_cq_objects_union = cq.Workplane("XY")
+        for bounding_box_cq_object in self._bounding_box_cq_object_dict.values():
+            bounding_box_cq_objects_union = bounding_box_cq_objects_union.union(
+                bounding_box_cq_object)
+        return bounding_box_cq_objects_union
 
     @cache
     def get_holes_union(self):
@@ -86,11 +98,36 @@ class Board:
         return part_settings
 
     @cache
-    def get_pcb_extrusion(self, side: Literal[SIDE.TOP, SIDE.BOTTOM]):
+    def get_pcb_extrusion(self, pcb_slot_settings: PcbSlotSettings):
         """
         Returns a cq object that can be cut out of the case to make space for inserting the pcb
         """
-        return extrude_part_faces(self._pcb_cq_object_with_tolerance, side.value, case_hole_extrusion_size)
+        if pcb_slot_settings.use_tolerance:
+            pcb_cq_object = self._pcb_cq_object_with_tolerance
+            parts_union = self.get_cq_objects_with_tolerances_union()
+        else:
+            pcb_cq_object = self.pcb_cq_object
+            parts_union = self.get_bounding_box_cq_objects_union()
+        if pcb_slot_settings.should_include_components:
+            cq_object_for_projection = pcb_cq_object.union(parts_union)
+            pcb_bounding_box = pcb_cq_object.val().BoundingBox()
+            pcb_bounding_box_cq_object = cq.Workplane().box(
+                pcb_bounding_box.xlen,
+                pcb_bounding_box.ylen,
+                pcb_bounding_box.zlen
+            ).translate(pcb_bounding_box.center)
+            target_face_cq_object = pcb_bounding_box_cq_object.faces(
+                pcb_slot_settings.side.value)
+            projection_face = projection.create_projection_face(
+                cq_object_for_projection, target_face_cq_object)
+            pcb_slot_settings.side
+            projection_cq_object = projection_face.wires().toPending().extrude(
+                (1 if pcb_slot_settings.side == SIDE.TOP else -1) *
+                case_hole_extrusion_size
+            )
+            return projection_cq_object
+
+        return extrude_part_faces(pcb_cq_object, pcb_slot_settings.side.value, case_hole_extrusion_size)
 
     def _get_cq_object_with_part_tolerance_dict(self) -> dict[str, cq.Workplane]:
         logging.info("Getting cq object with part tolerance dict")
