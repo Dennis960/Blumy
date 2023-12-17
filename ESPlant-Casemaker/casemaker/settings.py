@@ -149,7 +149,7 @@ class CompartmentDoorSettings:
     Settings for the compartment door.
 
     :param compartment_door_dimensions: The dimensions of the compartment door, meaning the width, height and thickness excluding the fitting arm(s)
-    When generating a compartment door with the Casemaker, this setting will be overwritten with the dimensions of the case
+    When set to Auto, the dimensions of the case will be used
     :param fitting_arm_thickness: TODO: This setting currently does not work, leave it as default. The thickness of the fitting arm. Thicker means thicker snap joints and more tension
     :param fitting_arm_height: How deep the fitting arm goes into the case. Higher (meaning deeper) means more suspension
     :param fitting_arm_width: How wide the fitting arm is. It is not recommended to have this value be greater than the width of the compartment door
@@ -166,7 +166,7 @@ class CompartmentDoorSettings:
     :param fitting_arm_tolerance: The tolerance for the fitting arm. This is the amount of extra space (height and width) where the fitting arm will be inserted
     :param compartment_door_tolerance: The tolerance for the compartment door. This is the amount of extra space where the compartment door will be inserted
     """
-    compartment_door_dimensions: cq.Vector = cq.Vector(50, 60, 1.5)
+    compartment_door_dimensions: Dimension = ("Auto", "Auto", "Auto")
     fitting_arm_thickness: float = 1.5
     fitting_arm_height: float = 10
     fitting_arm_width: float = 16
@@ -196,9 +196,6 @@ class CompartmentDoorSettings:
             self.snap_joint_face_selectors)
         if not type(self.tab_dimension) == cq.Vector:
             self.tab_dimension = cq.Vector(self.tab_dimension)
-        if not type(self.compartment_door_dimensions) == cq.Vector:
-            self.compartment_door_dimensions = cq.Vector(
-                self.compartment_door_dimensions)
 
 
 @dataclass

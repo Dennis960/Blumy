@@ -154,11 +154,17 @@ class CasemakerWithCase:
         Adds a compartment door to the case at the specified side.
         Currently only one compartment door can be added per case.
         """
-        face_width, face_height = self.case.get_dimension_of_side(side)
 
-        # set the dimensions of the compartment door to match the dimensions of the face where it is placed
-        compartment_door_settings.compartment_door_dimensions = Vector(
-            face_width - 2 * self.case.settings.case_wall_thickness, face_height - 2 * self.case.settings.case_wall_thickness, 1.5)
+        face_width, face_height = self.case.get_dimension_of_side(side)
+        # set the dimensions of the compartment door to match the dimensions of the face where it is placed, if set to auto
+        x, y, z = compartment_door_settings.compartment_door_dimensions
+        if x == "Auto":
+            x = face_width - 2 * self.case.settings.case_wall_thickness
+        if y == "Auto":
+            y = face_height - 2 * self.case.settings.case_wall_thickness
+        if z == "Auto":
+            z = self.case.settings.case_wall_thickness
+        compartment_door_settings.compartment_door_dimensions = Vector(x, y, z)
 
         self.compartment_door = CompartmentDoor(compartment_door_settings)
         self.compartment_door.translate(
