@@ -3,8 +3,6 @@ from enum import Enum
 from typing import Literal, NewType
 import cadquery as cq
 
-case_hole_extrusion_size = 1000
-
 
 class SIDE(Enum):
     TOP = ">Z"
@@ -99,6 +97,7 @@ class BoardSettings:
     :param pcb_part_name: Name of the PCB part.
     :param exclude: List of part names which should be excluded from the case generation.
     :param parts_without_tolerances: List of part names which should not have the part tolerance applied.
+    :param case_hole_extrusion_length: This param should be set to a value greater than the max size of the case. It is used to cut holes in the case. For 99% of the cases, the default value should be fine.
     """
     # having different tolerances for x and y is not supported
     pcb_tolerance: cq.Vector = cq.Vector(1.5, 1.5, 0.5)
@@ -107,6 +106,8 @@ class BoardSettings:
     pcb_part_name = "PCB"
     exclude: list[str] = field(default_factory=lambda: [])
     parts_without_tolerances: list[str] = field(default_factory=lambda: [])
+
+    case_hole_extrusion_length: float = 100000
 
     def __post_init__(self):
         if not type(self.pcb_tolerance) == cq.Vector:
