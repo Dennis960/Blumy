@@ -2,9 +2,6 @@ import cadquery as cq
 from settings import BatteryHolderSettings
 
 
-# TODO Future improvements:
-# Selectable battery types (AA, AAA)
-
 class BatteryHolder:
     def __init__(self, settings: BatteryHolderSettings = BatteryHolderSettings()):
         self.settings = settings
