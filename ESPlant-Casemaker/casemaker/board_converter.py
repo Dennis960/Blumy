@@ -111,12 +111,16 @@ class BoardConverter:
         :param step_path: Absolute output path for the step file
         :param uses_kicad_nightly_cli: Whether to use kicad-cli or kica-cli-nightly
         """
+        if "\"" in kicad_pcb_path or "\"" in step_path:
+            logging.error("Paths with \" are not supported")
+            exit()
         logging.info("Converting " + kicad_pcb_path + " to " + step_path)
-        kicad_nightly_cli_cmd = f"kicad-cli-nightly pcb export step {kicad_pcb_path} --drill-origin --no-dnp --subst-models -o {step_path}"
+        kicad_nightly_cli_cmd = f"kicad-cli-nightly pcb export step \"{kicad_pcb_path}\" --drill-origin --no-dnp --subst-models -o \"{step_path}\""
         # --no-dnp is not supported in kicad-cli yet
         kicad_cli_cmd = f"kicad-cli pcb export step {kicad_pcb_path} --drill-origin --subst-models -o {step_path}"
         cmd = kicad_nightly_cli_cmd if uses_kicad_nightly_cli else kicad_cli_cmd
-        os.system(cmd)
+        print(f"Running command: {cmd}")
+        os.system(cmd)  # TODO make this command save to execute
 
     def save_to_pickle(self, board_shape: TopoDS_Shape, shapes_dict: dict[str, TopoDS_Shape], pickle_file: str = "board.pickle"):
         """
