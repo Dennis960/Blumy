@@ -238,6 +238,7 @@ class BatteryHolderSettings:
     :param front_wall_thickness: Thickness of the front wall.
     :param back_wall_height: Height of the back wall.
     :param back_wall_thickness: Thickness of the back wall.
+    :param offset: Offset of the battery holder.
     :param insertable_springs_thickness: Thickness of insertable springs. There will be made space for these insertable springs at the back wall.
     :param center_text: Text to be placed in the center of the battery holder.
     :param text_size: Size of the text.
@@ -262,6 +263,8 @@ class BatteryHolderSettings:
     back_wall_height: float = 11
     back_wall_thickness: float = 5
 
+    offset: cq.Vector = cq.Vector(0, 0, 0)
+
     insertable_springs_thickness: float = 4
 
     center_text: str = "AAA"
@@ -274,3 +277,7 @@ class BatteryHolderSettings:
 
     battery_diameter_tolerance: float = 1
     battery_length_tolerance: float = 1
+
+    def __post_init__(self):
+        if not type(self.offset) == cq.Vector:
+            self.offset = cq.Vector(self.offset)
