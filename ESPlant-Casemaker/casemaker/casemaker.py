@@ -170,16 +170,20 @@ class CasemakerWithCase:
         # move the compartment door to the correct position
         self.compartment_door.translate(self.case.get_center_of_side(side))
 
-        # unite the compartment door frame with the case and keep tolerances to board
-        self.case.case_cq_object = self.case.case_cq_object.union(
-            self.compartment_door.frame.cut(self.board.get_cq_objects_with_tolerances_union())).cut(
-            self.compartment_door.door_with_tolerance)
+        # cut out holes in the compartment door
         self.compartment_door.door_cq_object = self.compartment_door.door_cq_object.cut(
             self.case.get_cuts())
 
+        # unite the compartment door frame with the case and keep tolerances to board
+        self.compartment_door.frame = self.compartment_door.frame.cut(
+            self.board.get_cq_objects_with_tolerances_union())
         if self.case.settings.pcb_slot_settings is not None:
-            self.case.case_cq_object = self.case.case_cq_object.cut(
+            self.compartment_door.frame = self.compartment_door.frame.cut(
                 self.board.get_pcb_extrusion(self.case.settings.pcb_slot_settings))
+        self.case.case_cq_object = self.case.case_cq_object.union(
+            self.compartment_door.frame).cut(
+            self.compartment_door.door_with_tolerance)
+
         return self
 
     def add_battery_holder(self, side: SIDE, battery_holder_settings: BatteryHolderSettings = None):
@@ -295,5 +299,4 @@ if __name__ == "__main__":
         "compartment_door": casemaker.compartment_door.door_cq_object,
         "battery_holder": casemaker.battery_holder.battery_holder_cq_object,
         # "batteries": casemaker.battery_holder.batteries_cq_object,
-        "pcb_extrusion": casemaker.board.get_pcb_extrusion(casemaker.case.settings.pcb_slot_settings),
     })
