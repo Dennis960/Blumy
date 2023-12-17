@@ -91,7 +91,7 @@ class BoardSettings:
     """
     Settings for the PCB board.
 
-    :param pcb_tolerance: Tolerance for the PCB board (Vector).
+    :param pcb_tolerance: Tolerance for the PCB board (Vector). Note: having different tolerances for x and y is not supported.
     :param part_tolerance: Tolerance which will be applied to all parts.
     :param part_settings: List of PartSettings.
     :param pcb_part_name: Name of the PCB part.
@@ -99,7 +99,6 @@ class BoardSettings:
     :param parts_without_tolerances: List of part names which should not have the part tolerance applied.
     :param case_hole_extrusion_length: This param should be set to a value greater than the max size of the case. It is used to cut holes in the case. For 99% of the cases, the default value should be fine.
     """
-    # having different tolerances for x and y is not supported
     pcb_tolerance: cq.Vector = cq.Vector(1.5, 1.5, 0.5)
     part_tolerance: float = 1
     part_settings: list[PartSetting] = field(default_factory=lambda: [])
