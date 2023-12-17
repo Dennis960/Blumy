@@ -186,9 +186,9 @@ class CasemakerWithCase:
         if self.case.settings.pcb_slot_settings is not None:
             self.compartment_door.frame_cq_object = self.compartment_door.frame_cq_object.cut(
                 self.board.get_pcb_extrusion(self.case.settings.pcb_slot_settings))
-        self.case.case_cq_object = self.case.case_cq_object.union(
-            self.compartment_door.frame_cq_object).cut(
-            self.compartment_door.door_with_tolerance)
+        self.case.case_cq_object = self.case.case_cq_object.cut(
+            self.compartment_door.door_with_tolerance).union(
+            self.compartment_door.frame_cq_object)
 
         return self
 
@@ -307,7 +307,10 @@ if __name__ == "__main__":
     show_all({
         "board": casemaker.board.board_cq_object,
         "case": casemaker.case.case_cq_object,
-        "compartment_door": casemaker.compartment_door.door_cq_object,
-        "battery_holder": casemaker.battery_holder.battery_holder_cq_object,
+        "compartment_door": casemaker.add_compartment_door(SIDE.BOTTOM, CompartmentDoorSettings()).compartment_door.door_cq_object,
+        "compartment_door_frame": casemaker.add_compartment_door(SIDE.BOTTOM, CompartmentDoorSettings()).compartment_door.frame_cq_object,
+        "cuts": casemaker.case.get_cuts(),
+        "final_case": casemaker.add_compartment_door(SIDE.BOTTOM, CompartmentDoorSettings()).case.case_cq_object,
+        # "battery_holder": casemaker.battery_holder.battery_holder_cq_object,
         # "batteries": casemaker.battery_holder.batteries_cq_object,
     })
