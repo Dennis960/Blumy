@@ -109,9 +109,9 @@ class Case:
         case_shell = case_shell.cut(self.get_cuts())
 
         # cut out pcb slot
-        if (self.settings.should_cut_pcb_slot):
+        if (self.settings.pcb_slot_settings is not None):
             case_shell = case_shell.cut(
-                self.board.get_pcb_extrusion(self.settings.pcb_slot_side))
+                self.board.get_pcb_extrusion(self.settings.pcb_slot_settings))
         return case_shell
 
     def get_dimension_of_side(self, side: SIDE) -> tuple[float, float]:

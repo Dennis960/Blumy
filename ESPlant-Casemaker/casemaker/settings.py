@@ -52,6 +52,21 @@ class PartSetting:
     height: float | Literal["Auto"] = "Auto"
 
 
+@dataclass(frozen=True)
+class PcbSlotSettings:
+    """
+    Settings for the pcb slot. The pcb slot is a slot in the case where the pcb can be inserted.
+
+    :param pcb_slot_side: The side of the case where the pcb slot should be cut.
+    :param should_include_components: Whether to include components in the pcb slot. This is useful if the components overhang the pcb.
+    :param use_tolerance: Whether to use the board and components with tolerance or the board and components original bounding boxes for the pcb slot.
+    """
+
+    side: Literal[SIDE.TOP, SIDE.BOTTOM] = SIDE.BOTTOM
+    should_include_components: bool = True
+    use_tolerance: bool = True
+
+
 @dataclass
 class CaseSettings:
     """
@@ -62,10 +77,9 @@ class CaseSettings:
     :param case_dimension: Overwrite the dimension of the case. "Auto" means to fit the case to the bounding box of the parts.
     :param case_offset: Offset of the case. Using "Positive" or "Negative" will align the case to the bounding box of the parts in the specified direction.
 
-    :param should_cut_pcb_slot: Whether to cut a slot for the PCB. If set to True and the pcb sticks out of the case,
-    the pcb can be inserted from the outside of the case. If False, the pcb can only be inserted if there is enough space and the pcb
-    only sticks out in one direction.
-    :param pcb_slot_side: The side of the case where the pcb slot should be cut. Only used if should_cut_pcb_slot is True.
+    :param pcb_slot_settings: Whether to cut a slot for the PCB. If set and the pcb sticks out of the case,
+    the pcb can be inserted from the outside of the case. If not set, the pcb can only be inserted if there is enough space and the pcb
+    sticks out in no more than one direction.
     """
     case_wall_thickness: float = 1.5
     case_floor_pad: float = 0
@@ -73,8 +87,7 @@ class CaseSettings:
     case_dimension: Dimension = ("Auto", "Auto", "Auto")
     case_offset: Offset = (0, 0, 0)
 
-    should_cut_pcb_slot: bool = True
-    pcb_slot_side: Literal[SIDE.TOP, SIDE.BOTTOM] = SIDE.BOTTOM
+    pcb_slot_settings: PcbSlotSettings = PcbSlotSettings()
 
 
 @dataclass
