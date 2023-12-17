@@ -175,13 +175,13 @@ class CasemakerWithCase:
             self.case.get_cuts())
 
         # unite the compartment door frame with the case and keep tolerances to board
-        self.compartment_door.frame = self.compartment_door.frame.cut(
+        self.compartment_door.frame_cq_object = self.compartment_door.frame_cq_object.cut(
             self.board.get_cq_objects_with_tolerances_union())
         if self.case.settings.pcb_slot_settings is not None:
-            self.compartment_door.frame = self.compartment_door.frame.cut(
+            self.compartment_door.frame_cq_object = self.compartment_door.frame_cq_object.cut(
                 self.board.get_pcb_extrusion(self.case.settings.pcb_slot_settings))
         self.case.case_cq_object = self.case.case_cq_object.union(
-            self.compartment_door.frame).cut(
+            self.compartment_door.frame_cq_object).cut(
             self.compartment_door.door_with_tolerance)
 
         return self
