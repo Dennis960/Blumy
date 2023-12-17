@@ -1,45 +1,40 @@
-import cadquery as __cq
+import cadquery as cq
 
-__battery_spring_tolerance = 1
+thickness = 1.5
+leg_width = 4.3
+contact_width = 10
+contact_height = 11
+spring_width = 7
+spring_length = 8
+leg_length = 8
+spacing = 11
+battery_spring_position = (5.5, 49.1)
 
-# battery_spring
-__battery_spring_hole_size = (3.3, 0.5)  # oval
-__battery_spring_thickness = __battery_spring_hole_size[1] + __battery_spring_tolerance
-__battery_spring_contact_size = 11
-__battery_spring_leg_size = (
-    __battery_spring_hole_size[0] + __battery_spring_tolerance,
-    __battery_spring_thickness,
-    8,
-)
-__battery_spring_contact_size = (
-    __battery_spring_contact_size,
-    __battery_spring_thickness,
-    __battery_spring_contact_size,
-)
-__battery_spring_spring_length = 8
-__battery_spring_spring_width = 7
-__battery_spring_position = (5.5, 49.1)
+battery_spring = (cq.Workplane()
+                  .moveTo(-0.5 * contact_width, -0.5 * thickness)
+                  .line(0, thickness)
+                  .line(0.5 * (contact_width - spring_width), 0)
+                  .line(0, spring_length)
+                  .line(spring_width, 0)
+                  .line(0, -spring_length)
+                  .line(0.5 * (contact_width - spring_width), 0)
+                  .line(0, -thickness)
+                  .line(-contact_width, 0)
+                  .close()
+                  .extrude(-contact_height)
+                  .moveTo(0, 0)
+                  .rect(leg_width, thickness)
+                  .extrude(leg_length)
+                  )
+battery_spring_left = battery_spring
+battery_spring_right = battery_spring_left.translate((spacing, 0, 0))
 
-__xy = __cq.Workplane("XY")
+battery_springs = battery_spring_left.union(battery_spring_right)
 
-__battery_spring_leg = __xy.rect(
-    __battery_spring_leg_size[0], __battery_spring_leg_size[1]
-).extrude(__battery_spring_leg_size[2])
-__battery_spring_contact = __xy.rect(
-    __battery_spring_contact_size[0], __battery_spring_contact_size[1]
-).extrude(-__battery_spring_contact_size[2])
-__battery_spring_springs = (
-    __battery_spring_contact.faces(">Y")
-    .workplane(centerOption="CenterOfBoundBox")
-    .rect(__battery_spring_spring_width, __battery_spring_contact_size[0])
-    .extrude(__battery_spring_spring_length)
-)
-battery_springs = __battery_spring_leg.union(__battery_spring_contact).union(
-    __battery_spring_springs
-)
-battery_springs = battery_springs.union(
-    battery_springs.mirror(mirrorPlane=battery_springs.faces(">X"))
-)
 battery_springs = battery_springs.translate(
-    (__battery_spring_position[0], -__battery_spring_position[1], 0)
+    (battery_spring_position[0], -battery_spring_position[1], 0)
 )
+
+if __name__ == "__main__":
+    import ocp_vscode
+    ocp_vscode.show_object(battery_springs)
