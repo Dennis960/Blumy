@@ -3,28 +3,33 @@ import time
 from celery import shared_task
 import cadquery as cq
 
-from server import utils
+from server.project_repository import ProjectRepository
 
 
 @shared_task
-def run_convert(project_id: str, file_name: str):
+def run_convert(root: str, project_id: str):
     # Needs to be imported here to avoid segmentation faults caused by _bool_op, see https://github.com/CadQuery/cadquery/issues/1354, https://github.com/celery/celery/issues/3398
     import sys
     print(sys.path)
     from casemaker.casemaker import CasemakerLoader
+
     start = time.time()
-    print("converting " + project_id + " " + file_name)
-    root_path = utils.get_project_directory(project_id)
-    casemaker = CasemakerLoader(utils.get_project_cache_path(project_id)).load_kicad_pcb(
-        os.path.join(root_path, file_name), "board.step")
-    print("saving " + project_id + " " + file_name)
-    casemaker.save_gltf_file(utils.get_project_export_glb_path(project_id),
-                             tolerance=0.1, angularTolerance=0.1)
+
+    project_repository = ProjectRepository(root)
+    pcb_path = project_repository.pcb_path(project_id)
+
+    print("converting " + project_id + " " + pcb_path)
+    CasemakerLoader(project_repository.cache_path(project_id))\
+        .load_kicad_pcb(pcb_path, project_repository.step_filename())\
+        .save_pickle()\
+        .save_gltf_file()
     print("converted " + project_id + " in " + str(time.time() - start) + "s")
 
 
 @shared_task
 def run_generate_bottom_case(project_id: str, version: int):
+    # TODO rewrite
+
     # Needs to be imported here to avoid segmentation faults caused by _bool_op, see https://github.com/CadQuery/cadquery/issues/1354, https://github.com/celery/celery/issues/3398
     from casemaker.casemaker import CasemakerLoader
     from casemaker.settings import BoardSettings
