@@ -196,10 +196,16 @@ class BoardRenderer {
 
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
 
+        const updateSize = () => {
+            if (this.container.clientWidth !== this.renderer.domElement.width || this.container.clientHeight !== this.renderer.domElement.height) {
+                this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+                this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
+                this.camera.updateProjectionMatrix();
+            }
+        }
 
         const animate = () => {
-            // TODO implement updateSize
-            // updateSize();
+            updateSize();
             controls.update();
             this.renderer.render(this.scene, this.camera);
             if (this.isRendering)
