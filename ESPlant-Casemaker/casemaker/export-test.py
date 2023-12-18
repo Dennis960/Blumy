@@ -83,7 +83,7 @@ for i, settings in enumerate(battery_holder_settings):
 
 casemaker = (CasemakerLoader()
              .load_pickle("board.pickle")
-             .save_gltf_file("board.gltf")
+             .save_gltf_file("board.glb")
              .generate_board(esplant_default_settings.board_settings, additional_parts={
                  "BatterySprings": battery_springs.val().wrapped
              })
