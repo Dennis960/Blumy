@@ -8,6 +8,7 @@ from battery_holder import BatteryHolder
 from board import Board
 from settings import *
 from utils import get_rotation_for_side
+from kicad_pcb_analyzer import find_missing_models_in_kicad_pcb, update_kicad_pcb_with_new_models, SexpModel
 
 from serializer import register
 register()
@@ -23,7 +24,10 @@ class CasemakerLoader:
 
     def load_kicad_pcb(self, kicad_pcb_path: str, step_file: str = "board.step", force_reconvert: bool = False):
         """
-        Loads the kicad_pcb file and creates a Casemaker object from it.
+        Loads the kicad_pcb file and creates a Casemaker object from it.\n
+        Note: This function will skip all step files that are not in the default kicad 3d model directory.
+        If you want to use custom models, you need to use the analyze_kicad_pcb function first and
+        update the missing_models list.
 
         :param kicad_pcb_path: Absolute path to the kicad_pcb file
         :param step_file: Name of the file in the cache directory
@@ -54,6 +58,59 @@ class CasemakerLoader:
                                     .from_pickle(pickle_file)
                                     )
         return Casemaker(board_shape, shapes_dict, self.cache_dir)
+
+    def analyze_kicad_pcb(self, kicad_pcb_path: str):
+        """
+        Analyzes the kicad_pcb file and creates a CasemakerKiCadPcbAnalyzer object from it.
+
+        :param kicad_pcb_path: Absolute path to the kicad_pcb file
+        """
+        missing_models = find_missing_models_in_kicad_pcb(kicad_pcb_path)
+        return CasemakerKiCadPcbAnalyzer(self.cache_dir, kicad_pcb_path, missing_models)
+
+
+class CasemakerKiCadPcbAnalyzer:
+    """
+    Do not use this class directly if you don't know what you are doing.\n
+    Use the CasemakerLoader class instead.
+    Helper class that analyzes and edits a kicad_pcb file and creates a Casemaker object from it.
+    """
+
+    def __init__(self, cache_directory: str, kicad_pcb_path: str, missing_models: list[SexpModel]):
+        self.cache_dir = cache_directory
+        self.kicad_pcb_path = kicad_pcb_path
+        self.missing_models = missing_models
+
+    def update_kicad_pcb_with_new_models(self, new_kicad_pcb_path: str = None):
+        """
+        Updates the kicad_pcb file with the missing models.\n
+        The .missing_models list has to be updated before calling this function, else it will have no effect.\n
+
+        example:
+        ```python
+        for missing_model in casemaker_analyzer.missing_models:
+            # Get the new path here
+            new_path = "/app/casemaker/43057230957234/upload/model/NewModel.step"
+            missing_model["path"] = new_path
+        casemaker_analyzer.update_kicad_pcb_with_new_models("new_board.kicad_pcb").to_casemaker()
+        ```
+
+        :param new_kicad_pcb_path: Absolute path to the new kicad_pcb file
+        """
+        if new_kicad_pcb_path is None:
+            new_kicad_pcb_path = self.kicad_pcb_path
+        self.kicad_pcb_path = update_kicad_pcb_with_new_models(
+            self.kicad_pcb_path, self.missing_models)
+        return self
+
+    def to_casemaker(self, step_file: str = "board.step", force_reconvert: bool = False):
+        """
+        Converts the kicad_pcb file to a step file and creates a Casemaker object from it.
+
+        :param step_file: Name of the file in the cache directory
+        :param force_reconvert: Whether to force reconvert the step data
+        """
+        return CasemakerLoader(self.cache_dir).load_kicad_pcb(self.kicad_pcb_path, step_file, force_reconvert=force_reconvert)
 
 
 class Casemaker:
@@ -284,6 +341,18 @@ if __name__ == "__main__":
     import esplant_default_settings
 
     logging.basicConfig(level=logging.INFO)
+
+    # How to analyze a kicad_pcb file and update it with new models:
+    # casemaker_analyzer = (CasemakerLoader()
+    #                       .analyze_kicad_pcb("ESPlant-Board/ESPlant-Board.kicad_pcb")
+    #                       )
+    # for missing_model in casemaker_analyzer.missing_models:
+    #     missing_model["path"] = "/app/casemaker/43057230957234/upload/model/NewModel.step"
+    # casemaker = (casemaker_analyzer
+    #              .update_kicad_pcb_with_new_models()
+    #              .to_casemaker()
+    #              .save_step_file()
+    #              )
 
     if not os.path.exists("parts/board.pickle"):
         CasemakerLoader().load_kicad_pcb(
