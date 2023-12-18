@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/base:ubuntu
+FROM --platform=linux/amd64 mcr.microsoft.com/devcontainers/base:ubuntu
 
 RUN apt-get update && \
     apt-get install -y gpg-agent python-is-python3 redis software-properties-common python3-pip npm && \
