@@ -154,7 +154,7 @@ function updateSize() {
     const height = canvas.clientHeight;
 
     if (canvas.width !== width || canvas.height !== height) {
-        renderer.setSize(width, height, false);
+        renderer.setSize(width, height);
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
     }
