@@ -25,22 +25,19 @@ class BoardConverter:
         self.cache_dir = os.path.join(self.base_dir, cache_dir)
         self.cache_already_exists = self._create_cache_dir()
 
-    def from_kicad_pcb(self, kicad_pcb_path: str, step_file: str = "board.step", uses_kicad_nightly_cli=True, force_reconvert=False):
+    def from_kicad_pcb(self, kicad_pcb_path: str, step_file: str = "board.step", uses_kicad_nightly_cli=True):
         """
         Converts the kicad_pcb file to a step file and loads the individual components as TopoDS_Shape into a dictionary.\n
 
         :param kicad_pcb_path: Absolute path to the kicad_pcb file
         :param step_file: Name of the file to be saved in the cache directory
         :param uses_kicad_nightly_cli: Whether to use kicad-cli or kica-cli-nightly
-        :param force_reconvert: Whether to force reconvert the step data
 
         :return: A dictionary of names and TopoDS_Shape objects.
         """
         step_path = os.path.join(self.cache_dir, step_file)
-        step_file_exists = os.path.exists(step_path)
-        if not step_file_exists or force_reconvert:
-            self._convert_kicad_pcb_to_step(
-                kicad_pcb_path, step_path, uses_kicad_nightly_cli)
+        self._convert_kicad_pcb_to_step(
+            kicad_pcb_path, step_path, uses_kicad_nightly_cli)
         return self.from_step_file(step_file)
 
     def from_step_file(self, step_file: str) -> dict[str, TopoDS_Shape]:
@@ -184,5 +181,5 @@ class BoardConverter:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     (BoardConverter()
-     .from_kicad_pcb("ESPlant-Board/ESPlant-Board.kicad_pcb", force_reconvert=True)
+     .from_kicad_pcb("/workspaces/ESPlant/ESPlant-Board/ESPlant-Board.kicad_pcb")
      )
