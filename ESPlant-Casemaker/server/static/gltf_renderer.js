@@ -14,6 +14,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
  * @property {function(number): void} setLineColor
  * @property {boolean} highlighted
  * @property {boolean} selected
+ * @property {boolean} highlightable
+ * @property {boolean} selectable
  * @property {THREE.MeshStandardMaterial} material
  * @property {THREE.LineBasicMaterial} lineMaterial
  */
@@ -30,8 +32,12 @@ class BoardRenderer {
         this.renderer = new THREE.WebGLRenderer();
 
         const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-        dirLight.position.set(10, 10, 30);
+        dirLight.position.set(-10, -10, 30);
         this.scene.add(dirLight);
+
+        const dirLight2 = new THREE.DirectionalLight(0xffffff, 3);
+        dirLight2.position.set(10, 10, 30);
+        this.scene.add(dirLight2);
 
         this.scene.background = new THREE.Color(0xffffff);
 
@@ -140,6 +146,8 @@ class BoardRenderer {
                     },
                     highlighted: false,
                     selected: false,
+                    highlightable: true,
+                    selectable: true,
                     material: new THREE.MeshStandardMaterial({ color: this.defaultComponentColor }),
                     lineMaterial: new THREE.LineBasicMaterial({ color: this.defaultEdgeColor })
                 };
@@ -247,7 +255,7 @@ class BoardRenderer {
         const component = this.getRaycastComponent(mousePosition);
         if (component !== undefined) {
             if (this.areComponentsHighlightable) {
-                if (!component.highlighted) {
+                if (!component.highlighted && component.highlightable) {
                     component.highlighted = true;
                     component.lineMaterial.color.set(this.highlightedEdgeColor);
                     this.onComponentHighlighted(component);
@@ -273,7 +281,7 @@ class BoardRenderer {
         const component = this.getRaycastComponent(mousePosition);
         if (component !== undefined) {
             if (this.areComponentsSelectable) {
-                if (!component.selected) {
+                if (!component.selected && component.selectable) {
                     component.selected = true;
                     component.material.color.set(this.selectedComponentColor);
                     component.lineMaterial.color.set(this.selectedComponentColor);
@@ -326,7 +334,12 @@ const boardRenderer = new BoardRenderer(document.getElementById('container'));
 // boardRenderer.renderOnLoad = false;
 boardRenderer.loadModel(glb_path, () => {
     console.log('model loaded');
-    boardRenderer.components.find((component) => component.name.includes("_PCB"))?.setColor(0x004e00);
+    const pcb = boardRenderer.components.find((component) => component.name.includes("_PCB"))
+    if (pcb !== undefined) {
+        pcb.setColor(0x004e00);
+        pcb.selectable = false;
+        pcb.highlightable = false;
+    }
 }, (progress) => {
     console.log('model loading progress', progress);
 });
