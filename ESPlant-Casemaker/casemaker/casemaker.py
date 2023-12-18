@@ -161,7 +161,7 @@ class Casemaker:
             self.shapes_dict, step_file, exportType="STEP")
         return self
 
-    def save_gltf_file(self, gltf_file: str = "board.gltf", tolerance: float = 0.1, angularTolerance: float = 0.1):
+    def save_gltf_file(self, gltf_file: str = "board.glb", tolerance: float = 0.1, angularTolerance: float = 0.1):
         """
         Saves the board with its components as a gltf file.
 
@@ -363,7 +363,7 @@ if __name__ == "__main__":
                  # .load_step_file("board.step")
                  # .save_step_file("board-saved.step")
                  # .save_pickle("board.pickle")
-                 # .save_gltf_file("board.gltf")
+                 # .save_gltf_file("board.glb")
                  .generate_board(esplant_default_settings.board_settings, esplant_default_settings.additional_parts)
                  .generate_case(esplant_default_settings.case_settings)
                  .add_compartment_door(SIDE.BOTTOM, esplant_default_settings.compartment_door_settings)
