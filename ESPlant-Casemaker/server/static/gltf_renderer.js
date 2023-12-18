@@ -179,7 +179,7 @@ class BoardRenderer {
         }, (error) => {
             console.error(error);
             setTimeout(() => {
-                this.loadModel(glbPath);
+                this.loadModel(glbPath, onLoaded, onProgress);
             }, 1000); // retry
         });
     }
