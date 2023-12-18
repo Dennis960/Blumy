@@ -74,10 +74,10 @@ class BoardRenderer {
          */
         this.areComponentsSelectable = true;
 
-        this.highlightedEdgeColor = 0xffff00;
-        this.defaultEdgeColor = 0x000000;
-        this.selectedComponentColor = 0xffff00;
         this.defaultComponentColor = 0xffffff;
+        this.defaultEdgeColor = 0x404040;
+        this.selectedComponentColor = 0xFFFF00;
+        this.highlightedEdgeColor = 0xb3b300;
 
 
         this.onMouseMove = this.onMouseMove.bind(this);
@@ -265,8 +265,7 @@ class BoardRenderer {
         for (const otherComponent of this.components) {
             if (otherComponent !== component && otherComponent.highlighted) {
                 otherComponent.highlighted = false;
-                if (!otherComponent.selected)
-                    otherComponent.lineMaterial.color.set(otherComponent.lineColor);
+                otherComponent.lineMaterial.color.set(otherComponent.lineColor);
                 this.onComponentUnhighlighted(otherComponent);
             }
         }
@@ -284,9 +283,8 @@ class BoardRenderer {
                 if (!component.selected && component.selectable) {
                     component.selected = true;
                     component.material.color.set(this.selectedComponentColor);
-                    component.lineMaterial.color.set(this.selectedComponentColor);
                     this.onComponentSelected(component);
-                } else {
+                } else if (component.selected) {
                     component.selected = false;
                     component.material.color.set(component.color);
                     this.onComponentUnselected(component);
