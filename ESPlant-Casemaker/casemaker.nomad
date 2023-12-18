@@ -89,7 +89,7 @@ job "casemaker" {
       config {
         image = "ghcr.io/dennis960/casemaker:${var.tag}"
         command = "/home/appuser/.local/bin/celery"
-        args = ["-A", "worker", "worker", "--loglevel", "info", "--concurrency", "1"]
+        args = ["-A", "celery_worker.worker", "worker", "--loglevel", "info", "--concurrency", "1"]
       }
 
       # FIXME containers do not respect host's DNS settings
