@@ -22,7 +22,7 @@ class CasemakerLoader:
     def __init__(self, cache_directory: str = "parts"):
         self.cache_dir = cache_directory
 
-    def load_kicad_pcb(self, kicad_pcb_path: str, step_file: str = "board.step", force_reconvert: bool = False):
+    def load_kicad_pcb(self, kicad_pcb_path: str, step_file: str = "board.step"):
         """
         Loads the kicad_pcb file and creates a Casemaker object from it.\n
         Note: This function will skip all step files that are not in the default kicad 3d model directory.
@@ -33,7 +33,7 @@ class CasemakerLoader:
         :param step_file: Name of the file in the cache directory
         """
         board_shape, shapes_dict = (BoardConverter(self.cache_dir)
-                                    .from_kicad_pcb(kicad_pcb_path, step_file, force_reconvert=force_reconvert)
+                                    .from_kicad_pcb(kicad_pcb_path, step_file)
                                     )
         return Casemaker(board_shape, shapes_dict, self.cache_dir)
 
@@ -103,14 +103,13 @@ class CasemakerKiCadPcbAnalyzer:
             self.kicad_pcb_path, self.missing_models)
         return self
 
-    def to_casemaker(self, step_file: str = "board.step", force_reconvert: bool = False):
+    def to_casemaker(self, step_file: str = "board.step"):
         """
         Converts the kicad_pcb file to a step file and creates a Casemaker object from it.
 
         :param step_file: Name of the file in the cache directory
-        :param force_reconvert: Whether to force reconvert the step data
         """
-        return CasemakerLoader(self.cache_dir).load_kicad_pcb(self.kicad_pcb_path, step_file, force_reconvert=force_reconvert)
+        return CasemakerLoader(self.cache_dir).load_kicad_pcb(self.kicad_pcb_path, step_file)
 
 
 class Casemaker:
@@ -360,7 +359,7 @@ if __name__ == "__main__":
 
     casemaker = (CasemakerLoader()
                  .load_pickle("board.pickle")
-                 # .load_kicad_pcb("ESPlant-Board/ESPlant-Board.kicad_pcb", force_reconvert=True)
+                 # .load_kicad_pcb("ESPlant-Board/ESPlant-Board.kicad_pcb")
                  # .load_step_file("board.step")
                  # .save_step_file("board-saved.step")
                  # .save_pickle("board.pickle")
