@@ -1,160 +1,362 @@
+// @ts-check
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 5;
+/**
+ * @typedef {Object} Component
+ * @property {THREE.Object3D<THREE.Object3DEventMap>} model
+ * @property {string} name
+ * @property {THREE.Mesh[]} meshes
+ * @property {number} color
+ * @property {function(number): void} setColor
+ * @property {number} lineColor
+ * @property {function(number): void} setLineColor
+ * @property {boolean} highlighted
+ * @property {boolean} selected
+ * @property {THREE.MeshStandardMaterial} material
+ * @property {THREE.LineBasicMaterial} lineMaterial
+ */
 
-const renderer = new THREE.WebGLRenderer({ alpha: true });
-renderer.setPixelRatio(window.devicePixelRatio);
-const container = document.getElementById('container');
-const component_name_element = document.getElementById('component_name');
-const selected_components_element = document.getElementById('selected_components');
-renderer.setSize(container.innerWidth, container.innerHeight);
-container.innerHTML = '';
-container.appendChild(renderer.domElement);
+class BoardRenderer {
+    /**
+     * Use release() to stop rendering and remove event listeners
+     * 
+     * @param {HTMLElement} container 
+     */
+    constructor(container) {
+        this.container = container;
+        this.scene = new THREE.Scene();
+        this.renderer = new THREE.WebGLRenderer();
 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 0, 0);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        dirLight.position.set(10, 10, 30);
+        this.scene.add(dirLight);
 
-const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
-scene.add(hemisphereLight);
+        this.scene.background = new THREE.Color(0xffffff);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-directionalLight.position.set(0, 1, 1);
-scene.add(directionalLight);
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-const loader = new GLTFLoader();
-function loadModel() {
-    loader.load(glb_path, function (gltf) {
         /**
-         * @type {THREE.Mesh}
+         * @type {Component[]}
          */
-        const model = gltf.scene;
-        const board = model.children[0];
-        const components = board.children
+        this.components = [];
 
-        components.forEach(component => {
-            const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
-            const meshes = component.children[0].children;
-            meshes.forEach(mesh => {
-                mesh.material = material;
-            });
-        });
-        console.log(model);
-        scene.add(model);
+        /**
+         * @param {Component} component 
+         */
+        this.onComponentHighlighted = (component) => { };
+        /**
+         * @param {Component} component 
+         */
+        this.onComponentSelected = (component) => { };
+        /**
+         * @param {Component} component
+         */
+        this.onComponentUnhighlighted = (component) => { };
+        /**
+         * @param {Component} component
+         */
+        this.onComponentUnselected = (component) => { };
 
+        /**
+         * @type {boolean}
+         */
+        this.areComponentsHighlightable = true;
+        /**
+         * @type {boolean}
+         */
+        this.areComponentsSelectable = true;
+
+        this.highlightedEdgeColor = 0xffff00;
+        this.defaultEdgeColor = 0x000000;
+        this.selectedComponentColor = 0xffff00;
+        this.defaultComponentColor = 0xffffff;
+
+
+        this.onMouseMove = this.onMouseMove.bind(this);
+        this.onMouseClick = this.onMouseClick.bind(this);
+        this.onMouseDown = this.onMouseDown.bind(this);
+        this.onMouseUp = this.onMouseUp.bind(this);
+
+        this.isRendering = false;
+        this.isModelLoaded = false;
+
+        /**
+         * @type {boolean}
+         */
+        this.renderOnLoad = true;
+    }
+
+    centerCamera() {
         // center the model
-        const box = new THREE.Box3().setFromObject(model);
+        const box = new THREE.Box3().setFromObject(this.model);
         const center = box.getCenter(new THREE.Vector3());
-        model.position.sub(center);
+        this.model.position.sub(center);
 
+        // ensure the model fits in the view
         const size = box.getSize(new THREE.Vector3());
         const maxDimension = Math.max(size.x, size.y, size.z);
-        const fitHeightDistance = maxDimension / (2 * Math.atan(Math.PI * camera.fov / 360));
-        const fitWidthDistance = fitHeightDistance / camera.aspect;
+        const fitHeightDistance = maxDimension / (2 * Math.atan(Math.PI * this.camera.fov / 360));
+        const fitWidthDistance = fitHeightDistance / this.camera.aspect;
         const distance = Math.max(fitHeightDistance, fitWidthDistance);
+        this.camera.position.z = distance;
+    }
 
-        camera.position.z = distance;
-
-        window.addEventListener('mousemove', onMouseMove, false);
-        window.addEventListener('click', onMouseClick, false);
-
-        /**
-         * @type {THREE.Mesh}
-         */
-        let highlightedComponent = undefined;
-
-        /**
-         * @param {THREE.Mesh} component
-         */
-        function setHighlightedComponent(component) {
-            if (highlightedComponent !== undefined) {
-                highlightedComponent.material.color.set(0xffffff);
-            }
-            highlightedComponent = component;
-            component.material.color.set(0xff0000);
-            component_name_element.innerHTML = component.name;
+    /**
+     * @param {string} glbPath 
+     * @param {function(): void} onLoaded
+     * @param {function(number): void} onProgress
+     * @returns 
+     */
+    loadModel(glbPath, onLoaded, onProgress) {
+        if (this.isModelLoaded) {
+            return;
         }
+        new GLTFLoader().load(glbPath, (gltf) => {
+            /**
+             * @type {THREE.Mesh}
+             */
+            this.model = gltf.scene;
+            const board = this.model.children[0];
+            for (let i = 0; i < board.children.length; i++) {
+                const componentModel = board.children[i];
+                /**
+                 * @type {Component}
+                 */
+                const component = {
+                    model: componentModel,
+                    name: componentModel.name,
+                    meshes: componentModel.children[0].children,
+                    color: this.defaultComponentColor,
+                    setColor: function (color) {
+                        this.color = color;
+                        this.material.color.set(color);
+                    },
+                    lineColor: this.defaultEdgeColor,
+                    setLineColor: function (color) {
+                        this.lineColor = color;
+                        this.lineMaterial.color.set(color);
+                    },
+                    highlighted: false,
+                    selected: false,
+                    material: new THREE.MeshStandardMaterial({ color: this.defaultComponentColor }),
+                    lineMaterial: new THREE.LineBasicMaterial({ color: this.defaultEdgeColor })
+                };
 
-        function unhighlightHighlightedComponent() {
-            if (highlightedComponent !== undefined) {
-                highlightedComponent.material.color.set(0xffffff);
-            }
-            highlightedComponent = undefined;
-            component_name_element.innerHTML = 'No component highlighted';
-        }
+                this.components.push(component);
 
-        function onMouseMove(event) {
-            event.preventDefault();
-
-            const rect = renderer.domElement.getBoundingClientRect();
-            const mouse = {
-                x: ((event.clientX - rect.left) / rect.width) * 2 - 1,
-                y: -((event.clientY - rect.top) / rect.height) * 2 + 1
-            };
-
-
-            const raycaster = new THREE.Raycaster();
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(components, true);
-            if (intersects.length > 0) {
-                const raycastHit = intersects[0].object;
-                if (raycastHit !== highlightedComponent) {
-                    setHighlightedComponent(raycastHit);
+                for (const mesh of component.meshes) {
+                    mesh.material = component.material;
+                    const edges = new THREE.EdgesGeometry(mesh.geometry);
+                    const edgesMesh = new THREE.LineSegments(edges, component.lineMaterial);
+                    mesh.add(edgesMesh);
                 }
-            } else {
-                unhighlightHighlightedComponent();
             }
+
+            this.centerCamera();
+
+            this.scene.add(this.model);
+            this.isModelLoaded = true;
+            if (this.renderOnLoad) {
+                boardRenderer.render();
+            }
+            if (onLoaded !== undefined) {
+                onLoaded();
+            }
+        }, (progressEvent) => {
+            if (onProgress !== undefined) {
+                onProgress(progressEvent.loaded / progressEvent.total);
+            }
+        }, (error) => {
+            console.error(error);
+            setTimeout(() => {
+                this.loadModel(glbPath);
+            }, 1000); // retry
+        });
+    }
+
+    render() {
+        if (this.isRendering) {
+            return;
+        }
+        this.isRendering = true;
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+        this.container.innerHTML = '';
+        this.container.appendChild(this.renderer.domElement);
+
+        const controls = new OrbitControls(this.camera, this.renderer.domElement);
+
+
+        const animate = () => {
+            // TODO implement updateSize
+            // updateSize();
+            controls.update();
+            this.renderer.render(this.scene, this.camera);
+            if (this.isRendering)
+                requestAnimationFrame(animate);
         }
 
-        let selectedComponents = {};
+        animate();
 
-        function onMouseClick(event) {
-            if (highlightedComponent !== undefined) {
-                const component = highlightedComponent.parent.parent;
-                if (selectedComponents[component.name] !== undefined) {
-                    scene.remove(selectedComponents[component.name]);
-                    delete selectedComponents[component.name];
+        this.mouseMovedAfterMouseDown = false;
+
+        window.addEventListener('mousemove', this.onMouseMove, false);
+        window.addEventListener('mousedown', this.onMouseDown, false);
+        window.addEventListener('mouseup', this.onMouseUp, false);
+    }
+
+    /**
+     * @param {{x: number, y: number}} windowPosition
+     */
+    getRaycastComponent(windowPosition) {
+
+        const rect = this.container.getBoundingClientRect();
+        const containerPosition = new THREE.Vector2(
+            ((windowPosition.x - rect.left) / rect.width) * 2 - 1,
+            -((windowPosition.y - rect.top) / rect.height) * 2 + 1
+        )
+
+
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(containerPosition, this.camera);
+        const intersects = raycaster.intersectObjects(this.components.map((component) => component.model), true);
+        if (intersects.length > 0) {
+            let intersectedObject = intersects[0].object;
+            // Find the component that the intersected object belongs to, by going through all parent objects
+            while (intersectedObject !== undefined && intersectedObject.parent !== null) {
+                for (const component of this.components) {
+                    if (component.model === intersectedObject) {
+                        return component;
+                    }
+                }
+                intersectedObject = intersectedObject.parent;
+            }
+        }
+        return undefined;
+    }
+
+    onMouseMove(event) {
+        this.mouseMovedAfterMouseDown = true;
+        const mousePosition = {
+            x: event.clientX,
+            y: event.clientY
+        };
+
+        const component = this.getRaycastComponent(mousePosition);
+        if (component !== undefined) {
+            if (this.areComponentsHighlightable) {
+                if (!component.highlighted) {
+                    component.highlighted = true;
+                    component.lineMaterial.color.set(this.highlightedEdgeColor);
+                    this.onComponentHighlighted(component);
+                }
+            }
+        }
+        for (const otherComponent of this.components) {
+            if (otherComponent !== component && otherComponent.highlighted) {
+                otherComponent.highlighted = false;
+                if (!otherComponent.selected)
+                    otherComponent.lineMaterial.color.set(otherComponent.lineColor);
+                this.onComponentUnhighlighted(otherComponent);
+            }
+        }
+    }
+
+    onMouseClick(event) {
+        const mousePosition = {
+            x: event.clientX,
+            y: event.clientY
+        };
+
+        const component = this.getRaycastComponent(mousePosition);
+        if (component !== undefined) {
+            if (this.areComponentsSelectable) {
+                if (!component.selected) {
+                    component.selected = true;
+                    component.material.color.set(this.selectedComponentColor);
+                    component.lineMaterial.color.set(this.selectedComponentColor);
+                    this.onComponentSelected(component);
                 } else {
-                    // Get bounding box of component and add it to the scene, show only the edges
-                    const bbox = new THREE.Box3().setFromObject(component);
-                    const bboxHelper = new THREE.Box3Helper(bbox, 0xffff00);
-                    scene.add(bboxHelper);
-                    selectedComponents[component.name] = bboxHelper;
+                    component.selected = false;
+                    component.material.color.set(component.color);
+                    this.onComponentUnselected(component);
                 }
-                // Update the string of selected components
-                let selectedComponentsString = Object.keys(selectedComponents).join(', ');
-                selected_components_element.innerHTML = selectedComponentsString;
             }
         }
+    }
 
-    }, undefined, function (error) {
-        console.error(error);
-        setTimeout(loadModel, 1000); // retry
-    });
-}
+    onMouseDown() {
+        this.mouseMovedAfterMouseDown = false;
+    }
 
-loadModel();
+    onMouseUp(event) {
+        if (!this.mouseMovedAfterMouseDown) {
+            this.onMouseClick(event);
+        }
+    }
 
-function animate() {
-    updateSize();
-    controls.update();
-    renderer.render(scene, camera);
-    requestAnimationFrame(animate);
-}
+    /**
+     * @returns {Component[]}
+     */
+    get selectedComponents() {
+        return this.components.filter((component) => component.selected);
+    }
 
-animate();
+    resetSelection() {
+        for (const component of this.components) {
+            if (component.selected) {
+                component.selected = false;
+                component.material.color.set(component.color);
+                component.lineMaterial.color.set(component.lineColor);
+            }
+        }
+    }
 
-function updateSize() {
-    const canvas = container;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-
-    if (canvas.width !== width || canvas.height !== height) {
-        renderer.setSize(width, height);
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
+    release() {
+        window.removeEventListener('mousemove', this.onMouseMove, false);
+        window.removeEventListener('mousedown', this.onMouseDown, false);
+        window.removeEventListener('mouseup', this.onMouseUp, false);
+        this.isRendering = false;
     }
 }
+
+const boardRenderer = new BoardRenderer(document.getElementById('container'));
+// boardRenderer.renderOnLoad = false;
+boardRenderer.loadModel(glb_path, () => {
+    console.log('model loaded');
+    boardRenderer.components.find((component) => component.name.includes("_PCB"))?.setColor(0x004e00);
+}, (progress) => {
+    console.log('model loading progress', progress);
+});
+/**
+ * @param {Component} component 
+*/
+boardRenderer.onComponentHighlighted = (component) => {
+    // console.log('highlighted', component.name);
+};
+/**
+ * @param {Component} component 
+*/
+boardRenderer.onComponentSelected = (component) => {
+    console.log('selected', component.name);
+    console.log('selected components', boardRenderer.selectedComponents.map((component) => component.name));
+};
+
+/**
+ * @param {Component} component 
+*/
+boardRenderer.onComponentUnhighlighted = (component) => {
+    // console.log('unhighlighted', component.name);
+};
+/**
+ * @param {Component} component 
+*/
+boardRenderer.onComponentUnselected = (component) => {
+    console.log('unselected', component.name);
+    console.log('selected components', boardRenderer.selectedComponents.map((component) => component.name));
+};
+// boardRenderer.areComponentsHighlightable = true;
+// boardRenderer.areComponentsSelectable = true;
+// boardRenderer.centerCamera();
