@@ -102,7 +102,7 @@ class BoardSettings:
     pcb_tolerance: cq.Vector = cq.Vector(1.5, 1.5, 0.5)
     part_tolerance: float = 1
     part_settings: list[PartSetting] = field(default_factory=lambda: [])
-    pcb_part_name = "PCB"
+    pcb_part_name: str = "PCB"
     exclude: list[str] = field(default_factory=lambda: [])
     parts_without_tolerances: list[str] = field(default_factory=lambda: [])
 

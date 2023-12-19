@@ -1,0 +1,25 @@
+{% from "partials/render_field.html" import render_field %}
+
+<form
+    hx-post="{{ url_for('projects.part_settings_form', project_id=project_id, part=part_name) }}"
+    hx-swap="outerHTML"
+    class="container"
+>
+    <h5 class="mb-4">{{ part_name }} Settings</h5>
+
+    {{ form.hidden_tag() }}
+
+    {{ render_field(form.top_direction) }}
+    {{ render_field(form.create_hole) }}
+    {{ render_field(form.offset_x) }}
+    {{ render_field(form.offset_y) }}
+    {{ render_field(form.offset_z) }}
+    {{ render_field(form.width) }}
+    {{ render_field(form.width_auto) }}
+    {{ render_field(form.height) }}
+    {{ render_field(form.height_auto) }}
+
+    <div class="row">
+        <button type="submit" class="offset-9 col-3 btn btn-primary">Save</button>
+    </div>
+</form>

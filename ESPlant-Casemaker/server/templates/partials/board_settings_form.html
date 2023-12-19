@@ -1,87 +1,23 @@
-<form hx-post="{{ url_for('projects.board_settings_form', project_id=project_id) }}">
+{% from "partials/render_field.html" import render_field %}
+
+<form
+    hx-post="{{ url_for('projects.board_settings_form', project_id=project_id) }}"
+    hx-swap="outerHTML"
+    class="container"
+>
+    <h4 class="mb-4">Board Settings</h4>
+
     {{ form.hidden_tag() }}
   
-    <div class="mb-3">
-      {{ form.pcb_tolerance_x.label }}<br>
-      {{ form.pcb_tolerance_x(class="form-control") }}
-      {% if form.pcb_tolerance_x.errors %}
-        <div class="alert alert-danger">
-          {% for error in form.pcb_tolerance_x.errors %}
-          <span>{{ error }}</span>
-          {% endfor %}
-        </div>
-      {% endif %}
-    </div>
-    <div class="mb-3">
-      {{ form.pcb_tolerance_y.label }}<br>
-      {{ form.pcb_tolerance_y(class="form-control") }}
-      {% if form.pcb_tolerance_y.errors %}
-        <div class="alert alert-danger">
-          {% for error in form.pcb_tolerance_y.errors %}
-          <span>{{ error }}</span>
-          {% endfor %}
-        </div>
-      {% endif %}
-    </div>
-    <div class="mb-3">
-      {{ form.pcb_tolerance_z.label }}<br>
-      {{ form.pcb_tolerance_z(class="form-control") }}
-      {% if form.pcb_tolerance_z.errors %}
-        <div class="alert alert-danger">
-          {% for error in form.pcb_tolerance_z.errors %}
-          <span>{{ error }}</span>
-          {% endfor %}
-        </div>
-      {% endif %}
-    </div>
+    {{ render_field(form.pcb_tolerance_x) }}
+    {{ render_field(form.pcb_tolerance_y) }}
+    {{ render_field(form.pcb_tolerance_z) }}
+    {{ render_field(form.part_tolerance) }}
+    {{ render_field(form.pcb_part_name) }}
+    {{ render_field(form.exclude) }}
+    {{ render_field(form.parts_without_tolerances) }}
   
-    <div class="mb-3">
-      {{ form.part_tolerance.label }}<br>
-      {{ form.part_tolerance(class="form-control") }}
-      {% if form.part_tolerance.errors %}
-        <div class="alert alert-danger">
-          {% for error in form.part_tolerance.errors %}
-          <span>{{ error }}</span>
-          {% endfor %}
-        </div>
-      {% endif %}
+    <div class="row">
+        <button type="submit" class="offset-9 col-3 btn btn-primary">Save</button>
     </div>
-  
-    <div class="mb-3">
-      {{ form.pcb_part_name.label }}<br>
-      {{ form.pcb_part_name(class="form-control") }}
-      {% if form.pcb_part_name.errors %}
-        <div class="alert alert-danger">
-          {% for error in form.pcb_part_name.errors %}
-          <span>{{ error }}</span>
-          {% endfor %}
-        </div>
-      {% endif %}
-    </div>
-  
-    <div class="mb-3">
-      {{ form.exclude.label }}<br>
-      {{ form.exclude(class="form-control") }}
-      {% if form.exclude.errors %}
-        <div class="alert alert-danger">
-          {% for error in form.exclude.errors %}
-          <span>{{ error }}</span>
-          {% endfor %}
-        </div>
-      {% endif %}
-    </div>
-    
-    <div class="mb-3">
-      {{ form.parts_without_tolerances.label }}<br>
-      {{ form.parts_without_tolerances(class="form-control") }}
-      {% if form.parts_without_tolerances.errors %}
-        <div class="alert alert-danger">
-          {% for error in form.parts_without_tolerances.errors %}
-          <span>{{ error }}</span>
-          {% endfor %}
-        </div>
-      {% endif %}
-    </div>
-  
-    <button type="submit" class="btn btn-primary">Submit</button>
 </form>
