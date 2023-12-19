@@ -201,20 +201,20 @@ def part_settings_form(project_id: str):
     )
 
 
-@bp.route("/<project_id>/bottom-case", methods=["POST"])
-def generate_bottom_case(project_id: str):
+@bp.route("/<project_id>/case", methods=["POST"])
+def generate_case(project_id: str):
     version = get_version()
-    tasks.run_generate_bottom_case.delay(project_id, version)
-    return redirect(url_for("projects.view_bottom_case", project_id=project_id, version=version))
+    tasks.run_generate_case.delay(upload_root(), project_id, version)
+    return redirect(url_for("projects.view_case", project_id=project_id, version=version))
 
 
-@bp.route("/<project_id>/bottom-case")
-def view_bottom_case(project_id: str):
+@bp.route("/<project_id>/case")
+def view_case(project_id: str):
     version = get_version()
-    return render_template("./pages/projects/bottom_case.html",
+    return render_template("./pages/projects/case.html",
         project_id=project_id,
         version=version,
-        glb_path=url_for("projects.bottom_case", format="glb", project_id=project_id, version=version)
+        glb_path=url_for("projects.case", format="glb", project_id=project_id, version=version)
     )
 
 
@@ -242,8 +242,8 @@ def board_glb(project_id: str):
     return send_file(file_path)
 
 
-@bp.route("/<project_id>/bottom-case.<format>")
-def bottom_case(project_id: str, format: str):
+@bp.route("/<project_id>/case.<format>")
+def case(project_id: str, format: str):
     if format not in ['glb', 'stl', 'step']:
         return "Invalid file format", 400
 
