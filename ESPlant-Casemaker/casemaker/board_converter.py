@@ -17,13 +17,14 @@ register()
 
 
 class BoardConverter:
-    def __init__(self, cache_dir="parts/"):
+    def __init__(self, cache_dir="parts/", name_replace_map: dict[str, str] = {".", "_"}):
         """
         :param cache_dir: Path to the cache directory where the board is saved as step file
         """
         self.base_dir = os.path.dirname(os.path.realpath(__file__)) + "/"
         self.cache_dir = os.path.join(self.base_dir, cache_dir)
         self.cache_already_exists = self._create_cache_dir()
+        self.name_replace_map = name_replace_map
 
     def from_kicad_pcb(self, kicad_pcb_path: str, step_file: str = "board.step", uses_kicad_nightly_cli=True):
         """
@@ -83,6 +84,8 @@ class BoardConverter:
                     if refLabel.FindAttribute(TDataStd_Name.GetID_s(), nameAttr):
                         name = nameAttr.Get().ToExtString()
                 newName = name
+                for key, value in self.name_replace_map.items():
+                    newName = newName.replace(key, value)
                 i = 1
                 while newName in shapes:
                     newName = name + f" ({i})"

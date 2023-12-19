@@ -22,7 +22,7 @@ class CasemakerLoader:
     def __init__(self, cache_directory: str = "parts"):
         self.cache_dir = cache_directory
 
-    def load_kicad_pcb(self, kicad_pcb_path: str, step_file: str = "board.step"):
+    def load_kicad_pcb(self, kicad_pcb_path: str, step_file: str = "board.step", name_replace_map: dict[str, str] = {".": "_"}):
         """
         Loads the kicad_pcb file and creates a Casemaker object from it.\n
         Note: This function will skip all step files that are not in the default kicad 3d model directory.
@@ -32,18 +32,18 @@ class CasemakerLoader:
         :param kicad_pcb_path: Absolute path to the kicad_pcb file
         :param step_file: Name of the file in the cache directory
         """
-        board_shape, shapes_dict = (BoardConverter(self.cache_dir)
+        board_shape, shapes_dict = (BoardConverter(self.cache_dir, name_replace_map)
                                     .from_kicad_pcb(kicad_pcb_path, step_file)
                                     )
         return Casemaker(board_shape, shapes_dict, self.cache_dir)
 
-    def load_step_file(self, step_file: str = "board.step"):
+    def load_step_file(self, step_file: str = "board.step", name_replace_map: dict[str, str] = {".": "_"}):
         """
         Loads the step file and creates a Casemaker object from it.
 
         :param step_file: Name of the file in the cache directory
         """
-        board_shape, shapes_dict = (BoardConverter(self.cache_dir)
+        board_shape, shapes_dict = (BoardConverter(self.cache_dir, name_replace_map)
                                     .from_step_file(step_file)
                                     )
         return Casemaker(board_shape, shapes_dict, self.cache_dir)
@@ -103,13 +103,13 @@ class CasemakerKiCadPcbAnalyzer:
             self.kicad_pcb_path, self.missing_models)
         return self
 
-    def to_casemaker(self, step_file: str = "board.step"):
+    def to_casemaker(self, step_file: str = "board.step", name_replace_map: dict[str, str] = {".": "_"}):
         """
         Converts the kicad_pcb file to a step file and creates a Casemaker object from it.
 
         :param step_file: Name of the file in the cache directory
         """
-        return CasemakerLoader(self.cache_dir).load_kicad_pcb(self.kicad_pcb_path, step_file)
+        return CasemakerLoader(self.cache_dir).load_kicad_pcb(self.kicad_pcb_path, step_file, name_replace_map=name_replace_map)
 
 
 class Casemaker:
