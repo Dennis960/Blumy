@@ -64,36 +64,55 @@ def view_board(project_id: str):
 
 @bp.route("/<project_id>/board-settings", methods=['GET', 'POST'])
 def board_settings_form(project_id: str):
+    # TODO validate that project and board exist
     version = get_version()
-    # TODO read previous config and pre-populate form with it
 
-    # TODO validate project and board exist
+    form = settings_form.BoardSettingsForm()
+
     project_repository = ProjectRepository(upload_root())
+    board_settings = project_repository.load_board_settings(project_id, version)
+
+    # populate PCB select fields with part names
     board = CasemakerLoader(project_repository.cache_path(project_id))\
         .load_pickle()
     part_names = list(board.shapes_dict.keys())
-
-    form = settings_form.BoardSettingsForm()
-    form.pcb_part_name.choices = part_names
+    for field in form:
+        if field.type == "SelectPCBPartField" or field.type == "SelectMultiplePCBPartField":
+            field.choices = part_names
+    
+    # search and default-select PCB part
     pcb_part_names = [pn for pn in part_names if pn.endswith("_PCB")]
     form.pcb_part_name.default = pcb_part_names[0] if pcb_part_names else None
-    form.exclude.choices = part_names
-    form.parts_without_tolerances.choices = part_names
 
+    # map form to settings entity
     if form.validate_on_submit():
         pcb_tolerance = cq.Vector(
-            form.data["pcb_tolerance_x"],
-            form.data["pcb_tolerance_y"],
-            form.data["pcb_tolerance_z"],
+            form.pcb_tolerance_x.data,
+            form.pcb_tolerance_y.data,
+            form.pcb_tolerance_z.data,
         )
         board_settings = settings.BoardSettings(
             pcb_tolerance=pcb_tolerance,
-            part_tolerance=form.data["part_tolerance"],
-            part_settings=[], # TODO
-            pcb_part_name=form.data["pcb_part_name"],
-            exclude=form.data["exclude"],
-            parts_without_tolerances=form.data["parts_without_tolerances"],
+            part_tolerance=form.part_tolerance.data,
+            part_settings=board_settings.part_settings if board_settings is not None else [],
+            pcb_part_name=form.pcb_part_name.data,
+            exclude=form.exclude.data,
+            parts_without_tolerances=form.parts_without_tolerances.data,
         )
+
+        project_repository.store_board_settings(project_id, version, board_settings)
+        print("Stored board settings in project {} version {}".format(project_id, version))
+
+    # map entity to form (if exists)
+    if not form.is_submitted() and board_settings is not None:
+        form.pcb_tolerance_x.data = board_settings.pcb_tolerance.x
+        form.pcb_tolerance_y.data = board_settings.pcb_tolerance.y
+        form.pcb_tolerance_z.data = board_settings.pcb_tolerance.z
+        form.part_tolerance.data = board_settings.part_tolerance
+        form.pcb_part_name.data = board_settings.pcb_part_name
+        form.exclude.data = board_settings.exclude
+        form.parts_without_tolerances.data = board_settings.parts_without_tolerances
+        print("Loaded board settings in project {} version {}".format(project_id, version))
 
     return render_template("./partials/board_settings_form.html",
         project_id=project_id,
@@ -103,15 +122,19 @@ def board_settings_form(project_id: str):
 
 @bp.route("/<project_id>/part-settings", methods=['GET', 'POST'])
 def part_settings_form(project_id: str):
+    # TODO validate that project and board exist
     version = get_version()
-    # TODO read previous config and pre-populate form with it
 
     part_name = request.args.get("part")
     if part_name is None:
         return "Error: query parameter 'part' is required"
 
-    # TODO validate project and board exist
     project_repository = ProjectRepository(upload_root())
+    board_settings = project_repository.load_board_settings(project_id, version)
+
+    if board_settings is None:
+        return "Error: Configure board first"
+
     board = CasemakerLoader(project_repository.cache_path(project_id))\
         .load_pickle()
     valid_part_names = list(board.shapes_dict.keys())
@@ -124,17 +147,52 @@ def part_settings_form(project_id: str):
 
     form = settings_form.PartSettingForm()
 
+    part_setting_index: int | None = None
+    for i, existing_part_setting in enumerate(board_settings.part_settings):
+        if existing_part_setting.name_regex == part_setting.name_regex:
+            part_setting_index = i
+            break
+
+    # map form to settings entity
     if form.validate_on_submit():
-        part_settings = settings.PartSetting(
+        part_setting = settings.PartSetting(
             name_regex=part_name,
-            top_direction=form.data["top_direction"],
-            length="Hole" if form.data["create_hole"] else form.data["length"],
-            offset_x=form.data["offset_x"],
-            offset_y=form.data["offset_y"],
-            offset_z=form.data["offset_z"],
-            width="Auto" if form.data["width_auto"] else form.data["width"],
-            height="Auto" if form.data["height_auto"] else form.data["height"],
+            top_direction=form.top_direction.data,
+            length="Hole" if form.create_hole.data else form.length.data,
+            offset_x=form.offset_x.data,
+            offset_y=form.offset_y.data,
+            offset_z=form.offset_z.data,
+            width="Auto" if form.width_auto.data else form.width.data,
+            height="Auto" if form.height_auto.data else form.height.data,
         )
+
+        if part_setting_index is not None:
+            # replace 
+            board_settings.part_settings[part_setting_index] = part_setting
+        else:
+            # add 
+            board_settings.part_settings.append(part_setting)
+
+        project_repository.store_board_settings(project_id, version, board_settings)
+        print("Stored part {} settings in project {} version {}".format(part_name, project_id, version))
+
+    # map entity to form (if exists)
+    if not form.is_submitted() and part_setting_index is not None:
+        part_setting = board_settings.part_settings[part_setting_index]
+        form.top_direction.data = part_setting.top_direction
+        form.length.data = part_setting.length
+        form.create_hole.data = part_setting.length == "Hole"
+        form.offset_x.data = part_setting.top_direction
+        form.offset_y.data = part_setting.top_direction
+        form.offset_z.data = part_setting.top_direction
+        form.width_auto.data = part_setting.width == "Auto"
+        form.width.data = None if form.width_auto.data else part_setting.width
+        form.height_auto.data = part_setting.height == "Auto"
+        form.height.data = None if form.height_auto.data else part_setting.height
+        form.pcb_tolerance_x.data = board_settings.pcb_tolerance.x
+        form.pcb_tolerance_y.data = board_settings.pcb_tolerance.y
+        form.pcb_tolerance_z.data = board_settings.pcb_tolerance.z
+        print("Loaded part {} settings in project {} version {}".format(part_name, project_id, version))
 
     return render_template("./partials/part_settings_form.html",
         project_id=project_id,
