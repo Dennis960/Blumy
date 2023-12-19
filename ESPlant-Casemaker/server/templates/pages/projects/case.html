@@ -1,0 +1,52 @@
+{% extends 'partials/base.html' %}
+{% block title %}Case Generator - Preview{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-sm">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Preview your Case</a>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item me-3">
+                <a href="{{ url_for('projects.view_board', project_id=project_id, version=version) }}" class="btn btn-secondary">Back</a>
+            </li>
+            <li class="nav-item">
+                <form action="{{ url_for('projects.confirm', project_id=project_id, version=version) }}" method="POST">
+                    <button class="btn btn-primary" type="submit">Finish</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div id="container"></div>
+
+<style>
+    #container {
+        height: calc(100vh - 56px);
+    }
+</style>
+{% endblock %}
+
+{% block js %}
+<script type="module">
+import BoardRenderer from '~/board-renderer'
+
+const container = document.getElementById('container');
+
+const boardRenderer = new BoardRenderer(container);
+
+boardRenderer.loadModel('{{ glb_path }}', () => {
+    console.log('model loaded');
+    const pcb = boardRenderer.components.find((component) => component.name.includes("_PCB"))
+    if (pcb !== undefined) {
+        pcb.setColor(0x004e00);
+        pcb.selectable = false;
+        pcb.highlightable = false;
+    }
+}, (progress) => {
+    console.log('model loading progress', progress);
+});
+ boardRenderer.areComponentsHighlightable = false;
+ boardRenderer.areComponentsSelectable = false;
+</script>
+{% endblock %}
