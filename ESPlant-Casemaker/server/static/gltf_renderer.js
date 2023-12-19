@@ -20,7 +20,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
  * @property {THREE.LineBasicMaterial} lineMaterial
  */
 
-class BoardRenderer {
+export default class BoardRenderer {
     /**
      * Use release() to stop rendering and remove event listeners
      * 
@@ -47,23 +47,6 @@ class BoardRenderer {
          * @type {Component[]}
          */
         this.components = [];
-
-        /**
-         * @param {Component} component 
-         */
-        this.onComponentHighlighted = (component) => { };
-        /**
-         * @param {Component} component 
-         */
-        this.onComponentSelected = (component) => { };
-        /**
-         * @param {Component} component
-         */
-        this.onComponentUnhighlighted = (component) => { };
-        /**
-         * @param {Component} component
-         */
-        this.onComponentUnselected = (component) => { };
 
         /**
          * @type {boolean}
@@ -167,7 +150,7 @@ class BoardRenderer {
             this.scene.add(this.model);
             this.isModelLoaded = true;
             if (this.renderOnLoad) {
-                boardRenderer.render();
+                this.render();
             }
             if (onLoaded !== undefined) {
                 onLoaded();
@@ -264,7 +247,9 @@ class BoardRenderer {
                 if (!component.highlighted && component.highlightable) {
                     component.highlighted = true;
                     component.lineMaterial.color.set(this.highlightedEdgeColor);
-                    this.onComponentHighlighted(component);
+                    this.container.dispatchEvent(new CustomEvent('component-highlight', {
+                        detail: component,
+                    }));
                 }
             }
         }
@@ -272,7 +257,9 @@ class BoardRenderer {
             if (otherComponent !== component && otherComponent.highlighted) {
                 otherComponent.highlighted = false;
                 otherComponent.lineMaterial.color.set(otherComponent.lineColor);
-                this.onComponentUnhighlighted(otherComponent);
+                this.container.dispatchEvent(new CustomEvent('component-unhighlight', {
+                    detail: component,
+                }));
             }
         }
     }
@@ -289,11 +276,15 @@ class BoardRenderer {
                 if (!component.selected && component.selectable) {
                     component.selected = true;
                     component.material.color.set(this.selectedComponentColor);
-                    this.onComponentSelected(component);
+                    this.container.dispatchEvent(new CustomEvent('component-select', {
+                        detail: component,
+                    }));
                 } else if (component.selected) {
                     component.selected = false;
                     component.material.color.set(component.color);
-                    this.onComponentUnselected(component);
+                    this.container.dispatchEvent(new CustomEvent('component-unselect', {
+                        detail: component,
+                    }));
                 }
             }
         }
@@ -333,47 +324,3 @@ class BoardRenderer {
         this.isRendering = false;
     }
 }
-
-const boardRenderer = new BoardRenderer(document.getElementById('container'));
-// boardRenderer.renderOnLoad = false;
-boardRenderer.loadModel(glb_path, () => {
-    console.log('model loaded');
-    const pcb = boardRenderer.components.find((component) => component.name.includes("_PCB"))
-    if (pcb !== undefined) {
-        pcb.setColor(0x004e00);
-        pcb.selectable = false;
-        pcb.highlightable = false;
-    }
-}, (progress) => {
-    console.log('model loading progress', progress);
-});
-/**
- * @param {Component} component 
-*/
-boardRenderer.onComponentHighlighted = (component) => {
-    // console.log('highlighted', component.name);
-};
-/**
- * @param {Component} component 
-*/
-boardRenderer.onComponentSelected = (component) => {
-    console.log('selected', component.name);
-    console.log('selected components', boardRenderer.selectedComponents.map((component) => component.name));
-};
-
-/**
- * @param {Component} component 
-*/
-boardRenderer.onComponentUnhighlighted = (component) => {
-    // console.log('unhighlighted', component.name);
-};
-/**
- * @param {Component} component 
-*/
-boardRenderer.onComponentUnselected = (component) => {
-    console.log('unselected', component.name);
-    console.log('selected components', boardRenderer.selectedComponents.map((component) => component.name));
-};
-// boardRenderer.areComponentsHighlightable = true;
-// boardRenderer.areComponentsSelectable = true;
-// boardRenderer.centerCamera();

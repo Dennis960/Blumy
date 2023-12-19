@@ -6,6 +6,7 @@ import cadquery as cq
 from flask import current_app
 from celery_worker import tasks
 from casemaker import settings
+from casemaker.casemaker import CasemakerLoader
 from .. import settings_form
 from ..project_repository import ProjectRepository
 
@@ -66,11 +67,18 @@ def board_settings_form(project_id: str):
     version = get_version()
     # TODO read previous config and pre-populate form with it
 
+    # TODO validate project and board exist
+    project_repository = ProjectRepository(upload_root())
+    board = CasemakerLoader(project_repository.cache_path(project_id))\
+        .load_pickle()
+    part_names = list(board.shapes_dict.keys())
+
     form = settings_form.BoardSettingsForm()
-    parts = ["PCB", "BatterySprings", "PinHeader"] # TODO load board and use part names here
-    form.pcb_part_name.choices = parts
-    form.exclude.choices = parts
-    form.parts_without_tolerances.choices = parts
+    form.pcb_part_name.choices = part_names
+    pcb_part_names = [pn for pn in part_names if pn.endswith("_PCB")]
+    form.pcb_part_name.default = pcb_part_names[0] if pcb_part_names else None
+    form.exclude.choices = part_names
+    form.parts_without_tolerances.choices = part_names
 
     if form.validate_on_submit():
         pcb_tolerance = cq.Vector(
@@ -89,6 +97,48 @@ def board_settings_form(project_id: str):
 
     return render_template("./partials/board_settings_form.html",
         project_id=project_id,
+        form=form,
+    )
+
+
+@bp.route("/<project_id>/part-settings", methods=['GET', 'POST'])
+def part_settings_form(project_id: str):
+    version = get_version()
+    # TODO read previous config and pre-populate form with it
+
+    part_name = request.args.get("part")
+    if part_name is None:
+        return "Error: query parameter 'part' is required"
+
+    # TODO validate project and board exist
+    project_repository = ProjectRepository(upload_root())
+    board = CasemakerLoader(project_repository.cache_path(project_id))\
+        .load_pickle()
+    valid_part_names = list(board.shapes_dict.keys())
+
+    # FIXME threejs removes "." and ":" from part names
+    matching_part_names = [vpn for vpn in valid_part_names if vpn.replace(".", "") == part_name.replace(".", "")]
+    if len(matching_part_names) == 0:
+        return "Error: part " + part_name + " is not in this board"
+    part_name = matching_part_names[0]
+
+    form = settings_form.PartSettingForm()
+
+    if form.validate_on_submit():
+        part_settings = settings.PartSetting(
+            name_regex=part_name,
+            top_direction=form.data["top_direction"],
+            length="Hole" if form.data["create_hole"] else form.data["length"],
+            offset_x=form.data["offset_x"],
+            offset_y=form.data["offset_y"],
+            offset_z=form.data["offset_z"],
+            width="Auto" if form.data["width_auto"] else form.data["width"],
+            height="Auto" if form.data["height_auto"] else form.data["height"],
+        )
+
+    return render_template("./partials/part_settings_form.html",
+        project_id=project_id,
+        part_name=part_name,
         form=form,
     )
 
