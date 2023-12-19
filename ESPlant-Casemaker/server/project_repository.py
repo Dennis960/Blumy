@@ -2,7 +2,10 @@ import os
 import zipfile
 import shutil
 import glob
+import pickle
 from werkzeug.datastructures import FileStorage
+from casemaker import settings
+
 
 class ProjectRepository:
     def __init__(self, root: str):
@@ -12,10 +15,9 @@ class ProjectRepository:
         return os.path.join(self._root, project_id)
 
     def _settings_root(self, project_id: str, version: int) -> str:
-        return os.path.join(self.project_root(project_id), str(version))
-
-    def _settings_path(self, project_id: str, version: int) -> str:
-        return os.path.join(self._settings_root(project_id, version), "settings.pkl")
+        directory_path = os.path.join(self.project_root(project_id), str(version))
+        os.makedirs(directory_path, exist_ok=True)
+        return directory_path
 
     def store_pcb(self, project_id: str, filename: str, file: FileStorage):
         """
@@ -61,3 +63,19 @@ class ProjectRepository:
     def export_root(self, project_id: str, version: int) -> str:
         return self._settings_root(project_id, version)
 
+    def _board_settings_path(self, project_id: str, version: int) -> str:
+        return os.path.join(self._settings_root(project_id, version), "board_settings.pkl")
+
+    def store_board_settings(self, project_id: str, version: int, board_settings: settings.BoardSettings):
+        board_settings_path = self._board_settings_path(project_id, version)
+        with open(board_settings_path, "wb") as f:
+            # TODO use JSON or another secure format
+            pickle.dump(board_settings, f)
+
+    def load_board_settings(self, project_id: str, version: int) -> settings.BoardSettings:
+        board_settings_path = self._board_settings_path(project_id, version)
+        if not os.path.exists(board_settings_path):
+            return None
+
+        with open(board_settings_path, "rb") as f:
+            return pickle.load(f)

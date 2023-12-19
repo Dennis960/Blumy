@@ -19,9 +19,9 @@ class PartSettingForm(FlaskForm):
     offset_x = DecimalField('Offset X', validators=[Optional()])
     offset_y = DecimalField('Offset Y', validators=[Optional()])
     offset_z = DecimalField('Offset Z', validators=[Optional()])
-    width = DecimalField('Width')
+    width = DecimalField('Width', default=None, validators=[Optional()])
     width_auto = BooleanField('Auto width', default=False)
-    height = DecimalField('Height')
+    height = DecimalField('Height', default=None, validators=[Optional()])
     height_auto = BooleanField('Auto height', default=False)
 
 class CaseSettingsForm(FlaskForm):
