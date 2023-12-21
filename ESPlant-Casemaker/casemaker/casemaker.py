@@ -1,3 +1,4 @@
+import os
 from OCP.TopoDS import TopoDS_Shape
 from cadquery import Vector
 from board_converter import BoardConverter
@@ -54,6 +55,9 @@ class CasemakerLoader:
 
         :param pickle_file: Name of the pickle file
         """
+        if not os.path.exists(os.path.join(self.cache_dir, pickle_file)):
+            return None
+
         board_shape, shapes_dict = (BoardConverter(self.cache_dir)
                                     .from_pickle(pickle_file)
                                     )

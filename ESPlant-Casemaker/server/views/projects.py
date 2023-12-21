@@ -75,7 +75,12 @@ def board_settings_form(project_id: str):
     # populate PCB select fields with part names
     board = CasemakerLoader(project_repository.cache_path(project_id))\
         .load_pickle()
-    part_names = list(board.shapes_dict.keys())
+    if board is not None:
+        part_names = list(board.shapes_dict.keys())
+    else:
+        # TODO wait for conversion
+        part_names = []
+
     for field in form:
         if field.type == "SelectPCBPartField" or field.type == "SelectMultiplePCBPartField":
             field.choices = part_names
