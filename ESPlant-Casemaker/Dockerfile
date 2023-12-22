@@ -13,7 +13,7 @@ USER appuser
 
 RUN pip install --user numpy --upgrade && \
     pip install --user \
-    ocp cadquery https://github.com/CadQuery/OCP-stubs/archive/refs/tags/7.7.0.zip flask Flask-WTF celery redis sexpdata
+    ocp cadquery https://github.com/CadQuery/OCP-stubs/archive/refs/tags/7.7.0.zip flask Flask-WTF celery celery-types redis sexpdata
 # Info: This docker should not need `pip install ocp_vscode`. If python says it's missing, I forgot to move it to __main__.
 
 COPY ./ /app
