@@ -7,7 +7,7 @@
         <a class="navbar-brand" href="#">Preview your Board</a>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <form action="{{ url_for('projects.generate_case', project_id=project_id, version=version) }}" method="POST">
+                <form action="{{ url_for('projects.generate_case', **request.view_args) }}" method="POST">
                     <button class="btn btn-primary" type="submit">Generate Case</button>
                 </form>
             </li>
@@ -16,15 +16,22 @@
 </nav>
 
 <div class="editor">
-    <div id="container" class="editor__preview"></div>
-    <div class="editor__settings px-3 py-2">
-        <div id="board-settings" hx-get="board-settings" hx-trigger="load">
-            Loading...
-        </div>
-        <hr>
-        <div id="part-settings" class="settings">
+    <div
+        id="container"
+        class="editor__preview position-relative"
+        hx-trigger="loaded"
+        hx-target="#settings"
+        hx-get="{{ url_for('projects.board_settings_form', **request.view_args) }}"
+    >
+        <div class="position-absolute top-50 start-50 translate-middle">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
         </div>
     </div>
+    <div
+        id="settings"
+        class="editor__settings px-3 py-2"
+        hx-target="#settings"
+    ></div>
 </div>
 
 <style>
@@ -57,7 +64,7 @@ container.addEventListener('component-select', event => {
     const query = new URLSearchParams({
         part: event.detail.name,
     });
-    htmx.ajax('GET', `part-settings?${query.toString()}`, '#part-settings');
+    htmx.ajax('GET', `part-settings?${query.toString()}`, '#settings');
 });
 
 const boardRenderer = new BoardRenderer(container);
@@ -65,6 +72,9 @@ const boardRenderer = new BoardRenderer(container);
 // boardRenderer.renderOnLoad = false;
 boardRenderer.loadModel('{{ glb_path }}', () => {
     console.log('model loaded');
+
+    container.dispatchEvent(new CustomEvent('loaded'));
+
     const pcb = boardRenderer.components.find((component) => component.name.includes("_PCB"))
     if (pcb !== undefined) {
         pcb.setColor(0x004e00);

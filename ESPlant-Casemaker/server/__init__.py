@@ -10,8 +10,8 @@ def create_app() -> Flask:
     app.config.from_mapping(
         CELERY=dict(
             broker_url="redis://localhost",
-            result_backend="redis://localhost",
-            task_ignore_result=True
+            #result_backend="redis://localhost",
+            task_ignore_result=True  # no task state is stored
         ),
         UPLOAD_ROOT="./upload",
         SECRET_KEY="changeme"

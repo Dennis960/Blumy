@@ -49,7 +49,11 @@ def upload_board():
     tasks.run_convert.delay(upload_root(), project_id)
 
     version = incremented_version()
-    return redirect(url_for("projects.view_board", project_id=project_id, version=version))
+    return redirect(url_for(
+        "projects.view_board",
+        project_id=project_id,
+        version=version
+    ))
 
 
 @bp.route("/<project_id>/board")
@@ -130,9 +134,8 @@ def part_settings_form(project_id: str):
     # TODO validate that project and board exist
     version = get_version()
 
+    # TODO escape part_name as regex
     part_name = request.args.get("part")
-    if part_name is None:
-        return "Error: query parameter 'part' is required"
 
     project_repository = ProjectRepository(upload_root())
     board_settings = project_repository.load_board_settings(project_id, version)
@@ -144,17 +147,14 @@ def part_settings_form(project_id: str):
         .load_pickle()
     valid_part_names = list(board.shapes_dict.keys())
 
-    # FIXME threejs removes "." and ":" from part names
-    matching_part_names = [vpn for vpn in valid_part_names if vpn.replace(".", "") == part_name.replace(".", "")]
-    if len(matching_part_names) == 0:
+    if part_name is not None and not part_name in valid_part_names:
         return "Error: part " + part_name + " is not in this board"
-    part_name = matching_part_names[0]
 
     form = settings_form.PartSettingForm()
 
     part_setting_index: int | None = None
     for i, existing_part_setting in enumerate(board_settings.part_settings):
-        if existing_part_setting.name_regex == part_setting.name_regex:
+        if existing_part_setting.name_regex == part_name:
             part_setting_index = i
             break
 

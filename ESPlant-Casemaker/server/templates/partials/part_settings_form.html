@@ -1,11 +1,15 @@
 {% from "partials/render_field.html" import render_field %}
 
+{% include "partials/editor_settings_nav.html" %}
+
+{% if part_name is none %}
+<p>Click on a part to edit its settings</p>
+{% else %}
 <form
-    hx-post="{{ url_for('projects.part_settings_form', project_id=project_id, part=part_name) }}"
-    hx-swap="outerHTML"
+    hx-post="{{ request.full_path }}"
     class="container"
 >
-    <h5 class="mb-4">{{ part_name }} Settings</h5>
+    <h5 class="mb-4">{{ part_name }}</h5>
 
     {{ form.hidden_tag() }}
 
@@ -23,3 +27,4 @@
         <button type="submit" class="offset-9 col-3 btn btn-secondary">Save</button>
     </div>
 </form>
+{% endif %}
