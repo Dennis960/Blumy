@@ -92,6 +92,7 @@ def board_settings_form(project_id: str):
     # search and default-select PCB part
     pcb_part_names = [pn for pn in part_names if pn.endswith("_PCB")]
     form.pcb_part_name.default = pcb_part_names[0] if pcb_part_names else None
+    form.process() # apply default
 
     # map form to settings entity
     if form.validate_on_submit():
