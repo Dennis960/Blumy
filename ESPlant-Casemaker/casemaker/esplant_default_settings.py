@@ -28,8 +28,8 @@ battery_holder_settings = BatteryHolderSettings(
     back_wall_thickness=1.5,
     insertable_springs_thickness=1,
     polartiy_text_spacing=0.3,
-    battery_length_tolerance=4,
-    offset=(0, 1.5, 0)
+    battery_length_tolerance=0,
+    offset=(0, -2.5, 0)
 )
 
 mounting_hole_diameter = 2.2
