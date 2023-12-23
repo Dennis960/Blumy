@@ -10,29 +10,29 @@ from settings import *
 from components import battery_springs
 import esplant_default_settings
 
-export_file_extension = ".step"
+export_file_extension = ".stl"
 
 parts = {}
 
 # Compartment Door
 compartment_door_settings: list[CompartmentDoorSettings] = [
-    CompartmentDoorSettings(compartment_door_dimensions=(20, 20, 1.5), snap_joint_face_selectors=[
+    CompartmentDoorSettings(compartment_door_dimensions=cq.Vector(20, 20, 1.5), snap_joint_face_selectors=[
                             "+X", "-X", "+Y"], tabs_face_selector="<Y"),
-    CompartmentDoorSettings(compartment_door_dimensions=(
+    CompartmentDoorSettings(compartment_door_dimensions=cq.Vector(
         24, 20, 1.5), fitting_arm_angle_offset=0),
-    CompartmentDoorSettings(compartment_door_dimensions=(20, 20, 1.5), snap_joint_face_selectors=[
+    CompartmentDoorSettings(compartment_door_dimensions=cq.Vector(20, 20, 1.5), snap_joint_face_selectors=[
                             "+X", "-X", "+Y", "-Y"], tabs_face_selector=""),
-    CompartmentDoorSettings(compartment_door_dimensions=(
+    CompartmentDoorSettings(compartment_door_dimensions=cq.Vector(
         20, 20, 1.5), fitting_arm_thickness=2, fitting_arm_height=12, compartment_door_tolerance=0.1),
-    CompartmentDoorSettings(compartment_door_dimensions=(
+    CompartmentDoorSettings(compartment_door_dimensions=cq.Vector(
         20, 20, 1.5), tab_dimension=(3, 4), tab_spacing_factor=0.6, tab_tolerance=0.1),
-    CompartmentDoorSettings(compartment_door_dimensions=(
+    CompartmentDoorSettings(compartment_door_dimensions=cq.Vector(
         20, 20, 1.5), fitting_arm_distance_factor=3, fitting_arm_tolerance=0.1),
     # TODO fix fitting arm with different thickness
-    # CompartmentDoorSettings(compartment_door_dimensions=(
+    # CompartmentDoorSettings(compartment_door_dimensions=cq.Vector(
     #     20, 20, 1.5), recessed_edge_width=0.5),
     # TODO fix recessed edge width
-    # CompartmentDoorSettings(compartment_door_dimensions=(20, 20, 1.5), fitting_arm_thickness=0.5, fitting_arm_height=5, fitting_arm_width=10),
+    # CompartmentDoorSettings(compartment_door_dimensions=cq.Vector(20, 20, 1.5), fitting_arm_thickness=0.5, fitting_arm_height=5, fitting_arm_width=10),
 ]
 
 for i, settings in enumerate(compartment_door_settings):
@@ -53,7 +53,7 @@ for i, settings in enumerate(compartment_door_settings):
     }
 
 compartment_door = CompartmentDoor(
-    CompartmentDoorSettings(compartment_door_text="sideways"))
+    CompartmentDoorSettings(compartment_door_dimensions=cq.Vector(20, 20, 1.5), compartment_door_text="sideways"))
 compartment_door.door_cq_object = compartment_door.door_cq_object.rotate(
     (0, 0, 0), (0, 1, 0), 90)
 cq.Assembly(compartment_door.door_cq_object).save(
