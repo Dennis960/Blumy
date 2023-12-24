@@ -29,10 +29,15 @@ battery_holder_settings = BatteryHolderSettings(
     insertable_springs_thickness=1,
     polartiy_text_spacing=0.3,
     battery_length_tolerance=2,
+    battery_diameter_tolerance=0.25,
     offset=(0, -0.5, 0)
 )
 
 mounting_hole_diameter = 2.2
+
+default_mounting_hole_settings = MountingHoleSettings(
+    tolerance=0.2,
+)
 
 additional_parts = {
     "BatterySprings": battery_springs.val().wrapped,

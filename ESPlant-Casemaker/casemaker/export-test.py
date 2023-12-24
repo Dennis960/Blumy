@@ -90,7 +90,7 @@ casemaker = (CasemakerLoader()
              .generate_case(esplant_default_settings.case_settings)
              .add_compartment_door(SIDE.BOTTOM, esplant_default_settings.compartment_door_settings)
              .add_battery_holder(SIDE.BOTTOM, esplant_default_settings.battery_holder_settings)
-             .add_auto_detected_mounting_holes(SIDE.TOP, mounting_hole_diameter=esplant_default_settings.mounting_hole_diameter)
+             .add_auto_detected_mounting_holes(SIDE.TOP, mounting_hole_diameter=esplant_default_settings.mounting_hole_diameter, default_mounting_hole_settings=esplant_default_settings.default_mounting_hole_settings)
              )
 
 casemaker.battery_holder.battery_holder_cq_object = casemaker.battery_holder.battery_holder_cq_object.mirror(
