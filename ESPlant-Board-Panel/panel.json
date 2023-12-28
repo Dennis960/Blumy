@@ -9,7 +9,7 @@
     },
     "tabs": {
         "type": "annotation",
-        "tabfootprints": "PCM_kikit:Tab_5mm"
+        "tabfootprints": "CustomFootprints:MouseBites5mm"
     },
     "cuts": {
         "type": "mousebites",
@@ -32,6 +32,11 @@
         "hoffset": "3.85mm",
         "voffset": "5mm",
         "opening": "2mm"
+    },
+    "text": {
+        "type": "simple",
+        "voffset": "2.5mm",
+        "text": "JLCJLCJLCJLC"
     },
     "post": {
         "dimensions": "True"
