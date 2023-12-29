@@ -35,6 +35,7 @@ job "casemaker" {
 
     service {
       name = "casemaker-web"
+      provider = "nomad"
       port = "http"
 
       tags = [
@@ -62,7 +63,7 @@ job "casemaker" {
       # https://github.com/hashicorp/nomad/issues/12894
       template {
         data = <<-EOF
-          {{ with service "redis" }}
+          {{ with nomadService "redis" }}
             CLICKHOUSE_HOST = "{{ with index . 0 }}{{ .Address }}{{ end }}"
             FLASK_CELERY__broker_url = "redis://{{ with index . 0 }}{{ .Address }}{{ end }}"
             FLASK_CELERY__result_backend = "redis://{{ with index . 0 }}{{ .Address }}{{ end }}"
@@ -92,11 +93,9 @@ job "casemaker" {
         args = ["-A", "celery_worker.worker", "worker", "--loglevel", "info", "--concurrency", "1"]
       }
 
-      # FIXME containers do not respect host's DNS settings
-      # https://github.com/hashicorp/nomad/issues/12894
       template {
         data = <<-EOF
-          {{ with service "redis" }}
+          {{ with nomadService "redis" }}
             CLICKHOUSE_HOST = "{{ with index . 0 }}{{ .Address }}{{ end }}"
             FLASK_CELERY__broker_url = "redis://{{ with index . 0 }}{{ .Address }}{{ end }}"
             FLASK_CELERY__result_backend = "redis://{{ with index . 0 }}{{ .Address }}{{ end }}"
@@ -128,6 +127,7 @@ job "casemaker" {
 
     service {
       name = "redis"
+      provider = "nomad"
       port = "db"
 
       check {
