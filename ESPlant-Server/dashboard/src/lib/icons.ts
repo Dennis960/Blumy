@@ -2,7 +2,7 @@ export { default as IconWifi1 } from '@tabler/icons-svelte/dist/svelte/icons/Ico
 export { default as IconWifi2 } from '@tabler/icons-svelte/dist/svelte/icons/IconWifi2.svelte';
 export { default as IconWifiOff } from '@tabler/icons-svelte/dist/svelte/icons/IconWifiOff.svelte';
 export { default as IconDroplet } from '@tabler/icons-svelte/dist/svelte/icons/IconDroplet.svelte';
-export { default as IconDropletFilled2 } from '@tabler/icons-svelte/dist/svelte/icons/IconDropletFilled2.svelte';
+export { default as IconDropletFilled2 } from '@tabler/icons-svelte/dist/svelte/icons/IconDropletHalf2Filled.svelte';
 export { default as IconDropletFilled } from '@tabler/icons-svelte/dist/svelte/icons/IconDropletFilled.svelte';
 export { default as IconScubaMask } from '@tabler/icons-svelte/dist/svelte/icons/IconScubaMask.svelte';
 export { default as IconGrave } from '@tabler/icons-svelte/dist/svelte/icons/IconGrave.svelte';
@@ -18,7 +18,7 @@ export { default as IconChevronLeftRaw } from '@tabler/icons/chevron-left.svg?ra
 export { default as IconChevronRightRaw } from '@tabler/icons/chevron-right.svg?raw';
 export { default as IconBucketDropletSvg } from '@tabler/icons/bucket-droplet.svg';
 export { default as IconDropletSvg } from '@tabler/icons/droplet.svg';
-export { default as IconDropletFilled2Svg } from '@tabler/icons/droplet-filled-2.svg';
+export { default as IconDropletFilled2Svg } from '@tabler/icons/droplet-half-2-filled.svg';
 export { default as IconDropletFilledSvg } from '@tabler/icons/droplet-filled.svg';
 export { default as IconScubeMaskSvg } from '@tabler/icons/scuba-mask.svg';
 export { default as IconGraveSvg } from '@tabler/icons/grave.svg';
