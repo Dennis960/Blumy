@@ -22,7 +22,7 @@ export default class SensorEntity {
   ): Promise<RedactedSensorEntity> {
     let image: Buffer | null = null;
 
-    if (dto.imageUrl.startsWith("data:image/")) {
+    if (dto.imageUrl?.startsWith("data:image/")) {
       const buf = Buffer.from(dto.imageUrl.split(",")[1], "base64");
       image = await sharp(buf)
         .resize(800, 800, {

@@ -256,6 +256,10 @@ const migrations = [
     name: "drop_plant_name",
     statements: [`ALTER TABLE data DROP COLUMN plantName;`],
   },
+  {
+    name: "add_sensor_token",
+    statements: [`ALTER TABLE sensor ADD COLUMN token TEXT;`],
+  },
 ];
 
 export async function migrateDatabase() {

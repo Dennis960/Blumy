@@ -84,7 +84,8 @@ router.post("/sensors/:sensorId/config", isOwner, validate(z.object({
 router.post("/sensors", validate(z.object({
   body: sensorConfigurationDTOSchema,
 })), async (req, res) => {
-  const sensor = await sensorController.create(req.user?.userId!, req.body);
+  const config = req.body;
+  const sensor = await sensorController.create(req.user?.userId!, config);
   return res.json(sensor);
 });
 

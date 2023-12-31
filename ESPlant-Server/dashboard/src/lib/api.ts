@@ -3,7 +3,8 @@ import type {
 	SensorHistoryDTO,
 	SensorOverviewDTO,
 	SensorValueDistributionDTO,
-	SensorConfigurationDTO
+	SensorConfigurationDTO,
+	SensorCreatedDTO,
 } from './types/api';
 import SuperJSON from 'superjson';
 
@@ -53,7 +54,21 @@ export async function fetchSensorValueDistribution(
 		.then((text) => SuperJSON.parse(text));
 }
 
-export async function submitSensorConfig(
+export async function createSensor(
+	config: SensorConfigurationDTO
+): Promise<SensorCreatedDTO> {
+	return await fetch(`${BASE_URL}/sensors`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: SuperJSON.stringify(config)
+	})
+		.then((response) => response.text())
+		.then((text) => SuperJSON.parse(text));
+}
+
+export async function updateSensorConfig(
 	id: number,
 	config: SensorConfigurationDTO
 ): Promise<SensorConfigurationDTO> {

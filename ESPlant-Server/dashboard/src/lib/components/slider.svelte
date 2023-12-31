@@ -14,7 +14,7 @@ export type { Options as SliderOptions } from 'nouislider';
 
     let previousValues: (string|number)[]
 
-    const dispatcher = createEventDispatcher();
+    const dispatch = createEventDispatcher();
 
 	onMount(async () => {
 		const NoUiSlider = (await import('nouislider')).default;
@@ -22,7 +22,7 @@ export type { Options as SliderOptions } from 'nouislider';
         slider.on('update', (values) => {
             if (JSON.stringify(values) === JSON.stringify(previousValues)) return;
             previousValues = values;
-            dispatcher('input', { values });
+            dispatch('input', { values });
         });
 	});
 
