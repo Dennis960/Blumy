@@ -4,6 +4,8 @@ import { isAuthenticated } from "../middlewares/authenticated.js";
 
 const router = Router();
 
+const FRONTEND_URL = process.env.FRONTEND_URL ?? 'http://localhost:5173';
+
 router.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["openid"] })
@@ -12,8 +14,8 @@ router.get(
 router.get(
   "/auth/google/callback",
   passport.authenticate("google", {
-    successRedirect: "/",
-    failureRedirect: "/",
+    successRedirect: FRONTEND_URL,
+    failureRedirect: FRONTEND_URL,
   })
 );
 
