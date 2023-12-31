@@ -49,7 +49,7 @@ export default class SensorEntity {
       "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
     return {
-      name: this.name,
+      name: entity.name,
       imageUrl:
         entity.image != undefined
           ? "data:image/webp;base64," + entity.image.toString("base64")
