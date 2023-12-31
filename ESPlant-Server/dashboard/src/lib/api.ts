@@ -7,7 +7,7 @@ import type {
 } from './types/api';
 import SuperJSON from 'superjson';
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? 'https://esplant.hoppingadventure.com/api';
+const BASE_URL = '/api'
 
 export async function ensureLoggedIn() {
 	await fetch(`${BASE_URL}/profile`)
