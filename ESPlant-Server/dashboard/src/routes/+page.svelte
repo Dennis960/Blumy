@@ -21,6 +21,11 @@
 					<SensorCard {sensor} />
 				</div>
 			{/each}
+			<div class="col-12">
+				<div class="w-full d-flex justify-content-end column-gap-2">
+					<a href="sensor/new" class="btn btn-primary">Neuen Sensor einrichten</a>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
