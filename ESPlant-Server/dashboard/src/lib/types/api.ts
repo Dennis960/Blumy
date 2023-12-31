@@ -9,7 +9,7 @@ export interface SensorReadingDTO {
 
 export interface SensorConfigurationDTO {
   name: string;
-  imageUrl: string; // data URL for now
+  imageUrl?: string|undefined; // data URL for now
   fieldCapacity: number; // max water value
   /*
    * Typical permanent wilting points:
@@ -68,6 +68,12 @@ export interface SensorDTO {
         predictedWaterCapacity: WaterCapacityHistoryEntry[];
       }
     | undefined;
+}
+
+export interface SensorCreatedDTO {
+  id: number;
+  token: string;
+  config: SensorConfigurationDTO;
 }
 
 export interface SensorOverviewDTO {

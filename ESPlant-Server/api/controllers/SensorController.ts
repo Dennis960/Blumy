@@ -3,6 +3,7 @@ import {
   PlantHealthDTO,
   RSSIHistoryEntry,
   SensorConfigurationDTO,
+  SensorCreatedDTO,
   SensorDTO,
   SensorHealthDTO,
   SensorHistoryDTO,
@@ -216,8 +217,18 @@ export default class SensorController {
     return SensorEntity.toDTO(sensorEntity);
   }
 
-  public async create(ownerId: number, config: SensorConfigurationDTO) {
-    const token = crypto.randomBytes(32).toString("hex");
+  private generateToken(): string {
+    let token = 'blumy_';
+    const possibleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < 32; i++) {
+        let randomIndex = crypto.randomInt(0, possibleChars.length);
+        token += possibleChars[randomIndex];
+    }
+    return token;
+  }
+
+  public async create(ownerId: number, config: SensorConfigurationDTO): Promise<SensorCreatedDTO> {
+    const token = this.generateToken();
     const sensorEntityPartial = await SensorEntity.fromDTO(0, config);
     const creatingSensorEntity = {
       ...sensorEntityPartial,
@@ -229,7 +240,8 @@ export default class SensorController {
 
     return {
       token,
-      sensor: SensorEntity.toDTO(sensorEntity),
+      id: sensorEntity.sensorAddress,
+      config: SensorEntity.toDTO(sensorEntity),
     };
   }
 }

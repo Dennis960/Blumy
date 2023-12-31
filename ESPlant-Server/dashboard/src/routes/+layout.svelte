@@ -39,7 +39,7 @@
 				>
 					<span class="navbar-toggler-icon" />
 				</button>
-				<a class="navbar-brand ms-2 ms-lg-0 me-auto" href="./">ES-Plant Dashboard</a>
+				<a class="navbar-brand ms-2 ms-lg-0 me-auto" href={base}>ES-Plant Dashboard</a>
 				<div class="collapse navbar-collapse" id="navbarNav">
 					<ul class="navbar-nav">
 						<li class="nav-item">
