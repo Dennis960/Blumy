@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createQuery } from '@tanstack/svelte-query';
+	import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
 	import { fetchSensor, fetchSensorHistory } from '$lib/api.js';
 	import { goto } from '$app/navigation';
 	import SensorDetailCard from '$lib/components/sensor-detail-card.svelte';
@@ -36,7 +36,7 @@
 	$: historyQuery = createQuery({
 		queryKey: ['sensor-data', data.id, data.startDate, data.endDate],
 		queryFn: () => fetchSensorHistory(data.id, data.startDate, data.endDate),
-		keepPreviousData: true,
+		placeholderData: keepPreviousData,
 		refetchInterval: 15 * 60 * 1000
 	});
 </script>

@@ -74,7 +74,7 @@
 			error = `${e}`;
 			return;
 		}
-		queryClient.invalidateQueries(['sensor', data.id]);
+		queryClient.invalidateQueries({ queryKey: ['sensor', data.id] });
 		goto(`${base}/sensor/${data.id}`);
 	}
 
