@@ -119,7 +119,7 @@ export class FirstSetupScreen extends LitElement {
     render() {
         return html`
             <header>
-                <header-element icon="🌱" title="PlantFi"></header-element>
+                <header-element icon="🌱" title="Blumy"></header-element>
                 <loader-bar-element
                     ?active="${loadingState.state > 0}"
                 ></loader-bar-element>

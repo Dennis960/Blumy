@@ -46,34 +46,36 @@ export class WelcomePage extends BasePage {
 
     render() {
         return html`
-            <title-element>Welcome</title-element>
+            <title-element>Willkommen</title-element>
             <description-element>
-                PlantFi is currently
+                Blumy ist aktuell
+                ${networkState.state.isConnected
+                        ?  "mit dem Internet"
+                        : "vom Internet"}
                 <span
                     class="${networkState.state.isConnected ? "green" : "red"}"
                     >${networkState.state.isConnected
-                        ? "connected"
-                        : "not connected"}</span
-                >
-                to the internet.
+                        ? "verbunden"
+                        : "getrennt"}</span
+                >.
                 ${networkState.state.isConnected &&
                 networkState.state.network?.ssid
                     ? html`
                           <br />
-                          Connected to
+                          Verbunden mit
                           <b>${networkState.state.network?.ssid}</b>.
                       `
                     : html``}
             </description-element>
             <button-nav-element>
                 <button-element
-                    name="Skip Setup"
+                    name="Setup überspringen"
                     @click="${() =>
                         this.dispatchEvent(new CustomEvent("skip"))}"
                     ?secondary="${false}"
                 ></button-element>
                 <button-element
-                    name="Start Setup"
+                    name="Setup beginnen"
                     @click="${this.next}"
                     ?secondary="${true}"
                 ></button-element>

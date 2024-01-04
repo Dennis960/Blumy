@@ -19,7 +19,7 @@ export class WifiSetupPage extends BasePage {
             this.passwordElement.input.value
         );
         if (!res.ok) {
-            this.errorText = "Error, device not responding";
+            this.errorText = "Fehler, Sensor antwortet nicht";
             return;
         }
         // wait 500 ms for the device to connect to the network
@@ -28,7 +28,7 @@ export class WifiSetupPage extends BasePage {
             const wifiStatus = await isEspConnected();
 
             if (wifiStatus == WifiStatus.ERROR) {
-                this.errorText = "Error, device not responding";
+                this.errorText = "Fehler, Sensor antwortet nicht";
             } else if (wifiStatus == WifiStatus.CONNECTED) {
                 networkState.state.isConnected = true;
                 if (
@@ -42,11 +42,11 @@ export class WifiSetupPage extends BasePage {
                 this.next();
                 return;
             } else if (wifiStatus == WifiStatus.CONNECT_FAILED) {
-                this.errorText = "Could not connect to WiFi";
+                this.errorText = "Konnte keine Verbindung zum WLAN herstellen";
             } else if (wifiStatus == WifiStatus.CONNECT_WRONG_PASSWORD) {
-                this.errorText = "Wrong password";
+                this.errorText = "Falsches Passwort";
             } else if (wifiStatus == WifiStatus.NO_SSID_AVAIL) {
-                this.errorText = "The specified SSID cannot be reached";
+                this.errorText = "Die angegebene SSID kann nicht erreicht werden";
             } else {
                 loadingState.state++;;
                 await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -55,7 +55,7 @@ export class WifiSetupPage extends BasePage {
             }
             return;
         }
-        this.errorText = "Could not connect to WiFi";
+        this.errorText = "Konnte keine Verbindung zum WLAN herstellen";
     }
 
     async painted() {
@@ -68,7 +68,7 @@ export class WifiSetupPage extends BasePage {
 
     render() {
         return html`
-            <title-element>Enter WiFi Credentials</title-element>
+            <title-element>WLAN-Zugangsdaten eingeben</title-element>
             <input-element-grid>
                 <input-element
                     id="ssid"
@@ -79,18 +79,18 @@ export class WifiSetupPage extends BasePage {
                 <input-element
                     id="password"
                     type="password"
-                    label="Password"
+                    label="Passwort"
                 ></input-element>
             </input-element-grid>
             <error-text-element text="${this.errorText}"></error-text-element>
             <button-nav-element>
                 <button-element
-                    name="Back"
+                    name="Zurück"
                     @click="${this.back}"
                     ?secondary="${false}"
                 ></button-element>
                 <button-element
-                    name="Connect"
+                    name="Verbinden"
                     @click="${this.connect}"
                     ?secondary="${true}"
                 ></button-element>

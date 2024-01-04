@@ -45,11 +45,11 @@ export class NamePage extends BasePage {
             name = this.generateRandomName();
         }
         if (name.length > 32) {
-            this.errorText = "Name must be between 1 and 32 characters";
+            this.errorText = "Name muss zwischen 1 und 32 Zeichen lang sein";
             return;
         }
         if (typeof id !== "number" || id < 0 || id > Number.MAX_SAFE_INTEGER) {
-            this.errorText = `Sensor id must be a number between 0 and ${Number.MAX_SAFE_INTEGER}`;
+            this.errorText = `Sensor-ID muss eine Zahl zwischen 0 und ${Number.MAX_SAFE_INTEGER} sein`;
             return;
         }
         this.errorText = "";
@@ -62,7 +62,7 @@ export class NamePage extends BasePage {
             !sensorIdResponse.ok ||
             !sleepTimeoutResponse.ok
         ) {
-            this.errorText = "Error, device not responding";
+            this.errorText = "Fehler, Gerät antwortet nicht";
             return;
         }
         this.next();
@@ -85,47 +85,46 @@ export class NamePage extends BasePage {
 
     render() {
         return html`
-            <title-element>Choose a name for your plant</title-element>
+            <title-element>Wähle einen Namen für deine Pflanze</title-element>
             <input-element-grid>
-                <input-element id="name" label="Plant Name">
+                <input-element id="name" label="Name">
                     <button-element
-                        name="Random"
+                        name="Zufällig"
                         @click="${this.generateRandomName}"
                         ?secondary="${false}"
                     ></button-element>
                 </input-element>
-                <input-element id="id" type="number" label="Sensor id">
+                <input-element id="id" type="number" label="Sensor-ID">
                     <button-element
-                        name="Time"
+                        name="Zeit"
                         @click="${this.setIdToDate}"
                         ?secondary="${false}"
                     ></button-element>
                 </input-element>
                 <input-element
                     id="sleepTimeout"
-                    label="Sleep Timeout"
+                    label="Messinterval"
                     initialValue="30 min"
                 >
                 </input-element>
             </input-element-grid>
             <error-text-element text="${this.errorText}"></error-text-element>
             <description-element
-                >If left empty, clicking submit will fill out default
-                values.</description-element
+                >Leere Werte werden beim Speichern durch Standardwerte ersetzt.</description-element
             >
             <button-nav-element>
                 <button-element
-                    name="Back"
+                    name="Zurück"
                     @click="${this.back}"
                     ?secondary="${false}"
                 ></button-element>
                 <button-element
-                    name="Skip"
+                    name="Überspringen"
                     @click="${this.next}"
                     ?secondary="${true}"
                 ></button-element>
                 <button-element
-                    name="Submit"
+                    name="Speichern"
                     @click="${this.submit}"
                     ?secondary="${true}"
                 ></button-element>
