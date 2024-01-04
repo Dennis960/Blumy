@@ -1,7 +1,7 @@
 import { InputElement } from "./input-element";
 import { LitElement, html } from "lit";
 import { customElement, query } from "lit/decorators.js";
-import { MqttApiConfiguration } from "../../api";
+import { MqttCloudConfiguration } from "../../api";
 
 @customElement("mqtt-form-element")
 export class MqttForm extends LitElement {
@@ -13,7 +13,7 @@ export class MqttForm extends LitElement {
     @query("#client-id") clientIdInput: InputElement;
 
     private handleChange() {
-        this.dispatchEvent(new CustomEvent<MqttApiConfiguration>('input', {
+        this.dispatchEvent(new CustomEvent<MqttCloudConfiguration>('input', {
             detail: {
                 type: 'mqtt',
                 server: this.serverInput.input.value,

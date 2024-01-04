@@ -5,13 +5,13 @@ import "./page-elements/collapsible-element";
 import "./page-elements/http-form-element";
 import "./page-elements/mqtt-form-element";
 import "./page-elements/cloud-form-element";
-import { ApiConfiguration, setApiCredentials } from "../api";
+import { CloudConfiguration, setCloudCredentials } from "../api";
 
-@customElement("api-page")
-export class ApiPage extends BasePage {
+@customElement("cloud-page")
+export class CloudPage extends BasePage {
     @state() errorText: string = "";
-    @state() apiConfig: ApiConfiguration;
-    @state() openState: Record<ApiConfiguration['type'], boolean> = {
+    @state() apiConfig: CloudConfiguration;
+    @state() openState: Record<CloudConfiguration['type'], boolean> = {
         'cloud': true,
         'http': false,
         'mqtt': false,
@@ -23,7 +23,7 @@ export class ApiPage extends BasePage {
             return;
         }
 
-        const res = await setApiCredentials(this.apiConfig);
+        const res = await setCloudCredentials(this.apiConfig);
         if (!res.ok) {
             this.errorText = "Fehler, Gerät antwortet nicht";
             return;
@@ -32,7 +32,7 @@ export class ApiPage extends BasePage {
         }
     }
 
-    private handleOpen(target: ApiConfiguration['type']) {
+    private handleOpen(target: CloudConfiguration['type']) {
         this.openState = {
             'cloud': false,
             'http': false,
@@ -41,7 +41,7 @@ export class ApiPage extends BasePage {
         }
     }
 
-    private handleConfigChange(event: CustomEvent<ApiConfiguration>) {
+    private handleConfigChange(event: CustomEvent<CloudConfiguration>) {
         this.apiConfig = event.detail;
     }
 

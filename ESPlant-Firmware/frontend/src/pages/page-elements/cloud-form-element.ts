@@ -1,4 +1,4 @@
-import { CloudApiConfiguration } from "api";
+import { BlumyCloudConfiguration } from "api";
 import { InputElement } from "./input-element";
 import { LitElement, html } from "lit";
 import { customElement, query } from "lit/decorators.js";
@@ -8,7 +8,7 @@ export class CloudFormElement extends LitElement {
     @query("#token") tokenInput: InputElement;
     
     private handleChange() {
-        this.dispatchEvent(new CustomEvent<CloudApiConfiguration>('input-config', {
+        this.dispatchEvent(new CustomEvent<BlumyCloudConfiguration>('input-config', {
             detail: {
                 type: 'cloud',
                 token: this.tokenInput.input.value,
