@@ -28,7 +28,7 @@ export class UpdatePage extends BasePage {
             !this.littlefsElement.input.files[0] &&
             !this.firmwareElement.input.files[0]
         ) {
-            this.errorText = "Please select a file to upload";
+            this.errorText = "Bitte Datei für den Upload auswählen";
             return;
         }
         console.log(this.littlefsElement.input.files[0]);
@@ -46,7 +46,7 @@ export class UpdatePage extends BasePage {
             const res = await updateFs(this.littlefsElement.input.files[0]);
             finished = true;
             if (!res.ok) {
-                this.errorText = "Error, device not responding";
+                this.errorText = "Fehler, Gerät antwortet nicht";
                 return;
             }
             if (!this.errorText) {
@@ -68,7 +68,7 @@ export class UpdatePage extends BasePage {
             );
             finished = true;
             if (!res.ok) {
-                this.errorText = "Error, device not responding";
+                this.errorText = "Fehler, Gerät antwortet nicht";
                 return;
             }
             if (!this.errorText) {
@@ -81,7 +81,7 @@ export class UpdatePage extends BasePage {
 
     render() {
         return html`
-            <title-element>Update Firmware</title-element>
+            <title-element>Firmware aktualisieren</title-element>
             <input-element-grid>
                 <input-element
                     id="littlefs"
@@ -103,17 +103,17 @@ export class UpdatePage extends BasePage {
             <error-text-element text="${this.errorText}"></error-text-element>
             <button-nav-element>
                 <button-element
-                    name="Back"
+                    name="Zurück"
                     @click="${this.back}"
                     ?secondary="${false}"
                 ></button-element>
                 <button-element
-                    name="Skip"
+                    name="Überspringen"
                     @click="${this.next}"
                     ?secondary="${true}"
                 ></button-element>
                 <button-element
-                    name="Upload"
+                    name="Hochladen"
                     @click="${this.upload}"
                     ?secondary="${true}"
                 ></button-element>

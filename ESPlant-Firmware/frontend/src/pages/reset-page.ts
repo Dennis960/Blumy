@@ -10,7 +10,7 @@ export class ResetPage extends BasePage {
     async reset() {
         const res = await resetEsp(ResetFlag.SENSOR_FLAG);
         if (!res.ok) {
-            this.errorText = "Error, device not responding";
+            this.errorText = "Fehler, Gerät antwortet nicht";
             return;
         }
     }
@@ -19,20 +19,20 @@ export class ResetPage extends BasePage {
         return html`
             <title-element>Reset</title-element>
             <description-element>
-                Pressing the reset button sends the sensor into sensor mode. It
-                will connect to the specified WiFi network and send data to the
-                specified MQTT broker. To configure the device again, you will
-                have to reset it again by pressing the reset button.
+                Das Drücken des Neustart-Buttons versetzt das Gerät in den Sensor-Modus.
+                Es wird sich zu dem konfigurierten WLAN verbinden und Daten entsprechend
+                der Einstellungen versenden. Um das Gerät später erneut zu konfigurieren,
+                drücke den Reset-Knopf auf dem Gerät.
             </description-element>
             <error-text-element text="${this.errorText}"></error-text-element>
             <button-nav-element>
                 <button-element
-                    name="Back"
+                    name="Zurück"
                     @click="${this.back}"
                     ?secondary="${false}"
                 ></button-element>
                 <button-element
-                    name="Reset"
+                    name="Neustart"
                     @click="${this.reset}"
                     ?secondary="${true}"
                 ></button-element>

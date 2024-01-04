@@ -1,4 +1,3 @@
-import { loadingState } from '../states';
 import { InputElement } from "./page-elements/input-element";
 import { html } from "lit";
 import { customElement, query, state } from "lit/decorators.js";
@@ -25,7 +24,7 @@ export class MqttPage extends BasePage {
             this.clientIdInput.input.value
         );
         if (!res.ok) {
-            this.errorText = "Error, device not responding";
+            this.errorText = "Fehler, Gerät antwortet nicht";
             return;
         } else {
             this.next();
@@ -34,7 +33,7 @@ export class MqttPage extends BasePage {
 
     render() {
         return html`
-            <title-element>MQTT Configuration (optional)</title-element>
+            <title-element>MQTT-Konfiguration (optional)</title-element>
             <input-element-grid>
                 <input-element
                     id="server"
@@ -49,12 +48,12 @@ export class MqttPage extends BasePage {
                 <input-element
                     id="user"
                     type="text"
-                    label="User"
+                    label="Nutzername"
                 ></input-element>
                 <input-element
                     id="password"
                     type="password"
-                    label="Password"
+                    label="Passwort"
                 ></input-element>
                 <input-element
                     id="topic"
@@ -70,17 +69,17 @@ export class MqttPage extends BasePage {
             <error-text-element text="${this.errorText}"></error-text-element>
             <button-nav-element>
                 <button-element
-                    name="Back"
+                    name="Zurück"
                     @click="${this.back}"
                     ?secondary="${false}"
                 ></button-element>
                 <button-element
-                    name="Skip"
+                    name="Überspringen"
                     @click="${this.next}"
                     ?secondary="${true}"
                 ></button-element>
                 <button-element
-                    name="Submit"
+                    name="Speichern"
                     @click="${this.submit}"
                     ?secondary="${true}"
                 ></button-element>

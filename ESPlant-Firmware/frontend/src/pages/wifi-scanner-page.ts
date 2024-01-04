@@ -14,7 +14,7 @@ export class WifiScannerPage extends BasePage {
     async updateNetworks() {
         const networks = await getNetworks();
         if (networks === undefined || networks === null) {
-            this.errorText = "Error getting networks";
+            this.errorText = "Fehler beim Scannen der Netzwerke";
             return;
         } else {
             this.errorText = "";
@@ -46,8 +46,8 @@ export class WifiScannerPage extends BasePage {
 
     render() {
         return html`
-            <title-element>Select WiFi Network</title-element>
-            <description-element>Available WiFi Networks</description-element>
+            <title-element>Wähle WLAN aus</title-element>
+            <description-element>Verfügbare WLANs</description-element>
             <error-text-element text="${this.errorText}"></error-text-element>
             <wifi-list-element
                 .wifis="${this.networks}"
@@ -55,12 +55,12 @@ export class WifiScannerPage extends BasePage {
             ></wifi-list-element>
             <button-nav-element>
                 <button-element
-                    name="Back"
+                    name="Zurück"
                     @click="${this.back}"
                     ?secondary="${false}"
                 ></button-element>
                 <button-element
-                    name="Enter Manually"
+                    name="Manuelle Eingabe"
                     @click="${this.next}"
                     ?secondary="${true}"
                 ></button-element>

@@ -53,13 +53,10 @@ export class HomeScreen extends LitElement {
 
     render() {
         return html`
-            <header-element icon="🌱" title="PlantFi"></header-element>
+            <header-element icon="🌱" title="Blumy"></header-element>
             <loader-bar-element ?active="${this.loading}"></loader-bar-element>
-            <div class="page">
-                This is the home screen. It is currently under construction.
-            </div>
             <p style="font-size: 1.5rem; font-weight: bold;">
-                Currently reading water value:
+                Zuletzt gelesener Feuchtigkeitswert:
             </p>
             <div style="font-size: 3rem; font-weight: bold;">
                 ${this.sensorValue}
