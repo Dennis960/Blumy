@@ -2,7 +2,7 @@ import { defineMock } from "vite-plugin-mock-dev-server";
 
 export default defineMock(
     {
-        url: "/api/apiSetup",
+        url: "/api/cloudSetup",
         body: "OK",
     }
 );

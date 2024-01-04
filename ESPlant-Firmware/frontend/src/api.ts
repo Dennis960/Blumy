@@ -106,13 +106,13 @@ export async function isEspConnected(): Promise<WifiStatus> {
     return Number(res);
 }
 
-export interface HttpApiConfiguration extends Record<string, string>{
+export interface HttpCloudConfiguration extends Record<string, string>{
     type: 'http'
     url: string
     auth: string
 }
 
-export interface MqttApiConfiguration extends Record<string, string>{
+export interface MqttCloudConfiguration extends Record<string, string>{
     type: 'mqtt'
     server: string,
     port: string,
@@ -122,16 +122,16 @@ export interface MqttApiConfiguration extends Record<string, string>{
     clientId: string
 }
 
-export interface CloudApiConfiguration extends Record<string, string> {
+export interface BlumyCloudConfiguration extends Record<string, string> {
     type: 'cloud'
     token: string
 }
 
-export type ApiConfiguration = HttpApiConfiguration | MqttApiConfiguration | CloudApiConfiguration;
+export type CloudConfiguration = HttpCloudConfiguration | MqttCloudConfiguration | BlumyCloudConfiguration;
 
-export async function setApiCredentials(config: ApiConfiguration) {
+export async function setCloudCredentials(config: CloudConfiguration) {
     const params = new URLSearchParams(config);
-    return await postDataToEsp("/apiSetup", params);
+    return await postDataToEsp("/cloudSetup", params);
 }
 
 export async function setSensorId(id: number) {

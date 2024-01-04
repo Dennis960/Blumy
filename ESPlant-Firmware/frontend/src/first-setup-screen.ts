@@ -4,7 +4,7 @@ import { customElement, state } from "lit/decorators.js";
 import "./elements/dots-stepper-element";
 import "./elements/header-element";
 import "./elements/loader-bar-element";
-import "./pages/api-page";
+import "./pages/cloud-page";
 import "./pages/name-page";
 import "./pages/reset-page";
 import "./pages/update-page";
@@ -82,10 +82,10 @@ export class FirstSetupScreen extends LitElement {
                 @next="${this.next}"
                 @back="${this.back}"
             ></wifi-setup-page>`,
-            html`<api-page
+            html`<cloud-page
                 @next="${this.next}"
                 @back="${this.back}"
-            ></api-page>`,
+            ></cloud-page>`,
             html`<reset-page
                 @back="${this.back}"
             ></reset-page>`,
