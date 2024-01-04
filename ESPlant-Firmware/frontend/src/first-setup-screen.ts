@@ -4,7 +4,7 @@ import { customElement, state } from "lit/decorators.js";
 import "./elements/dots-stepper-element";
 import "./elements/header-element";
 import "./elements/loader-bar-element";
-import "./pages/mqtt-page";
+import "./pages/api-page";
 import "./pages/name-page";
 import "./pages/reset-page";
 import "./pages/update-page";
@@ -82,10 +82,10 @@ export class FirstSetupScreen extends LitElement {
                 @next="${this.next}"
                 @back="${this.back}"
             ></wifi-setup-page>`,
-            html`<mqtt-page
+            html`<api-page
                 @next="${this.next}"
                 @back="${this.back}"
-            ></mqtt-page>`,
+            ></api-page>`,
             html`<reset-page
                 @back="${this.back}"
             ></reset-page>`,

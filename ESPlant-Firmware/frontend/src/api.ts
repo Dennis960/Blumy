@@ -106,22 +106,32 @@ export async function isEspConnected(): Promise<WifiStatus> {
     return Number(res);
 }
 
-export async function setMqttCredentials(
+export interface HttpApiConfiguration extends Record<string, string>{
+    type: 'http'
+    url: string
+    auth: string
+}
+
+export interface MqttApiConfiguration extends Record<string, string>{
+    type: 'mqtt'
     server: string,
     port: string,
     username: string,
     password: string,
     topic: string,
     clientId: string
-) {
-    const params = new URLSearchParams();
-    params.append("server", server);
-    params.append("port", port);
-    params.append("user", username);
-    params.append("password", password);
-    params.append("topic", topic);
-    params.append("clientId", clientId);
-    return await postDataToEsp("/mqttSetup", params);
+}
+
+export interface CloudApiConfiguration extends Record<string, string> {
+    type: 'cloud'
+    token: string
+}
+
+export type ApiConfiguration = HttpApiConfiguration | MqttApiConfiguration | CloudApiConfiguration;
+
+export async function setApiCredentials(config: ApiConfiguration) {
+    const params = new URLSearchParams(config);
+    return await postDataToEsp("/apiSetup", params);
 }
 
 export async function setSensorId(id: number) {

@@ -4,7 +4,7 @@ import { customElement, state } from "lit/decorators.js";
 import "./elements/dots-stepper-element";
 import "./elements/header-element";
 import "./elements/loader-bar-element";
-import "./pages/mqtt-page";
+import "./pages/page-elements/mqtt-form-element";
 import "./pages/name-page";
 import "./pages/update-page";
 import "./pages/welcome-page";

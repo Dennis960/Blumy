@@ -11,6 +11,7 @@ export class InputElementGrid extends LitElement {
                 row-gap: 0.75rem;
                 column-gap: 1rem;
                 align-items: center;
+                margin-top: 0.75rem;
                 margin-bottom: 0.75rem;
             }
         `,
