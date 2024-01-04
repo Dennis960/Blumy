@@ -65,7 +65,6 @@ export class InputElement extends LitElement {
                 <input
                     id="input"
                     type="${this.type}"
-                    placeholder="${this.label}"
                 />
                 <slot></slot>
             </div>
