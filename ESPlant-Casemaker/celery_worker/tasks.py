@@ -34,11 +34,14 @@ def run_generate_case(root: str, project_id: str, version: int):
 
     project_repository = ProjectRepository(root)
     board_settings = project_repository.load_board_settings(project_id, version)
+    case_settings = project_repository.load_case_settings(project_id, version)
+
+    print(case_settings)
 
     casemaker = CasemakerLoader(project_repository.cache_path(project_id))\
             .load_pickle()\
             .generate_board(board_settings)\
-            .generate_case() # TODO case settings
+            .generate_case(case_settings)
 
     # casemaker.add_compartment_door() # (optional) TODO compartment door settings
     # casemaker.add_battery_holder() # (optional) TODO battery holder settings

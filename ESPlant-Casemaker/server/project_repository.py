@@ -5,6 +5,13 @@ import glob
 import pickle
 from werkzeug.datastructures import FileStorage
 from casemaker import settings
+from dataclasses import dataclass
+
+
+@dataclass
+class Settings:
+    board_settings: settings.BoardSettings
+    case_settings: settings.CaseSettings
 
 
 class ProjectRepository:
@@ -63,19 +70,43 @@ class ProjectRepository:
     def export_base(self, project_id: str, version: int) -> str:
         return os.path.join(self._settings_root(project_id, version), "case")
 
-    def _board_settings_path(self, project_id: str, version: int) -> str:
-        return os.path.join(self._settings_root(project_id, version), "board_settings.pkl")
+    def _settings_path(self, project_id: str, version: int) -> str:
+        return os.path.join(self._settings_root(project_id, version), "settings.pkl")
 
-    def store_board_settings(self, project_id: str, version: int, board_settings: settings.BoardSettings):
-        board_settings_path = self._board_settings_path(project_id, version)
-        with open(board_settings_path, "wb") as f:
+    def _store_settings(self, project_id: str, version: int, board_settings: Settings):
+        settings_path = self._settings_path(project_id, version)
+        with open(settings_path, "wb") as f:
             # TODO use JSON or another secure format
             pickle.dump(board_settings, f)
 
-    def load_board_settings(self, project_id: str, version: int) -> settings.BoardSettings:
-        board_settings_path = self._board_settings_path(project_id, version)
-        if not os.path.exists(board_settings_path):
-            return None
+    def _load_settings(self, project_id: str, version: int) -> Settings:
+        settings_path = self._settings_path(project_id, version)
+        if not os.path.exists(settings_path):
+            return Settings(board_settings=None, case_settings=None)
 
-        with open(board_settings_path, "rb") as f:
+        with open(settings_path, "rb") as f:
             return pickle.load(f)
+
+    def increment_version(self, project_id: str, version: int) -> int:
+        # TODO detect and prevent overwriting versions
+        # copy settings to create a new version
+        settings = self._load_settings(project_id, version)
+        new_version = version + 1
+        self._store_settings(project_id, new_version, settings)
+        return new_version
+
+    def store_board_settings(self, project_id: str, version: int, board_settings: settings.BoardSettings):
+        settings = self._load_settings(project_id, version)
+        settings.board_settings = board_settings
+        self._store_settings(project_id, version, settings)
+
+    def load_board_settings(self, project_id: str, version: int) -> settings.BoardSettings:
+        return self._load_settings(project_id, version).board_settings
+
+    def store_case_settings(self, project_id: str, version: int, case_settings: settings.CaseSettings):
+        settings = self._load_settings(project_id, version)
+        settings.case_settings = case_settings
+        self._store_settings(project_id, version, settings)
+
+    def load_case_settings(self, project_id: str, version: int) -> settings.CaseSettings:
+        return self._load_settings(project_id, version).case_settings

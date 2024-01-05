@@ -193,10 +193,12 @@ class CasemakerWithBoard:
         self.shapes_dict = shapes_dict
         self.board = board
 
-    def generate_case(self, case_settings: CaseSettings = CaseSettings()):
+    def generate_case(self, case_settings: CaseSettings = None):
         """
         Generates a case object using information from the board object.
         """
+        if case_settings is None:
+            case_settings = CaseSettings()
         case = Case(self.board, case_settings)
         return CasemakerWithCase(self.board_shape, self.shapes_dict, self.board, case)
 

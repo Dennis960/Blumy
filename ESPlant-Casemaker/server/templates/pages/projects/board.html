@@ -18,7 +18,7 @@
 
 <div class="editor">
     <div
-        id="container"
+        id="board-renderer"
         class="editor__preview position-relative"
         hx-trigger="loaded"
         hx-target="#settings"
@@ -35,31 +35,13 @@
     ></div>
 </div>
 
-<style>
-    #container canvas {
-        width: 100%;
-        height: 100%;
-    }
-
-    .editor {
-        height: calc(100vh - 56px);
-        width: 100vw;
-        display: grid;
-        grid-template-columns: 1fr 500px;
-        column-gap: 1rem;
-    }
-
-    .editor__settings {
-        overflow-y: auto;
-    }
-</style>
 {% endblock %}
 
 {% block js %}
 <script type="module">
 import BoardRenderer from '~/board-renderer'
 
-const container = document.getElementById('container');
+const container = document.getElementById('board-renderer');
 
 container.addEventListener('component-click', event => {
     const query = new URLSearchParams({
