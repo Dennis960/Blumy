@@ -2,9 +2,6 @@
 
 {% include "partials/editor_settings_nav.html" %}
 
-{% if part_name is none %}
-<p>Click on a part to edit its settings</p>
-{% else %}
 <form
     hx-post="{{ request.full_path }}"
     class="container"
@@ -27,4 +24,3 @@
         <button type="submit" class="offset-9 col-3 btn btn-secondary">Save</button>
     </div>
 </form>
-{% endif %}
