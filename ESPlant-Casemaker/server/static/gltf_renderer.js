@@ -41,7 +41,7 @@ export default class BoardRenderer {
 
         this.scene.background = new THREE.Color(0xffffff);
 
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
 
         /**
          * @type {Component[]}
