@@ -92,7 +92,9 @@ def board_settings_form(project_id: str):
     # search and default-select PCB part
     pcb_part_names = [pn for pn in part_names if pn.endswith("_PCB")]
     form.pcb_part_name.default = pcb_part_names[0] if pcb_part_names else None
-    form.process() # apply default
+    # set a default name
+    form.name.default = pcb_part_names[0] if pcb_part_names else ""
+    form.process() # apply defaults
 
     # map form to settings entity
     if form.validate_on_submit():
@@ -138,18 +140,21 @@ def part_settings_form(project_id: str):
     # TODO escape part_name as regex
     part_name = request.args.get("part")
 
+    if part_name is None:
+        return render_template("./partials/settings_error.html", message="Click on a part to edit its settings")
+
     project_repository = ProjectRepository(upload_root())
     board_settings = project_repository.load_board_settings(project_id, version)
 
     if board_settings is None:
-        return "Error: Configure board first"
+        return render_template("./partials/settings_error.html", message="Save board settings first")
 
     board = CasemakerLoader(project_repository.cache_path(project_id))\
         .load_pickle()
     valid_part_names = list(board.shapes_dict.keys())
 
-    if part_name is not None and not part_name in valid_part_names:
-        return "Error: part " + part_name + " is not in this board"
+    if not part_name in valid_part_names:
+        return render_template("./partials/settings_error.html", message="Part " + part_name + " is not in this board")
 
     form = settings_form.PartSettingForm()
 

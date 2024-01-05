@@ -35,6 +35,7 @@ class CaseSettingsForm(FlaskForm):
                                 default='BOTTOM')
 
 class BoardSettingsForm(FlaskForm):
+    name = StringField('Name')
     pcb_tolerance_x = DecimalField('PCB Tolerance X', default=1.5)
     pcb_tolerance_y = DecimalField('PCB Tolerance Y', default=1.5)
     pcb_tolerance_z = DecimalField('PCB Tolerance Z', default=0.5)
