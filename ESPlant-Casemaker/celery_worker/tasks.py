@@ -46,7 +46,7 @@ def run_generate_case(root: str, project_id: str, version: int):
     assembly = cq.Assembly(
         casemaker.case.case_cq_object, name="case")
 
-    export_base = project_repository.export_root(project_id, version)
+    export_base = project_repository.export_base(project_id, version)
     assembly.save(export_base + ".glb", "GLTF")
     assembly.save(export_base + ".step", "STEP")
     assembly.save(export_base + ".stl", "STL")

@@ -60,8 +60,8 @@ class ProjectRepository:
     def _board_cache_path(self, project_id: str) -> str:
         return os.path.join(self.project_root(project_id), "board.pkl")
 
-    def export_root(self, project_id: str, version: int) -> str:
-        return self._settings_root(project_id, version)
+    def export_base(self, project_id: str, version: int) -> str:
+        return os.path.join(self._settings_root(project_id, version), "case")
 
     def _board_settings_path(self, project_id: str, version: int) -> str:
         return os.path.join(self._settings_root(project_id, version), "board_settings.pkl")

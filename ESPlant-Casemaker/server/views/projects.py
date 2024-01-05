@@ -270,7 +270,7 @@ def case(project_id: str, format: str):
         return "Invalid file format", 400
 
     project_repository = ProjectRepository(upload_root())
-    file_path = os.path.join(project_repository.export_root(project_id, get_version()), "board." + format)
+    file_path = project_repository.export_base(project_id, get_version()) + "." + format
 
     if not os.path.exists(file_path):
         return "Does not exist on disk", 404
