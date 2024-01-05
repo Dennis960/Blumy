@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, DecimalField, BooleanField, SelectField, IntegerField, SelectMultipleField
-from wtforms.validators import DataRequired, Optional
+from wtforms.validators import InputRequired, Optional
 
 class SelectPCBPartField(SelectField):
     pass
@@ -13,16 +13,16 @@ class PartSettingForm(FlaskForm):
                                 choices=['>X', '>Y', 
                                          '>Z', '<X', 
                                          '<Y', '<Z'],
-                                validators=[DataRequired()])
-    length = StringField('Length', validators=[DataRequired()])
-    create_hole = BooleanField('Create a hole', default=False)
-    offset_x = DecimalField('Offset X', validators=[Optional()])
-    offset_y = DecimalField('Offset Y', validators=[Optional()])
-    offset_z = DecimalField('Offset Z', validators=[Optional()])
-    width = DecimalField('Width', default=None, validators=[Optional()])
-    width_auto = BooleanField('Auto width', default=False)
-    height = DecimalField('Height', default=None, validators=[Optional()])
-    height_auto = BooleanField('Auto height', default=False)
+                                validators=[InputRequired()])
+    length = DecimalField('Length', validators=[Optional()])
+    create_hole = BooleanField('Ignore length, create a hole', validators=[InputRequired()], default=True)
+    offset_x = DecimalField('Offset X', validators=[InputRequired()], default=0)
+    offset_y = DecimalField('Offset Y', validators=[InputRequired()], default=0)
+    offset_z = DecimalField('Offset Z', validators=[InputRequired()], default=0)
+    width = DecimalField('Width', validators=[Optional()], default=None)
+    width_auto = BooleanField('Auto width', validators=[InputRequired()], default=True)
+    height = DecimalField('Height', validators=[Optional()], default=None)
+    height_auto = BooleanField('Auto height', validators=[InputRequired()], default=True)
 
 class CaseSettingsForm(FlaskForm):
     case_wall_thickness = DecimalField('Case Wall Thickness', default=1.5)
@@ -35,14 +35,14 @@ class CaseSettingsForm(FlaskForm):
                                 default='BOTTOM')
 
 class BoardSettingsForm(FlaskForm):
-    name = StringField('Name')
-    pcb_tolerance_x = DecimalField('PCB Tolerance X', default=1.5)
-    pcb_tolerance_y = DecimalField('PCB Tolerance Y', default=1.5)
-    pcb_tolerance_z = DecimalField('PCB Tolerance Z', default=0.5)
-    part_tolerance = DecimalField('Part Tolerance', default=1)
-    pcb_part_name = SelectPCBPartField('PCB Part Name', choices=[], default="PCB")
-    exclude = SelectMultiplePCBPartField('Exclude', choices=[])
-    parts_without_tolerances = SelectMultiplePCBPartField('Parts Without Tolerances', choices=[])
+    name = StringField('Name', validators=[InputRequired()])
+    pcb_tolerance_x = DecimalField('PCB Tolerance X', validators=[InputRequired()], default=1.5)
+    pcb_tolerance_y = DecimalField('PCB Tolerance Y', validators=[InputRequired()], default=1.5)
+    pcb_tolerance_z = DecimalField('PCB Tolerance Z', validators=[InputRequired()], default=0.5)
+    part_tolerance = DecimalField('Part Tolerance', validators=[InputRequired()], default=1)
+    pcb_part_name = SelectPCBPartField('PCB Part Name', validators=[InputRequired()], choices=[], default="PCB")
+    exclude = SelectMultiplePCBPartField('Exclude', choices=[], default=[])
+    parts_without_tolerances = SelectMultiplePCBPartField('Parts Without Tolerances', choices=[], default=[])
 
 class MountingHoleSettingsForm(FlaskForm):
     position = StringField('Position', default="(0, 0, 0)")
@@ -80,8 +80,8 @@ class CompartmentDoorSettingsForm(FlaskForm):
     compartment_door_tolerance = DecimalField('Compartment Door Tolerance', default=0.5)
 
 class BatteryForm(FlaskForm):
-    diameter = DecimalField('Diameter', validators=[DataRequired()])
-    length = DecimalField('Length', validators=[DataRequired()])
+    diameter = DecimalField('Diameter', validators=[InputRequired()])
+    length = DecimalField('Length', validators=[InputRequired()])
 
 class BatteryHolderSettingsForm(FlaskForm):
     battery = StringField('Battery', default="AAA")

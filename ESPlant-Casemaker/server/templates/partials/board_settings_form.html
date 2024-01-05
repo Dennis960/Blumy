@@ -17,7 +17,16 @@
     {{ render_field(form.exclude) }}
     {{ render_field(form.parts_without_tolerances) }}
   
-    <div class="row">
+    <div class="row mb-3">
         <button type="submit" class="offset-9 col-3 btn btn-secondary">Save</button>
     </div>
+
+    {% if request.method == 'POST' and form.errors.items() | length == 0 %}
+        <div id="save-notification" class="row">
+            <div class="alert alert-success" role="alert">Saved successfully</div>
+            <script type="module">
+                setTimeout(() => bootstrap.Alert.getOrCreateInstance('#save-notification').close(), 5000);
+            </script>
+        </div>
+    {% endif %}
 </form>

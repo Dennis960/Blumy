@@ -272,6 +272,10 @@ export default class BoardRenderer {
 
         const component = this.getRaycastComponent(mousePosition);
         if (component !== undefined) {
+            this.container.dispatchEvent(new CustomEvent('component-click', {
+                detail: component,
+            }));
+
             if (this.areComponentsSelectable) {
                 if (!component.selected && component.selectable) {
                     component.selected = true;

@@ -7,7 +7,8 @@
         <a class="navbar-brand" href="#">Preview your Board</a>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <form action="{{ url_for('projects.generate_case', **request.view_args) }}" method="POST">
+                <form action="{{ url_for('projects.generate_case', version=version, **request.view_args) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button class="btn btn-primary" type="submit">Generate Case</button>
                 </form>
             </li>
@@ -21,7 +22,7 @@
         class="editor__preview position-relative"
         hx-trigger="loaded"
         hx-target="#settings"
-        hx-get="{{ url_for('projects.board_settings_form', **request.view_args) }}"
+        hx-get="{{ url_for('projects.board_settings_form', version=version, **request.view_args) }}"
     >
         <div class="position-absolute top-50 start-50 translate-middle">
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
@@ -60,11 +61,11 @@ import BoardRenderer from '~/board-renderer'
 
 const container = document.getElementById('container');
 
-container.addEventListener('component-select', event => {
+container.addEventListener('component-click', event => {
     const query = new URLSearchParams({
         part: event.detail.name,
     });
-    htmx.ajax('GET', `part-settings?${query.toString()}`, '#settings');
+    htmx.ajax('GET', `{{ url_for('projects.part_settings_form', version=version, **request.view_args) }}&${query.toString()}`, '#settings');
 });
 
 const boardRenderer = new BoardRenderer(container);
@@ -85,7 +86,7 @@ boardRenderer.loadModel('{{ glb_path }}', () => {
     console.log('model loading progress', progress);
 });
 // boardRenderer.areComponentsHighlightable = true;
-// boardRenderer.areComponentsSelectable = true;
+boardRenderer.areComponentsSelectable = false;
 // boardRenderer.centerCamera();
 </script>
 {% endblock %}

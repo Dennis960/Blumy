@@ -3,7 +3,9 @@ from celery import Celery
 from celery import Task
 from flask import Flask
 from flask import render_template
+from flask_wtf.csrf import CSRFProtect
 
+csrf = CSRFProtect()
 
 def create_app() -> Flask:
     app = Flask(__name__)
@@ -23,6 +25,8 @@ def create_app() -> Flask:
         os.makedirs(app.config['UPLOAD_ROOT'])
 
     celery_init_app(app)
+
+    csrf.init_app(app)
 
     @app.route("/")
     def index() -> str:

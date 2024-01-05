@@ -104,6 +104,7 @@ def board_settings_form(project_id: str):
             form.pcb_tolerance_z.data,
         )
         board_settings = settings.BoardSettings(
+            name=form.name.data,
             pcb_tolerance=pcb_tolerance,
             part_tolerance=form.part_tolerance.data,
             part_settings=board_settings.part_settings if board_settings is not None else [],
@@ -117,6 +118,7 @@ def board_settings_form(project_id: str):
 
     # map entity to form (if exists)
     if not form.is_submitted() and board_settings is not None:
+        form.name.data = board_settings.name
         form.pcb_tolerance_x.data = board_settings.pcb_tolerance.x
         form.pcb_tolerance_y.data = board_settings.pcb_tolerance.y
         form.pcb_tolerance_z.data = board_settings.pcb_tolerance.z
@@ -128,6 +130,7 @@ def board_settings_form(project_id: str):
 
     return render_template("./partials/board_settings_form.html",
         project_id=project_id,
+        version=version,
         form=form,
     )
 
@@ -137,24 +140,33 @@ def part_settings_form(project_id: str):
     # TODO validate that project and board exist
     version = get_version()
 
-    # TODO escape part_name as regex
-    part_name = request.args.get("part")
-
-    if part_name is None:
-        return render_template("./partials/settings_error.html", message="Click on a part to edit its settings")
-
     project_repository = ProjectRepository(upload_root())
     board_settings = project_repository.load_board_settings(project_id, version)
 
     if board_settings is None:
-        return render_template("./partials/settings_error.html", message="Save board settings first")
+        return render_template("./partials/settings_error.html",
+            message="Save board settings first",
+            version=version
+        )
+
+    # TODO escape part_name as regex
+    part_name = request.args.get("part")
+
+    if part_name is None:
+        return render_template("./partials/settings_error.html",
+            message="Click on a part to edit its settings",
+            version=version,
+        )
 
     board = CasemakerLoader(project_repository.cache_path(project_id))\
         .load_pickle()
     valid_part_names = list(board.shapes_dict.keys())
 
     if not part_name in valid_part_names:
-        return render_template("./partials/settings_error.html", message="Part " + part_name + " is not in this board")
+        return render_template("./partials/settings_error.html",
+            message="Part " + part_name + " is not in this board",
+            version=version
+        )
 
     form = settings_form.PartSettingForm()
 
@@ -193,21 +205,20 @@ def part_settings_form(project_id: str):
         form.top_direction.data = part_setting.top_direction
         form.length.data = part_setting.length
         form.create_hole.data = part_setting.length == "Hole"
-        form.offset_x.data = part_setting.top_direction
-        form.offset_y.data = part_setting.top_direction
-        form.offset_z.data = part_setting.top_direction
+        form.offset_x.data = part_setting.offset_x
+        form.offset_y.data = part_setting.offset_y
+        form.offset_z.data = part_setting.offset_z
         form.width_auto.data = part_setting.width == "Auto"
-        form.width.data = None if form.width_auto.data else part_setting.width
+        form.width.data = part_setting.width if part_setting.width != "Auto" else None
         form.height_auto.data = part_setting.height == "Auto"
-        form.height.data = None if form.height_auto.data else part_setting.height
-        form.pcb_tolerance_x.data = board_settings.pcb_tolerance.x
-        form.pcb_tolerance_y.data = board_settings.pcb_tolerance.y
-        form.pcb_tolerance_z.data = board_settings.pcb_tolerance.z
+        form.height.data = part_setting.height if part_setting.height != "Auto" else None
+
         print("Loaded part {} settings in project {} version {}".format(part_name, project_id, version))
 
     return render_template("./partials/part_settings_form.html",
         project_id=project_id,
         part_name=part_name,
+        version=version,
         form=form,
     )
 
