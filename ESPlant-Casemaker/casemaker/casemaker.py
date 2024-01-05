@@ -14,7 +14,12 @@ from kicad_pcb_analyzer import find_missing_models_in_kicad_pcb, update_kicad_pc
 from serializer import register
 register()
 
-default_name_replace_map = {".": "_", "(": "_", ")": "_"}
+default_name_replace_map = {
+    ".": "_",
+    "(": "_",
+    ")": "_"
+}
+
 
 class CasemakerLoader:
     """
