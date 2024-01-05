@@ -14,10 +14,7 @@ def upload_root():
     return current_app.config['UPLOAD_ROOT']
 
 def get_version():
-    return int(request.args.get("version", 1))
-
-def incremented_version():
-    return int(request.args.get("version", 0)) + 1
+    return int(request.args.get("version", 0))
 
 
 bp = Blueprint("projects", __name__, url_prefix="/projects")
@@ -48,11 +45,10 @@ def upload_board():
 
     tasks.run_convert.delay(upload_root(), project_id)
 
-    version = incremented_version()
     return redirect(url_for(
         "projects.view_board",
         project_id=project_id,
-        version=version
+        version=0
     ))
 
 
@@ -225,9 +221,79 @@ def part_settings_form(project_id: str):
 
 @bp.route("/<project_id>/case", methods=["POST"])
 def generate_case(project_id: str):
-    version = get_version()
+    project_repository = ProjectRepository(upload_root())
+    version = project_repository.increment_version(project_id, get_version())
     tasks.run_generate_case.delay(upload_root(), project_id, version)
     return redirect(url_for("projects.view_case", project_id=project_id, version=version))
+
+
+@bp.route("/<project_id>/case-settings", methods=['GET', 'POST'])
+def case_settings_form(project_id: str):
+    # TODO validate that project and board exist
+    version = get_version()
+
+    form = settings_form.CaseSettingsForm()
+
+    project_repository = ProjectRepository(upload_root())
+    case_settings = project_repository.load_case_settings(project_id, version)
+
+    # map form to settings entity
+    if form.validate_on_submit():
+        pcb_slot_settings = settings.PcbSlotSettings(
+            side=settings.SIDE[form.pcb_slot_side.data],
+            should_include_components=form.pcb_should_include_components.data,
+            use_tolerance=form.pcb_use_tolerance.data
+        )
+
+        case_settings = settings.CaseSettings(
+            case_wall_thickness=form.case_wall_thickness.data,
+            case_floor_pad=form.case_floor_pad.data,
+            case_dimension=(
+                "Auto" if form.case_dimension_x_auto.data else form.case_dimension_x.data,
+                "Auto" if form.case_dimension_y_auto.data else form.case_dimension_y.data,
+                "Auto" if form.case_dimension_z_auto.data else form.case_dimension_z.data
+            ),
+            case_offset=(
+                "Positive" if form.case_offset_x_positive.data else "Negative" if form.case_offset_x_negative.data else form.case_offset_x.data,
+                "Positive" if form.case_offset_y_positive.data else "Negative" if form.case_offset_y_negative.data else form.case_offset_y.data,
+                "Positive" if form.case_offset_z_positive.data else "Negative" if form.case_offset_z_negative.data else form.case_offset_z.data
+            ),
+            pcb_slot_settings=pcb_slot_settings
+        )
+
+        project_repository.store_case_settings(project_id, version, case_settings)
+        print("Stored case settings in project {} version {}".format(project_id, version))
+
+    # map entity to form (if exists)
+    if not form.is_submitted() and case_settings is not None:
+        form.case_wall_thickness.data = case_settings.case_wall_thickness
+        form.case_floor_pad.data = case_settings.case_floor_pad
+        form.case_dimension_x.data = case_settings.case_dimension[0] if case_settings.case_dimension[0] != "Auto" else None
+        form.case_dimension_x_auto.data = case_settings.case_dimension[0] == "Auto"
+        form.case_dimension_y.data = case_settings.case_dimension[1] if case_settings.case_dimension[1] != "Auto" else None
+        form.case_dimension_y_auto.data = case_settings.case_dimension[1] == "Auto"
+        form.case_dimension_z.data = case_settings.case_dimension[2] if case_settings.case_dimension[2] != "Auto" else None
+        form.case_dimension_z_auto.data = case_settings.case_dimension[2] == "Auto"
+        form.case_offset_x.data = case_settings.case_offset[0] if case_settings.case_offset[0] != "Positive" and case_settings.case_offset[0] != "Negative" else None
+        form.case_offset_x_positive.data = case_settings.case_offset[0] == "Positive"
+        form.case_offset_x_negative.data = case_settings.case_offset[0] == "Negative"
+        form.case_offset_y.data = case_settings.case_offset[1] if case_settings.case_offset[1] != "Positive" and case_settings.case_offset[1] != "Negative" else None
+        form.case_offset_y_positive.data = case_settings.case_offset[1] == "Positive"
+        form.case_offset_y_negative.data = case_settings.case_offset[1] == "Negative"
+        form.case_offset_z.data = case_settings.case_offset[2] if case_settings.case_offset[2] != "Positive" and case_settings.case_offset[2] != "Negative" else None
+        form.case_offset_z_positive.data = case_settings.case_offset[2] == "Positive"
+        form.case_offset_z_negative.data = case_settings.case_offset[2] == "Negative"
+        form.pcb_slot_side.data = case_settings.pcb_slot_settings.side
+        form.pcb_should_include_components.data = case_settings.pcb_slot_settings.should_include_components
+        form.pcb_use_tolerance.data = case_settings.pcb_slot_settings.use_tolerance
+
+        print("Loaded case settings in project {} version {}".format(project_id, version))
+
+    return render_template("./partials/case_settings_form.html",
+        project_id=project_id,
+        version=version,
+        form=form,
+    )
 
 
 @bp.route("/<project_id>/case")
@@ -255,6 +321,7 @@ def view_download(project_id: str):
 
 @bp.route("/<project_id>/board.glb")
 def board_glb(project_id: str):
+    # TODO BoardRenderer sometimes throws CONTENT_LENGTH_MISMATCH, probably when the file gets served while still being written
     project_repository = ProjectRepository(upload_root())
     file_path = os.path.join(project_repository.cache_path(project_id), "board.glb")
 

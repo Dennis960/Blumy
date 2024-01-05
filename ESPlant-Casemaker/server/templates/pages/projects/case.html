@@ -1,16 +1,23 @@
 {% extends 'partials/base.html' %}
-{% block title %}Case Generator - Preview{% endblock %}
+{% block title %}Case Generator - Bottom Case Preview{% endblock %}
 
 {% block content %}
 <nav class="navbar navbar-expand-sm">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Preview your Case</a>
+        <a class="navbar-brand" href="#">Preview your Bottom Case</a>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item me-3">
                 <a href="{{ url_for('projects.view_board', project_id=project_id, version=version) }}" class="btn btn-secondary">Back</a>
             </li>
+            <li class="nav-item me-3">
+                <form action="{{ url_for('projects.generate_case', version=version, **request.view_args) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button class="btn btn-primary" type="submit">Regenerate</button>
+                </form>
+            </li>
             <li class="nav-item">
                 <form action="{{ url_for('projects.confirm', project_id=project_id, version=version) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button class="btn btn-primary" type="submit">Finish</button>
                 </form>
             </li>
@@ -18,25 +25,39 @@
     </div>
 </nav>
 
-<div id="container"></div>
-
-<style>
-    #container {
-        height: calc(100vh - 56px);
-    }
-</style>
+<div class="editor">
+    <div
+        id="board-renderer"
+        class="editor__preview position-relative"
+        hx-trigger="loaded"
+        hx-target="#settings"
+        hx-get="{{ url_for('projects.case_settings_form', version=version, **request.view_args) }}"
+    >
+        <div class="position-absolute top-50 start-50 translate-middle">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
+        </div>
+    </div>
+    <div
+        id="settings"
+        class="editor__settings px-3 py-2"
+        hx-target="#settings"
+    ></div>
+</div>
 {% endblock %}
 
 {% block js %}
 <script type="module">
 import BoardRenderer from '~/board-renderer'
 
-const container = document.getElementById('container');
+const container = document.getElementById('board-renderer');
 
 const boardRenderer = new BoardRenderer(container);
 
 boardRenderer.loadModel('{{ glb_path }}', () => {
     console.log('model loaded');
+
+    container.dispatchEvent(new CustomEvent('loaded'));
+
     const pcb = boardRenderer.components.find((component) => component.name.includes("_PCB"))
     if (pcb !== undefined) {
         pcb.setColor(0x004e00);
@@ -46,7 +67,7 @@ boardRenderer.loadModel('{{ glb_path }}', () => {
 }, (progress) => {
     console.log('model loading progress', progress);
 });
- boardRenderer.areComponentsHighlightable = false;
- boardRenderer.areComponentsSelectable = false;
+boardRenderer.areComponentsHighlightable = false;
+boardRenderer.areComponentsSelectable = false;
 </script>
 {% endblock %}

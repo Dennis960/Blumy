@@ -15,24 +15,39 @@ class PartSettingForm(FlaskForm):
                                          '<Y', '<Z'],
                                 validators=[InputRequired()])
     length = DecimalField('Length', validators=[Optional()])
-    create_hole = BooleanField('Ignore length, create a hole', validators=[InputRequired()], default=True)
+    create_hole = BooleanField('Ignore length, create a hole', default=True)
     offset_x = DecimalField('Offset X', validators=[InputRequired()], default=0)
     offset_y = DecimalField('Offset Y', validators=[InputRequired()], default=0)
     offset_z = DecimalField('Offset Z', validators=[InputRequired()], default=0)
     width = DecimalField('Width', validators=[Optional()], default=None)
-    width_auto = BooleanField('Auto width', validators=[InputRequired()], default=True)
+    width_auto = BooleanField('Auto width', default=True) # TODO enforce that either auto=True or the other value is set
     height = DecimalField('Height', validators=[Optional()], default=None)
-    height_auto = BooleanField('Auto height', validators=[InputRequired()], default=True)
+    height_auto = BooleanField('Auto height', default=True)
 
 class CaseSettingsForm(FlaskForm):
-    case_wall_thickness = DecimalField('Case Wall Thickness', default=1.5)
-    case_floor_pad = DecimalField('Case Floor Pad', default=0)
-    case_dimension = StringField('Case Dimension', default="(Auto, Auto, Auto)")
-    case_offset = StringField('Case Offset', default="(0, 0, 0)")
-    should_cut_pcb_slot = BooleanField('Should Cut PCB Slot', default=True)
+    case_wall_thickness = DecimalField('Wall Thickness', validators=[InputRequired()], default=1.5)
+    case_floor_pad = DecimalField('Floor Pad', validators=[InputRequired()], default=0)
+    case_dimension_x = DecimalField('Dimension X', validators=[Optional()], default=None)
+    case_dimension_x_auto = BooleanField('Auto Dimension X', default=True)
+    case_dimension_y = DecimalField('Dimension Y', validators=[Optional()], default=None)
+    case_dimension_y_auto = BooleanField('Auto Dimension Y', default=True)
+    case_dimension_z = DecimalField('Dimension Z', validators=[Optional()], default=None)
+    case_dimension_z_auto = BooleanField('Auto Dimension Z', default=True)
+    case_offset_x = DecimalField('Offset X', validators=[Optional()], default=0)
+    case_offset_x_positive = BooleanField('Align to parts in +X', default=False) # TODO validation
+    case_offset_x_negative = BooleanField('Align to parts in -X', default=False)
+    case_offset_y = DecimalField('Offset Y', validators=[Optional()], default=0)
+    case_offset_y_positive = BooleanField('Align to parts in +Y', default=False)
+    case_offset_y_negative = BooleanField('Align to parts in -Y', default=False)
+    case_offset_z = DecimalField('Offset Z', validators=[Optional()], default=0)
+    case_offset_z_positive = BooleanField('Align to parts in +Z', default=False)
+    case_offset_z_negative = BooleanField('Align to parts in -Z', default=False)
     pcb_slot_side = SelectField('PCB Slot Side', 
-                                choices=[('top', 'TOP'), ('bottom', 'BOTTOM')],
+                                choices=['TOP', 'BOTTOM'],
+                                validators=[InputRequired()],
                                 default='BOTTOM')
+    pcb_should_include_components = BooleanField('Include components of PCB', default=True)
+    pcb_use_tolerance = BooleanField('Use tolerance for PCB', default=True)
 
 class BoardSettingsForm(FlaskForm):
     name = StringField('Name', validators=[InputRequired()])

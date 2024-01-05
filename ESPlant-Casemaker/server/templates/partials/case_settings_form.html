@@ -1,0 +1,42 @@
+{% from "partials/render_field.html" import render_field %}
+
+<form
+    hx-post="{{ request.full_path }}"
+    class="container"
+>
+    {{ form.hidden_tag() }}
+  
+    {{ render_field(form.case_wall_thickness) }}
+    {{ render_field(form.case_floor_pad) }}
+    {{ render_field(form.case_dimension_x) }}
+    {{ render_field(form.case_dimension_x_auto) }}
+    {{ render_field(form.case_dimension_y) }}
+    {{ render_field(form.case_dimension_y_auto) }}
+    {{ render_field(form.case_dimension_z) }}
+    {{ render_field(form.case_dimension_z_auto) }}
+    {{ render_field(form.case_offset_x) }}
+    {{ render_field(form.case_offset_x_positive) }}
+    {{ render_field(form.case_offset_x_negative) }}
+    {{ render_field(form.case_offset_y) }}
+    {{ render_field(form.case_offset_y_positive) }}
+    {{ render_field(form.case_offset_y_negative) }}
+    {{ render_field(form.case_offset_z) }}
+    {{ render_field(form.case_offset_z_positive) }}
+    {{ render_field(form.case_offset_z_negative) }}
+    {{ render_field(form.pcb_slot_side) }}
+    {{ render_field(form.pcb_should_include_components) }}
+    {{ render_field(form.pcb_use_tolerance) }}
+  
+    <div class="row mb-3">
+        <button type="submit" class="offset-9 col-3 btn btn-secondary">Save</button>
+    </div>
+
+    {% if request.method == 'POST' and form.errors.items() | length == 0 %}
+        <div id="save-notification" class="row">
+            <div class="alert alert-success" role="alert">Saved successfully</div>
+            <script type="module">
+                setTimeout(() => bootstrap.Alert.getOrCreateInstance('#save-notification').close(), 5000);
+            </script>
+        </div>
+    {% endif %}
+</form>
