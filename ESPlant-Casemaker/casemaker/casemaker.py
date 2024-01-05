@@ -14,6 +14,7 @@ from kicad_pcb_analyzer import find_missing_models_in_kicad_pcb, update_kicad_pc
 from serializer import register
 register()
 
+default_name_replace_map = {".": "_", "(": "_", ")": "_"}
 
 class CasemakerLoader:
     """
@@ -23,7 +24,7 @@ class CasemakerLoader:
     def __init__(self, cache_directory: str = "parts"):
         self.cache_dir = cache_directory
 
-    def load_kicad_pcb(self, kicad_pcb_path: str, step_file: str = "board.step", name_replace_map: dict[str, str] = {".": "_"}):
+    def load_kicad_pcb(self, kicad_pcb_path: str, step_file: str = "board.step", name_replace_map: dict[str, str] = default_name_replace_map):
         """
         Loads the kicad_pcb file and creates a Casemaker object from it.\n
         Note: This function will skip all step files that are not in the default kicad 3d model directory.
@@ -38,7 +39,7 @@ class CasemakerLoader:
                                     )
         return Casemaker(board_shape, shapes_dict, self.cache_dir)
 
-    def load_step_file(self, step_file: str = "board.step", name_replace_map: dict[str, str] = {".": "_"}):
+    def load_step_file(self, step_file: str = "board.step", name_replace_map: dict[str, str] = default_name_replace_map):
         """
         Loads the step file and creates a Casemaker object from it.
 
