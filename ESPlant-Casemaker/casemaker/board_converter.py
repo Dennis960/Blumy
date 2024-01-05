@@ -18,7 +18,7 @@ register()
 
 class BoardConverter:
     # TODO add ":" to name replace map
-    def __init__(self, cache_dir="parts/", name_replace_map: dict[str, str] = {".", "_"}):
+    def __init__(self, cache_dir="parts/", name_replace_map: dict[str, str] = {}):
         """
         :param cache_dir: Path to the cache directory where the board is saved as step file
         """
