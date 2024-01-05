@@ -8,6 +8,7 @@
             <a class="navbar-brand" href="#">Upload PCB</a>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button type="submit" class="btn btn-primary">Upload</button>
                 </li>
             </ul>

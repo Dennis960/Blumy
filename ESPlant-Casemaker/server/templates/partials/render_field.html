@@ -17,7 +17,7 @@
     {% endif %}
 
     {% if field.errors %}
-    <div class="col-12 alert alert-danger">
+    <div class="mt-2 p-2 offset-4 col-8 alert alert-danger" role="alert">
         {% for error in field.errors %}
         <span>{{ error }}</span>
         {% endfor %}
