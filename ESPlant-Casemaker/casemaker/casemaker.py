@@ -358,11 +358,11 @@ if __name__ == "__main__":
     #              .save_step_file()
     #              )
 
-    if not os.path.exists("parts/board.pickle"):
+    if not os.path.exists("/workspaces/ESPlant/ESPlant-Casemaker/casemaker/parts/board.pickle"):
         CasemakerLoader().load_kicad_pcb(
-            "ESPlant-Board/ESPlant-Board.kicad_pcb").save_pickle()
+            "/workspaces/ESPlant/ESPlant-Board/ESPlant-Board.kicad_pcb").save_pickle()
 
-    casemaker = (CasemakerLoader()
+    casemaker = (CasemakerLoader(cache_directory="/workspaces/ESPlant/ESPlant-Casemaker/casemaker/parts")
                  .load_pickle("board.pickle")
                  # .load_kicad_pcb("ESPlant-Board/ESPlant-Board.kicad_pcb")
                  # .load_step_file("board.step")
