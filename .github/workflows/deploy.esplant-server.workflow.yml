@@ -5,14 +5,12 @@ on:
       - main
     paths:
       - "ESPlant-Server/**"
-      - "ESPlant-Pages/**"
       - ".github/workflows/deploy.esplant-server.workflow.yml"
   pull_request:
     branches:
       - main
     paths:
       - "ESPlant-Server/**"
-      - "ESPlant-Pages/**"
 jobs:
   build-api:
     runs-on: ubuntu-latest
@@ -50,27 +48,9 @@ jobs:
         with:
           name: ESPlant-Dashboard
           path: ./ESPlant-Server/api/dashboard
-  build-pages:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "20"
-      - name: Install pages dependencies
-        working-directory: ./ESPlant-Pages
-        run: npm install
-      - name: Build pages
-        working-directory: ./ESPlant-Pages
-        run: npm run build
-      - name: Upload pages artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: ESPlant-Pages
-          path: ./ESPlant-Pages/dist
   deploy:
     runs-on: ubuntu-latest
-    needs: ["build-api", "build-dashboard", "build-pages"]
+    needs: ["build-api", "build-dashboard"]
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Download api artifacts
@@ -83,11 +63,6 @@ jobs:
         with:
           name: ESPlant-Dashboard
           path: ESPlant-Api/dashboard
-      - name: Download pages artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: ESPlant-Pages
-          path: ESPlant-Api/pages
       - name: Deploy to server
         uses: easingthemes/ssh-deploy@main
         with:

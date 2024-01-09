@@ -14,7 +14,7 @@ import sirv from "sirv";
 const app = express();
 app.use(express.json({ limit: "10mb" })); // allow image upload
 
-const PORT = 4803;
+const PORT = parseInt(process.env.PORT ?? '4803');
 
 // use mqtt-listener
 import "./mqtt-listener.js";

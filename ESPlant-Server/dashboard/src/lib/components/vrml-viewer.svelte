@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { VRMLLoader } from "three/examples/jsm/loaders/VRMLLoader.js";
-  // @ts-ignore
   import * as THREE from "three";
+  // @ts-ignore
   import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
   export let src: string;
@@ -17,7 +17,9 @@
 
   const autoRotateObj = () => {
     rotateAnimation = requestAnimationFrame(autoRotateObj);
-    object.rotation.y += 0.01;
+    if (object != undefined) {
+      object.rotation.y += 0.01;
+    }
   };
 
   onMount(() => {

@@ -1,6 +1,7 @@
 <script>
 	import '@tabler/core/dist/css/tabler.css';
 	import '@tabler/core/dist/css/tabler-vendors.css'; // TODO remove all vendors except litepicker
+	// @ts-ignore
 	import { pwaInfo } from 'virtual:pwa-info';
 	import { QueryClientProvider } from '@tanstack/svelte-query';
 	import { onMount } from 'svelte';
