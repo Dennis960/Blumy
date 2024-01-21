@@ -87,18 +87,13 @@ def board_settings_form(project_id: str):
     
     # search and default-select PCB part
     pcb_part_names = [pn for pn in part_names if pn.endswith("_PCB")]
-    form.pcb_part_name.default = pcb_part_names[0] if pcb_part_names else None
+    form.pcb_part_name.data = pcb_part_names[0] if pcb_part_names else None
     # set a default name
-    form.name.default = pcb_part_names[0] if pcb_part_names else ""
-    form.process() # apply defaults
+    form.name.data = pcb_part_names[0] if pcb_part_names else ""
 
     # map form to settings entity
     if form.validate_on_submit():
-        pcb_tolerance = cq.Vector(
-            form.pcb_tolerance_x.data,
-            form.pcb_tolerance_y.data,
-            form.pcb_tolerance_z.data,
-        )
+        pcb_tolerance = cq.Vector(*form.pcb_tolerance.data)
         board_settings = settings.BoardSettings(
             name=form.name.data,
             pcb_tolerance=pcb_tolerance,
@@ -115,9 +110,9 @@ def board_settings_form(project_id: str):
     # map entity to form (if exists)
     if not form.is_submitted() and board_settings is not None:
         form.name.data = board_settings.name
-        form.pcb_tolerance_x.data = board_settings.pcb_tolerance.x
-        form.pcb_tolerance_y.data = board_settings.pcb_tolerance.y
-        form.pcb_tolerance_z.data = board_settings.pcb_tolerance.z
+        form.pcb_tolerance.entries[0].data = board_settings.pcb_tolerance.x
+        form.pcb_tolerance.entries[1].data = board_settings.pcb_tolerance.y
+        form.pcb_tolerance.entries[2].data = board_settings.pcb_tolerance.z
         form.part_tolerance.data = board_settings.part_tolerance
         form.pcb_part_name.data = board_settings.pcb_part_name
         form.exclude.data = board_settings.exclude
@@ -178,9 +173,9 @@ def part_settings_form(project_id: str):
             name_regex=part_name,
             top_direction=form.top_direction.data,
             length="Hole" if form.create_hole.data else form.length.data,
-            offset_x=form.offset_x.data,
-            offset_y=form.offset_y.data,
-            offset_z=form.offset_z.data,
+            offset_x=form.offset.data[0],
+            offset_y=form.offset.data[1],
+            offset_z=form.offset.data[2],
             width="Auto" if form.width_auto.data else form.width.data,
             height="Auto" if form.height_auto.data else form.height.data,
         )
@@ -199,17 +194,20 @@ def part_settings_form(project_id: str):
     if not form.is_submitted() and part_setting_index is not None:
         part_setting = board_settings.part_settings[part_setting_index]
         form.top_direction.data = part_setting.top_direction
-        form.length.data = part_setting.length
         form.create_hole.data = part_setting.length == "Hole"
-        form.offset_x.data = part_setting.offset_x
-        form.offset_y.data = part_setting.offset_y
-        form.offset_z.data = part_setting.offset_z
+        form.length.data = part_setting.length if not form.create_hole.data else None
+        form.offset.entries[0].data = part_setting.offset_x
+        form.offset.entries[1].data = part_setting.offset_y
+        form.offset.entries[2].data = part_setting.offset_z
         form.width_auto.data = part_setting.width == "Auto"
         form.width.data = part_setting.width if part_setting.width != "Auto" else None
         form.height_auto.data = part_setting.height == "Auto"
         form.height.data = part_setting.height if part_setting.height != "Auto" else None
 
         print("Loaded part {} settings in project {} version {}".format(part_name, project_id, version))
+
+    print(form.length.data)
+    print(form.offset.data)
 
     return render_template("./partials/part_settings_form.html",
         project_id=project_id,
@@ -249,14 +247,14 @@ def case_settings_form(project_id: str):
             case_wall_thickness=form.case_wall_thickness.data,
             case_floor_pad=form.case_floor_pad.data,
             case_dimension=(
-                "Auto" if form.case_dimension_x_auto.data else form.case_dimension_x.data,
-                "Auto" if form.case_dimension_y_auto.data else form.case_dimension_y.data,
-                "Auto" if form.case_dimension_z_auto.data else form.case_dimension_z.data
+                "Auto" if form.case_dimension_x_auto.data else form.case_dimension.data[0],
+                "Auto" if form.case_dimension_y_auto.data else form.case_dimension.data[1],
+                "Auto" if form.case_dimension_z_auto.data else form.case_dimension.data[2]
             ),
             case_offset=(
-                "Positive" if form.case_offset_x_positive.data else "Negative" if form.case_offset_x_negative.data else form.case_offset_x.data,
-                "Positive" if form.case_offset_y_positive.data else "Negative" if form.case_offset_y_negative.data else form.case_offset_y.data,
-                "Positive" if form.case_offset_z_positive.data else "Negative" if form.case_offset_z_negative.data else form.case_offset_z.data
+                "Positive" if form.case_offset_x_positive.data else "Negative" if form.case_offset_x_negative.data else form.case_offset.data[0],
+                "Positive" if form.case_offset_y_positive.data else "Negative" if form.case_offset_y_negative.data else form.case_offset.data[1],
+                "Positive" if form.case_offset_z_positive.data else "Negative" if form.case_offset_z_negative.data else form.case_offset.data[2]
             ),
             pcb_slot_settings=pcb_slot_settings
         )
@@ -268,19 +266,19 @@ def case_settings_form(project_id: str):
     if not form.is_submitted() and case_settings is not None:
         form.case_wall_thickness.data = case_settings.case_wall_thickness
         form.case_floor_pad.data = case_settings.case_floor_pad
-        form.case_dimension_x.data = case_settings.case_dimension[0] if case_settings.case_dimension[0] != "Auto" else None
+        form.case_dimension.entries[0].data = case_settings.case_dimension[0] if case_settings.case_dimension[0] != "Auto" else None
         form.case_dimension_x_auto.data = case_settings.case_dimension[0] == "Auto"
-        form.case_dimension_y.data = case_settings.case_dimension[1] if case_settings.case_dimension[1] != "Auto" else None
+        form.case_dimension.entries[1].data = case_settings.case_dimension[1] if case_settings.case_dimension[1] != "Auto" else None
         form.case_dimension_y_auto.data = case_settings.case_dimension[1] == "Auto"
-        form.case_dimension_z.data = case_settings.case_dimension[2] if case_settings.case_dimension[2] != "Auto" else None
+        form.case_dimension.entries[2].data = case_settings.case_dimension[2] if case_settings.case_dimension[2] != "Auto" else None
         form.case_dimension_z_auto.data = case_settings.case_dimension[2] == "Auto"
-        form.case_offset_x.data = case_settings.case_offset[0] if case_settings.case_offset[0] != "Positive" and case_settings.case_offset[0] != "Negative" else None
+        form.case_offset.entries[0].data = case_settings.case_offset[0] if case_settings.case_offset[0] != "Positive" and case_settings.case_offset[0] != "Negative" else None
         form.case_offset_x_positive.data = case_settings.case_offset[0] == "Positive"
         form.case_offset_x_negative.data = case_settings.case_offset[0] == "Negative"
-        form.case_offset_y.data = case_settings.case_offset[1] if case_settings.case_offset[1] != "Positive" and case_settings.case_offset[1] != "Negative" else None
+        form.case_offset.entries[1].data = case_settings.case_offset[1] if case_settings.case_offset[1] != "Positive" and case_settings.case_offset[1] != "Negative" else None
         form.case_offset_y_positive.data = case_settings.case_offset[1] == "Positive"
         form.case_offset_y_negative.data = case_settings.case_offset[1] == "Negative"
-        form.case_offset_z.data = case_settings.case_offset[2] if case_settings.case_offset[2] != "Positive" and case_settings.case_offset[2] != "Negative" else None
+        form.case_offset.entries[2].data = case_settings.case_offset[2] if case_settings.case_offset[2] != "Positive" and case_settings.case_offset[2] != "Negative" else None
         form.case_offset_z_positive.data = case_settings.case_offset[2] == "Positive"
         form.case_offset_z_negative.data = case_settings.case_offset[2] == "Negative"
         form.pcb_slot_side.data = case_settings.pcb_slot_settings.side
