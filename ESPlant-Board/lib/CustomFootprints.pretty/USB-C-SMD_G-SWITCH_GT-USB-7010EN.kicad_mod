@@ -48,7 +48,7 @@
   (pad "B7" smd rect (at -0.750064 -2.377572) (size 0.3 1.150013) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 4c077824-97f3-49ce-85c2-029a69bb4839))
   (pad "B8" smd rect (at -1.750064 -2.377572) (size 0.3 1.150013) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp b35e6760-f959-42dc-94a3-7d3be405206d))
   (model "lib/CustomFootprints.pretty/packages3d/USB-C-SMD_G-SWITCH_GT-USB-7010EN.step"
-    (offset (xyz 0 0 0))
+    (offset (xyz 0 -1 0))
     (scale (xyz 1 1 1))
     (rotate (xyz 0 0 0))
   )
