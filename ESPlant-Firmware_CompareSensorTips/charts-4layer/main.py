@@ -95,7 +95,7 @@ for key in dataDict:
 with open(os.path.join(cur_dir, 'data.csv'), 'w') as f:
     f.write("sensor;moisture;r1;r2;c1;frequency;duty_cycle;measurement_wet;stabilization_time_wet;success_wet;measurement_dry;stabilization_time_dry;success_dry;difference;stabilization_time_avg\n")
     for key in dataDict:
-        f.write("{};{};{};{};{};{};{};{};{};{};{};{};{};{}\n".format(
+        f.write("{};{};{};{};{};{};{};{};{};{};{};{};{};{};{}\n".format(
             dataDict[key]['sensor'],
             dataDict[key]['moisture'],
             dataDict[key]['r1'],
@@ -111,7 +111,7 @@ with open(os.path.join(cur_dir, 'data.csv'), 'w') as f:
             dataDict[key]['success_dry'],
             dataDict[key]['difference'],
             dataDict[key]['stabilization_time_avg']
-        ))
+        ).replace('.', ','))
 
 for key in list(dataDict):
     if dataDict[key]['measurement_wet'] < 50 or dataDict[key]['measurement_dry'] >= 4050 or dataDict[key]['success_wet'] == 0 or dataDict[key]['success_dry'] == 0:
