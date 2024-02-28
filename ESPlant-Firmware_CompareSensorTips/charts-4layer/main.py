@@ -1,37 +1,39 @@
 import seaborn as seaborn
 import matplotlib.pyplot as plot
 import numpy as np
+import os
+
+cur_dir = os.path.dirname(__file__)
 
 seaborn.set_style("whitegrid")
 seaborn.set_context("paper")
 
 sensorDict = {
-    "full": 0,
-    "standard": 1,
-    "tracks": 2,
-    "half": 3,
-    # "floating": 4
+    "NPPN": 0,
+    "PNNP": 1,
+    "PNDD": 2,
+    "PDDN": 3,
+    "PN": 4
 }
 moistureDict = {
     "dry": 0,
     "wet": 1
 }
 r1Dict = {
-    "1k": 1000,
-    "4.7k": 4700,
+    "10":  10,
+    "1k":  1000,
     "10k": 10000,
-    "20k": 20000,
+    "1M":  1000000
 }
 r2Dict = {
-    "100k": 100000,
-    "1M": 1000000,
-    "100M": 100000000
+    "100M": 100000000 # 100M = no resistor
 }
 c1Dict = {
-    "104pF": 0.000000000104,
-    "0.1uF": 0.0000001,
-    "1uF": 0.000001,
-    "10uF": 0.00001
+    "2pF":   0.000000000002,
+    "150pF": 0.00000000015,
+    "10nF":  0.00000001,
+    "1uF":   0.000001,
+    "100uF": 0.0001
 }
 
 dataDict = {}
@@ -40,47 +42,44 @@ measurementDictDry = {}
 stabilizationDictWet = {}
 stabilizationDictDry = {}
 
-for sensorKey in sensorDict:
-    for moistureKey in moistureDict:
-        for r1Key in r1Dict:
-            for r2Key in r2Dict:
-                for c1Key in c1Dict:
-                    # Read data.csv (frequency,duty_cycle,measurement,stabilization_time)
-                    file = sensorKey + '/' + moistureKey + '-' + r1Key + '-' + r2Key + '-' + c1Key + '.csv'
-                    try:
-                        data = np.genfromtxt(file, delimiter=',', skip_header=1)
-                    except:
+for moistureKey in moistureDict:
+    for r1Key in r1Dict:
+        for r2Key in r2Dict:
+            for c1Key in c1Dict:
+                # Read data.csv (frequency,duty_cycle,measurement,stabilization_time)
+                file = moistureKey + '-' + r1Key + '-' + r2Key + '-' + c1Key + '.csv'
+                file = os.path.join(cur_dir, file)
+                with open(file, 'r') as f:
+                    if os.stat(file).st_size == 0:
                         continue
-                    # ----------------- clean data -----------------
-                    # remove from data where measurement == 4096
-                    data = data[data[:, 2] < 4096]
-                    # remove from data where measurement < 100
-                    data = data[data[:, 2] > 100]
-                    # remove from data where duty_cycle == 255
-                    data = data[data[:, 1] < 255]
-                    # --------------- clean data end ---------------
-                    # add to dataDict
-                    for row in data:
-                        key = "S: {:8s} | R1: {:4s} | R2: {:4s} | C1: {:5s} | Freq: {:7d} | Duty: {:3d}".format(str(sensorKey), str(r1Key), str(r2Key), str(c1Key), int(row[0]), int(row[1]))
-                        if (moistureKey == "wet"):
-                            measurementDictWet[key] = row[2]
-                            stabilizationDictWet[key] = row[3]
-                        else:
-                            measurementDictDry[key] = row[2]
-                            stabilizationDictDry[key] = row[3]
-                        dataDict[key] = {
-                            'sensor': sensorDict[sensorKey],
-                            'moisture': moistureDict[moistureKey],
-                            'r1': r1Dict[r1Key],
-                            'r2': r2Dict[r2Key],
-                            'c1': c1Dict[c1Key],
-                            'frequency': row[0],
-                            'duty_cycle': row[1],
-                            'measurement': row[2],
-                            'stabilization_time': row[3],
-                            'difference': None,
-                            'stabilization_time_avg': None
-                        }
+                                
+                data = np.genfromtxt(file, delimiter=';', skip_header=1, dtype=None)
+                # add to dataDict
+                for row in data:
+                    _, frequency, duty_cycle, measurement, stabilization_time, success = row
+                    sensor_name: str = row[0].decode('utf-8')
+                    if not success or measurement >= 4050 or measurement < 50:
+                        continue
+                    key = "S: {:4s} | R1: {:4s} | R2: {:4s} | C1: {:5s} | Freq: {:7d} | Duty: {:3d}".format(sensor_name, r1Key, r2Key, c1Key, frequency, duty_cycle)
+                    if (moistureKey == "wet"):
+                        measurementDictWet[key] = row[3]
+                        stabilizationDictWet[key] = row[4]
+                    else:
+                        measurementDictDry[key] = row[3]
+                        stabilizationDictDry[key] = row[4]
+                    dataDict[key] = {
+                        'sensor': row[0],
+                        'moisture': moistureDict[moistureKey],
+                        'r1': r1Dict[r1Key],
+                        'r2': r2Dict[r2Key],
+                        'c1': c1Dict[c1Key],
+                        'frequency': row[1],
+                        'duty_cycle': row[2],
+                        'measurement': row[3],
+                        'stabilization_time': row[4],
+                        'difference': None,
+                        'stabilization_time_avg': None
+                    }
 
 
 for key in measurementDictWet:
@@ -98,7 +97,7 @@ for key in list(dataDict):
     if dataDict[key]['difference'] is None or dataDict[key]['stabilization_time_avg'] is None:
         del dataDict[key]
 
-sortedByDifference = sorted(dataDict.items(), key=lambda x: x[1]['difference'], reverse=True)[:200]
+sortedByDifference = sorted(dataDict.items(), key=lambda x: x[1]['difference'], reverse=True)[:40]
 # reverse sortedByDifference
 sortedByDifference.reverse()
 print("best by difference")
@@ -137,7 +136,7 @@ for key in keys:
     c1s[data['c1']] += 1
 
 print("r1s: {}".format(r1s))
-print("r2s: {}".format(r2s))
+# print("r2s: {}".format(r2s))
 print("c1s: {}".format(c1s))
 
 def plot2D(keyX, keyY, ax, log=False):
