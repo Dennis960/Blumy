@@ -58,54 +58,74 @@ for moistureKey in moistureDict:
                 for row in data:
                     _, frequency, duty_cycle, measurement, stabilization_time, success = row
                     sensor_name: str = row[0].decode('utf-8')
-                    if not success or measurement >= 4050 or measurement < 50:
-                        continue
                     key = "S: {:4s} | R1: {:4s} | R2: {:4s} | C1: {:5s} | Freq: {:7d} | Duty: {:3d}".format(sensor_name, r1Key, r2Key, c1Key, frequency, duty_cycle)
+                    if key not in dataDict:
+                        dataDict[key] = {
+                            'sensor': row[0].decode('utf-8'),
+                            'moisture': moistureDict[moistureKey],
+                            'r1': r1Dict[r1Key],
+                            'r2': r2Dict[r2Key],
+                            'c1': c1Dict[c1Key],
+                            'frequency': row[1],
+                            'duty_cycle': row[2],
+                        }
+                    
                     if (moistureKey == "wet"):
-                        measurementDictWet[key] = row[3]
-                        stabilizationDictWet[key] = row[4]
+                        dataDict[key]['measurement_wet'] = row[3]
+                        dataDict[key]['stabilization_time_wet'] = row[4]
+                        dataDict[key]['success_wet'] = row[5]
                     else:
-                        measurementDictDry[key] = row[3]
-                        stabilizationDictDry[key] = row[4]
-                    dataDict[key] = {
-                        'sensor': row[0],
-                        'moisture': moistureDict[moistureKey],
-                        'r1': r1Dict[r1Key],
-                        'r2': r2Dict[r2Key],
-                        'c1': c1Dict[c1Key],
-                        'frequency': row[1],
-                        'duty_cycle': row[2],
-                        'measurement': row[3],
-                        'stabilization_time': row[4],
-                        'difference': None,
-                        'stabilization_time_avg': None
-                    }
+                        dataDict[key]['measurement_dry'] = row[3]
+                        dataDict[key]['stabilization_time_dry'] = row[4]
+                        dataDict[key]['success_dry'] = row[5]
 
-
-for key in measurementDictWet:
-    # add to differenceDict if in both dicts
-    if key in measurementDictDry:
-        dataDict[key]['difference'] = measurementDictDry[key] - measurementDictWet[key]
-
-for key in stabilizationDictWet:
-    # add to stabilizationDict if in both dicts
-    if key in stabilizationDictDry:
-        dataDict[key]['stabilization_time_avg'] = (stabilizationDictDry[key] + stabilizationDictWet[key]) / 2
-
-# remove all keys where difference is None or stabilization_time_avg is None
+# remove all keys where data is missing
 for key in list(dataDict):
-    if dataDict[key]['difference'] is None or dataDict[key]['stabilization_time_avg'] is None:
+    if not 'measurement_wet' in dataDict[key] or not 'measurement_dry' in dataDict[key] or not 'stabilization_time_wet' in dataDict[key] or 'not stabilization_time_dry' in dataDict[key]:
         del dataDict[key]
 
-sortedByDifference = sorted(dataDict.items(), key=lambda x: x[1]['difference'], reverse=True)[:40]
+
+for key in dataDict:
+    dataDict[key]['difference'] = dataDict[key]['measurement_dry'] - dataDict[key]['measurement_wet']
+
+for key in dataDict:
+    dataDict[key]['stabilization_time_avg'] = (dataDict[key]['stabilization_time_dry'] + dataDict[key]['stabilization_time_wet']) / 2
+
+# save dataDict to file in csv format
+with open(os.path.join(cur_dir, 'data.csv'), 'w') as f:
+    f.write("sensor;moisture;r1;r2;c1;frequency;duty_cycle;measurement_wet;stabilization_time_wet;success_wet;measurement_dry;stabilization_time_dry;success_dry;difference;stabilization_time_avg\n")
+    for key in dataDict:
+        f.write("{};{};{};{};{};{};{};{};{};{};{};{};{};{}\n".format(
+            dataDict[key]['sensor'],
+            dataDict[key]['moisture'],
+            dataDict[key]['r1'],
+            dataDict[key]['r2'],
+            dataDict[key]['c1'],
+            dataDict[key]['frequency'],
+            dataDict[key]['duty_cycle'],
+            dataDict[key]['measurement_wet'],
+            dataDict[key]['stabilization_time_wet'],
+            dataDict[key]['success_wet'],
+            dataDict[key]['measurement_dry'],
+            dataDict[key]['stabilization_time_dry'],
+            dataDict[key]['success_dry'],
+            dataDict[key]['difference'],
+            dataDict[key]['stabilization_time_avg']
+        ))
+
+for key in list(dataDict):
+    if dataDict[key]['measurement_wet'] < 50 or dataDict[key]['measurement_dry'] >= 4050 or dataDict[key]['success_wet'] == 0 or dataDict[key]['success_dry'] == 0:
+        del dataDict[key]
+
+sortedByDifference = sorted(dataDict.items(), key=lambda x: x[1]['difference'], reverse=True)#[:40]
 # reverse sortedByDifference
 sortedByDifference.reverse()
 print("best by difference")
-print("   sensor         R1         R2         C1            Freq         Duty   => difference = measurementDry - measurementWet => stabilization")
+print(" sensor         R1         R2         C1            Freq           Duty   => difference = measurementDry - measurementWet => stabilization")
 print("------------------------------------------------------------------------------------------------------------------------------------------")
 keys = []
 for item in sortedByDifference:
-    print("{:73s} =>    {:4d}    =      {:4d}      -      {:4d}      =>      {:4d}".format(item[0], int(item[1]["difference"]), int(measurementDictDry[item[0]]), int(measurementDictWet[item[0]]), int(dataDict[item[0]]['stabilization_time_avg'])))
+    print("{:73s} =>    {:4d}    =      {:4d}      -      {:4d}      =>      {:4d}".format(item[0], int(item[1]["difference"]), int(item[1]["measurement_dry"]), int(item[1]["measurement_wet"]), int(item[1]["stabilization_time_avg"])))
     keys.append(item[0])
 
 # print freq and duty_cycle min and max
@@ -123,6 +143,7 @@ print("duty_cycle: {} - {}".format(maxDatas[-1]["duty_cycle"], maxDatas[0]["duty
 r1s = {}
 r2s = {}
 c1s = {}
+sensors = {}
 for key in keys:
     data = dataDict[key]
     if data['r1'] not in r1s:
@@ -134,10 +155,15 @@ for key in keys:
     if data['c1'] not in c1s:
         c1s[data['c1']] = 0
     c1s[data['c1']] += 1
+    if data['sensor'] not in sensors:
+        sensors[data['sensor']] = 0
+    sensors[data['sensor']] += 1
+
 
 print("r1s: {}".format(r1s))
 # print("r2s: {}".format(r2s))
 print("c1s: {}".format(c1s))
+print("sensors: {}".format(sensors))
 
 def plot2D(keyX, keyY, ax, log=False):
     x = []
@@ -235,8 +261,8 @@ plot3D('duty_cycle', 'c1', 'difference', ax2, True, 300)
 plot3D('frequency', 'r1', 'difference', ax3, True, 300)
 plot3D('frequency', 'c1', 'difference', ax4, True, 300)
 plot2D('r1', 'difference', ax5, True)
-plot2D('r1', 'stabilization_time', ax5, True)
-plot3D('frequency', 'duty_cycle', 'stabilization_time', ax6, True, 300)
+plot2D('r1', 'stabilization_time_avg', ax5, True)
+plot3D('frequency', 'duty_cycle', 'stabilization_time_avg', ax6, True, 300)
 
 
 fig.tight_layout()
