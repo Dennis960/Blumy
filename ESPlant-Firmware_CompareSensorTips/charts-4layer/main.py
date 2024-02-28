@@ -117,7 +117,7 @@ for key in list(dataDict):
     if dataDict[key]['measurement_wet'] < 50 or dataDict[key]['measurement_dry'] >= 4050 or dataDict[key]['success_wet'] == 0 or dataDict[key]['success_dry'] == 0:
         del dataDict[key]
 
-sortedByDifference = sorted(dataDict.items(), key=lambda x: x[1]['difference'], reverse=True)#[:40]
+sortedByDifference = sorted(dataDict.items(), key=lambda x: x[1]['difference'], reverse=True)[:40]
 # reverse sortedByDifference
 sortedByDifference.reverse()
 print("best by difference")
