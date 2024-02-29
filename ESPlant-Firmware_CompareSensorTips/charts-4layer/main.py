@@ -160,9 +160,9 @@ for key in list(dataDict):
 save_data_csv(dataDict, 'data_cleaned.csv')
 
 for key in dataDict:
-    stabilization_time_weight = 0.2
-    difference_weight = 0.6
-    difference_height_weight = 0.2
+    stabilization_time_weight = 0.1
+    difference_weight = 0.5
+    difference_height_weight = 0.4
     difference_score = difference_weight * (dataDict[key]['difference'] / dataDict[key]['measurement_dry'])
     difference_height_score = difference_height_weight * (dataDict[key]['difference'] / 4096)
     stabilization_score = stabilization_time_weight * (1 - dataDict[key]['stabilization_time_avg'] / 500)

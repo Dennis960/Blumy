@@ -93,8 +93,6 @@ void resetToZero(int sensorId)
 {
     int strength = 1;
     int analogValue = analogRead(sensors[sensorId].analogPin);
-    Serial.printf("Resetting sensor %d to zero", sensorId);
-    Serial.printf(", %d", analogValue);
     Sensor sensor = sensors[sensorId];
     ledcSetup(sensorId, 100, 10);
     ledcWrite(sensorId, 0);
@@ -110,9 +108,7 @@ void resetToZero(int sensorId)
         pinMode(sensor.analogPin, INPUT);
         // wait until the output is 0 again
         analogValue = analogRead(sensor.analogPin);
-        Serial.printf(", %d", analogValue);
     }
-    Serial.println(" Done!");
 }
 
 void resetAllToZero()
@@ -217,8 +213,7 @@ void updateLcd(String sensorName, long currentFrequency, int currentDutyCycle, i
     lcd.printf("o%4dt:%4lu %3d%%", output, stabilizationTime, progress);
 }
 
-void loop()
-{
+void doCsvMeasurement() {
     for (int frequencyIndex = 0; frequencyIndex < sizeof(frequencies) / sizeof(frequencies[0]); frequencyIndex++)
     {
         for (int dutyCycleIndex = 0; dutyCycleIndex < sizeof(duty_cycles) / sizeof(duty_cycles[0]); dutyCycleIndex++)
@@ -267,4 +262,20 @@ void loop()
     {
         // wait forever
     }
+}
+
+void showMeasurementOnLcd() {
+    resetToZero(3);
+    setupMeasurement(3, 12800, 3);
+    Sensor sensor = sensors[3];
+    measureStabilizedOutput(sensor);
+    lcd.setCursor(0, 0);
+    lcd.printf("%4d", sensor.output);
+    Serial.println(sensor.output);
+}
+
+void loop()
+{
+    // doCsvMeasurement();
+    showMeasurementOnLcd();
 }
