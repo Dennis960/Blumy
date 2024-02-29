@@ -2,6 +2,8 @@ import seaborn as seaborn
 import matplotlib.pyplot as plot
 import numpy as np
 import os
+import enum
+from typing import Literal
 
 cur_dir = os.path.dirname(__file__)
 
@@ -36,6 +38,34 @@ c1Dict = {
     "100uF": 0.0001
 }
 
+KEY = Literal[
+    'sensor',
+    'moisture_key',
+    'moisture',
+    'r1_key',
+    'r1',
+    'r2_key',
+    'r2',
+    'c1_key'
+    'c1',
+    'frequency',
+    'duty_cycle',
+    'measurement_wet',
+    'stabilization_time_wet',
+    'success_wet',
+    'measurement_dry',
+    'stabilization_time_dry',
+    'success_dry',
+    'difference',
+    'stabilization_time_avg'
+]
+
+ATT_11 = 1
+ATT_6 = 1750/2450
+ATT_2_5 = 1250/2450
+ATT_0 = 950/2450
+
+
 dataDict = {}
 measurementDictWet = {}
 measurementDictDry = {}
@@ -62,9 +92,13 @@ for moistureKey in moistureDict:
                     if key not in dataDict:
                         dataDict[key] = {
                             'sensor': row[0].decode('utf-8'),
+                            'moisture_key': moistureKey,
                             'moisture': moistureDict[moistureKey],
+                            'r1_key': r1Key,
                             'r1': r1Dict[r1Key],
+                            'r2_key': r2Key,
                             'r2': r2Dict[r2Key],
+                            'c1_key': c1Key,
                             'c1': c1Dict[c1Key],
                             'frequency': row[1],
                             'duty_cycle': row[2],
@@ -91,41 +125,62 @@ for key in dataDict:
 for key in dataDict:
     dataDict[key]['stabilization_time_avg'] = (dataDict[key]['stabilization_time_dry'] + dataDict[key]['stabilization_time_wet']) / 2
 
-# save dataDict to file in csv format
-with open(os.path.join(cur_dir, 'data.csv'), 'w') as f:
-    f.write("sensor;moisture;r1;r2;c1;frequency;duty_cycle;measurement_wet;stabilization_time_wet;success_wet;measurement_dry;stabilization_time_dry;success_dry;difference;stabilization_time_avg\n")
-    for key in dataDict:
-        f.write("{};{};{};{};{};{};{};{};{};{};{};{};{};{};{}\n".format(
-            dataDict[key]['sensor'],
-            dataDict[key]['moisture'],
-            dataDict[key]['r1'],
-            dataDict[key]['r2'],
-            dataDict[key]['c1'],
-            dataDict[key]['frequency'],
-            dataDict[key]['duty_cycle'],
-            dataDict[key]['measurement_wet'],
-            dataDict[key]['stabilization_time_wet'],
-            dataDict[key]['success_wet'],
-            dataDict[key]['measurement_dry'],
-            dataDict[key]['stabilization_time_dry'],
-            dataDict[key]['success_dry'],
-            dataDict[key]['difference'],
-            dataDict[key]['stabilization_time_avg']
-        ).replace('.', ','))
+def save_data_csv(dataDict, filename):
+    return
+    with open(os.path.join(cur_dir, filename), 'w') as f:
+        f.write("sensor;moisture_key;r1_key;r1;r2_key;r2;c1_key;c1;frequency;duty_cycle;measurement_wet;stabilization_time_wet;success_wet;measurement_dry;stabilization_time_dry;success_dry;difference;stabilization_time_avg\n")
+        for key in dataDict:
+            f.write("{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{}\n".format(
+                dataDict[key]['sensor'],
+                dataDict[key]['moisture_key'],
+                dataDict[key]['r1_key'],
+                dataDict[key]['r1'],
+                dataDict[key]['r2_key'],
+                dataDict[key]['r2'],
+                dataDict[key]['c1_key'],
+                dataDict[key]['c1'],
+                dataDict[key]['frequency'],
+                dataDict[key]['duty_cycle'],
+                dataDict[key]['measurement_wet'],
+                dataDict[key]['stabilization_time_wet'],
+                dataDict[key]['success_wet'],
+                dataDict[key]['measurement_dry'],
+                dataDict[key]['stabilization_time_dry'],
+                dataDict[key]['success_dry'],
+                dataDict[key]['difference'],
+                dataDict[key]['stabilization_time_avg']
+            ).replace('.', ','))
+
+save_data_csv(dataDict, 'data.csv')
 
 for key in list(dataDict):
     if dataDict[key]['measurement_wet'] < 50 or dataDict[key]['measurement_dry'] >= 4050 or dataDict[key]['success_wet'] == 0 or dataDict[key]['success_dry'] == 0:
         del dataDict[key]
 
-sortedByDifference = sorted(dataDict.items(), key=lambda x: x[1]['difference'], reverse=True)[:40]
+save_data_csv(dataDict, 'data_cleaned.csv')
+
+for key in dataDict:
+    stabilization_time_weight = 0.2
+    difference_weight = 0.6
+    difference_height_weight = 0.2
+    difference_score = difference_weight * (dataDict[key]['difference'] / dataDict[key]['measurement_dry'])
+    difference_height_score = difference_height_weight * (dataDict[key]['difference'] / 4096)
+    stabilization_score = stabilization_time_weight * (1 - dataDict[key]['stabilization_time_avg'] / 500)
+    dataDict[key]['score'] = difference_score + stabilization_score + difference_height_score
+
+# for key in list(dataDict):
+#     if dataDict[key]['measurement_dry'] > ATT_0 * 4096:
+#         del dataDict[key]
+
+sortedByScore = sorted(dataDict.items(), key=lambda x: x[1]['score'], reverse=True)[:50]
 # reverse sortedByDifference
-sortedByDifference.reverse()
-print("best by difference")
-print(" sensor         R1         R2         C1            Freq           Duty   => difference = measurementDry - measurementWet => stabilization")
-print("------------------------------------------------------------------------------------------------------------------------------------------")
+sortedByScore.reverse()
+print("best by score")
+print(" sensor         R1         R2         C1            Freq           Duty   => difference = measurementDry - measurementWet => stabilization score")
+print("------------------------------------------------------------------------------------------------------------------------------------------------")
 keys = []
-for item in sortedByDifference:
-    print("{:73s} =>    {:4d}    =      {:4d}      -      {:4d}      =>      {:4d}".format(item[0], int(item[1]["difference"]), int(item[1]["measurement_dry"]), int(item[1]["measurement_wet"]), int(item[1]["stabilization_time_avg"])))
+for item in sortedByScore:
+    print("{:73s} =>    {:4d}    =      {:4d}      -      {:4d}      =>      {:4d}      {:1.2f}".format(item[0], int(item[1]["difference"]), int(item[1]["measurement_dry"]), int(item[1]["measurement_wet"]), int(item[1]["stabilization_time_avg"]), item[1]["score"]))
     keys.append(item[0])
 
 # print freq and duty_cycle min and max
@@ -139,25 +194,53 @@ print("frequency : {} - {}".format(maxDatas[-1]["frequency"], maxDatas[0]["frequ
 maxDatas = sorted(maxDatas, key=lambda x: x['duty_cycle'], reverse=True)
 print("duty_cycle: {} - {}".format(maxDatas[-1]["duty_cycle"], maxDatas[0]["duty_cycle"]))
 
-# print most common r1, r2 and c1
-r1s = {}
-r2s = {}
-c1s = {}
-sensors = {}
+# print most common r1, r2 and c1 with average score
+r1s_sum = {}
+r2s_sum = {}
+c1s_sum = {}
+sensors_sum = {}
+r1s_avg = {}
+r2s_avg = {}
+c1s_avg = {}
+sensors_avg = {}
 for key in keys:
     data = dataDict[key]
-    if data['r1'] not in r1s:
-        r1s[data['r1']] = 0
-    r1s[data['r1']] += 1
-    if data['r2'] not in r2s:
-        r2s[data['r2']] = 0
-    r2s[data['r2']] += 1
-    if data['c1'] not in c1s:
-        c1s[data['c1']] = 0
-    c1s[data['c1']] += 1
-    if data['sensor'] not in sensors:
-        sensors[data['sensor']] = 0
-    sensors[data['sensor']] += 1
+    if data['r1_key'] not in r1s_sum:
+        r1s_sum[data['r1_key']] = 0
+        r1s_avg[data['r1_key']] = 0
+    if data['r2_key'] not in r2s_sum:
+        r2s_sum[data['r2_key']] = 0
+        r2s_avg[data['r2_key']] = 0
+    if data['c1_key'] not in c1s_sum:
+        c1s_sum[data['c1_key']] = 0
+        c1s_avg[data['c1_key']] = 0
+    if data['sensor'] not in sensors_sum:
+        sensors_sum[data['sensor']] = 0
+        sensors_avg[data['sensor']] = 0
+    r1s_sum[data['r1_key']] += data['score']
+    r2s_sum[data['r2_key']] += data['score']
+    c1s_sum[data['c1_key']] += data['score']
+    sensors_sum[data['sensor']] += data['score']
+    r1s_avg[data['r1_key']] += 1
+    r2s_avg[data['r2_key']] += 1
+    c1s_avg[data['c1_key']] += 1
+    sensors_avg[data['sensor']] += 1
+
+for key in r1s_sum:
+    r1s_avg[key] = r1s_sum[key] / r1s_avg[key]
+for key in r2s_sum:
+    r2s_avg[key] = r2s_sum[key] / r2s_avg[key]
+for key in c1s_sum:
+    c1s_avg[key] = c1s_sum[key] / c1s_avg[key]
+for key in sensors_sum:
+    sensors_avg[key] = sensors_sum[key] / sensors_avg[key]
+
+r1s = sorted(r1s_sum.items(), key=lambda x: x[1], reverse=True)
+r2s = sorted(r2s_sum.items(), key=lambda x: x[1], reverse=True)
+c1s = sorted(c1s_sum.items(), key=lambda x: x[1], reverse=True)
+sensors = sorted(sensors_sum.items(), key=lambda x: x[1], reverse=True)
+
+
 
 
 print("r1s: {}".format(r1s))
@@ -165,27 +248,36 @@ print("r1s: {}".format(r1s))
 print("c1s: {}".format(c1s))
 print("sensors: {}".format(sensors))
 
-def plot2D(keyX, keyY, ax, log=False):
+exit()
+
+def plot2D(keyX: KEY, keyY: KEY, ax, keyFilter: KEY=None, filter=None, log=False, color='blue', alpha=1, offset_x=9):
     x = []
     y = []
     for key in dataDict:
+        if keyFilter != None and dataDict[key][keyFilter] != filter:
+            continue
         data = dataDict[key]
-        x.append(data[keyX])
+        if offset_x == 0:
+            x.append(data[keyX])
+        else:
+            x.append(data[keyX] * (1 + offset_x))
         y.append(data[keyY])
         
     if log:
         ax.set_xscale('log')
         ax.set_yscale('log')
-    ax.scatter(x, y, c='blue')
+    ax.scatter(x, y, color=color, alpha=alpha)
     ax.set_xlabel(keyX)
     ax.set_ylabel(keyY)
     ax.set_title("{} - {}".format(keyX, keyY))
 
-def plot3D(keyX, keyY, keyZ, ax, log=False, dotSize=10):
+def plot3D(keyX: KEY, keyY: KEY, keyZ: KEY, ax, log=False, dotSize=10, filterKey: KEY=None, filter=None):
     x = []
     y = []
     z = []
     for key in dataDict:
+        if filterKey != None and dataDict[key][filterKey] != filter:
+            continue
         data = dataDict[key]
         x.append(data[keyX])
         y.append(data[keyY])
@@ -197,9 +289,11 @@ def plot3D(keyX, keyY, keyZ, ax, log=False, dotSize=10):
     ax.scatter(x, y, c=z, cmap='viridis', s=dotSize)
     ax.set_xlabel(keyX)
     ax.set_ylabel(keyY)
-    ax.set_title("{} - {} - {}".format(keyX, keyY, keyZ))
+    ax.set_title("{} - {} - {}: {}".format(keyX, keyY, keyZ, filter))
+    # show colormap
+    plot.colorbar(ax.scatter(x, y, c=z, cmap='viridis', s=dotSize), ax=ax)
 
-def plot2DHistogram(keyX, keyFilter, filter, ax, color, alpha=1):
+def plot2DHistogram(keyX: KEY, keyFilter: KEY, filter, ax, color, alpha=1):
     # calculate buckets of size 100
     buckets = {}
     count = 0
@@ -223,96 +317,70 @@ def plot2DHistogram(keyX, keyFilter, filter, ax, color, alpha=1):
     ax.bar(x, y, width=100, color=color, alpha=alpha)
     ax.set_xlabel(keyX)
     ax.set_ylabel('count')
-    ax.set_title("{} - count".format(keyX))
+    ax.set_title("{} - count: {}".format(keyX, filter))
 
 # def plot2DBarChart(keyX, keyY, ax):
     
 
 # create 2x3 subplots
-fig, ((ax1, ax2, ax3), (ax4, ax5, ax6)) = plot.subplots(2, 3, figsize=(16, 9))
+fig, ((ax1, ax2, ax3, ax4, ax5), (ax7, ax8, ax9, ax10, ax11)) = plot.subplots(2, 5, figsize=(20, 6))
 
-# keys:
-#   sensor
-#   moisture
-#   r1
-#   r2
-#   c1
-#   frequency
-#   duty_cycle
-#   measurement
-#   stabilization_time
-#   difference
-#   stabilization_time_avg
+# plot2DHistogram('difference', 'sensor', "NPPN", ax1, 'red', 0.2)
+# plot2DHistogram('difference', 'sensor', "PNNP", ax1, 'green', 0.2)
+# plot2DHistogram('difference', 'sensor', "PNDD", ax1, 'blue', 0.2)
+# plot2DHistogram('difference', 'sensor', "PDDN", ax1, 'yellow', 0.2)
+# plot2DHistogram('difference', 'sensor', "PN", ax1, 'black', 0.2)
 
-# plot2DHistogram('difference', 'sensor', 0, ax1, 'red', 0.2)
-# plot2DHistogram('difference', 'sensor', 1, ax1, 'green', 0.2)
-# plot2DHistogram('difference', 'sensor', 2, ax1, 'blue', 0.2)
-# plot2DHistogram('difference', 'sensor', 3, ax1, 'yellow', 0.2)
-# plot2DHistogram('difference', 'sensor', 4, ax1, 'black', 0.2)
+# plot2DHistogram('difference', 'sensor', "NPPN", ax2, 'red')
+# plot2DHistogram('difference', 'sensor', "PNNP", ax3, 'green')
+# plot2DHistogram('difference', 'sensor', "PNDD", ax4, 'blue')
+# plot2DHistogram('difference', 'sensor', "PDDN", ax5, 'yellow')
+# plot2DHistogram('difference', 'sensor', "PN", ax6, 'black')
 
-# plot2DHistogram('difference', 'sensor', 0, ax2, 'red')
-# plot2DHistogram('difference', 'sensor', 1, ax3, 'green')
-# plot2DHistogram('difference', 'sensor', 2, ax4, 'blue')
-# plot2DHistogram('difference', 'sensor', 3, ax5, 'yellow')
-# plot2DHistogram('difference', 'sensor', 4, ax6, 'black')
+plot3D('duty_cycle', 'difference', 'frequency', ax1, True, 150, filterKey='sensor', filter="NPPN")
+plot3D('duty_cycle', 'difference', 'frequency', ax2, True, 150, filterKey='sensor', filter="PNNP")
+plot3D('duty_cycle', 'difference', 'frequency', ax3, True, 150, filterKey='sensor', filter="PNDD")
+plot3D('duty_cycle', 'difference', 'frequency', ax4, True, 150, filterKey='sensor', filter="PDDN")
+plot3D('duty_cycle', 'difference', 'frequency', ax5, True, 150, filterKey='sensor', filter="PN")
 
-plot3D('frequency', 'duty_cycle', 'difference', ax1, True, 300)
-plot3D('duty_cycle', 'c1', 'difference', ax2, True, 300)
-plot3D('frequency', 'r1', 'difference', ax3, True, 300)
-plot3D('frequency', 'c1', 'difference', ax4, True, 300)
-plot2D('r1', 'difference', ax5, True)
-plot2D('r1', 'stabilization_time_avg', ax5, True)
-plot3D('frequency', 'duty_cycle', 'stabilization_time_avg', ax6, True, 300)
+plot3D('r1', 'c1', 'difference', ax7, True, 150, filterKey='sensor', filter="NPPN")
+plot3D('r1', 'c1', 'difference', ax8, True, 150, filterKey='sensor', filter="PNNP")
+plot3D('r1', 'c1', 'difference', ax9, True, 150, filterKey='sensor', filter="PNDD")
+plot3D('r1', 'c1', 'difference', ax10, True, 150, filterKey='sensor', filter="PDDN")
+plot3D('r1', 'c1', 'difference', ax11, True, 150, filterKey='sensor', filter="PN")
+
+# plot3D('frequency', 'duty_cycle', 'stabilization_time_avg', ax1, True, 150, filterKey='sensor', filter="NPPN")
+# plot3D('frequency', 'duty_cycle', 'stabilization_time_avg', ax2, True, 150, filterKey='sensor', filter="PNNP")
+# plot3D('frequency', 'duty_cycle', 'stabilization_time_avg', ax3, True, 150, filterKey='sensor', filter="PNDD")
+# plot3D('frequency', 'duty_cycle', 'stabilization_time_avg', ax4, True, 150, filterKey='sensor', filter="PDDN")
+# plot3D('frequency', 'duty_cycle', 'stabilization_time_avg', ax5, True, 150, filterKey='sensor', filter="PN")
+
+# plot3D('r1', 'c1', 'stabilization_time_avg', ax7, True, 150, filterKey='sensor', filter="NPPN")
+# plot3D('r1', 'c1', 'stabilization_time_avg', ax8, True, 150, filterKey='sensor', filter="PNNP")
+# plot3D('r1', 'c1', 'stabilization_time_avg', ax9, True, 150, filterKey='sensor', filter="PNDD")
+# plot3D('r1', 'c1', 'stabilization_time_avg', ax10, True, 150, filterKey='sensor', filter="PDDN")
+# plot3D('r1', 'c1', 'stabilization_time_avg', ax11, True, 150, filterKey='sensor', filter="PN")
+
+
+# plot3D('duty_cycle', 'c1', 'difference', ax2, True, 300)
+# plot3D('frequency', 'r1', 'difference', ax3, True, 300)
+# plot3D('frequency', 'c1', 'difference', ax4, True, 300)
+# plot2D('r1', 'difference', ax5, True)
+# plot2D('r1', 'stabilization_time_avg', ax5, True)
+# plot3D('frequency', 'duty_cycle', 'stabilization_time_avg', ax6, True, 300)
+
+# plot2D("r1", "difference", ax5, "sensor", "NPPN", True, 'red', 1, 0)
+# plot2D("r1", "difference", ax5, "sensor", "PNNP", True, 'green', 1, 0.4)
+# plot2D("r1", "difference", ax5, "sensor", "PNDD", True, 'blue', 1, 0.8)
+# plot2D("r1", "difference", ax5, "sensor", "PDDN", True, 'yellow', 1, 1.2)
+# plot2D("r1", "difference", ax5, "sensor", "PN", True, 'black', 1, 1.6)
+
+# plot2D("c1", "difference", ax6, "sensor", "NPPN", True, 'red', 1, 0)
+# plot2D("c1", "difference", ax6, "sensor", "PNNP", True, 'green', 1, 0.4)
+# plot2D("c1", "difference", ax6, "sensor", "PNDD", True, 'blue', 1, 0.8)
+# plot2D("c1", "difference", ax6, "sensor", "PDDN", True, 'yellow', 1, 1.2)
+# plot2D("c1", "difference", ax6, "sensor", "PN", True, 'black', 1, 1.6)
 
 
 fig.tight_layout()
 plot.show()
-
-# best by difference
-#    sensor         R1         R2         C1            Freq         Duty   => difference = measurementDry - measurementWet => stabilization
-# ------------------------------------------------------------------------------------------------------------------------------------------
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:     400 | Duty:   3 =>    2512    =      2943      -       431      =>       877
-# S: full     | R1: 10k  | R2: 100M | C1: 104pF | Freq:   12800 | Duty:   3 =>    2513    =      3091      -       578      =>       668
-# S: full     | R1: 10k  | R2: 100M | C1: 104pF | Freq:   51200 | Duty:  13 =>    2525    =      3272      -       747      =>       418
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:   51200 | Duty:  34 =>    2529    =      3573      -      1044      =>       209
-# S: standard | R1: 10k  | R2: 100M | C1: 104pF | Freq:   25600 | Duty:   5 =>    2540    =      3216      -       676      =>       604
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:    3200 | Duty:  34 =>    2543    =      3624      -      1081      =>       209
-# S: standard | R1: 10k  | R2: 100M | C1: 104pF | Freq:   51200 | Duty:   8 =>    2550    =      3176      -       626      =>       484
-# S: full     | R1: 10k  | R2: 100M | C1: 104pF | Freq:   25600 | Duty:   5 =>    2553    =      3093      -       540      =>       543
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:  100000 | Duty:   3 =>    2576    =      2970      -       394      =>       376
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:     200 | Duty:   3 =>    2577    =      3110      -       533      =>       753
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:    1600 | Duty:  21 =>    2608    =      3563      -       955      =>       209
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:   25600 | Duty:  21 =>    2624    =      3597      -       973      =>       209
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:     800 | Duty:   5 =>    2657    =      3092      -       435      =>       668
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:  100000 | Duty:   8 =>    2671    =      3440      -       769      =>       293
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:     100 | Duty:   2 =>    2685    =      2992      -       307      =>       879
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:   51200 | Duty:   8 =>    2700    =      3075      -       375      =>       376
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:     400 | Duty:  21 =>    2717    =      3525      -       808      =>       335
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:    3200 | Duty:   5 =>    2719    =      3118      -       399      =>       626
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:     400 | Duty:   5 =>    2733    =      3226      -       493      =>       585
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:     800 | Duty:  21 =>    2738    =      3498      -       760      =>       251
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:   12800 | Duty:   3 =>    2742    =      3132      -       390      =>       459
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:  100000 | Duty:   5 =>    2749    =      3259      -       510      =>       335
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:     100 | Duty:   3 =>    2750    =      3180      -       430      =>       670
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:   25600 | Duty:   5 =>    2758    =      3139      -       381      =>       459
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:    1600 | Duty:  13 =>    2758    =      3505      -       747      =>       251
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:    6400 | Duty:   8 =>    2770    =      3161      -       391      =>       543
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:   51200 | Duty:  21 =>    2777    =      3478      -       701      =>       293
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:     800 | Duty:   8 =>    2796    =      3293      -       497      =>       501
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:    1600 | Duty:   5 =>    2797    =      3272      -       475      =>       459
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:     400 | Duty:   8 =>    2810    =      3378      -       568      =>       460
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:     800 | Duty:  13 =>    2814    =      3436      -       622      =>       334
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:   25600 | Duty:  13 =>    2817    =      3498      -       681      =>       251
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:    1600 | Duty:   8 =>    2819    =      3391      -       572      =>       334
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:    6400 | Duty:  21 =>    2824    =      3487      -       663      =>       292
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:   12800 | Duty:   8 =>    2836    =      3502      -       666      =>       251
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:    3200 | Duty:  13 =>    2839    =      3469      -       630      =>       293
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:   51200 | Duty:  13 =>    2846    =      3326      -       480      =>       293
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:    3200 | Duty:   8 =>    2860    =      3347      -       487      =>       417
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:    6400 | Duty:  13 =>    2867    =      3364      -       497      =>       334
-# S: tracks   | R1: 10k  | R2: 100M | C1: 104pF | Freq:   25600 | Duty:   8 =>    2875    =      3353      -       478      =>       292
-# frequency : 100.0 - 100000.0
-# duty_cycle: 2.0 - 34.0
-# r1s: {10000: 40}
-# r2s: {100000000: 40}
-# c1s: {1.04e-10: 40}
