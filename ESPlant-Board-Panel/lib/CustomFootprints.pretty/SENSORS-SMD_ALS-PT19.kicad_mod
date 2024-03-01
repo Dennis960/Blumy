@@ -23,6 +23,8 @@
     (stroke (width 0.151994) (type solid)) (layer "F.SilkS") (tstamp 7bea910e-e8a7-473e-bf17-c4b7f77aee34))
   (fp_circle (center -1.016 0.537998) (end -0.986002 0.537998)
     (stroke (width 0.059995) (type solid)) (fill none) (layer "F.SilkS") (tstamp 90e0133f-5682-4cd9-b724-0c0a50caa034))
+  (fp_rect (start -1.5 0.7) (end 1.5 -0.7)
+    (stroke (width 0.05) (type default)) (fill none) (layer "F.CrtYd") (tstamp 087bb3e0-e2ed-4cff-89fa-5f9464a40d21))
   (pad "1" smd rect (at -0.750064 0 180) (size 0.8 0.8) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 16c44ea6-c1fc-494d-b0f4-c1d3b2991aa6))
   (pad "2" smd rect (at 0.750064 0 180) (size 0.8 0.8) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 8d386c55-89ba-48a7-a79e-7fa4639995cd))
   (model "lib/CustomFootprints.pretty/packages3d/SENSORS-SMD_ALS-PT19.step"
