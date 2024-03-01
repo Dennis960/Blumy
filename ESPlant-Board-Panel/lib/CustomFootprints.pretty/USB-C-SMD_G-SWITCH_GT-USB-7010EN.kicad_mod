@@ -25,6 +25,8 @@
     (stroke (width 0.254) (type solid)) (layer "F.SilkS") (tstamp 162cec71-ece6-410b-984e-d19b31b36df0))
   (fp_circle (center -4.796028 -2.794) (end -4.766056 -2.794)
     (stroke (width 0.059995) (type solid)) (fill none) (layer "F.SilkS") (tstamp 68012164-715b-4fb9-ae1e-30dc62e0d1a6))
+  (fp_rect (start -5.2 -3.3) (end 5.2 5.3)
+    (stroke (width 0.05) (type default)) (fill none) (layer "F.CrtYd") (tstamp 263bd481-2eb1-4d3a-9880-d23a7421727c))
   (fp_circle (center -2.890018 -1.302134) (end -2.76505 -1.302134)
     (stroke (width 0.250012) (type solid)) (fill none) (layer "F.Fab") (tstamp c988b57f-c3f2-4965-8168-0f64e65036fb))
   (fp_circle (center 2.890018 -1.302134) (end 3.014986 -1.302134)
@@ -48,7 +50,7 @@
   (pad "B7" smd rect (at -0.750064 -2.377572) (size 0.3 1.150013) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 4c077824-97f3-49ce-85c2-029a69bb4839))
   (pad "B8" smd rect (at -1.750064 -2.377572) (size 0.3 1.150013) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp b35e6760-f959-42dc-94a3-7d3be405206d))
   (model "lib/CustomFootprints.pretty/packages3d/USB-C-SMD_G-SWITCH_GT-USB-7010EN.step"
-    (offset (xyz 0 0 0))
+    (offset (xyz 0 -1 0))
     (scale (xyz 1 1 1))
     (rotate (xyz 0 0 0))
   )
