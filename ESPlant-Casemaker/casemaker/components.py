@@ -2,9 +2,9 @@ import cadquery as cq
 
 thickness = 1.5
 leg_width = 4.3
-contact_width = 10
-contact_height = 11
-spring_width = 7
+contact_width = 9
+contact_height = 12
+spring_width = 5.5
 spring_length = 8
 leg_length = 8
 spacing = 11
