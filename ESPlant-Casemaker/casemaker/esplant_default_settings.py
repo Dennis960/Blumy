@@ -24,12 +24,12 @@ case_settings = CaseSettings(
 compartment_door_settings = CompartmentDoorSettings(tab_spacing_factor=0.8, fitting_arm_height=11)
 battery_holder_settings = BatteryHolderSettings(
     front_wall_thickness=2.5,
-    back_wall_thickness=1.5,
+    back_wall_thickness=2,
     insertable_springs_thickness=1,
     polartiy_text_spacing=0.2,
     battery_length_tolerance=2,
     battery_diameter_tolerance=0.25,
-    offset=(0, -1.5, 0),
+    offset=(0, 0.2, 0),
     flip_polarity=True
 )
 
