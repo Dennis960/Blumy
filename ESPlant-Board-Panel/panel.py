@@ -12,7 +12,7 @@ output = "ESPlant-Board-Panel/panel.kicad_pcb"
 # KiKit Panel Config (Only deviations from default)
 
 layout = {
-    "hspace": "2mm",
+    "hspace": "4mm",
     "vspace": "2mm",
     "cols": "2"
 }
@@ -35,6 +35,7 @@ cuts = {
 framing = {
     "type": "railslr",
     "vspace": "5mm",
+    "hspace": "4mm"
 }
 tooling = {
     "type": "4hole",
