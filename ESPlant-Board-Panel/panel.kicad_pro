@@ -45,7 +45,7 @@
         "silk_text_thickness": 0.15,
         "silk_text_upright": false,
         "zones": {
-          "min_clearance": 0.39999999999999997
+          "min_clearance": 0.19999999999999998
         }
       },
       "diff_pair_dimensions": [
@@ -223,7 +223,41 @@
         "name": "Default",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.25,
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Analog",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_0-Analog",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "wire_width": 6
@@ -240,14 +274,48 @@
         "name": "Board_0-Default",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.25,
+        "track_width": 0.3,
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "wire_width": 6
       },
       {
         "bus_width": 12,
-        "clearance": 0.4,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_0-GND",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_0-Moisture",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -257,7 +325,41 @@
         "name": "Board_0-Power",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.25,
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_0-USB",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.2,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_1-Analog",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "wire_width": 6
@@ -274,14 +376,48 @@
         "name": "Board_1-Default",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.25,
+        "track_width": 0.3,
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "wire_width": 6
       },
       {
         "bus_width": 12,
-        "clearance": 0.4,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_1-GND",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_1-Moisture",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -291,7 +427,41 @@
         "name": "Board_1-Power",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.25,
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_1-USB",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.2,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_2-Analog",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "wire_width": 6
@@ -308,14 +478,48 @@
         "name": "Board_2-Default",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.25,
+        "track_width": 0.3,
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "wire_width": 6
       },
       {
         "bus_width": 12,
-        "clearance": 0.4,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_2-GND",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_2-Moisture",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -325,7 +529,41 @@
         "name": "Board_2-Power",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.25,
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_2-USB",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.2,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_3-Analog",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "wire_width": 6
@@ -342,14 +580,48 @@
         "name": "Board_3-Default",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.25,
+        "track_width": 0.3,
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "wire_width": 6
       },
       {
         "bus_width": 12,
-        "clearance": 0.4,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_3-GND",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_3-Moisture",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -359,7 +631,41 @@
         "name": "Board_3-Power",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.25,
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_3-USB",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.2,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_4-Analog",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "wire_width": 6
@@ -376,14 +682,48 @@
         "name": "Board_4-Default",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.25,
+        "track_width": 0.3,
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "wire_width": 6
       },
       {
         "bus_width": 12,
-        "clearance": 0.4,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_4-GND",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_4-Moisture",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -393,14 +733,65 @@
         "name": "Board_4-Power",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.25,
+        "track_width": 0.3,
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "wire_width": 6
       },
       {
         "bus_width": 12,
-        "clearance": 0.4,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Board_4-USB",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.2,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "GND",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Moisture",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -410,7 +801,24 @@
         "name": "Power",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.25,
+        "track_width": 0.3,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "USB",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.2,
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "wire_width": 6
@@ -424,55 +832,35 @@
     "netclass_patterns": [
       {
         "netclass": "Board_0-Default",
+        "pattern": "Board_0-unconnected-(U13-IO18-Pad24)"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-TX"
+      },
+      {
+        "netclass": "Board_0-Default",
         "pattern": "Board_0-unconnected-(U1-SHELL-Pad4)"
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-/EN"
+        "pattern": "Board_0-IO8"
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-/IO8"
+        "pattern": "Board_0-LED_Green"
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U8-Pad4)"
+        "pattern": "Board_0-unconnected-(U13-IO20-Pad26)"
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-/D+"
+        "pattern": "Board_0-Light_Sensor_Select"
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U3-NC-Pad6)"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-/LED_GREEN"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-/SensorCapV"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U13-IO2-Pad5)"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U8-Pad5)"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-/TH_SCL"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-/D-"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U3-NC-Pad1)"
+        "pattern": "Board_0-IO9"
       },
       {
         "netclass": "Board_0-Default",
@@ -480,31 +868,11 @@
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-/Square_Wave_Signal"
+        "pattern": "Board_0-unconnected-(U1-SHELL-Pad1)"
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U13-IO15-Pad20)"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-/TH_SDA"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-Net-(R1-Pad1)"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-/Voltage_Measurement_Analog"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-Net-(D3-+)"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U13-NC-Pad35)"
+        "pattern": "Board_0-TH_SCL"
       },
       {
         "netclass": "Board_0-Default",
@@ -512,47 +880,7 @@
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U13-NC-Pad7)"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U1-SHELL-Pad1)"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-/IO9"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U8-Pad6)"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U13-NC-Pad4)"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-/Light_Sensor_Analog"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-/USB"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-Net-(U1-CC2)"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-/BAT"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U13-NC-Pad21)"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U8-Pad7)"
+        "pattern": "Board_0-RX"
       },
       {
         "netclass": "Board_0-Default",
@@ -560,47 +888,7 @@
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-/Light_Sensor_Select"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U13-NC-Pad33)"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U13-IO3-Pad6)"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-/SW"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U5-LBO-Pad4)"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-/Light_Sensor_In"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-/LED_RED"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U1-SHELL-Pad3)"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-VCC"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-/Voltage_Measurement_Select"
-      },
-      {
-        "netclass": "Board_0-Default",
-        "pattern": "Board_0-GND"
+        "pattern": "Board_0-unconnected-(U3-NC-Pad6)"
       },
       {
         "netclass": "Board_0-Default",
@@ -608,7 +896,7 @@
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-Net-(U1-CC1)"
+        "pattern": "Board_0-unconnected-(BZ1-NC-Pad4)"
       },
       {
         "netclass": "Board_0-Default",
@@ -616,15 +904,51 @@
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-/TX"
+        "pattern": "Board_0-Buzzer"
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-unconnected-(U1-SHELL-Pad2)"
+        "pattern": "Board_0-LED_Red"
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-Net-(U13-IO4)"
+        "pattern": "Board_0-Net-(D3-+)"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-TH_SDA"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-unconnected-(U8-Pad6)"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-unconnected-(U13-NC-Pad33)"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-Voltage_Measurement_Select"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-unconnected-(U13-NC-Pad35)"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-unconnected-(U13-IO19-Pad25)"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-unconnected-(U8-Pad7)"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-Light_Sensor_In"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-unconnected-(U13-NC-Pad4)"
       },
       {
         "netclass": "Board_0-Default",
@@ -632,179 +956,75 @@
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-/FB"
+        "pattern": "Board_0-unconnected-(U1-SHELL-Pad2)"
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-/AD_Capacitance"
+        "pattern": "Board_0-EN"
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-/Buzzer"
+        "pattern": "Board_0-unconnected-(U5-LBO-Pad4)"
       },
       {
         "netclass": "Board_0-Default",
-        "pattern": "Board_0-/RX"
+        "pattern": "Board_0-unconnected-(U13-NC-Pad7)"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-unconnected-(U8-Pad4)"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-Net-(R1-Pad1)"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-unconnected-(U1-SHELL-Pad3)"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-unconnected-(U13-NC-Pad21)"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-unconnected-(U3-NC-Pad1)"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-unconnected-(BZ1-NC-Pad3)"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-unconnected-(U8-Pad5)"
+      },
+      {
+        "netclass": "Board_0-Default",
+        "pattern": "Board_0-Net-(U13-IO15)"
+      },
+      {
+        "netclass": "Board_0-Power",
+        "pattern": "Board_0-PWR*"
+      },
+      {
+        "netclass": "Board_0-USB",
+        "pattern": "Board_0-USB*"
+      },
+      {
+        "netclass": "Board_0-Analog",
+        "pattern": "Board_0-ADC*"
+      },
+      {
+        "netclass": "Board_0-GND",
+        "pattern": "Board_0-*GND*"
+      },
+      {
+        "netclass": "Board_0-Moisture",
+        "pattern": "Board_0-*Moisture*"
       },
       {
         "netclass": "Board_1-Default",
-        "pattern": "Board_1-Net-(U1-CC1)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/Voltage_Measurement_Analog"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U1-SHELL-Pad1)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/FB"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U13-NC-Pad7)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U13-NC-Pad35)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/USB"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-GND"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U13-NC-Pad21)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U13-NC-Pad32)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U13-IO15-Pad20)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/TX"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U8-Pad5)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U1-SHELL-Pad4)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U8-Pad4)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/D-"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U8-Pad7)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/IO9"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-+3V3"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/TH_SDA"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/SW"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/BAT"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/SensorCapV"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U13-NC-Pad33)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-VCC"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/Square_Wave_Signal"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/Light_Sensor_Analog"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/RX"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-Net-(D1-A)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U1-SBU2-PadB8)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/Voltage_Measurement_Select"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U13-IO3-Pad6)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U3-NC-Pad1)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/Light_Sensor_Select"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-Net-(U1-CC2)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U13-IO2-Pad5)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U13-NC-Pad4)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/Buzzer"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/TH_SCL"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/EN"
+        "pattern": "Board_1-LED_Green"
       },
       {
         "netclass": "Board_1-Default",
@@ -812,55 +1032,11 @@
       },
       {
         "netclass": "Board_1-Default",
-        "pattern": "Board_1-/LED_GREEN"
+        "pattern": "Board_1-TH_SCL"
       },
       {
         "netclass": "Board_1-Default",
-        "pattern": "Board_1-/D+"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U1-SBU1-PadA8)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/AD_Capacitance"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-Net-(U13-IO4)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-Net-(D3-+)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U1-SHELL-Pad3)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/LED_RED"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/IO8"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U1-SHELL-Pad2)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-/Light_Sensor_In"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U5-LBO-Pad4)"
-      },
-      {
-        "netclass": "Board_1-Default",
-        "pattern": "Board_1-unconnected-(U3-NC-Pad6)"
+        "pattern": "Board_1-Net-(U13-IO15)"
       },
       {
         "netclass": "Board_1-Default",
@@ -868,139 +1044,175 @@
       },
       {
         "netclass": "Board_1-Default",
+        "pattern": "Board_1-Buzzer"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U13-NC-Pad33)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-IO8"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U13-IO18-Pad24)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-IO9"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U5-LBO-Pad4)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-TX"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-Voltage_Measurement_Select"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-Net-(D3-+)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U13-IO19-Pad25)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-LED_Red"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U13-NC-Pad32)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U1-SHELL-Pad3)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U1-SHELL-Pad4)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-Net-(D1-A)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-EN"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U8-Pad5)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-RX"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U8-Pad4)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-+3V3"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-Light_Sensor_In"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U1-SHELL-Pad2)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U3-NC-Pad1)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U13-NC-Pad4)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U1-SBU2-PadB8)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(BZ1-NC-Pad3)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U3-NC-Pad6)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U13-NC-Pad21)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U13-NC-Pad7)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-Light_Sensor_Select"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U13-NC-Pad35)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U1-SHELL-Pad1)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U13-IO20-Pad26)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U1-SBU1-PadA8)"
+      },
+      {
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-TH_SDA"
+      },
+      {
+        "netclass": "Board_1-Default",
         "pattern": "Board_1-unconnected-(U13-NC-Pad34)"
       },
       {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-/TH_SDA"
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(U8-Pad7)"
       },
       {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U8-Pad4)"
+        "netclass": "Board_1-Default",
+        "pattern": "Board_1-unconnected-(BZ1-NC-Pad4)"
       },
       {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U13-NC-Pad32)"
+        "netclass": "Board_1-Power",
+        "pattern": "Board_1-PWR*"
       },
       {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U13-IO15-Pad20)"
+        "netclass": "Board_1-USB",
+        "pattern": "Board_1-USB*"
       },
       {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U13-IO2-Pad5)"
+        "netclass": "Board_1-Analog",
+        "pattern": "Board_1-ADC*"
       },
       {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-/D-"
+        "netclass": "Board_1-GND",
+        "pattern": "Board_1-*GND*"
       },
       {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-/IO9"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U1-SHELL-Pad2)"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U13-NC-Pad21)"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-/LED_GREEN"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-Net-(R1-Pad1)"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-/D+"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U13-IO3-Pad6)"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-GND"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U8-Pad5)"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-/LED_RED"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-/Buzzer"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U8-Pad7)"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U13-NC-Pad33)"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-/SW"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U3-NC-Pad1)"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-/AD_Capacitance"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-/FB"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-Net-(U1-CC2)"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U13-NC-Pad7)"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U5-LBO-Pad4)"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-/IO8"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-/EN"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-Net-(D3-+)"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-VCC"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U1-SHELL-Pad3)"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U1-SHELL-Pad4)"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-/BAT"
+        "netclass": "Board_1-Moisture",
+        "pattern": "Board_1-*Moisture*"
       },
       {
         "netclass": "Board_2-Default",
@@ -1008,11 +1220,7 @@
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-/Light_Sensor_Analog"
-      },
-      {
-        "netclass": "Board_2-Default",
-        "pattern": "Board_2-/Square_Wave_Signal"
+        "pattern": "Board_2-unconnected-(U13-NC-Pad35)"
       },
       {
         "netclass": "Board_2-Default",
@@ -1020,55 +1228,71 @@
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-Net-(U13-IO4)"
+        "pattern": "Board_2-unconnected-(U3-NC-Pad6)"
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-/RX"
+        "pattern": "Board_2-TH_SDA"
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-/TH_SCL"
+        "pattern": "Board_2-RX"
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-/Voltage_Measurement_Analog"
+        "pattern": "Board_2-Net-(D3-+)"
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-/Light_Sensor_In"
+        "pattern": "Board_2-unconnected-(U8-Pad5)"
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U13-NC-Pad34)"
+        "pattern": "Board_2-Voltage_Measurement_Select"
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-/TX"
+        "pattern": "Board_2-Buzzer"
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U13-NC-Pad35)"
+        "pattern": "Board_2-LED_Red"
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-/Light_Sensor_Select"
+        "pattern": "Board_2-TH_SCL"
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U8-Pad6)"
+        "pattern": "Board_2-Light_Sensor_Select"
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-+3V3"
+        "pattern": "Board_2-unconnected-(U1-SHELL-Pad4)"
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-Net-(U1-CC1)"
+        "pattern": "Board_2-unconnected-(U3-NC-Pad1)"
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-/USB"
+        "pattern": "Board_2-unconnected-(BZ1-NC-Pad3)"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-unconnected-(U13-IO18-Pad24)"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-unconnected-(U8-Pad4)"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-IO9"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-TX"
       },
       {
         "netclass": "Board_2-Default",
@@ -1076,11 +1300,75 @@
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-/Voltage_Measurement_Select"
+        "pattern": "Board_2-Net-(D1-A)"
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-unconnected-(U3-NC-Pad6)"
+        "pattern": "Board_2-unconnected-(U13-NC-Pad33)"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-Light_Sensor_In"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-Net-(R1-Pad1)"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-unconnected-(U1-SHELL-Pad3)"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-EN"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-IO8"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-unconnected-(U1-SHELL-Pad2)"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-LED_Green"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-unconnected-(U13-NC-Pad34)"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-unconnected-(U13-IO20-Pad26)"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-unconnected-(U13-NC-Pad7)"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-Net-(U13-IO15)"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-unconnected-(BZ1-NC-Pad4)"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-unconnected-(U13-NC-Pad21)"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-unconnected-(U5-LBO-Pad4)"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-unconnected-(U8-Pad6)"
+      },
+      {
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-unconnected-(U13-NC-Pad32)"
       },
       {
         "netclass": "Board_2-Default",
@@ -1088,223 +1376,35 @@
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-Net-(D1-A)"
+        "pattern": "Board_2-unconnected-(U13-IO19-Pad25)"
       },
       {
         "netclass": "Board_2-Default",
-        "pattern": "Board_2-/SensorCapV"
+        "pattern": "Board_2-unconnected-(U8-Pad7)"
       },
       {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-VCC"
+        "netclass": "Board_2-Default",
+        "pattern": "Board_2-+3V3"
       },
       {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/RX"
+        "netclass": "Board_2-Power",
+        "pattern": "Board_2-PWR*"
       },
       {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-Net-(U13-IO4)"
+        "netclass": "Board_2-USB",
+        "pattern": "Board_2-USB*"
       },
       {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U13-IO3-Pad6)"
+        "netclass": "Board_2-Analog",
+        "pattern": "Board_2-ADC*"
       },
       {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U13-NC-Pad34)"
+        "netclass": "Board_2-GND",
+        "pattern": "Board_2-*GND*"
       },
       {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U5-LBO-Pad4)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/USB"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U8-Pad6)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U13-NC-Pad7)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U8-Pad7)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/FB"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U13-NC-Pad33)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/EN"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U1-SHELL-Pad1)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/D-"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/Voltage_Measurement_Select"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/TH_SDA"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U1-SHELL-Pad2)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U8-Pad5)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/Light_Sensor_In"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-GND"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U1-SBU1-PadA8)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/LED_RED"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/Light_Sensor_Analog"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/Square_Wave_Signal"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/AD_Capacitance"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-Net-(R1-Pad1)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U13-NC-Pad32)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U1-SBU2-PadB8)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U13-NC-Pad4)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U3-NC-Pad1)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/Light_Sensor_Select"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U3-NC-Pad6)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/LED_GREEN"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/SW"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/TH_SCL"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/Voltage_Measurement_Analog"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/TX"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-Net-(U1-CC2)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-Net-(D1-A)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/IO8"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U13-IO2-Pad5)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U13-NC-Pad21)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-Net-(D3-+)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-Net-(U1-CC1)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U1-SHELL-Pad3)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/SensorCapV"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U1-SHELL-Pad4)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/BAT"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U13-IO15-Pad20)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-unconnected-(U8-Pad4)"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/Buzzer"
-      },
-      {
-        "netclass": "Board_3-Default",
-        "pattern": "Board_3-/D+"
+        "netclass": "Board_2-Moisture",
+        "pattern": "Board_2-*Moisture*"
       },
       {
         "netclass": "Board_3-Default",
@@ -1312,59 +1412,199 @@
       },
       {
         "netclass": "Board_3-Default",
+        "pattern": "Board_3-LED_Red"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(BZ1-NC-Pad3)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-Light_Sensor_In"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U1-SHELL-Pad2)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U13-NC-Pad32)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U13-NC-Pad33)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U3-NC-Pad6)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U8-Pad6)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-TH_SDA"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U13-IO19-Pad25)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-Net-(R1-Pad1)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-Light_Sensor_Select"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U5-LBO-Pad4)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-Net-(U13-IO15)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U1-SHELL-Pad4)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U13-IO20-Pad26)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U13-NC-Pad34)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-Buzzer"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-Voltage_Measurement_Select"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U1-SBU1-PadA8)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-IO8"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-TH_SCL"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-EN"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-IO9"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U1-SBU2-PadB8)"
+      },
+      {
+        "netclass": "Board_3-Default",
         "pattern": "Board_3-+3V3"
       },
       {
         "netclass": "Board_3-Default",
-        "pattern": "Board_3-/IO9"
+        "pattern": "Board_3-unconnected-(BZ1-NC-Pad4)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U8-Pad7)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U1-SHELL-Pad3)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U13-NC-Pad21)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-RX"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U13-NC-Pad7)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U1-SHELL-Pad1)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U13-NC-Pad4)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-TX"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-Net-(D3-+)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U3-NC-Pad1)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-LED_Green"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U8-Pad5)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U13-IO18-Pad24)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-Net-(D1-A)"
+      },
+      {
+        "netclass": "Board_3-Default",
+        "pattern": "Board_3-unconnected-(U8-Pad4)"
+      },
+      {
+        "netclass": "Board_3-Power",
+        "pattern": "Board_3-PWR*"
+      },
+      {
+        "netclass": "Board_3-USB",
+        "pattern": "Board_3-USB*"
+      },
+      {
+        "netclass": "Board_3-Analog",
+        "pattern": "Board_3-ADC*"
+      },
+      {
+        "netclass": "Board_3-GND",
+        "pattern": "Board_3-*GND*"
+      },
+      {
+        "netclass": "Board_3-Moisture",
+        "pattern": "Board_3-*Moisture*"
       },
       {
         "netclass": "Board_4-Default",
-        "pattern": "Board_4-/Buzzer"
+        "pattern": "Board_4-unconnected-(BZ1-NC-Pad4)"
       },
       {
         "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U13-NC-Pad4)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U8-Pad6)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-GND"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-/EN"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U1-SHELL-Pad1)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U1-SHELL-Pad3)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U1-SHELL-Pad4)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U13-NC-Pad35)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U8-Pad7)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U8-Pad4)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-Net-(U1-CC1)"
+        "pattern": "Board_4-Voltage_Measurement_Select"
       },
       {
         "netclass": "Board_4-Default",
@@ -1372,139 +1612,31 @@
       },
       {
         "netclass": "Board_4-Default",
-        "pattern": "Board_4-/LED_RED"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-/USB"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-Net-(U13-IO4)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U1-SBU2-PadB8)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-+3V3"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-/SensorCapV"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U13-IO15-Pad20)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-/BAT"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-/SW"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U5-LBO-Pad4)"
-      },
-      {
-        "netclass": "Board_4-Default",
         "pattern": "Board_4-Net-(D3-+)"
       },
       {
         "netclass": "Board_4-Default",
-        "pattern": "Board_4-/AD_Capacitance"
+        "pattern": "Board_4-Light_Sensor_In"
       },
       {
         "netclass": "Board_4-Default",
-        "pattern": "Board_4-/Voltage_Measurement_Select"
+        "pattern": "Board_4-LED_Red"
       },
       {
         "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U1-SHELL-Pad2)"
+        "pattern": "Board_4-Net-(U13-IO15)"
       },
       {
         "netclass": "Board_4-Default",
-        "pattern": "Board_4-/TH_SDA"
+        "pattern": "Board_4-Buzzer"
       },
       {
         "netclass": "Board_4-Default",
-        "pattern": "Board_4-/FB"
+        "pattern": "Board_4-unconnected-(U13-NC-Pad35)"
       },
       {
         "netclass": "Board_4-Default",
-        "pattern": "Board_4-/D-"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U3-NC-Pad6)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-/IO8"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-/Light_Sensor_In"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-Net-(R1-Pad1)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U1-SBU1-PadA8)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-/D+"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-/TH_SCL"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-/IO9"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-/Light_Sensor_Analog"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-/Light_Sensor_Select"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U3-NC-Pad1)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U8-Pad5)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U13-NC-Pad7)"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-/RX"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-/TX"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-/Voltage_Measurement_Analog"
-      },
-      {
-        "netclass": "Board_4-Default",
-        "pattern": "Board_4-VCC"
+        "pattern": "Board_4-TH_SCL"
       },
       {
         "netclass": "Board_4-Default",
@@ -1512,23 +1644,75 @@
       },
       {
         "netclass": "Board_4-Default",
-        "pattern": "Board_4-/Square_Wave_Signal"
+        "pattern": "Board_4-RX"
       },
       {
         "netclass": "Board_4-Default",
-        "pattern": "Board_4-Net-(D1-A)"
+        "pattern": "Board_4-unconnected-(U8-Pad5)"
       },
       {
         "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U13-IO3-Pad6)"
+        "pattern": "Board_4-unconnected-(U13-NC-Pad4)"
       },
       {
         "netclass": "Board_4-Default",
-        "pattern": "Board_4-/LED_GREEN"
+        "pattern": "Board_4-TH_SDA"
       },
       {
         "netclass": "Board_4-Default",
-        "pattern": "Board_4-unconnected-(U13-IO2-Pad5)"
+        "pattern": "Board_4-unconnected-(U8-Pad6)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-unconnected-(U3-NC-Pad6)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-IO9"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-unconnected-(U1-SBU2-PadB8)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-unconnected-(U13-IO18-Pad24)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-unconnected-(U8-Pad4)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-unconnected-(U1-SBU1-PadA8)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-unconnected-(U1-SHELL-Pad4)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-EN"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-unconnected-(U13-IO20-Pad26)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-unconnected-(U3-NC-Pad1)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-+3V3"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-unconnected-(U1-SHELL-Pad1)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-unconnected-(U13-NC-Pad7)"
       },
       {
         "netclass": "Board_4-Default",
@@ -1536,11 +1720,75 @@
       },
       {
         "netclass": "Board_4-Default",
-        "pattern": "Board_4-Net-(U1-CC2)"
+        "pattern": "Board_4-unconnected-(U1-SHELL-Pad3)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-Light_Sensor_Select"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-TX"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-LED_Green"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-unconnected-(U8-Pad7)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-unconnected-(U5-LBO-Pad4)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-unconnected-(BZ1-NC-Pad3)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-Net-(D1-A)"
       },
       {
         "netclass": "Board_4-Default",
         "pattern": "Board_4-unconnected-(U13-NC-Pad34)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-unconnected-(U1-SHELL-Pad2)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-unconnected-(U13-IO19-Pad25)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-Net-(R1-Pad1)"
+      },
+      {
+        "netclass": "Board_4-Default",
+        "pattern": "Board_4-IO8"
+      },
+      {
+        "netclass": "Board_4-Power",
+        "pattern": "Board_4-PWR*"
+      },
+      {
+        "netclass": "Board_4-USB",
+        "pattern": "Board_4-USB*"
+      },
+      {
+        "netclass": "Board_4-Analog",
+        "pattern": "Board_4-ADC*"
+      },
+      {
+        "netclass": "Board_4-GND",
+        "pattern": "Board_4-*GND*"
+      },
+      {
+        "netclass": "Board_4-Moisture",
+        "pattern": "Board_4-*Moisture*"
       }
     ]
   },
