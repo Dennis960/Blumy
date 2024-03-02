@@ -14,7 +14,7 @@ output = "ESPlant-Board-Panel/panel.kicad_pcb"
 layout = {
     "hspace": "2mm",
     "vspace": "2mm",
-    "cols": "5"
+    "cols": "2"
 }
 source = {
     "tolerance": "15mm"
