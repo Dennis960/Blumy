@@ -1,6 +1,8 @@
 FROM ubuntu
 RUN useradd --create-home --shell /bin/bash --uid 1001 appuser
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && \
     apt-get install -y gpg-agent python-is-python3 redis software-properties-common python3-pip && \
     add-apt-repository --yes ppa:kicad/kicad-dev-nightly && \
