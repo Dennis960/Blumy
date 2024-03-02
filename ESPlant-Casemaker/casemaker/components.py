@@ -8,7 +8,7 @@ spring_width = 7
 spring_length = 8
 leg_length = 8
 spacing = 11
-battery_spring_position = (5.5, 49.1)
+battery_spring_position = (6.5, 45)
 
 battery_spring = (cq.Workplane()
                   .moveTo(-0.5 * contact_width, -0.5 * thickness)

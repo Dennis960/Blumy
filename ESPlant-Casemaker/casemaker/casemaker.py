@@ -391,3 +391,6 @@ if __name__ == "__main__":
         "battery_holder": casemaker.battery_holder.battery_holder_cq_object,
         # "batteries": casemaker.battery_holder.batteries_cq_object,
     })
+    cq.Assembly(casemaker.case.case_cq_object, name="case").save("case.stl")
+    cq.Assembly(casemaker.battery_holder.battery_holder_cq_object, name="battery_holder").save("battery_holder.stl")
+    cq.Assembly(casemaker.compartment_door.door_cq_object, name="compartment_door").save("compartment_door.stl")
