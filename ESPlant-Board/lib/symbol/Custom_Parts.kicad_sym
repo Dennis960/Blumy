@@ -90,11 +90,11 @@
     )
     (symbol "AAA_Battery-Spring_1_1"
       (pin power_out line (at -3.81 -2.54 0) (length 3.81)
-        (name "-" (effects (font (size 1 1))))
+        (name "+" (effects (font (size 1 1))))
         (number "1" (effects (font (size 1 1))))
       )
       (pin power_out line (at -3.81 2.54 0) (length 3.81)
-        (name "+" (effects (font (size 1 1))))
+        (name "-" (effects (font (size 1 1))))
         (number "2" (effects (font (size 1 1))))
       )
     )
