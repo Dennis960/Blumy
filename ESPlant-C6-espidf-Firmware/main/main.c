@@ -129,6 +129,17 @@ void disableLightSensor()
     gpio_set_level(LIGHT_SENSOR_SELECT, 0);
 }
 
+float readLightPercentage()
+{
+    enableLightSensor();
+    vTaskDelay(20 / portTICK_PERIOD_MS); // Wait for the sensor to stabilize (statistically >10ms is enough)
+    int light_sensor_value = analogReadVoltage(ADC_LIGHT_SENSOR_CHANNEL);
+    disableLightSensor();
+    const int max_value = 3300;
+    ESP_LOGI("Light Sensor", "Value: %d", light_sensor_value);
+    return light_sensor_value / (float)max_value;
+}
+
 void enableVoltageMeasurement()
 {
     gpio_set_level(VOLTAGE_MEASUREMENT_SELECT, 0);
@@ -177,13 +188,12 @@ void app_main()
     ESP_ERROR_CHECK(gpio_config(&io_conf));
 
     initAdc();
-    enableLightSensor();
     initAht(TEMPERATURE_SENSOR_SDA, TEMPERATURE_SENSOR_SCL);
 
     while (1)
     {
-        int light_sensor_value = analogReadVoltage(ADC_LIGHT_SENSOR_CHANNEL);
-        ESP_LOGI("Light Sensor", "Value: %d", light_sensor_value);
+        float light_sensor_percentage = readLightPercentage();
+        ESP_LOGI("Light Sensor", "Percentage: %.2f%%", 100 * light_sensor_percentage);
         float voltage_measurement_value = readVoltage();
         ESP_LOGI("Voltage Measurement", "Value: %.2f", voltage_measurement_value);
         aht_data_t data;
