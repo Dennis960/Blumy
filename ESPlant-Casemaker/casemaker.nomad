@@ -12,16 +12,16 @@ job "casemaker" {
 
   priority = 1
 
+  constraint {
+    attribute = "${node.class}"
+    value = "worker"
+  }
+
   group "web" {
     # run both server and worker on the same node so that they can share the upload directory
     ephemeral_disk {
       migrate = true
       size = 4096
-    }
-
-    constraint {
-      attribute = "${node.class}"
-      value = "worker"
     }
 
     restart {
