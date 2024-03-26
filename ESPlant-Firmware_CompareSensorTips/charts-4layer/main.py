@@ -172,6 +172,10 @@ for key in dataDict:
 #     if dataDict[key]['measurement_dry'] > ATT_0 * 4096:
 #         del dataDict[key]
 
+# Filter only PDDN sensor
+for key in list(dataDict):
+    if dataDict[key]['sensor'] != "PDDN":
+        del dataDict[key]
 sortedByScore = sorted(dataDict.items(), key=lambda x: x[1]['score'], reverse=True)[:50]
 # reverse sortedByDifference
 sortedByScore.reverse()
@@ -248,7 +252,7 @@ print("r1s: {}".format(r1s))
 print("c1s: {}".format(c1s))
 print("sensors: {}".format(sensors))
 
-exit()
+# exit()
 
 def plot2D(keyX: KEY, keyY: KEY, ax, keyFilter: KEY=None, filter=None, log=False, color='blue', alpha=1, offset_x=9):
     x = []
@@ -337,17 +341,17 @@ fig, ((ax1, ax2, ax3, ax4, ax5), (ax7, ax8, ax9, ax10, ax11)) = plot.subplots(2,
 # plot2DHistogram('difference', 'sensor', "PDDN", ax5, 'yellow')
 # plot2DHistogram('difference', 'sensor', "PN", ax6, 'black')
 
-plot3D('duty_cycle', 'difference', 'frequency', ax1, True, 150, filterKey='sensor', filter="NPPN")
-plot3D('duty_cycle', 'difference', 'frequency', ax2, True, 150, filterKey='sensor', filter="PNNP")
-plot3D('duty_cycle', 'difference', 'frequency', ax3, True, 150, filterKey='sensor', filter="PNDD")
-plot3D('duty_cycle', 'difference', 'frequency', ax4, True, 150, filterKey='sensor', filter="PDDN")
-plot3D('duty_cycle', 'difference', 'frequency', ax5, True, 150, filterKey='sensor', filter="PN")
+# plot3D('frequency', 'duty_cycle', 'difference', ax1, True, 150, filterKey='sensor', filter="NPPN")
+# plot3D('frequency', 'duty_cycle', 'difference', ax2, True, 150, filterKey='sensor', filter="PNNP")
+# plot3D('frequency', 'duty_cycle', 'difference', ax3, True, 150, filterKey='sensor', filter="PNDD")
+# plot3D('frequency', 'duty_cycle', 'difference', ax4, True, 150, filterKey='sensor', filter="PDDN")
+# plot3D('frequency', 'duty_cycle', 'difference', ax5, True, 150, filterKey='sensor', filter="PN")
 
-plot3D('r1', 'c1', 'difference', ax7, True, 150, filterKey='sensor', filter="NPPN")
-plot3D('r1', 'c1', 'difference', ax8, True, 150, filterKey='sensor', filter="PNNP")
-plot3D('r1', 'c1', 'difference', ax9, True, 150, filterKey='sensor', filter="PNDD")
-plot3D('r1', 'c1', 'difference', ax10, True, 150, filterKey='sensor', filter="PDDN")
-plot3D('r1', 'c1', 'difference', ax11, True, 150, filterKey='sensor', filter="PN")
+# plot3D('r1', 'c1', 'difference', ax7, True, 150, filterKey='sensor', filter="NPPN")
+# plot3D('r1', 'c1', 'difference', ax8, True, 150, filterKey='sensor', filter="PNNP")
+# plot3D('r1', 'c1', 'difference', ax9, True, 150, filterKey='sensor', filter="PNDD")
+# plot3D('r1', 'c1', 'difference', ax10, True, 150, filterKey='sensor', filter="PDDN")
+# plot3D('r1', 'c1', 'difference', ax11, True, 150, filterKey='sensor', filter="PN")
 
 # plot3D('frequency', 'duty_cycle', 'stabilization_time_avg', ax1, True, 150, filterKey='sensor', filter="NPPN")
 # plot3D('frequency', 'duty_cycle', 'stabilization_time_avg', ax2, True, 150, filterKey='sensor', filter="PNNP")
