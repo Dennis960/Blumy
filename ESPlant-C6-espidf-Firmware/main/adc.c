@@ -1,7 +1,9 @@
 // Taken from https://github.com/espressif/esp-idf/blob/master/examples/peripherals/adc/oneshot_read/main/oneshot_read_main.c
-
+#pragma once
 #include "esp_log.h"
 #include "esp_adc/adc_oneshot.h"
+
+#include "config.c"
 
 static int adc_raw[2][10];
 static int voltage[2][10];
@@ -43,9 +45,15 @@ void initAdc()
         .bitwidth = ADC_BITWIDTH_DEFAULT,
         .atten = ADC_ATTEN_DB_12,
     };
-    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_CHANNEL_3, &config));
-    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_CHANNEL_0, &config));
-    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_CHANNEL_6, &config));
+
+    // TODO this also needs calibration
+    // adc_oneshot_chan_cfg_t config2 = {
+    //     .bitwidth = ADC_BITWIDTH_DEFAULT,
+    //     .atten = ADC_ATTEN_DB_0,
+    // };
+    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_LIGHT_SENSOR_CHANNEL, &config));
+    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_MOISTURE_SENSOR_CHANNEL, &config));
+    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_VOLTAGE_MEASUREMENT_CHANNEL, &config));
 
     //-------------ADC1 Calibration Init---------------//
     // FOR ESP32-S2
@@ -72,6 +80,37 @@ int analogReadVoltage(adc_channel_t channel)
 {
     analogRead(channel);
     return voltage[ADC_UNIT_1][channel];
+}
+
+/**
+ * @brief Read the average analog value of an adc channel over a number of measurements
+ * @param adcChannel The ADC channel
+ * @param numberOfMeasurements The number of measurements to take in total
+ * @param numberOfThrowaway The number of smallest and largest measurements to throw away
+ */
+int analogReadAverageVoltage(adc_channel_t adcChannel, int numberOfMeasurements, int numberOfThrowaway)
+{
+    int measurementsTemp[numberOfMeasurements];
+    for (int i = 0; i < numberOfMeasurements; i++)
+    {
+        int measurement = analogReadVoltage(adcChannel);
+        // insert sorted
+        int j = i;
+        while (j > 0 && measurementsTemp[j - 1] > measurement)
+        {
+            measurementsTemp[j] = measurementsTemp[j - 1];
+            j--;
+        }
+        measurementsTemp[j] = measurement;
+    }
+    // calculate the mean of median measurements
+    long measurement = 0;
+    for (int i = numberOfThrowaway; i < numberOfMeasurements - numberOfThrowaway; i++)
+    {
+        measurement += measurementsTemp[i];
+    }
+    measurement /= numberOfMeasurements - 2 * numberOfThrowaway;
+    return measurement;
 }
 
 void deinitAdc()
