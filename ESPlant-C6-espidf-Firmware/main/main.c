@@ -65,6 +65,7 @@ void playTone(int frequency, int duration_ms)
 
 void setRedLedBrightness(float brightness)
 {
+    brightness = brightness * brightness;
     if (brightness <= 0)
     {
         ledc_stop(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_1, 0);
@@ -91,6 +92,7 @@ void setRedLedBrightness(float brightness)
 
 void setGreenLedBrightness(float brightness)
 {
+    brightness = brightness * brightness;
     if (brightness <= 0)
     {
         ledc_stop(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_2, 0);
@@ -137,6 +139,21 @@ void disableVoltageMeasurement()
     gpio_set_level(VOLTAGE_MEASUREMENT_SELECT, 1);
 }
 
+float readVoltage()
+{
+    enableVoltageMeasurement();
+    int voltage = analogReadVoltage(ADC_VOLTAGE_MEASUREMENT_CHANNEL);
+    disableVoltageMeasurement();
+    const int r1 = 5100;
+    const int r2 = 2000;
+    return voltage * (r1 + r2) / r2;
+}
+
+bool isUsbConnected()
+{
+    return gpio_get_level(POWER_USB_VIN);
+}
+
 void app_main()
 {
     // Set digital output pins
@@ -151,6 +168,7 @@ void app_main()
                         (1ULL << MOISTURE_SQUARE_WAVE_SIGNAL) |
                         (1ULL << BUZZER)};
     ESP_ERROR_CHECK(gpio_config(&io_conf));
+    disableVoltageMeasurement();
 
     // Set digital input pins
     io_conf.mode = GPIO_MODE_INPUT;
@@ -164,20 +182,32 @@ void app_main()
 
     while (1)
     {
-        int light_sensor_value = analogReadRaw(ADC_LIGHT_SENSOR_CHANNEL);
+        int light_sensor_value = analogReadVoltage(ADC_LIGHT_SENSOR_CHANNEL);
         ESP_LOGI("Light Sensor", "Value: %d", light_sensor_value);
-        int voltage_measurement_value = analogReadVoltage(ADC_VOLTAGE_MEASUREMENT_CHANNEL);
-        ESP_LOGI("Voltage Measurement", "Value: %d", voltage_measurement_value);
+        float voltage_measurement_value = readVoltage();
+        ESP_LOGI("Voltage Measurement", "Value: %.2f", voltage_measurement_value);
         aht_data_t data;
         aht_read_data(&data);
         ESP_LOGI("Temperature", "Value: %.2f", data.temperature);
         ESP_LOGI("Humidity", "Value: %.2f", data.humidity);
+        bool usb_connected = isUsbConnected();
+        ESP_LOGI("USB", "Connected: %s", usb_connected ? "true" : "false");
 
-        // playTone(light_sensor_value, 10);
-        setGreenLedBrightness(0.2);
+        setRedLedBrightness(0.1);
+        setGreenLedBrightness(0.1);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        setRedLedBrightness(0.5);
+        setGreenLedBrightness(0.5);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        setRedLedBrightness(0);
+        setGreenLedBrightness(0);
+        // int frequency = 1000;
+        // int duration_ms = 100;
+        // playTone(frequency, duration_ms);
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 
-    deinit_adc();
+    deinitAdc();
+    deinitAht();
 }
