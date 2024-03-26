@@ -2802,6 +2802,14 @@
     (uuid fe9a86d9-456a-4164-83ef-c3de7a386a6d)
   )
 
+  (text_box "TODO: use a different resistor"
+    (at 54.61 113.03 0) (size 12.7 7.62)
+    (stroke (width 0) (type default))
+    (fill (type none))
+    (effects (font (size 1.27 1.27)) (justify left top))
+    (uuid 21f8fc7c-5162-4a74-9f98-c12956ff9325)
+  )
+
   (text "Capacitor formed\nby solder pads" (at 30.48 54.61 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 0d26f376-74bf-4ba7-8d07-6d5d00bd5608)
