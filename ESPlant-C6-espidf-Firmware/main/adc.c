@@ -10,6 +10,7 @@ static int voltage[2][10];
 const static char *TAG = "ADC";
 static adc_oneshot_unit_handle_t adc1_handle;
 static adc_cali_handle_t adc1_cali_handle = NULL;
+static adc_cali_handle_t adc1_cali_handle2 = NULL;
 
 static void adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t *out_handle)
 {
@@ -46,12 +47,11 @@ void initAdc()
         .atten = ADC_ATTEN_DB_12,
     };
 
-    // TODO this also needs calibration
-    // adc_oneshot_chan_cfg_t config2 = {
-    //     .bitwidth = ADC_BITWIDTH_DEFAULT,
-    //     .atten = ADC_ATTEN_DB_0,
-    // };
-    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_LIGHT_SENSOR_CHANNEL, &config));
+    adc_oneshot_chan_cfg_t config2 = {
+        .bitwidth = ADC_BITWIDTH_DEFAULT,
+        .atten = ADC_ATTEN_DB_0,
+    };
+    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_LIGHT_SENSOR_CHANNEL, &config2));
     ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_MOISTURE_SENSOR_CHANNEL, &config));
     ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_VOLTAGE_MEASUREMENT_CHANNEL, &config));
 
@@ -62,6 +62,7 @@ void initAdc()
     // ADC_ATTEN_DB_6 150 mV ~ 1750 mV
     // ADC_ATTEN_DB_12 150 mV ~ 2450 mV
     adc_calibration_init(ADC_UNIT_1, ADC_ATTEN_DB_12, &adc1_cali_handle);
+    adc_calibration_init(ADC_UNIT_1, ADC_ATTEN_DB_0, &adc1_cali_handle2);
 }
 
 static void analogRead(adc_channel_t channel)
@@ -69,7 +70,14 @@ static void analogRead(adc_channel_t channel)
     adc_unit_t unit = ADC_UNIT_1;
     ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, channel, &adc_raw[unit][channel]));
     ESP_LOGD(TAG, "ADC%d Channel[%d] Raw Data: %d", unit + 1, channel, adc_raw[unit][channel]);
-    ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle, adc_raw[unit][channel], &voltage[unit][channel]));
+    if (channel == ADC_LIGHT_SENSOR_CHANNEL)
+    {
+        ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle2, adc_raw[unit][channel], &voltage[unit][channel]));
+    }
+    else
+    {
+        ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle, adc_raw[unit][channel], &voltage[unit][channel]));
+    }
     ESP_LOGD(TAG, "ADC%d Channel[%d] Cali Voltage: %d mV", unit + 1, channel, voltage[unit][channel]);
 }
 
@@ -82,18 +90,18 @@ int analogReadVoltage(adc_channel_t channel)
     return voltage[ADC_UNIT_1][channel];
 }
 
-/**
- * @brief Read the average analog value of an adc channel over a number of measurements
- * @param adcChannel The ADC channel
- * @param numberOfMeasurements The number of measurements to take in total
- * @param numberOfThrowaway The number of smallest and largest measurements to throw away
- */
-int analogReadAverageVoltage(adc_channel_t adcChannel, int numberOfMeasurements, int numberOfThrowaway)
+int analogReadRaw(adc_channel_t channel)
+{
+    analogRead(channel);
+    return adc_raw[ADC_UNIT_1][channel];
+}
+
+static int analogReadAverage(adc_channel_t adcChannel, int numberOfMeasurements, int numberOfThrowaway, int (*readFunction)(adc_channel_t, int, int))
 {
     int measurementsTemp[numberOfMeasurements];
     for (int i = 0; i < numberOfMeasurements; i++)
     {
-        int measurement = analogReadVoltage(adcChannel);
+        int measurement = readFunction(adcChannel, 0, 0);
         // insert sorted
         int j = i;
         while (j > 0 && measurementsTemp[j - 1] > measurement)
@@ -111,6 +119,32 @@ int analogReadAverageVoltage(adc_channel_t adcChannel, int numberOfMeasurements,
     }
     measurement /= numberOfMeasurements - 2 * numberOfThrowaway;
     return measurement;
+}
+
+/**
+ * @brief Read the average analog value of an adc channel over a number of measurements
+ * @param adcChannel The ADC channel
+ * @param numberOfMeasurements The number of measurements to take in total
+ * @param numberOfThrowaway The number of smallest and largest measurements to throw away
+ *
+ * @return The average voltage in mV
+ */
+int analogReadAverageVoltage(adc_channel_t adcChannel, int numberOfMeasurements, int numberOfThrowaway)
+{
+    return analogReadAverage(adcChannel, numberOfMeasurements, numberOfThrowaway, analogReadVoltage);
+}
+
+/**
+ * @brief Read the average analog value of an adc channel over a number of measurements
+ * @param adcChannel The ADC channel
+ * @param numberOfMeasurements The number of measurements to take in total
+ * @param numberOfThrowaway The number of smallest and largest measurements to throw away
+ *
+ * @return The average raw value
+ */
+int analogReadAverageRaw(adc_channel_t adcChannel, int numberOfMeasurements, int numberOfThrowaway)
+{
+    return analogReadAverage(adcChannel, numberOfMeasurements, numberOfThrowaway, analogReadRaw);
 }
 
 void deinitAdc()

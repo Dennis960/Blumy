@@ -106,9 +106,9 @@ float readLightPercentage()
 {
     enableLightSensor();
     vTaskDelay(20 / portTICK_PERIOD_MS); // Wait for the sensor to stabilize (statistically >10ms is enough)
-    int light_sensor_value = analogReadVoltage(ADC_LIGHT_SENSOR_CHANNEL);
+    int light_sensor_value = analogReadAverageRaw(ADC_LIGHT_SENSOR_CHANNEL, 20, 5);
     disableLightSensor();
-    const int max_value = 3300;
+    const int max_value = 4095;
     ESP_LOGI("Light Sensor", "Value: %d", light_sensor_value);
     return light_sensor_value / (float)max_value;
 }
