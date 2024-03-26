@@ -6,15 +6,12 @@
 static int adc_raw[2][10];
 static int voltage[2][10];
 const static char *TAG = "ADC";
-static bool do_calibration = false;
 static adc_oneshot_unit_handle_t adc1_handle;
 static adc_cali_handle_t adc1_cali_handle = NULL;
 
-static bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t *out_handle)
+static void adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t *out_handle)
 {
     adc_cali_handle_t handle = NULL;
-    esp_err_t ret = ESP_FAIL;
-    bool calibrated = false;
 
     ESP_LOGI(TAG, "calibration scheme version is %s", "Curve Fitting");
     adc_cali_curve_fitting_config_t cali_config = {
@@ -22,27 +19,9 @@ static bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_ha
         .atten = atten,
         .bitwidth = ADC_BITWIDTH_DEFAULT,
     };
-    ret = adc_cali_create_scheme_curve_fitting(&cali_config, &handle);
-    if (ret == ESP_OK)
-    {
-        calibrated = true;
-    }
+    ESP_ERROR_CHECK(adc_cali_create_scheme_curve_fitting(&cali_config, &handle));
 
     *out_handle = handle;
-    if (ret == ESP_OK)
-    {
-        ESP_LOGI(TAG, "Calibration Success");
-    }
-    else if (ret == ESP_ERR_NOT_SUPPORTED || !calibrated)
-    {
-        ESP_LOGW(TAG, "eFuse not burnt, skip software calibration");
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Invalid arg or no memory");
-    }
-
-    return calibrated;
 }
 
 static void adc_calibration_deinit(adc_cali_handle_t handle)
@@ -74,38 +53,29 @@ void initAdc()
     // ADC_ATTEN_DB_2_5 100 mV ~ 1250 mV
     // ADC_ATTEN_DB_6 150 mV ~ 1750 mV
     // ADC_ATTEN_DB_12 150 mV ~ 2450 mV
-    do_calibration = adc_calibration_init(ADC_UNIT_1, ADC_ATTEN_DB_12, &adc1_cali_handle);
+    adc_calibration_init(ADC_UNIT_1, ADC_ATTEN_DB_12, &adc1_cali_handle);
 }
 
-static int analogRead(adc_channel_t channel)
+static void analogRead(adc_channel_t channel)
 {
     adc_unit_t unit = ADC_UNIT_1;
     ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, channel, &adc_raw[unit][channel]));
     ESP_LOGD(TAG, "ADC%d Channel[%d] Raw Data: %d", unit + 1, channel, adc_raw[unit][channel]);
-    if (do_calibration)
-    {
-        ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle, adc_raw[unit][channel], &voltage[unit][channel]));
-        ESP_LOGD(TAG, "ADC%d Channel[%d] Cali Voltage: %d mV", unit + 1, channel, voltage[unit][channel]);
-    }
+    ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle, adc_raw[unit][channel], &voltage[unit][channel]));
+    ESP_LOGD(TAG, "ADC%d Channel[%d] Cali Voltage: %d mV", unit + 1, channel, voltage[unit][channel]);
 }
 
+/**
+ * @return Raw ADC value in mV
+ */
 int analogReadVoltage(adc_channel_t channel)
 {
     analogRead(channel);
     return voltage[ADC_UNIT_1][channel];
 }
 
-int analogReadRaw(adc_channel_t channel)
-{
-    analogRead(channel);
-    return adc_raw[ADC_UNIT_1][channel];
-}
-
-void deinit_adc()
+void deinitAdc()
 {
     ESP_ERROR_CHECK(adc_oneshot_del_unit(adc1_handle));
-    if (do_calibration)
-    {
-        adc_calibration_deinit(adc1_cali_handle);
-    }
+    adc_calibration_deinit(adc1_cali_handle);
 }

@@ -42,3 +42,9 @@ void aht_read_data(aht_data_t *data)
     data->temperature = temperature;
     data->humidity = humidity;
 }
+
+void deinitAht()
+{
+    ESP_ERROR_CHECK(aht20_del_sensor(aht_handle));
+    ESP_ERROR_CHECK(i2c_driver_delete(I2C_NUM_0));
+}
