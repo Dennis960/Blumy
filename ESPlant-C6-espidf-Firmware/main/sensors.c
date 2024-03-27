@@ -3,6 +3,8 @@
 #include "driver/gpio.h"
 #include "driver/ledc.h"
 #include "esp_timer.h"
+#include "driver/i2c.h"
+#include "aht20.h"
 
 #include "adc.c"
 #include "config.c"
@@ -14,26 +16,218 @@ typedef struct
 {
     unsigned long stabilization_time;
     int measurement;
-} moisture_sensor_output_t;
+} sensors_moisture_sensor_output_t;
 
-unsigned long millis()
+typedef struct
+{
+    float temperature;
+    float humidity;
+} sensors_aht_data_t;
+
+static unsigned long millis()
 {
     return esp_timer_get_time() / 1000;
 }
 
-static bool measure_stabilized_output(moisture_sensor_output_t *output)
+static bool ledc_initialized[LEDC_CHANNEL_MAX] = {false};
+
+/**
+ * @param duty_cycle Duty cycle in percentage (0.0 to 1.0)
+ */
+static void analogWrite(int gpio, int frequency, float duty_cycle, ledc_channel_t channel)
+{
+    if (duty_cycle <= 0)
+    {
+        if (ledc_initialized[channel])
+        {
+            ledc_stop(LEDC_LOW_SPEED_MODE, channel, 0);
+        }
+        return;
+    }
+    else if (!ledc_initialized[channel])
+    {
+        ledc_initialized[channel] = true;
+    }
+    ledc_timer_bit_t duty_resolution = LEDC_TIMER_13_BIT;
+    if (frequency < 1000)
+    {
+        duty_resolution = LEDC_TIMER_10_BIT;
+    }
+    else if (frequency < 10000)
+    {
+        duty_resolution = LEDC_TIMER_9_BIT;
+    }
+    else if (frequency < 100000)
+    {
+        duty_resolution = LEDC_TIMER_7_BIT;
+    }
+    else if (frequency < 1000000)
+    {
+        duty_resolution = LEDC_TIMER_5_BIT;
+    }
+    else
+    {
+        duty_resolution = LEDC_TIMER_3_BIT;
+    }
+    ledc_timer_config_t ledc_timer = {
+        .duty_resolution = duty_resolution,
+        .freq_hz = frequency,
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .timer_num = LEDC_TIMER_0};
+    ESP_ERROR_CHECK(ledc_timer_config(&ledc_timer));
+
+    ledc_channel_config_t ledc_channel = {
+        .gpio_num = gpio,
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .channel = channel,
+        .intr_type = LEDC_INTR_DISABLE,
+        .timer_sel = LEDC_TIMER_0,
+        .duty = (1 << duty_resolution) * duty_cycle,
+        .hpoint = 0};
+    ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
+}
+
+static TimerHandle_t toneTimer;
+static void buzzerOffCallback(TimerHandle_t xTimer)
+{
+    analogWrite(BUZZER, 0, 0, BUZZER_CHANNEL);
+}
+void sensors_playToneAsync(int frequency, int duration_ms)
+{
+    analogWrite(BUZZER, frequency, 0.5, BUZZER_CHANNEL);
+
+    if (toneTimer == NULL)
+    {
+        toneTimer = xTimerCreate("ToneTimer", pdMS_TO_TICKS(duration_ms), pdFALSE, NULL, buzzerOffCallback);
+    }
+    else
+    {
+        xTimerChangePeriod(toneTimer, pdMS_TO_TICKS(duration_ms), 0);
+    }
+    xTimerStart(toneTimer, 0);
+}
+void sensors_playToneSync(int frequency, int duration_ms)
+{
+    analogWrite(BUZZER, frequency, 0.5, BUZZER_CHANNEL);
+    vTaskDelay(duration_ms / portTICK_PERIOD_MS);
+    analogWrite(BUZZER, 0, 0, BUZZER_CHANNEL);
+}
+
+void sensors_setRedLedBrightness(float brightness)
+{
+    analogWrite(LED_RED, 5000, brightness * brightness, LED_RED_CHANNEL);
+}
+
+void sensors_setGreenLedBrightness(float brightness)
+{
+    analogWrite(LED_GREEN, 5000, brightness * brightness, LED_GREEN_CHANNEL);
+}
+
+static void enableLightSensor()
+{
+    gpio_set_level(LIGHT_SENSOR_IN, 1);
+}
+
+static void disableLightSensor()
+{
+    gpio_set_level(LIGHT_SENSOR_IN, 0);
+}
+
+/**
+ * @return Light percentage (0.0 to 1.0)
+ */
+float sensors_readLightPercentage()
+{
+    enableLightSensor();
+    vTaskDelay(20 / portTICK_PERIOD_MS); // Wait for the sensor to stabilize (statistically >10ms is enough)
+    int light_sensor_value = analogReadAverageRaw(ADC_LIGHT_SENSOR_CHANNEL, 20, 5);
+    disableLightSensor();
+    const int max_value = 4095;
+    ESP_LOGI("Light Sensor", "Value: %d", light_sensor_value);
+    return light_sensor_value / (float)max_value;
+}
+
+static void enableVoltageMeasurement()
+{
+    gpio_set_level(VOLTAGE_MEASUREMENT_SELECT, 0);
+}
+
+static void disableVoltageMeasurement()
+{
+    gpio_set_level(VOLTAGE_MEASUREMENT_SELECT, 1);
+}
+
+float sensors_readVoltage()
+{
+    enableVoltageMeasurement();
+    int voltage = analogReadVoltage(ADC_VOLTAGE_MEASUREMENT_CHANNEL);
+    disableVoltageMeasurement();
+    const int r1 = 5100;
+    const int r2 = 2000;
+    return voltage * (r1 + r2) / r2;
+}
+
+bool sensors_isUsbConnected()
+{
+    return gpio_get_level(POWER_USB_VIN);
+}
+
+static aht20_dev_handle_t aht_handle = NULL;
+
+static void configureI2cBus(int sda, int scl)
+{
+    i2c_config_t conf = {
+        .mode = I2C_MODE_MASTER,
+        .sda_io_num = sda,
+        .sda_pullup_en = GPIO_PULLUP_ENABLE,
+        .scl_io_num = scl,
+        .scl_pullup_en = GPIO_PULLUP_ENABLE,
+        .master.clk_speed = 100000,
+        .clk_flags = 0,
+    };
+    ESP_ERROR_CHECK(i2c_param_config(I2C_NUM_0, &conf));
+    ESP_ERROR_CHECK(i2c_driver_install(I2C_NUM_0, conf.mode, 0, 0, 0));
+}
+
+static void initAht(int sda, int scl)
+{
+    configureI2cBus(sda, scl);
+    aht20_i2c_config_t i2c_config = {
+        .i2c_addr = AHT20_ADDRRES_0,
+        .i2c_port = I2C_NUM_0,
+    };
+    ESP_ERROR_CHECK(aht20_new_sensor(&i2c_config, &aht_handle));
+}
+
+void sensors_aht_read_data(sensors_aht_data_t *data)
+{
+    uint32_t temperature_raw, humidity_raw;
+    float temperature, humidity;
+    ESP_ERROR_CHECK(aht20_read_temperature_humidity(aht_handle, &temperature_raw, &temperature, &humidity_raw, &humidity));
+    data->temperature = temperature;
+    data->humidity = humidity;
+}
+
+static void deinitAht()
+{
+    ESP_ERROR_CHECK(aht20_del_sensor(aht_handle));
+    ESP_ERROR_CHECK(i2c_driver_delete(I2C_NUM_0));
+}
+
+// Moisture sensor
+static bool measure_stabilized_output(sensors_moisture_sensor_output_t *output)
 {
     const int numberOfMeasurements = 5;
     unsigned long measurementStartTime = millis();
     unsigned long stabilization_time;
     while (true)
     {
-        int min = 4096; // TODO figure out what the max value is, it is not 4096
+        int min = 10000;
         int max = 0;
         int sum = 0;
         for (int i = 0; i < numberOfMeasurements; i++)
         {
-            int measurement = analogReadAverageVoltage(ADC_MOISTURE_SENSOR_CHANNEL, 100, 10);
+            int measurement = analogReadAverageRaw(ADC_MOISTURE_SENSOR_CHANNEL, 100, 10);
             if (measurement < min)
             {
                 min = measurement;
@@ -63,53 +257,19 @@ static bool measure_stabilized_output(moisture_sensor_output_t *output)
     }
 }
 
+/**
+ * @param dutyCycle Duty cycle (0 to 255)
+ */
 static void setupMoistureSensor(long frequency, int dutyCycle)
 {
-    ledc_timer_bit_t duty_resolution = LEDC_TIMER_13_BIT;
-    if (frequency < 1000)
-    {
-        duty_resolution = LEDC_TIMER_10_BIT;
-    }
-    else if (frequency < 10000)
-    {
-        duty_resolution = LEDC_TIMER_9_BIT;
-    }
-    else if (frequency < 100000)
-    {
-        duty_resolution = LEDC_TIMER_7_BIT;
-    }
-    else if (frequency < 1000000)
-    {
-        duty_resolution = LEDC_TIMER_5_BIT;
-    }
-    else
-    {
-        duty_resolution = LEDC_TIMER_3_BIT;
-    }
-    // Configure LEDC peripheral
-    ledc_timer_config_t ledc_timer = {
-        .duty_resolution = duty_resolution,
-        .freq_hz = frequency,
-        .speed_mode = LEDC_LOW_SPEED_MODE,
-        .timer_num = LEDC_TIMER_0};
-    ESP_ERROR_CHECK(ledc_timer_config(&ledc_timer));
-
-    ledc_channel_config_t ledc_channel = {
-        .gpio_num = MOISTURE_SQUARE_WAVE_SIGNAL,
-        .speed_mode = LEDC_LOW_SPEED_MODE,
-        .channel = LEDC_CHANNEL_3,
-        .intr_type = LEDC_INTR_DISABLE,
-        .timer_sel = LEDC_TIMER_0,
-        .duty = (1 << duty_resolution) * (dutyCycle / (float)255),
-        .hpoint = 0};
-    ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
+    analogWrite(MOISTURE_SQUARE_WAVE_SIGNAL, frequency, dutyCycle / 255.0, MOISTURE_SQUARE_WAVE_SIGNAL_CHANNEL);
 }
 
 static void resetToZero()
 {
     int strength = 1;
     int analogValue = analogReadVoltage(ADC_MOISTURE_SENSOR_CHANNEL);
-    ledc_stop(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_3, 0);
+    analogWrite(MOISTURE_SQUARE_WAVE_SIGNAL, 0, 0, MOISTURE_SQUARE_WAVE_SIGNAL_CHANNEL);
     while (analogValue > 0 && strength <= 256)
     {
         ESP_ERROR_CHECK(gpio_set_direction(ADC_MOISTURE_SENSOR, GPIO_MODE_OUTPUT));
@@ -129,13 +289,51 @@ static void stopMoistureSensor()
     ledc_stop(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_3, 0);
 }
 
-bool read_moisture(moisture_sensor_output_t *output)
+bool sensors_read_moisture(sensors_moisture_sensor_output_t *output)
 {
     resetToZero();
-    setupMoistureSensor(12800, 6);
-    if (measure_stabilized_output(output))
+    setupMoistureSensor(12800, 2);
+    bool success = measure_stabilized_output(output);
+    stopMoistureSensor();
+    return success;
+}
+
+// End moisture sensor
+
+void sensors_initSensors()
+{
+    // Set digital output pins
+    gpio_config_t io_conf = {
+        .mode = GPIO_MODE_OUTPUT,
+        .intr_type = GPIO_INTR_DISABLE,
+        .pin_bit_mask = (1ULL << LIGHT_SENSOR_IN) |
+                        (1ULL << LIGHT_SENSOR_SELECT) |
+                        (1ULL << VOLTAGE_MEASUREMENT_SELECT) |
+                        (1ULL << LED_RED) |
+                        (1ULL << LED_GREEN) |
+                        (1ULL << MOISTURE_SQUARE_WAVE_SIGNAL) |
+                        (1ULL << BUZZER)};
+    ESP_ERROR_CHECK(gpio_config(&io_conf));
+    gpio_set_level(LIGHT_SENSOR_SELECT, 0);
+    disableVoltageMeasurement();
+
+    // Set digital input pins
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+    io_conf.pin_bit_mask = (1ULL << POWER_USB_VIN);
+    ESP_ERROR_CHECK(gpio_config(&io_conf));
+
+    initAdc();
+    initAht(TEMPERATURE_SENSOR_SDA, TEMPERATURE_SENSOR_SCL);
+}
+
+void sensors_deinitSensors()
+{
+    deinitAdc();
+    deinitAht();
+    stopMoistureSensor();
+    if (toneTimer != NULL)
     {
-        return true;
+        xTimerDelete(toneTimer, 0);
     }
-    return -1;
 }
