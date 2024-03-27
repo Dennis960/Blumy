@@ -20,6 +20,8 @@ typedef struct
 
 typedef struct
 {
+    uint32_t temperature_raw;
+    uint32_t humidity_raw;
     float temperature;
     float humidity;
 } sensors_aht_data_t;
@@ -143,7 +145,6 @@ float sensors_readLightPercentage()
     int light_sensor_value = analogReadAverageRaw(ADC_LIGHT_SENSOR_CHANNEL, 20, 5);
     disableLightSensor();
     const int max_value = 4095;
-    ESP_LOGI("Light Sensor", "Value: %d", light_sensor_value);
     return light_sensor_value / (float)max_value;
 }
 
@@ -204,6 +205,8 @@ void sensors_aht_read_data(sensors_aht_data_t *data)
     uint32_t temperature_raw, humidity_raw;
     float temperature, humidity;
     ESP_ERROR_CHECK(aht20_read_temperature_humidity(aht_handle, &temperature_raw, &temperature, &humidity_raw, &humidity));
+    data->temperature_raw = temperature_raw;
+    data->humidity_raw = humidity_raw;
     data->temperature = temperature;
     data->humidity = humidity;
 }

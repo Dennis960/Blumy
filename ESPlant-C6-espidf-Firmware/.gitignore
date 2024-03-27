@@ -3,3 +3,4 @@
 debug.log
 esp_idf_project_configuration.json
 sdkconfig*
+secret.c
