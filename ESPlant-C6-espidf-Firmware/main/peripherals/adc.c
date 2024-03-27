@@ -6,7 +6,7 @@
 
 static int adc_raw[2][10];
 static int voltage[2][10];
-const static char *TAG = "ADC";
+const static char *ADC_TAG = "ADC";
 static adc_oneshot_unit_handle_t adc1_handle;
 static adc_cali_handle_t adc1_cali_handle = NULL;
 static adc_cali_handle_t adc1_cali_handle2 = NULL;
@@ -15,7 +15,7 @@ static void adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_ha
 {
     adc_cali_handle_t handle = NULL;
 
-    ESP_LOGI(TAG, "calibration scheme version is %s", "Curve Fitting");
+    ESP_LOGI(ADC_TAG, "calibration scheme version is %s", "Curve Fitting");
     adc_cali_curve_fitting_config_t cali_config = {
         .unit_id = unit,
         .atten = atten,
@@ -28,7 +28,7 @@ static void adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_ha
 
 static void adc_calibration_deinit(adc_cali_handle_t handle)
 {
-    ESP_LOGI(TAG, "deregister %s calibration scheme", "Curve Fitting");
+    ESP_LOGI(ADC_TAG, "deregister %s calibration scheme", "Curve Fitting");
     ESP_ERROR_CHECK(adc_cali_delete_scheme_curve_fitting(handle));
 }
 
@@ -68,10 +68,10 @@ static void analogRead(adc_channel_t channel)
 {
     adc_unit_t unit = ADC_UNIT_1;
     ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, channel, &adc_raw[unit][channel]));
-    ESP_LOGD(TAG, "ADC%d Channel[%d] Raw Data: %d", unit + 1, channel, adc_raw[unit][channel]);
+    ESP_LOGD(ADC_TAG, "ADC%d Channel[%d] Raw Data: %d", unit + 1, channel, adc_raw[unit][channel]);
     adc_cali_handle_t cali_handle = channel == ADC_LIGHT_SENSOR_CHANNEL ? adc1_cali_handle2 : adc1_cali_handle;
     ESP_ERROR_CHECK(adc_cali_raw_to_voltage(cali_handle, adc_raw[unit][channel], &voltage[unit][channel]));
-    ESP_LOGD(TAG, "ADC%d Channel[%d] Cali Voltage: %d mV", unit + 1, channel, voltage[unit][channel]);
+    ESP_LOGD(ADC_TAG, "ADC%d Channel[%d] Cali Voltage: %d mV", unit + 1, channel, voltage[unit][channel]);
 }
 
 /**
