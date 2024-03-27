@@ -2,11 +2,7 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 
-#include "driver/gpio.h"
-#include "driver/ledc.h"
-
-#include "config.c"
-#include "sensors.c"
+#include "peripherals/sensors.c"
 
 void app_main()
 {
@@ -39,9 +35,9 @@ void app_main()
         sensors_setRedLedBrightness(0);
         sensors_setGreenLedBrightness(0);
 
-        int frequency = 1000;
-        int duration_ms = 100;
-        sensors_playToneAsync(frequency, duration_ms);
+        // int frequency = 1000;
+        // int duration_ms = 100;
+        // sensors_playToneAsync(frequency, duration_ms);
 
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }

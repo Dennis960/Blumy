@@ -1,2 +1,2 @@
-idf_component_register(SRCS "config.c" "sensors.c" "adc.c" "main.c"
+idf_component_register(SRCS "peripherals/config.c" "peripherals/sensors.c" "peripherals/adc.c" "main.c"
                     INCLUDE_DIRS ".")
