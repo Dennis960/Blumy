@@ -30,7 +30,8 @@ battery_holder_settings = BatteryHolderSettings(
     battery_length_tolerance=2,
     battery_diameter_tolerance=0.25,
     offset=(0, 0.2, 0),
-    flip_polarity=True
+    flip_polarity=True,
+    back_wall_height=12.5
 )
 
 mounting_hole_diameter = 3.2
