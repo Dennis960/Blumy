@@ -1,5 +1,4 @@
 // Taken from https://github.com/espressif/esp-idf/blob/master/examples/peripherals/adc/oneshot_read/main/oneshot_read_main.c
-#pragma once
 #include "esp_log.h"
 #include "esp_adc/adc_oneshot.h"
 
@@ -70,14 +69,8 @@ static void analogRead(adc_channel_t channel)
     adc_unit_t unit = ADC_UNIT_1;
     ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, channel, &adc_raw[unit][channel]));
     ESP_LOGD(TAG, "ADC%d Channel[%d] Raw Data: %d", unit + 1, channel, adc_raw[unit][channel]);
-    if (channel == ADC_LIGHT_SENSOR_CHANNEL)
-    {
-        ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle2, adc_raw[unit][channel], &voltage[unit][channel]));
-    }
-    else
-    {
-        ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle, adc_raw[unit][channel], &voltage[unit][channel]));
-    }
+    adc_cali_handle_t cali_handle = channel == ADC_LIGHT_SENSOR_CHANNEL ? adc1_cali_handle2 : adc1_cali_handle;
+    ESP_ERROR_CHECK(adc_cali_raw_to_voltage(cali_handle, adc_raw[unit][channel], &voltage[unit][channel]));
     ESP_LOGD(TAG, "ADC%d Channel[%d] Cali Voltage: %d mV", unit + 1, channel, voltage[unit][channel]);
 }
 
@@ -96,12 +89,12 @@ int analogReadRaw(adc_channel_t channel)
     return adc_raw[ADC_UNIT_1][channel];
 }
 
-static int analogReadAverage(adc_channel_t adcChannel, int numberOfMeasurements, int numberOfThrowaway, int (*readFunction)(adc_channel_t, int, int))
+static int analogReadAverage(adc_channel_t adcChannel, int numberOfMeasurements, int numberOfThrowaway, int (*readFunction)(adc_channel_t))
 {
     int measurementsTemp[numberOfMeasurements];
     for (int i = 0; i < numberOfMeasurements; i++)
     {
-        int measurement = readFunction(adcChannel, 0, 0);
+        int measurement = readFunction(adcChannel);
         // insert sorted
         int j = i;
         while (j > 0 && measurementsTemp[j - 1] > measurement)
