@@ -263,7 +263,7 @@ class BatteryHolderSettings:
 
     offset: cq.Vector = cq.Vector(0, 0, 0)
 
-    insertable_springs_thickness: float = 4
+    insertable_springs_thickness: float = 3.5
 
     center_text: str = "AAA"
     text_size: float = 5
