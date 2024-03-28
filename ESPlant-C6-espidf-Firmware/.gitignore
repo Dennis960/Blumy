@@ -1,6 +1,7 @@
 /managed_components
 /build
+/data
 debug.log
 esp_idf_project_configuration.json
-sdkconfig*
+sdkconfig.old
 secret.c

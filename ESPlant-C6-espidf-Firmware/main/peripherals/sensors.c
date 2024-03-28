@@ -26,6 +26,20 @@ typedef struct
     float humidity;
 } sensors_aht_data_t;
 
+typedef struct
+{
+    float light;
+    float voltage;
+    float temperature;
+    float humidity;
+    bool is_usb_connected;
+    int moisture_measurement;
+    unsigned long moisture_stabilization_time;
+    bool moisture_measurement_successful;
+    unsigned long humidity_raw;
+    unsigned long temperature_raw;
+} sensors_full_data_t;
+
 static unsigned long millis()
 {
     return esp_timer_get_time() / 1000;
@@ -165,7 +179,7 @@ float sensors_readVoltage()
     disableVoltageMeasurement();
     const int r1 = 5100;
     const int r2 = 2000;
-    return voltage * (r1 + r2) / r2;
+    return voltage * (r1 + r2) / (float)r2 / (float)1000;
 }
 
 bool sensors_isUsbConnected()
@@ -339,4 +353,21 @@ void sensors_deinitSensors()
     {
         xTimerDelete(toneTimer, 0);
     }
+}
+
+void sensors_full_read(sensors_full_data_t *data)
+{
+    data->light = sensors_readLightPercentage();
+    data->voltage = sensors_readVoltage();
+    sensors_aht_data_t aht_data;
+    sensors_aht_read_data(&aht_data); // For performance, this could be done in parallel as it does a delay of 100 ms
+    data->temperature = aht_data.temperature;
+    data->humidity = aht_data.humidity;
+    data->temperature_raw = aht_data.temperature_raw;
+    data->humidity_raw = aht_data.humidity_raw;
+    data->is_usb_connected = sensors_isUsbConnected();
+    sensors_moisture_sensor_output_t moisture_sensor_output;
+    data->moisture_measurement_successful = sensors_read_moisture(&moisture_sensor_output);
+    data->moisture_measurement = moisture_sensor_output.measurement;
+    data->moisture_stabilization_time = moisture_sensor_output.stabilization_time;
 }
