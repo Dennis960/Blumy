@@ -1,5 +1,6 @@
 import cadquery as cq
 from settings import BatteryHolderSettings
+from components import battery_springs_front
 
 
 class BatteryHolder:
@@ -76,7 +77,7 @@ class BatteryHolder:
                           .line(s.outer_wall_thickness, 0)
                           .line(0, -s.outer_wall_height - s.floor_thickness)
                           .close()
-                          .extrude(total_battery_length)
+                          .extrude(total_battery_length + s.front_wall_thickness)
                           )
         battery_holder = (battery_holder
                           .faces("<Y")
@@ -88,13 +89,13 @@ class BatteryHolder:
                           .faces(">Y")
                           .workplane()
                           .rect(total_width, s.front_wall_height, centered=(True, False))
-                          .extrude(s.front_wall_thickness)
+                          .extrude(-s.insertable_springs_thickness)
                           )
-        insertable_springs = (cq.Workplane("XY")
-                                .transformed(rotate=(90, 180, 0), offset=(0, +s.battery.length/2 + s.battery_length_tolerance, s.floor_thickness))
-                                .rect(all_batteries_width, total_battery_width, centered=(True, False))
-                                .extrude(s.insertable_springs_thickness)
-                              )
+        # TODO This uses hardcoded values
+        insertable_springs = battery_springs_front.translate(
+            (0, +s.battery.length/2 + s.battery_length_tolerance -
+             1 + s.front_wall_thickness, s.floor_thickness)
+        )
         batteries = self.generate_batteries()
         polarity_text = self._generate_polarity_text()
         battery_holder = battery_holder.cut(batteries).cut(insertable_springs)
@@ -124,4 +125,8 @@ if __name__ == "__main__":
     ocp_vscode.show_all({
         "battery_holder": battery_holder.battery_holder_cq_object,
         "batteries": battery_holder.batteries_cq_object,
+        "battery_springs_front": battery_springs_front.translate(
+            (0, +battery_holder.settings.battery.length/2 + battery_holder.settings.battery_length_tolerance +
+             battery_holder.settings.insertable_springs_thickness, battery_holder.settings.floor_thickness)
+        ),
     })

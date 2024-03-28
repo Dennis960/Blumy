@@ -25,7 +25,6 @@ compartment_door_settings = CompartmentDoorSettings(tab_spacing_factor=0.8, fitt
 battery_holder_settings = BatteryHolderSettings(
     front_wall_thickness=2.5,
     back_wall_thickness=2,
-    insertable_springs_thickness=1,
     polartiy_text_spacing=0.2,
     battery_length_tolerance=2,
     battery_diameter_tolerance=0.25,
