@@ -161,7 +161,7 @@ static void disableVoltageMeasurement()
 float sensors_readVoltage()
 {
     enableVoltageMeasurement();
-    int voltage = analogReadVoltage(ADC_VOLTAGE_MEASUREMENT_CHANNEL);
+    int voltage = analogReadAverageVoltage(ADC_VOLTAGE_MEASUREMENT_CHANNEL, 10, 3);
     disableVoltageMeasurement();
     const int r1 = 5100;
     const int r2 = 2000;
