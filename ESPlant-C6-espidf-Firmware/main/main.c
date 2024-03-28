@@ -1,64 +1,94 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
-#include <string.h>
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "esp_event.h"
 #include "nvs_flash.h"
-#include "esp_log.h"
-
-#include "lwip/err.h"
-#include "lwip/sys.h"
 
 #include "peripherals/sensors.c"
 #include "secret.c"
 #include "wifi.c"
+#include "configuration_mode_server.c"
 
-#define WIFI_MAX_RETRY 1
+#include "esp_http_client.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <string.h>
+
+// TODO use udp or mqtt
+void sendSensorData(sensors_full_data_t *sensors_data, int8_t rssi)
+{
+    int sensorAddress = 13;
+    char data[400];
+
+    sprintf(data, "{\"sensorAddress\":%d,\"light\":%2.2f,\"voltage\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f,\"isUsbConnected\":%s,\"moisture\":%d,\"moistureStabilizationTime\":%lu,\"isMoistureMeasurementSuccessful\":%s,\"humidityRaw\":%lu,\"temperatureRaw\":%lu,\"rssi\":%d}",
+            sensorAddress,
+            sensors_data->light,
+            sensors_data->voltage,
+            sensors_data->temperature,
+            sensors_data->humidity,
+            sensors_data->is_usb_connected ? "true" : "false",
+            sensors_data->moisture_measurement,
+            sensors_data->moisture_stabilization_time,
+            sensors_data->moisture_measurement_successful ? "true" : "false",
+            sensors_data->humidity_raw,
+            sensors_data->temperature_raw,
+            rssi);
+
+    esp_http_client_config_t config = {
+        .url = SECRET_API_URL,
+        .method = HTTP_METHOD_POST,
+    };
+
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+    esp_http_client_set_post_field(client, data, strlen(data));
+    esp_http_client_set_header(client, "Content-Type", "application/json");
+    ESP_ERROR_CHECK(esp_http_client_perform(client));
+
+    esp_http_client_cleanup(client);
+
+    ESP_LOGI("Data", "%s", data);
+    int status_code = esp_http_client_get_status_code(client);
+    ESP_LOGI("HTTP", "Status Code: %d", status_code);
+}
 
 void app_main()
 {
-    // Initialize NVS
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
-    {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
+    initNvs();
+    initLittleFs();
 
-    wifi_config_t wifi_config = {
+    wifi_config_t wifi_sta_config = {
         .sta = {
             .ssid = SECRET_ESP_WIFI_SSID,
             .password = SECRET_ESP_WIFI_PASS,
         },
     };
+    wifi_config_t wifi_ap_config = {
+        .ap = {
+            .ssid = "Blumy",
+            .password = "Blumy123",
+            .max_connection = 4,
+        },
+    };
 
-    wifi_init_sta(&wifi_config, WIFI_MAX_RETRY);
+    int8_t rssi;
+    bool success = initWifi(&wifi_sta_config, &wifi_ap_config, 5, &rssi);
+    if (!success)
+    {
+        ESP_LOGE("WIFI", "Failed to connect to wifi");
+        return;
+    }
     sensors_initSensors();
+
+    sensors_full_data_t sensors_data;
+    sensors_full_read(&sensors_data);
+
+    sendSensorData(&sensors_data, rssi);
 
     while (1)
     {
-        float light_sensor_percentage = sensors_readLightPercentage() * 100;
-        float voltage_measurement_value = sensors_readVoltage();
-        sensors_aht_data_t aht_data;
-        sensors_aht_read_data(&aht_data);
-        bool usb_connected = sensors_isUsbConnected();
-        sensors_moisture_sensor_output_t output;
-        bool measurement_successful = sensors_read_moisture(&output);
-        sensors_setRedLedBrightness(0.1);
-        sensors_setGreenLedBrightness(0.1);
-
-        // ESP_LOGI("Sensors", "USB: %d, Light: %2.2f, Voltage: %.0f, Temp: %2.2f, Humidity: %2.2f, Moisture: %4d, Humidty_raw: %lu, Temp_raw: %lu",
-        //          usb_connected, light_sensor_percentage, voltage_measurement_value, aht_data.temperature, aht_data.humidity, output.measurement, aht_data.humidity_raw, aht_data.temperature_raw);
-
-        printf("%d %2.2f %.0f %2.2f %2.2f %4d %lu %lu\n",
-               usb_connected, light_sensor_percentage, voltage_measurement_value, aht_data.temperature, aht_data.humidity, output.measurement, aht_data.humidity_raw, aht_data.temperature_raw);
-
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        // Server mode
     }
+    
 
     sensors_deinitSensors();
+    deinitLittleFs();
 }
