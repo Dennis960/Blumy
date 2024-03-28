@@ -5,8 +5,8 @@
 void initLittleFs()
 {
     esp_vfs_littlefs_conf_t conf = {
-        .base_path = "/configuration_server",
-        .partition_label = "configuration_server",
+        .base_path = "",
+        .partition_label = "littlefs",
         .format_if_mount_failed = true,
         .dont_mount = false,
     };
@@ -25,14 +25,14 @@ void initLittleFs()
 
 void deinitLittleFs()
 {
-    ESP_ERROR_CHECK(esp_vfs_littlefs_unregister("/configuration_server"));
+    ESP_ERROR_CHECK(esp_vfs_littlefs_unregister("/littlefs"));
 }
 
 // Returns the requested file from the LittleFS
 esp_err_t get_handler(httpd_req_t *req)
 {
     char path[600];
-    sprintf(path, "/configuration_server%s", req->uri);
+    sprintf(path, "%s", req->uri);
     ESP_LOGI("HTTP", "GET %s", path);
     FILE *file = fopen(path, "r");
     if (file == NULL)
@@ -40,6 +40,22 @@ esp_err_t get_handler(httpd_req_t *req)
         httpd_resp_send_404(req);
         return ESP_FAIL;
     }
+    // If javascript file, set content type to javascript
+    if (strstr(path, ".js") != NULL)
+    {
+        httpd_resp_set_type(req, "application/javascript");
+    }
+    // If css file, set content type to css
+    if (strstr(path, ".css") != NULL)
+    {
+        httpd_resp_set_type(req, "text/css");
+    }
+    // If html file, set content type to html
+    if (strstr(path, ".html") != NULL)
+    {
+        httpd_resp_set_type(req, "text/html");
+    }
+
     char line[256];
     while (fgets(line, sizeof(line), file))
     {
@@ -340,6 +356,7 @@ httpd_handle_t start_webserver(void)
     /* Generate default configuration */
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.uri_match_fn = httpd_uri_match_wildcard;
+    config.max_uri_handlers = 50;
 
     /* Empty handle to esp_http_server */
     httpd_handle_t server = NULL;

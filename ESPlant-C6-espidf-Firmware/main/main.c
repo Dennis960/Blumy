@@ -76,6 +76,7 @@ void app_main()
         ESP_LOGE("WIFI", "Failed to connect to wifi");
         return;
     }
+    httpd_handle_t webserver = start_webserver();
     sensors_initSensors();
 
     sensors_full_data_t sensors_data;
@@ -86,9 +87,10 @@ void app_main()
     while (1)
     {
         // Server mode
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-    
 
     sensors_deinitSensors();
     deinitLittleFs();
+    stop_webserver(webserver);
 }
