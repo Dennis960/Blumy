@@ -1,6 +1,9 @@
 #include "esp_log.h"
 #include "esp_http_server.h"
 #include "esp_littlefs.h"
+#include "cJSON.h"
+
+#include "wifi.c"
 
 void initLittleFs()
 {
@@ -83,15 +86,27 @@ esp_err_t post_api_connect_handler(httpd_req_t *req)
         return ESP_FAIL;
     }
 
-    /* Send a simple response */
-    const char resp[] = "Not Implemented";
+    /* Extract ssid and password from request, they are separated by newline */
+    char ssid[33];
+    char password[100];
+    sscanf(content, "%[^\n]\n%[^\n]", ssid, password);
+
+    ESP_LOGI("HTTP", "SSID: %s, Password: %s", ssid, password);
+
+    const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+
+    // TODO
+    // if (wifi_connect(ssid, password))
+    // {
+    //     save_wifi_credentials(ssid, password);
+    // }
     return ESP_OK;
 }
 
 esp_err_t post_api_reset_handler(httpd_req_t *req)
 {
-    char content[100];
+    char content[1];
 
     /* Truncate if content length larger than the buffer */
     size_t recv_size = MIN(req->content_len, sizeof(content));
@@ -106,22 +121,47 @@ esp_err_t post_api_reset_handler(httpd_req_t *req)
         return ESP_FAIL;
     }
 
-    /* Send a simple response */
-    const char resp[] = "Not Implemented";
+    const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+
+    if (strcmp(content, "1") == 0)
+    {
+        // TODO
+        // reset();
+    }
     return ESP_OK;
 }
 
 esp_err_t get_api_networks_handler(httpd_req_t *req)
 {
-    const char resp[] = "Not Implemented";
+    my_wifi_ap_record_t ap_records[20];
+    int num_ap_records = 20;
+    wifi_scan_networks(ap_records, &num_ap_records);
+
+    cJSON *root = cJSON_CreateArray();
+    for (int i = 0; i < num_ap_records; i++)
+    {
+        cJSON *ap = cJSON_CreateObject();
+        cJSON_AddNumberToObject(ap, "rssi", ap_records[i].rssi);
+        cJSON_AddStringToObject(ap, "ssid", ap_records[i].ssid);
+        cJSON_AddNumberToObject(ap, "secure", ap_records[i].secure);
+        cJSON_AddItemToArray(root, ap);
+    }
+
+    char *resp = cJSON_Print(root);
+    cJSON_Delete(root);
+
+    httpd_resp_set_type(req, "application/json");
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    free(resp);
     return ESP_OK;
 }
 
 esp_err_t get_api_isConnected_handler(httpd_req_t *req)
 {
-    const char resp[] = "Not Implemented";
+    bool status = wifi_get_status();
+    char s = status ? '1' : '0';
+    const char resp[] = {s, '\0'};
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
@@ -216,36 +256,6 @@ esp_err_t get_api_update_percentage_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
-esp_err_t post_api_plantName_handler(httpd_req_t *req)
-{
-    char content[100];
-
-    /* Truncate if content length larger than the buffer */
-    size_t recv_size = MIN(req->content_len, sizeof(content));
-
-    int ret = httpd_req_recv(req, content, recv_size);
-    if (ret <= 0)
-    {
-        if (ret == HTTPD_SOCK_ERR_TIMEOUT)
-        {
-            httpd_resp_send_408(req);
-        }
-        return ESP_FAIL;
-    }
-
-    /* Send a simple response */
-    const char resp[] = "Not Implemented";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
-    return ESP_OK;
-}
-
-esp_err_t get_api_plantName_handler(httpd_req_t *req)
-{
-    const char resp[] = "Not Implemented";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
-    return ESP_OK;
-}
-
 esp_err_t get_api_connectedNetwork_handler(httpd_req_t *req)
 {
     const char resp[] = "Not Implemented";
@@ -326,18 +336,6 @@ httpd_uri_t get_api_update_percentage = {
     .handler = get_api_update_percentage_handler,
     .user_ctx = NULL};
 
-httpd_uri_t post_api_plantName = {
-    .uri = "/api/plantName",
-    .method = HTTP_POST,
-    .handler = post_api_plantName_handler,
-    .user_ctx = NULL};
-
-httpd_uri_t get_api_plantName = {
-    .uri = "/api/plantName",
-    .method = HTTP_GET,
-    .handler = get_api_plantName_handler,
-    .user_ctx = NULL};
-
 httpd_uri_t get_api_connectedNetwork = {
     .uri = "/api/connectedNetwork",
     .method = HTTP_GET,
@@ -374,8 +372,6 @@ httpd_handle_t start_webserver(void)
         httpd_register_uri_handler(server, &post_api_timeouts_sleep);
         httpd_register_uri_handler(server, &get_api_timeouts_sleep);
         httpd_register_uri_handler(server, &get_api_update_percentage);
-        httpd_register_uri_handler(server, &post_api_plantName);
-        httpd_register_uri_handler(server, &get_api_plantName);
         httpd_register_uri_handler(server, &get_api_connectedNetwork);
         httpd_register_uri_handler(server, &get_api_sensorValue);
         httpd_register_uri_handler(server, &get);

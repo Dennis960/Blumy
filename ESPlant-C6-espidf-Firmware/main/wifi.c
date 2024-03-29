@@ -1,3 +1,5 @@
+#pragma once
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
@@ -126,6 +128,76 @@ bool initWifi(wifi_config_t *wifi_sta_config, wifi_config_t *wifi_ap_config, int
     else
     {
         ESP_LOGE(WIFI_TAG, "UNEXPECTED EVENT");
+    }
+    return false;
+}
+
+/*
+rssi: -55,
+            ssid: "MyWiFi",
+            bssid: "00:11:22:33:44:55",
+            channel: 1,
+            secure: 4,
+            hidden: false,
+            */
+
+typedef struct
+{
+    int8_t rssi;
+    char ssid[32];
+    uint8_t secure;
+} my_wifi_ap_record_t;
+
+int compareWifiApRecords(const void *a, const void *b)
+{
+    return ((wifi_ap_record_t *)b)->rssi - ((wifi_ap_record_t *)a)->rssi;
+}
+
+/**
+ * @brief Scan for available wifi networks
+ *
+ * @param ap_records array of wifi_ap_record_t to store the scan results
+ * @param num_ap_records number of elements in ap_records. Will be updated with the number of elements actually stored in ap_records
+ *
+ * @note The scan results are sorted by rssi in descending order.
+ */
+void wifi_scan_networks(my_wifi_ap_record_t *ap_records, int *num_ap_records)
+{
+    wifi_scan_config_t scan_config = {
+        .ssid = NULL,
+        .bssid = NULL,
+        .channel = 0,
+    };
+    ESP_ERROR_CHECK(esp_wifi_scan_start(&scan_config, true));
+    uint16_t ap_num = 0;
+    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_num(&ap_num));
+    wifi_ap_record_t *ap_list = (wifi_ap_record_t *)malloc(sizeof(wifi_ap_record_t) * ap_num);
+    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&ap_num, ap_list));
+    qsort(ap_list, ap_num, sizeof(wifi_ap_record_t), compareWifiApRecords);
+
+    if (ap_num > *num_ap_records)
+    {
+        ap_num = *num_ap_records;
+    }
+
+    for (int i = 0; i < ap_num; i++)
+    {
+        ap_records[i].rssi = ap_list[i].rssi;
+        strcpy(ap_records[i].ssid, (char *)ap_list[i].ssid);
+        ap_records[i].secure = ap_list[i].authmode;
+    }
+
+    free(ap_list);
+    *num_ap_records = ap_num;
+}
+
+bool wifi_get_status()
+{
+    wifi_ap_record_t ap_info;
+    esp_err_t err = esp_wifi_sta_get_ap_info(&ap_info);
+    if (err == ESP_OK)
+    {
+        return true;
     }
     return false;
 }
