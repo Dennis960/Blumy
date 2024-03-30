@@ -5,6 +5,9 @@
 
 #include "plantfi.c"
 #include "plantstore.c"
+#include "peripherals/sensors.c"
+
+#define DEFAULT_SENSOR_TIMEOUT_SLEEP_MS 1000 * 60 * 30 // 30 minutes
 
 static void initLittleFs()
 {
@@ -141,6 +144,18 @@ bool get_single_value(httpd_req_t *req, char *value)
     return true;
 }
 
+bool is_number(char *content)
+{
+    for (int i = 0; i < strlen(content); i++)
+    {
+        if (content[i] < '0' || content[i] > '9')
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 esp_err_t post_api_connect_handler(httpd_req_t *req)
 {
     char ssid[PLANTFI_SSID_MAX_LENGTH];
@@ -170,10 +185,10 @@ esp_err_t post_api_reset_handler(httpd_req_t *req)
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
 
+    // TODO 0: reset to sensor mode, 1: reset to configuration mode
     if (resetFlag[0] == '1')
     {
-        // TODO
-        // reset();
+        esp_restart();
     }
     return ESP_OK;
 }
@@ -212,85 +227,203 @@ esp_err_t get_api_isConnected_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
-esp_err_t post_api_mqttSetup_handler(httpd_req_t *req)
+esp_err_t post_api_cloudSetup_mqtt_handler(httpd_req_t *req)
 {
-    char content[100];
-
-    /* Truncate if content length larger than the buffer */
-    size_t recv_size = MIN(req->content_len, sizeof(content));
-
-    int ret = httpd_req_recv(req, content, recv_size);
-    if (ret <= 0)
+    char server[100];
+    char portString[10];
+    char username[100];
+    char password[100];
+    char topic[100];
+    char clientId[100];
+    char *keys[] = {"server", "port", "username", "password", "topic", "clientId"};
+    char *values[] = {server, portString, username, password, topic, clientId};
+    if (!get_values(req, keys, values, 6) || !is_number(portString))
     {
-        if (ret == HTTPD_SOCK_ERR_TIMEOUT)
-        {
-            httpd_resp_send_408(req);
-        }
         return ESP_FAIL;
     }
 
-    /* Send a simple response */
-    const char resp[] = "Not Implemented";
+    int16_t port = atoi(portString);
+
+    plantstore_setCloudConfigurationMqtt(server, port, username, password, topic, clientId);
+
+    const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+esp_err_t post_api_cloudSetup_http_handler(httpd_req_t *req)
+{
+    char url[100];
+    char auth[100];
+    char *keys[] = {"url", "auth"};
+    char *values[] = {url, auth};
+    if (!get_values(req, keys, values, 2))
+    {
+        return ESP_FAIL;
+    }
+
+    plantstore_setCloudConfigurationHttp(url, auth);
+
+    const char resp[] = "OK";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+esp_err_t post_api_cloudSetup_blumy_handler(httpd_req_t *req)
+{
+    char token[100];
+    char *keys[] = {"token"};
+    char *values[] = {token};
+    if (!get_values(req, keys, values, 1))
+    {
+        return ESP_FAIL;
+    }
+
+    plantstore_setCloudConfigurationBlumy(token);
+
+    const char resp[] = "OK";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+esp_err_t get_api_cloudSetup_mqtt_handler(httpd_req_t *req)
+{
+    char server[100];
+    int16_t port;
+    char username[100];
+    char password[100];
+    char topic[100];
+    char clientId[100];
+
+    if (!plantstore_getCloudConfigurationMqtt(server, &port, username, password, topic, clientId, sizeof(server), sizeof(username), sizeof(password), sizeof(topic), sizeof(clientId)))
+    {
+        httpd_resp_send_404(req);
+        return ESP_FAIL;
+    }
+
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddStringToObject(root, "server", server);
+    cJSON_AddNumberToObject(root, "port", port);
+    cJSON_AddStringToObject(root, "username", username);
+    cJSON_AddStringToObject(root, "password", password);
+    cJSON_AddStringToObject(root, "topic", topic);
+    cJSON_AddStringToObject(root, "clientId", clientId);
+
+    char *resp = cJSON_Print(root);
+    cJSON_Delete(root);
+
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    free(resp);
+    return ESP_OK;
+}
+
+esp_err_t get_api_cloudSetup_http_handler(httpd_req_t *req)
+{
+    char url[100];
+    char auth[100];
+
+    if (!plantstore_getCloudConfigurationHttp(url, auth, sizeof(url), sizeof(auth)))
+    {
+        httpd_resp_send_404(req);
+        return ESP_FAIL;
+    }
+
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddStringToObject(root, "url", url);
+    cJSON_AddStringToObject(root, "auth", auth);
+
+    char *resp = cJSON_Print(root);
+    cJSON_Delete(root);
+
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    free(resp);
+    return ESP_OK;
+}
+
+esp_err_t get_api_cloudSetup_blumy_handler(httpd_req_t *req)
+{
+    char token[100];
+
+    if (!plantstore_getCloudConfigurationBlumy(token, sizeof(token)))
+    {
+        httpd_resp_send_404(req);
+        return ESP_FAIL;
+    }
+
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddStringToObject(root, "token", token);
+
+    char *resp = cJSON_Print(root);
+    cJSON_Delete(root);
+
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    free(resp);
     return ESP_OK;
 }
 
 esp_err_t post_api_sensorId_handler(httpd_req_t *req)
 {
-    char content[100];
-
-    /* Truncate if content length larger than the buffer */
-    size_t recv_size = MIN(req->content_len, sizeof(content));
-
-    int ret = httpd_req_recv(req, content, recv_size);
-    if (ret <= 0)
+    char sensorId[10];
+    if (!get_single_value(req, sensorId) || !is_number(sensorId))
     {
-        if (ret == HTTPD_SOCK_ERR_TIMEOUT)
-        {
-            httpd_resp_send_408(req);
-        }
         return ESP_FAIL;
     }
 
-    /* Send a simple response */
-    const char resp[] = "Not Implemented";
+    plantstore_setSensorId(atoi(sensorId));
+
+    const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
 esp_err_t get_api_sensorId_handler(httpd_req_t *req)
 {
-    const char resp[] = "Not Implemented";
+    int32_t sensorId;
+    if (!plantstore_getSensorId(&sensorId))
+    {
+        httpd_resp_send_404(req);
+        return ESP_FAIL;
+    }
+
+    char resp[10];
+    sprintf(resp, "%ld", sensorId);
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
 esp_err_t post_api_timeouts_sleep_handler(httpd_req_t *req)
 {
-    char content[100];
-
-    /* Truncate if content length larger than the buffer */
-    size_t recv_size = MIN(req->content_len, sizeof(content));
-
-    int ret = httpd_req_recv(req, content, recv_size);
-    if (ret <= 0)
+    char timoutString[10];
+    if (!get_single_value(req, timoutString) || !is_number(timoutString))
     {
-        if (ret == HTTPD_SOCK_ERR_TIMEOUT)
-        {
-            httpd_resp_send_408(req);
-        }
         return ESP_FAIL;
     }
 
-    /* Send a simple response */
-    const char resp[] = "Not Implemented";
+    int32_t timeout;
+    sscanf(timoutString, "%ld", &timeout);
+
+    plantstore_setSensorTimeoutSleep(timeout);
+
+    const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
 esp_err_t get_api_timeouts_sleep_handler(httpd_req_t *req)
 {
-    const char resp[] = "Not Implemented";
+    uint32_t timeout;
+    if (!plantstore_getSensorTimeoutSleep(&timeout))
+    {
+        char resp[15];
+        sprintf(resp, "%d", DEFAULT_SENSOR_TIMEOUT_SLEEP_MS);
+        httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+        return ESP_OK;
+    }
+
+    char resp[15];
+    sprintf(resp, "%lu", timeout);
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
@@ -309,9 +442,8 @@ esp_err_t get_api_connectedNetwork_handler(httpd_req_t *req)
 
     if (!plantstore_getWifiCredentials(ssid, password, sizeof(ssid), sizeof(password)))
     {
-        const char resp[] = "No saved credentials";
-        httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
-        return ESP_OK;
+        httpd_resp_send_404(req);
+        return ESP_FAIL;
     }
 
     httpd_resp_send(req, ssid, HTTPD_RESP_USE_STRLEN);
@@ -320,7 +452,12 @@ esp_err_t get_api_connectedNetwork_handler(httpd_req_t *req)
 
 esp_err_t get_api_sensor_value_handler(httpd_req_t *req)
 {
-    const char resp[] = "Not Implemented";
+    sensors_moisture_sensor_output_t moisture_output;
+    sensors_read_moisture(&moisture_output);
+
+    int moisture = moisture_output.measurement;
+    char resp[10];
+    sprintf(resp, "%d", moisture);
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
@@ -355,10 +492,36 @@ httpd_uri_t get_api_isConnected = {
     .handler = get_api_isConnected_handler,
     .user_ctx = NULL};
 
-httpd_uri_t post_api_mqttSetup = {
-    .uri = "/api/mqttSetup",
+httpd_uri_t post_api_cloudSetup_mqtt = {
+    .uri = "/api/cloudSetup/mqtt",
     .method = HTTP_POST,
-    .handler = post_api_mqttSetup_handler,
+    .handler = post_api_cloudSetup_mqtt_handler,
+    .user_ctx = NULL};
+httpd_uri_t post_api_cloudSetup_http = {
+    .uri = "/api/cloudSetup/http",
+    .method = HTTP_POST,
+    .handler = post_api_cloudSetup_http_handler,
+    .user_ctx = NULL};
+httpd_uri_t post_api_cloudSetup_blumy = {
+    .uri = "/api/cloudSetup/blumy",
+    .method = HTTP_POST,
+    .handler = post_api_cloudSetup_blumy_handler,
+    .user_ctx = NULL};
+
+httpd_uri_t get_api_cloudSetup_mqtt = {
+    .uri = "/api/cloudSetup/mqtt",
+    .method = HTTP_GET,
+    .handler = get_api_cloudSetup_mqtt_handler,
+    .user_ctx = NULL};
+httpd_uri_t get_api_cloudSetup_http = {
+    .uri = "/api/cloudSetup/http",
+    .method = HTTP_GET,
+    .handler = get_api_cloudSetup_http_handler,
+    .user_ctx = NULL};
+httpd_uri_t get_api_cloudSetup_blumy = {
+    .uri = "/api/cloudSetup/blumy",
+    .method = HTTP_GET,
+    .handler = get_api_cloudSetup_blumy_handler,
     .user_ctx = NULL};
 
 httpd_uri_t post_api_sensorId = {
@@ -422,7 +585,12 @@ httpd_handle_t start_webserver(void)
         httpd_register_uri_handler(server, &post_api_reset);
         httpd_register_uri_handler(server, &get_api_networks);
         httpd_register_uri_handler(server, &get_api_isConnected);
-        httpd_register_uri_handler(server, &post_api_mqttSetup);
+        httpd_register_uri_handler(server, &post_api_cloudSetup_mqtt);
+        httpd_register_uri_handler(server, &post_api_cloudSetup_http);
+        httpd_register_uri_handler(server, &post_api_cloudSetup_blumy);
+        httpd_register_uri_handler(server, &get_api_cloudSetup_mqtt);
+        httpd_register_uri_handler(server, &get_api_cloudSetup_http);
+        httpd_register_uri_handler(server, &get_api_cloudSetup_blumy);
         httpd_register_uri_handler(server, &post_api_sensorId);
         httpd_register_uri_handler(server, &get_api_sensorId);
         httpd_register_uri_handler(server, &post_api_timeouts_sleep);
