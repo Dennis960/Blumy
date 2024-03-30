@@ -124,7 +124,13 @@ export interface BlumyCloudConfiguration extends Record<string, string> {
 export type CloudConfiguration = HttpCloudConfiguration | MqttCloudConfiguration | BlumyCloudConfiguration;
 
 export async function setCloudCredentials(config: CloudConfiguration) {
-    return await postDataToEsp("/cloudSetup", config);
+    if (config.type === 'http') {
+        return await postDataToEsp("/cloudSetup/http", config);
+    } else if (config.type === 'mqtt') {
+        return await postDataToEsp("/cloudSetup/mqtt", config);
+    } else if (config.type === 'cloud') {
+        return await postDataToEsp("/cloudSetup/blumy", config);
+    }
 }
 
 export async function setSensorId(id: number) {
@@ -136,6 +142,7 @@ export async function getSensorId() {
 }
 
 export async function setSleepTimeout(timeout: number) {
+    timeout = Math.round(timeout);
     return await postDataToEsp("/timeouts/sleep", timeout.toString());
 }
 

@@ -17,6 +17,7 @@
 #define MQTT_CLIENTID_KEY "mqtt_clientid"
 #define BLUMY_TOKEN_KEY "blumy_token"
 #define SENSOR_ID_KEY "sensor_id"
+#define SENSOR_TIMEOUT_SLEEP_KEY "timeout_sleep"
 
 void plantstore_init()
 {
@@ -141,6 +142,23 @@ void plantstore_setSensorId(int32_t sensorId)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
     ESP_ERROR_CHECK(nvs_set_i32(nvs_handle, SENSOR_ID_KEY, sensorId));
+    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    nvs_close(nvs_handle);
+}
+
+bool plantstore_getSensorTimeoutSleep(uint32_t *timeout)
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
+    esp_err_t timeout_err = nvs_get_u32(nvs_handle, SENSOR_TIMEOUT_SLEEP_KEY, timeout);
+    nvs_close(nvs_handle);
+
+    return timeout_err == ESP_OK;
+}
+
+void plantstore_setSensorTimeoutSleep(uint32_t timeout)
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
+    ESP_ERROR_CHECK(nvs_set_u32(nvs_handle, SENSOR_TIMEOUT_SLEEP_KEY, timeout));
     ESP_ERROR_CHECK(nvs_commit(nvs_handle));
     nvs_close(nvs_handle);
 }
