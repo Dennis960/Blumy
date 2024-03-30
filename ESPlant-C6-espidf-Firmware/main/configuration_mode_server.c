@@ -4,8 +4,9 @@
 #include "cJSON.h"
 
 #include "plantfi.c"
+#include "plantstore.c"
 
-void initLittleFs()
+static void initLittleFs()
 {
     esp_vfs_littlefs_conf_t conf = {
         .base_path = "",
@@ -26,7 +27,7 @@ void initLittleFs()
     }
 }
 
-void deinitLittleFs()
+static void deinitLittleFs()
 {
     ESP_ERROR_CHECK(esp_vfs_littlefs_unregister("/littlefs"));
 }
@@ -43,6 +44,11 @@ esp_err_t get_handler(httpd_req_t *req)
             break;
         }
         path[i] = req->uri[i];
+    }
+    // If path is empty, return index.html
+    if (strlen(path) == 0)
+    {
+        strcpy(path, "/index.html");
     }
     ESP_LOGI("HTTP", "GET %s", path);
     FILE *file = fopen(path, "r");
@@ -153,7 +159,8 @@ esp_err_t post_api_connect_handler(httpd_req_t *req)
 
     plantfi_initSta(ssid, password, 5);
 
-    // TODO save_wifi_credentials(ssid, password);
+
+    // TODO plantstore_setWifiCredentials(ssid, password);
     return ESP_OK;
 }
 
@@ -396,6 +403,7 @@ httpd_uri_t get_api_sensorValue = {
 /* Function for starting the webserver */
 httpd_handle_t start_webserver(void)
 {
+    initLittleFs();
     /* Generate default configuration */
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.uri_match_fn = httpd_uri_match_wildcard;
@@ -428,6 +436,7 @@ httpd_handle_t start_webserver(void)
 /* Function for stopping the webserver */
 void stop_webserver(httpd_handle_t server)
 {
+    deinitLittleFs();
     if (server)
     {
         /* Stop the httpd server */

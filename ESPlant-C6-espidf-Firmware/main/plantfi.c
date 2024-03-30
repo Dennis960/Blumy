@@ -311,8 +311,3 @@ plantfi_sta_status_t plantfi_get_sta_status()
     }
     return PLANTFI_STA_STATUS_PENDING;
 }
-
-void initNvs()
-{
-    ESP_ERROR_CHECK(nvs_flash_init());
-}
