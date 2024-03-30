@@ -55,7 +55,17 @@ void app_main()
 {
     plantstore_init();
 
-    plantfi_initSta(SECRET_ESP_WIFI_SSID, SECRET_ESP_WIFI_PASS, 4);
+    char ssid[PLANTFI_SSID_MAX_LENGTH];
+    char password[PLANTFI_PASSWORD_MAX_LENGTH];
+    if (plantstore_getWifiCredentials(ssid, password, sizeof(ssid), sizeof(password)))
+    {
+        plantfi_initSta(ssid, password, 5);
+        ESP_LOGI("Plantfi", "Wifi credentials found for %s", ssid);
+    }
+    else
+    {
+        ESP_LOGI("Plantfi", "No wifi credentials found");
+    }
     plantfi_initAp("Blumy", "Blumy123", 4);
 
     sensors_initSensors();

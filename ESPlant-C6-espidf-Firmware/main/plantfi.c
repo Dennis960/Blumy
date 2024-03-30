@@ -13,6 +13,8 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
+#include "plantstore.c"
+
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t plantfi_sta_event_group;
 
@@ -22,6 +24,9 @@ static EventGroupHandle_t plantfi_sta_event_group;
 #define PLANTFI_CONNECTED_BIT BIT0
 #define PLANTFI_FAIL_BIT BIT1
 #define PLANTFI_PASSWORD_WRONG_BIT BIT2
+
+#define PLANTFI_SSID_MAX_LENGTH 33
+#define PLANTFI_PASSWORD_MAX_LENGTH 65
 
 static const char *PLANTFI_TAG = "PLANTFI";
 
@@ -48,6 +53,9 @@ typedef enum
 
 static plantfi_mode_t plantfi_ap = PLANTFI_MODE_UNINITIALIZED;
 static plantfi_mode_t plantfi_sta = PLANTFI_MODE_UNINITIALIZED;
+
+static char plantfi_ssid[PLANTFI_SSID_MAX_LENGTH];
+static char plantfi_password[PLANTFI_PASSWORD_MAX_LENGTH];
 
 static void plantfi_sta_event_handler(void *arg, esp_event_base_t event_base,
                                       int32_t event_id, void *event_data)
@@ -85,6 +93,7 @@ static void plantfi_sta_event_handler(void *arg, esp_event_base_t event_base,
         ESP_LOGI(PLANTFI_TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         plantfi_retry_num = 0;
         xEventGroupSetBits(plantfi_sta_event_group, PLANTFI_CONNECTED_BIT);
+        plantstore_setWifiCredentials(plantfi_ssid, plantfi_password);
     }
 }
 
@@ -180,6 +189,8 @@ void plantfi_initSta(const char *ssid, const char *password, int max_retry)
     };
     strcpy((char *)wifi_sta_config.sta.ssid, ssid);
     strcpy((char *)wifi_sta_config.sta.password, password);
+    strcpy(plantfi_ssid, ssid);
+    strcpy(plantfi_password, password);
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_sta_config));
 
     if (plantfi_sta == PLANTFI_MODE_UNINITIALIZED)

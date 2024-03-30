@@ -143,8 +143,8 @@ bool get_single_value(httpd_req_t *req, char *value)
 
 esp_err_t post_api_connect_handler(httpd_req_t *req)
 {
-    char ssid[33];
-    char password[65];
+    char ssid[PLANTFI_SSID_MAX_LENGTH];
+    char password[PLANTFI_PASSWORD_MAX_LENGTH];
     char *keys[] = {"ssid", "password"};
     char *values[] = {ssid, password};
     if (!get_values(req, keys, values, 2))
@@ -152,15 +152,10 @@ esp_err_t post_api_connect_handler(httpd_req_t *req)
         return ESP_FAIL;
     }
 
-    ESP_LOGI("HTTP", "SSID: %s, Password: %s", ssid, password);
-
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
 
     plantfi_initSta(ssid, password, 5);
-
-
-    // TODO plantstore_setWifiCredentials(ssid, password);
     return ESP_OK;
 }
 
@@ -309,9 +304,17 @@ esp_err_t get_api_update_percentage_handler(httpd_req_t *req)
 
 esp_err_t get_api_connectedNetwork_handler(httpd_req_t *req)
 {
-    // TODO plantfi_get_ssid
-    const char resp[] = "Not Implemented";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    char ssid[PLANTFI_SSID_MAX_LENGTH];
+    char password[PLANTFI_PASSWORD_MAX_LENGTH];
+
+    if (!plantstore_getWifiCredentials(ssid, password, sizeof(ssid), sizeof(password)))
+    {
+        const char resp[] = "No saved credentials";
+        httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+        return ESP_OK;
+    }
+
+    httpd_resp_send(req, ssid, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
