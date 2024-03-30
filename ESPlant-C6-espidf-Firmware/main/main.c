@@ -7,6 +7,7 @@
 #include "secret.c"
 #include "plantfi.c"
 #include "configuration_mode_server.c"
+#include "plantstore.c"
 
 #include "esp_http_client.h"
 #include <sys/socket.h>
@@ -52,27 +53,28 @@ void sendSensorData(sensors_full_data_t *sensors_data, int8_t rssi)
 
 void app_main()
 {
-    initNvs();
-    initLittleFs();
+    plantstore_init();
 
     plantfi_initSta(SECRET_ESP_WIFI_SSID, SECRET_ESP_WIFI_PASS, 4);
     plantfi_initAp("Blumy", "Blumy123", 4);
 
-    ESP_ERROR_CHECK(plantfi_waitForStaConnection(NULL));
-    plantfi_sta_status_t status = plantfi_get_sta_status();
-    if (status != PLANTFI_STA_STATUS_CONNECTED)
-    {
-        ESP_LOGE("WIFI", "Failed to connect to wifi");
-        return;
-    }
-    int8_t rssi = plantfi_getRssi();
-    httpd_handle_t webserver = start_webserver();
     sensors_initSensors();
-
     sensors_full_data_t sensors_data;
     sensors_full_read(&sensors_data);
 
-    sendSensorData(&sensors_data, rssi);
+    ESP_ERROR_CHECK(plantfi_waitForStaConnection(NULL));
+    plantfi_sta_status_t status = plantfi_get_sta_status();
+    httpd_handle_t webserver = NULL;
+    if (status != PLANTFI_STA_STATUS_CONNECTED)
+    {
+        ESP_LOGE("WIFI", "Failed to connect to wifi");
+    }
+    else
+    {
+        int8_t rssi = plantfi_getRssi();
+        webserver = start_webserver();
+        sendSensorData(&sensors_data, rssi);
+    }
 
     while (1)
     {
@@ -81,6 +83,5 @@ void app_main()
     }
 
     sensors_deinitSensors();
-    deinitLittleFs();
     stop_webserver(webserver);
 }
