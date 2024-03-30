@@ -3,7 +3,7 @@
 #include "esp_littlefs.h"
 #include "cJSON.h"
 
-#include "wifi.c"
+#include "plantfi.c"
 
 void initLittleFs()
 {
@@ -35,7 +35,15 @@ void deinitLittleFs()
 esp_err_t get_handler(httpd_req_t *req)
 {
     char path[600];
-    sprintf(path, "%s", req->uri);
+    for (int i = 0; i < 600; i++)
+    {
+        if (req->uri[i] == '?' || req->uri[i] == '#' || req->uri[i] == '\0')
+        {
+            path[i] = '\0';
+            break;
+        }
+        path[i] = req->uri[i];
+    }
     ESP_LOGI("HTTP", "GET %s", path);
     FILE *file = fopen(path, "r");
     if (file == NULL)
@@ -69,13 +77,29 @@ esp_err_t get_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
-esp_err_t post_api_connect_handler(httpd_req_t *req)
+bool get_value(char *content, char *key, char *value)
 {
-    char content[100];
+    // Request bodies are in the form of key=value\nkey2=value2\n
+    char *key_start = strstr(content, key);
+    if (key_start == NULL)
+    {
+        return false;
+    }
+    key_start += strlen(key) + 1;
+    char *key_end = strstr(key_start, "\n");
+    if (key_end == NULL)
+    {
+        return false;
+    }
+    strncpy(value, key_start, key_end - key_start);
+    value[key_end - key_start] = '\0';
+    return true;
+}
 
-    /* Truncate if content length larger than the buffer */
+bool get_values(httpd_req_t *req, char *keys[], char *values[], int num_keys)
+{
+    char content[1000];
     size_t recv_size = MIN(req->content_len, sizeof(content));
-
     int ret = httpd_req_recv(req, content, recv_size);
     if (ret <= 0)
     {
@@ -83,48 +107,68 @@ esp_err_t post_api_connect_handler(httpd_req_t *req)
         {
             httpd_resp_send_408(req);
         }
+        return false;
+    }
+    for (int i = 0; i < num_keys; i++)
+    {
+        if (!get_value(content, keys[i], values[i]))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool get_single_value(httpd_req_t *req, char *value)
+{
+    // The entire request body is the value, there is no key and no newline
+    size_t recv_size = MIN(req->content_len, 1000);
+    int ret = httpd_req_recv(req, value, recv_size);
+    if (ret <= 0)
+    {
+        if (ret == HTTPD_SOCK_ERR_TIMEOUT)
+        {
+            httpd_resp_send_408(req);
+        }
+        return false;
+    }
+    return true;
+}
+
+esp_err_t post_api_connect_handler(httpd_req_t *req)
+{
+    char ssid[33];
+    char password[65];
+    char *keys[] = {"ssid", "password"};
+    char *values[] = {ssid, password};
+    if (!get_values(req, keys, values, 2))
+    {
         return ESP_FAIL;
     }
-
-    /* Extract ssid and password from request, they are separated by newline */
-    char ssid[33];
-    char password[100];
-    sscanf(content, "%[^\n]\n%[^\n]", ssid, password);
 
     ESP_LOGI("HTTP", "SSID: %s, Password: %s", ssid, password);
 
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
 
-    // TODO
-    // if (wifi_connect(ssid, password))
-    // {
-    //     save_wifi_credentials(ssid, password);
-    // }
+    plantfi_initSta(ssid, password, 5);
+
+    // TODO save_wifi_credentials(ssid, password);
     return ESP_OK;
 }
 
 esp_err_t post_api_reset_handler(httpd_req_t *req)
 {
-    char content[1];
-
-    /* Truncate if content length larger than the buffer */
-    size_t recv_size = MIN(req->content_len, sizeof(content));
-
-    int ret = httpd_req_recv(req, content, recv_size);
-    if (ret <= 0)
+    char resetFlag[2];
+    if (!get_single_value(req, resetFlag))
     {
-        if (ret == HTTPD_SOCK_ERR_TIMEOUT)
-        {
-            httpd_resp_send_408(req);
-        }
         return ESP_FAIL;
     }
 
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
 
-    if (strcmp(content, "1") == 0)
+    if (resetFlag[0] == '1')
     {
         // TODO
         // reset();
@@ -134,9 +178,9 @@ esp_err_t post_api_reset_handler(httpd_req_t *req)
 
 esp_err_t get_api_networks_handler(httpd_req_t *req)
 {
-    my_wifi_ap_record_t ap_records[20];
+    plantfi_ap_record_t ap_records[20];
     int num_ap_records = 20;
-    wifi_scan_networks(ap_records, &num_ap_records);
+    plantfi_scan_networks(ap_records, &num_ap_records);
 
     cJSON *root = cJSON_CreateArray();
     for (int i = 0; i < num_ap_records; i++)
@@ -159,9 +203,9 @@ esp_err_t get_api_networks_handler(httpd_req_t *req)
 
 esp_err_t get_api_isConnected_handler(httpd_req_t *req)
 {
-    bool status = wifi_get_status();
-    char s = status ? '1' : '0';
-    const char resp[] = {s, '\0'};
+    plantfi_sta_status_t status = plantfi_get_sta_status();
+    char resp[2];
+    sprintf(resp, "%d", status);
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
@@ -258,6 +302,7 @@ esp_err_t get_api_update_percentage_handler(httpd_req_t *req)
 
 esp_err_t get_api_connectedNetwork_handler(httpd_req_t *req)
 {
+    // TODO plantfi_get_ssid
     const char resp[] = "Not Implemented";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;

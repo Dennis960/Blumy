@@ -5,7 +5,7 @@
 
 #include "peripherals/sensors.c"
 #include "secret.c"
-#include "wifi.c"
+#include "plantfi.c"
 #include "configuration_mode_server.c"
 
 #include "esp_http_client.h"
@@ -55,27 +55,17 @@ void app_main()
     initNvs();
     initLittleFs();
 
-    wifi_config_t wifi_sta_config = {
-        .sta = {
-            .ssid = SECRET_ESP_WIFI_SSID,
-            .password = SECRET_ESP_WIFI_PASS,
-        },
-    };
-    wifi_config_t wifi_ap_config = {
-        .ap = {
-            .ssid = "Blumy",
-            .password = "Blumy123",
-            .max_connection = 4,
-        },
-    };
+    plantfi_initSta(SECRET_ESP_WIFI_SSID, SECRET_ESP_WIFI_PASS, 4);
+    plantfi_initAp("Blumy", "Blumy123", 4);
 
-    int8_t rssi;
-    bool success = initWifi(&wifi_sta_config, &wifi_ap_config, 5, &rssi);
-    if (!success)
+    ESP_ERROR_CHECK(plantfi_waitForStaConnection(NULL));
+    plantfi_sta_status_t status = plantfi_get_sta_status();
+    if (status != PLANTFI_STA_STATUS_CONNECTED)
     {
         ESP_LOGE("WIFI", "Failed to connect to wifi");
         return;
     }
+    int8_t rssi = plantfi_getRssi();
     httpd_handle_t webserver = start_webserver();
     sensors_initSensors();
 
