@@ -9,13 +9,12 @@
 #include "plantfi.c"
 #include "configuration_mode_server.c"
 #include "plantstore.c"
+#include "defaults.h"
 
 #include "esp_http_client.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <string.h>
-
-#define CONFIGURATION_MODE_TIMEOUT_MS 60000
 
 // TODO use udp or mqtt
 void sendSensorData(sensors_full_data_t *sensors_data, int8_t rssi)
@@ -57,7 +56,7 @@ void sendSensorData(sensors_full_data_t *sensors_data, int8_t rssi)
 void start_deep_sleep()
 {
     uint32_t sleepTime = DEFAULT_SENSOR_TIMEOUT_SLEEP_MS;
-    plantstore_getSensorTimeoutSleep(&sleepTime);
+    plantstore_getSensorTimeoutSleepMs(&sleepTime);
     ESP_LOGI("DeepSleep", "Going to sleep for %ld ms", sleepTime);
     esp_deep_sleep(sleepTime * 1000);
 }
@@ -67,7 +66,9 @@ void configuration_mode(bool isConfigured)
     bool userConnectedToAp = false;
     uint64_t start_time = esp_timer_get_time();
     uint64_t current_time = start_time;
-    ESP_LOGI("MODE", "Starting configuration mode");
+    int32_t timeoutMs = DEFAULT_CONFIGURATION_MODE_TIMEOUT_MS;
+    plantstore_getConfigurationModeTimeoutMs(&timeoutMs);
+    ESP_LOGI("MODE", "Starting configuration mode%s", isConfigured ? " (sensor is configured)" : "");
     plantfi_initAp("Blumy", "", 4, &userConnectedToAp);
     httpd_handle_t webserver = webserver = start_webserver();
     while (1)
@@ -75,7 +76,7 @@ void configuration_mode(bool isConfigured)
         if (isConfigured && !userConnectedToAp)
         {
             current_time = esp_timer_get_time();
-            if (current_time - start_time > CONFIGURATION_MODE_TIMEOUT_MS * 1000)
+            if (current_time - start_time > timeoutMs * 1000)
             {
                 break;
             }

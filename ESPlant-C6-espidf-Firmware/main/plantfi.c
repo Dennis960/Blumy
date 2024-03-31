@@ -57,6 +57,8 @@ static plantfi_mode_t plantfi_sta = PLANTFI_MODE_UNINITIALIZED;
 static char plantfi_ssid[PLANTFI_SSID_MAX_LENGTH];
 static char plantfi_password[PLANTFI_PASSWORD_MAX_LENGTH];
 
+static bool _credentialsChanged = false;
+
 static void plantfi_sta_event_handler(void *arg, esp_event_base_t event_base,
                                       int32_t event_id, void *event_data)
 {
@@ -93,7 +95,11 @@ static void plantfi_sta_event_handler(void *arg, esp_event_base_t event_base,
         ESP_LOGI(PLANTFI_TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         plantfi_retry_num = 0;
         xEventGroupSetBits(plantfi_sta_event_group, PLANTFI_CONNECTED_BIT);
-        plantstore_setWifiCredentials(plantfi_ssid, plantfi_password);
+        if (_credentialsChanged)
+        {
+            _credentialsChanged = false;
+            plantstore_setWifiCredentials(plantfi_ssid, plantfi_password);
+        }
     }
 }
 
@@ -162,8 +168,9 @@ void plantfi_initAp(const char *ssid, const char *password, int max_connection, 
     ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, WIFI_EVENT_AP_STACONNECTED, &plantfi_ap_event_handler, &userConnectedToAp));
 }
 
-void plantfi_initSta(const char *ssid, const char *password, int max_retry)
+void plantfi_initSta(const char *ssid, const char *password, int max_retry, bool credentialsChanged)
 {
+    _credentialsChanged = credentialsChanged;
     plantfi_initWifiIfNecessary();
     if (plantfi_sta == PLANTFI_MODE_ENABLED)
     {
@@ -225,7 +232,7 @@ bool plantfi_initSavedSta()
     char password[PLANTFI_PASSWORD_MAX_LENGTH];
     if (plantstore_getWifiCredentials(ssid, password, sizeof(ssid), sizeof(password)))
     {
-        plantfi_initSta(ssid, password, 5);
+        plantfi_initSta(ssid, password, 5, false);
         ESP_LOGI(PLANTFI_TAG, "Wifi credentials found for %s", ssid);
         return true;
     }

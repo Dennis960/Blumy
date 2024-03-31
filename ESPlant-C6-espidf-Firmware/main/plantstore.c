@@ -18,6 +18,7 @@
 #define BLUMY_TOKEN_KEY "blumy_token"
 #define SENSOR_ID_KEY "sensor_id"
 #define SENSOR_TIMEOUT_SLEEP_KEY "timeout_sleep"
+#define SENSOR_TIMEOUT_CONFIG_KEY "timeout_config"
 
 static bool plantstore_isInitialized = false;
 
@@ -158,19 +159,34 @@ void plantstore_setSensorId(int32_t sensorId)
     nvs_close(nvs_handle);
 }
 
-bool plantstore_getSensorTimeoutSleep(uint32_t *timeout)
+bool plantstore_getSensorTimeoutSleepMs(uint32_t *timeoutMs)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
-    esp_err_t timeout_err = nvs_get_u32(nvs_handle, SENSOR_TIMEOUT_SLEEP_KEY, timeout);
+    esp_err_t timeout_err = nvs_get_u32(nvs_handle, SENSOR_TIMEOUT_SLEEP_KEY, timeoutMs);
     nvs_close(nvs_handle);
 
     return timeout_err == ESP_OK;
 }
 
-void plantstore_setSensorTimeoutSleep(uint32_t timeout)
+void plantstore_setSensorTimeoutSleepMs(uint32_t timeoutMs)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
-    ESP_ERROR_CHECK(nvs_set_u32(nvs_handle, SENSOR_TIMEOUT_SLEEP_KEY, timeout));
+    ESP_ERROR_CHECK(nvs_set_u32(nvs_handle, SENSOR_TIMEOUT_SLEEP_KEY, timeoutMs));
+    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    nvs_close(nvs_handle);
+}
+
+void plantstore_getConfigurationModeTimeoutMs(int32_t *timeoutMs)
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
+    esp_err_t timeout_err = nvs_get_i32(nvs_handle, SENSOR_TIMEOUT_CONFIG_KEY, timeoutMs);
+    nvs_close(nvs_handle);
+}
+
+void plantstore_setConfigurationModeTimeoutMs(int32_t timeoutMs)
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
+    ESP_ERROR_CHECK(nvs_set_i32(nvs_handle, SENSOR_TIMEOUT_CONFIG_KEY, timeoutMs));
     ESP_ERROR_CHECK(nvs_commit(nvs_handle));
     nvs_close(nvs_handle);
 }
