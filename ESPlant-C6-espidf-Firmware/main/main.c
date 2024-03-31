@@ -56,11 +56,11 @@ void sendSensorData(sensors_full_data_t *sensors_data, int8_t rssi)
 
 void start_deep_sleep()
 {
-    int32_t sleepTime = DEFAULT_SENSOR_TIMEOUT_SLEEP_MS;
+    uint64_t sleepTime = DEFAULT_SENSOR_TIMEOUT_SLEEP_MS;
     plantstore_getSensorTimeoutSleepMs(&sleepTime);
-    ESP_LOGI("DeepSleep", "Going to sleep for %ld ms", sleepTime);
-    uint64_t u_sleepTime = sleepTime * 1000;
-    esp_deep_sleep(u_sleepTime);
+    sleepTime *= 1000;
+    ESP_LOGI("DeepSleep", "Going to sleep for %llu ms", sleepTime);
+    esp_deep_sleep(sleepTime);
 }
 
 void configuration_mode(bool isConfigured)
@@ -80,6 +80,7 @@ void configuration_mode(bool isConfigured)
             current_time = esp_timer_get_time();
             if (current_time - start_time > timeoutMs * 1000)
             {
+                ESP_LOGI("MODE", "Timeout reached, going to sleep");
                 break;
             }
         }
@@ -114,7 +115,11 @@ void sensor_mode()
 void app_main()
 {
     bool isConfigured = plantstore_isConfigured();
-    bool isManualReset = esp_reset_reason() & (ESP_RST_POWERON | ESP_RST_JTAG | ESP_RST_SDIO | ESP_RST_USB);
+    bool isManualReset = (esp_reset_reason() == ESP_RST_POWERON ||
+                          esp_reset_reason() == ESP_RST_JTAG ||
+                          esp_reset_reason() == ESP_RST_SDIO ||
+                          esp_reset_reason() == ESP_RST_USB);
+
     if (isManualReset || !isConfigured)
     {
         configuration_mode(isConfigured);
