@@ -97,6 +97,16 @@ static void plantfi_sta_event_handler(void *arg, esp_event_base_t event_base,
     }
 }
 
+static void plantfi_ap_event_handler(void *arg, esp_event_base_t event_base,
+                                     int32_t event_id, void *event_data)
+{
+    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_AP_STACONNECTED)
+    {
+        bool *userConnectedToAp = (bool *)arg;
+        *userConnectedToAp = true;
+    }
+}
+
 static void plantfi_initWifiIfNecessary()
 {
     if (plantfi_sta != PLANTFI_MODE_UNINITIALIZED || plantfi_ap != PLANTFI_MODE_UNINITIALIZED)
@@ -112,7 +122,7 @@ static void plantfi_initWifiIfNecessary()
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 }
 
-void plantfi_initAp(const char *ssid, const char *password, int max_connection)
+void plantfi_initAp(const char *ssid, const char *password, int max_connection, bool *userConnectedToAp)
 {
     plantfi_initWifiIfNecessary();
     if (plantfi_ap == PLANTFI_MODE_ENABLED)
@@ -148,6 +158,8 @@ void plantfi_initAp(const char *ssid, const char *password, int max_connection)
         ESP_ERROR_CHECK(esp_wifi_start());
     }
     plantfi_ap = PLANTFI_MODE_ENABLED;
+
+    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, WIFI_EVENT_AP_STACONNECTED, &plantfi_ap_event_handler, &userConnectedToAp));
 }
 
 void plantfi_initSta(const char *ssid, const char *password, int max_retry)
@@ -204,7 +216,30 @@ void plantfi_initSta(const char *ssid, const char *password, int max_retry)
     plantfi_sta = PLANTFI_MODE_ENABLED;
 }
 
-esp_err_t plantfi_waitForStaConnection(EventBits_t *bitsToWaitFor)
+/**
+ * @return true if wifi credentials were found
+ */
+bool plantfi_initSavedSta()
+{
+    char ssid[PLANTFI_SSID_MAX_LENGTH];
+    char password[PLANTFI_PASSWORD_MAX_LENGTH];
+    if (plantstore_getWifiCredentials(ssid, password, sizeof(ssid), sizeof(password)))
+    {
+        plantfi_initSta(ssid, password, 5);
+        ESP_LOGI(PLANTFI_TAG, "Wifi credentials found for %s", ssid);
+        return true;
+    }
+    else
+    {
+        ESP_LOGI(PLANTFI_TAG, "No wifi credentials found");
+    }
+    return false;
+}
+
+/**
+ * @param bits pointer to store the event bits that triggered the return, can be NULL
+ */
+esp_err_t plantfi_waitForStaConnection(EventBits_t *bits)
 {
     if (plantfi_sta == PLANTFI_MODE_UNINITIALIZED)
     {
@@ -214,14 +249,14 @@ esp_err_t plantfi_waitForStaConnection(EventBits_t *bitsToWaitFor)
     // TODO
     /* Waiting until either the connection is established (PLANTFI_CONNECTED_BIT) or connection failed for the maximum
      * number of re-tries (PLANTFI_FAIL_BIT). The bits are set by plantfi_sta_event_handler() (see above) */
-    EventBits_t bits = xEventGroupWaitBits(plantfi_sta_event_group,
-                                           PLANTFI_CONNECTED_BIT | PLANTFI_FAIL_BIT | PLANTFI_PASSWORD_WRONG_BIT,
-                                           pdFALSE,
-                                           pdFALSE,
-                                           portMAX_DELAY);
-    if (bitsToWaitFor != NULL)
+    EventBits_t _bits = xEventGroupWaitBits(plantfi_sta_event_group,
+                                            PLANTFI_CONNECTED_BIT | PLANTFI_FAIL_BIT | PLANTFI_PASSWORD_WRONG_BIT,
+                                            pdFALSE,
+                                            pdFALSE,
+                                            portMAX_DELAY);
+    if (bits != NULL)
     {
-        *bitsToWaitFor = bits;
+        *bits = _bits;
     }
     return ESP_OK;
 }

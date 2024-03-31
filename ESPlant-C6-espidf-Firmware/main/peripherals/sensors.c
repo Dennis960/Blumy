@@ -158,7 +158,7 @@ float sensors_readLightPercentage()
 {
     enableLightSensor();
     vTaskDelay(20 / portTICK_PERIOD_MS); // Wait for the sensor to stabilize (statistically >10ms is enough)
-    int light_sensor_value = analogReadAverageRaw(ADC_LIGHT_SENSOR_CHANNEL, 20, 5);
+    int light_sensor_value = adc_analogReadAverageRaw(ADC_LIGHT_SENSOR_CHANNEL, 20, 5);
     disableLightSensor();
     const int max_value = 4095;
     return light_sensor_value / (float)max_value;
@@ -177,7 +177,7 @@ static void disableVoltageMeasurement()
 float sensors_readVoltage()
 {
     enableVoltageMeasurement();
-    int voltage = analogReadAverageVoltage(ADC_VOLTAGE_MEASUREMENT_CHANNEL, 10, 3);
+    int voltage = adc_analogReadAverageVoltage(ADC_VOLTAGE_MEASUREMENT_CHANNEL, 10, 3);
     disableVoltageMeasurement();
     const int r1 = 5100;
     const int r2 = 2000;
@@ -246,7 +246,7 @@ static bool measure_stabilized_output(sensors_moisture_sensor_output_t *output)
         int sum = 0;
         for (int i = 0; i < numberOfMeasurements; i++)
         {
-            int measurement = analogReadAverageRaw(ADC_MOISTURE_SENSOR_CHANNEL, 100, 10);
+            int measurement = adc_analogReadAverageRaw(ADC_MOISTURE_SENSOR_CHANNEL, 100, 10);
             if (measurement < min)
             {
                 min = measurement;
@@ -287,7 +287,7 @@ static void setupMoistureSensor(long frequency, int dutyCycle)
 static void resetToZero()
 {
     int strength = 1;
-    int analogValue = analogReadVoltage(ADC_MOISTURE_SENSOR_CHANNEL);
+    int analogValue = adc_analogReadVoltage(ADC_MOISTURE_SENSOR_CHANNEL);
     analogWrite(MOISTURE_SQUARE_WAVE_SIGNAL, 0, 0, MOISTURE_SQUARE_WAVE_SIGNAL_CHANNEL);
     while (analogValue > 0 && strength <= 256)
     {
@@ -299,7 +299,7 @@ static void resetToZero()
         ESP_ERROR_CHECK(gpio_set_direction(ADC_MOISTURE_SENSOR, GPIO_MODE_INPUT));
 
         // wait until the output is 0 again
-        analogValue = analogReadVoltage(ADC_MOISTURE_SENSOR_CHANNEL);
+        analogValue = adc_analogReadVoltage(ADC_MOISTURE_SENSOR_CHANNEL);
     }
 }
 
@@ -342,13 +342,13 @@ void sensors_initSensors()
     io_conf.pin_bit_mask = (1ULL << POWER_USB_VIN);
     ESP_ERROR_CHECK(gpio_config(&io_conf));
 
-    initAdc();
+    adc_initAdc();
     initAht(TEMPERATURE_SENSOR_SDA, TEMPERATURE_SENSOR_SCL);
 }
 
 void sensors_deinitSensors()
 {
-    deinitAdc();
+    adc_deinitAdc();
     deinitAht();
     stopMoistureSensor();
     if (toneTimer != NULL)

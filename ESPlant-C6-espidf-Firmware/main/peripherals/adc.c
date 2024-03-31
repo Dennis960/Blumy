@@ -32,7 +32,7 @@ static void adc_calibration_deinit(adc_cali_handle_t handle)
     ESP_ERROR_CHECK(adc_cali_delete_scheme_curve_fitting(handle));
 }
 
-void initAdc()
+void adc_initAdc()
 {
     //-------------ADC1 Init---------------//
     adc_oneshot_unit_init_cfg_t init_config1 = {
@@ -77,13 +77,13 @@ static void analogRead(adc_channel_t channel)
 /**
  * @return Raw ADC value in mV
  */
-int analogReadVoltage(adc_channel_t channel)
+int adc_analogReadVoltage(adc_channel_t channel)
 {
     analogRead(channel);
     return voltage[ADC_UNIT_1][channel];
 }
 
-int analogReadRaw(adc_channel_t channel)
+int adc_analogReadRaw(adc_channel_t channel)
 {
     analogRead(channel);
     return adc_raw[ADC_UNIT_1][channel];
@@ -122,9 +122,9 @@ static int analogReadAverage(adc_channel_t adcChannel, int numberOfMeasurements,
  *
  * @return The average voltage in mV
  */
-int analogReadAverageVoltage(adc_channel_t adcChannel, int numberOfMeasurements, int numberOfThrowaway)
+int adc_analogReadAverageVoltage(adc_channel_t adcChannel, int numberOfMeasurements, int numberOfThrowaway)
 {
-    return analogReadAverage(adcChannel, numberOfMeasurements, numberOfThrowaway, analogReadVoltage);
+    return analogReadAverage(adcChannel, numberOfMeasurements, numberOfThrowaway, adc_analogReadVoltage);
 }
 
 /**
@@ -135,12 +135,12 @@ int analogReadAverageVoltage(adc_channel_t adcChannel, int numberOfMeasurements,
  *
  * @return The average raw value
  */
-int analogReadAverageRaw(adc_channel_t adcChannel, int numberOfMeasurements, int numberOfThrowaway)
+int adc_analogReadAverageRaw(adc_channel_t adcChannel, int numberOfMeasurements, int numberOfThrowaway)
 {
-    return analogReadAverage(adcChannel, numberOfMeasurements, numberOfThrowaway, analogReadRaw);
+    return analogReadAverage(adcChannel, numberOfMeasurements, numberOfThrowaway, adc_analogReadRaw);
 }
 
-void deinitAdc()
+void adc_deinitAdc()
 {
     ESP_ERROR_CHECK(adc_oneshot_del_unit(adc1_handle));
     adc_calibration_deinit(adc1_cali_handle);

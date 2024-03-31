@@ -2,6 +2,7 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
+#include "esp_sleep.h"
 
 #include "peripherals/sensors.c"
 #include "secret.c"
@@ -13,6 +14,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <string.h>
+
+#define CONFIGURATION_MODE_TIMEOUT_MS 60000
 
 // TODO use udp or mqtt
 void sendSensorData(sensors_full_data_t *sensors_data, int8_t rssi)
@@ -51,47 +54,70 @@ void sendSensorData(sensors_full_data_t *sensors_data, int8_t rssi)
     ESP_LOGI("HTTP", "Status Code: %d", status_code);
 }
 
-void app_main()
+void start_deep_sleep()
 {
-    plantstore_init();
+    uint32_t sleepTime = DEFAULT_SENSOR_TIMEOUT_SLEEP_MS;
+    plantstore_getSensorTimeoutSleep(&sleepTime);
+    ESP_LOGI("DeepSleep", "Going to sleep for %ld ms", sleepTime);
+    esp_deep_sleep(sleepTime * 1000);
+}
 
-    char ssid[PLANTFI_SSID_MAX_LENGTH];
-    char password[PLANTFI_PASSWORD_MAX_LENGTH];
-    if (plantstore_getWifiCredentials(ssid, password, sizeof(ssid), sizeof(password)))
+void configuration_mode(bool isConfigured)
+{
+    bool userConnectedToAp = false;
+    uint64_t start_time = esp_timer_get_time();
+    uint64_t current_time = start_time;
+    ESP_LOGI("MODE", "Starting configuration mode");
+    plantfi_initAp("Blumy", "", 4, &userConnectedToAp);
+    httpd_handle_t webserver = webserver = start_webserver();
+    while (1)
     {
-        plantfi_initSta(ssid, password, 5);
-        ESP_LOGI("Plantfi", "Wifi credentials found for %s", ssid);
+        if (isConfigured && !userConnectedToAp)
+        {
+            current_time = esp_timer_get_time();
+            if (current_time - start_time > CONFIGURATION_MODE_TIMEOUT_MS * 1000)
+            {
+                break;
+            }
+        }
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
-    else
-    {
-        ESP_LOGI("Plantfi", "No wifi credentials found");
-    }
-    plantfi_initAp("Blumy", "Blumy123", 4);
+}
 
+void sensor_mode()
+{
+    ESP_LOGI("MODE", "Starting sensor mode");
+    plantfi_initSavedSta();
     sensors_initSensors();
     sensors_full_data_t sensors_data;
     sensors_full_read(&sensors_data);
-
-    ESP_ERROR_CHECK(plantfi_waitForStaConnection(NULL));
-    plantfi_sta_status_t status = plantfi_get_sta_status();
-    httpd_handle_t webserver = NULL;
-    if (status != PLANTFI_STA_STATUS_CONNECTED)
+    EventBits_t bits;
+    ESP_ERROR_CHECK(plantfi_waitForStaConnection(&bits));
+    if (bits & PLANTFI_CONNECTED_BIT)
     {
-        ESP_LOGE("WIFI", "Failed to connect to wifi");
+        int8_t rssi = plantfi_getRssi();
+        sendSensorData(&sensors_data, rssi);
     }
     else
     {
-        int8_t rssi = plantfi_getRssi();
-        webserver = start_webserver();
-        sendSensorData(&sensors_data, rssi);
+        ESP_LOGE("WIFI", "Failed to connect to wifi");
     }
+    sensors_deinitSensors(); // optional
+    start_deep_sleep();
+}
 
-    while (1)
+void app_main()
+{
+    bool isConfigured = plantstore_isConfigured();
+    bool isManualReset = esp_reset_reason() & (ESP_RST_POWERON | ESP_RST_JTAG | ESP_RST_SDIO | ESP_RST_USB);
+    if (isManualReset || !isConfigured)
     {
-        // Server mode
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        configuration_mode(isConfigured);
+        // isConfigured and no user connected to AP
+        start_deep_sleep();
     }
-
-    sensors_deinitSensors();
-    stop_webserver(webserver);
+    else
+    {
+        sensor_mode(); // Never returns
+    }
 }
