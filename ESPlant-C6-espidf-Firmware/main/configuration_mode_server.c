@@ -1,18 +1,22 @@
+#include "configuration_mode_server.h"
+
 #include "esp_log.h"
 #include "esp_http_server.h"
 #include "esp_littlefs.h"
 #include "cJSON.h"
 
-#include "plantfi.c"
-#include "plantstore.c"
-#include "peripherals/sensors.c"
+#include "plantfi.h"
+#include "plantstore.h"
+#include "peripherals/sensors.h"
 #include "defaults.h"
 
-static void initLittleFs()
+#define LITTLE_FS_PARTITION_LABEL "littlefs"
+
+void initLittleFs()
 {
     esp_vfs_littlefs_conf_t conf = {
         .base_path = "",
-        .partition_label = "littlefs",
+        .partition_label = LITTLE_FS_PARTITION_LABEL,
         .format_if_mount_failed = true,
         .dont_mount = false,
     };
@@ -29,9 +33,9 @@ static void initLittleFs()
     }
 }
 
-static void deinitLittleFs()
+void deinitLittleFs()
 {
-    ESP_ERROR_CHECK(esp_vfs_littlefs_unregister("/littlefs"));
+    ESP_ERROR_CHECK(esp_vfs_littlefs_unregister(LITTLE_FS_PARTITION_LABEL));
 }
 
 // Returns the requested file from the LittleFS
@@ -157,8 +161,8 @@ bool is_number(char *content)
 
 esp_err_t post_api_connect_handler(httpd_req_t *req)
 {
-    char ssid[PLANTFI_SSID_MAX_LENGTH];
-    char password[PLANTFI_PASSWORD_MAX_LENGTH];
+    char ssid[DEFAULT_SSID_MAX_LENGTH];
+    char password[DEFAULT_PASSWORD_MAX_LENGTH];
     char *keys[] = {"ssid", "password"};
     char *values[] = {ssid, password};
     if (!get_values(req, keys, values, 2))
@@ -412,7 +416,7 @@ esp_err_t post_api_timeouts_sleep_handler(httpd_req_t *req)
 
 esp_err_t get_api_timeouts_sleep_handler(httpd_req_t *req)
 {
-    uint32_t timeout = DEFAULT_SENSOR_TIMEOUT_SLEEP_MS;
+    int32_t timeout = DEFAULT_SENSOR_TIMEOUT_SLEEP_MS;
     plantstore_getSensorTimeoutSleepMs(&timeout);
 
     char resp[15];
@@ -423,7 +427,7 @@ esp_err_t get_api_timeouts_sleep_handler(httpd_req_t *req)
 
 esp_err_t get_api_timeouts_configurationMode_handler(httpd_req_t *req)
 {
-    uint32_t timeout = DEFAULT_CONFIGURATION_MODE_TIMEOUT_MS;
+    int32_t timeout = DEFAULT_CONFIGURATION_MODE_TIMEOUT_MS;
     plantstore_getConfigurationModeTimeoutMs(&timeout);
 
     char resp[15];
@@ -459,8 +463,8 @@ esp_err_t get_api_update_percentage_handler(httpd_req_t *req)
 
 esp_err_t get_api_connectedNetwork_handler(httpd_req_t *req)
 {
-    char ssid[PLANTFI_SSID_MAX_LENGTH];
-    char password[PLANTFI_PASSWORD_MAX_LENGTH];
+    char ssid[DEFAULT_SSID_MAX_LENGTH];
+    char password[DEFAULT_PASSWORD_MAX_LENGTH];
 
     if (!plantstore_getWifiCredentials(ssid, password, sizeof(ssid), sizeof(password)))
     {

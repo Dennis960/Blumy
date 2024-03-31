@@ -1,17 +1,19 @@
+#include "peripherals/adc.h"
+
 // Taken from https://github.com/espressif/esp-idf/blob/master/examples/peripherals/adc/oneshot_read/main/oneshot_read_main.c
 #include "esp_log.h"
 #include "esp_adc/adc_oneshot.h"
 
-#include "config.c"
+#include "config.h"
 
-static int adc_raw[2][10];
-static int voltage[2][10];
-const static char *ADC_TAG = "ADC";
-static adc_oneshot_unit_handle_t adc1_handle;
-static adc_cali_handle_t adc1_cali_handle = NULL;
-static adc_cali_handle_t adc1_cali_handle2 = NULL;
+int adc_raw[2][10];
+int voltage[2][10];
+const char *ADC_TAG = "ADC";
+adc_oneshot_unit_handle_t adc1_handle;
+adc_cali_handle_t adc1_cali_handle = NULL;
+adc_cali_handle_t adc1_cali_handle2 = NULL;
 
-static void adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t *out_handle)
+void adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t *out_handle)
 {
     adc_cali_handle_t handle = NULL;
 
@@ -26,7 +28,7 @@ static void adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_ha
     *out_handle = handle;
 }
 
-static void adc_calibration_deinit(adc_cali_handle_t handle)
+void adc_calibration_deinit(adc_cali_handle_t handle)
 {
     ESP_LOGI(ADC_TAG, "deregister %s calibration scheme", "Curve Fitting");
     ESP_ERROR_CHECK(adc_cali_delete_scheme_curve_fitting(handle));
@@ -64,7 +66,7 @@ void adc_initAdc()
     adc_calibration_init(ADC_UNIT_1, ADC_ATTEN_DB_0, &adc1_cali_handle2);
 }
 
-static void analogRead(adc_channel_t channel)
+void analogRead(adc_channel_t channel)
 {
     adc_unit_t unit = ADC_UNIT_1;
     ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, channel, &adc_raw[unit][channel]));
@@ -89,7 +91,7 @@ int adc_analogReadRaw(adc_channel_t channel)
     return adc_raw[ADC_UNIT_1][channel];
 }
 
-static int analogReadAverage(adc_channel_t adcChannel, int numberOfMeasurements, int numberOfThrowaway, int (*readFunction)(adc_channel_t))
+int analogReadAverage(adc_channel_t adcChannel, int numberOfMeasurements, int numberOfThrowaway, int (*readFunction)(adc_channel_t))
 {
     int measurementsTemp[numberOfMeasurements];
     for (int i = 0; i < numberOfMeasurements; i++)
