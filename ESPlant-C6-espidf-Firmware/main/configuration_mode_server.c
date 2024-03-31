@@ -6,8 +6,7 @@
 #include "plantfi.c"
 #include "plantstore.c"
 #include "peripherals/sensors.c"
-
-#define DEFAULT_SENSOR_TIMEOUT_SLEEP_MS 1000 * 60 * 30 // 30 minutes
+#include "defaults.h"
 
 static void initLittleFs()
 {
@@ -170,7 +169,7 @@ esp_err_t post_api_connect_handler(httpd_req_t *req)
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
 
-    plantfi_initSta(ssid, password, 5);
+    plantfi_initSta(ssid, password, 5, true);
     return ESP_OK;
 }
 
@@ -404,7 +403,7 @@ esp_err_t post_api_timeouts_sleep_handler(httpd_req_t *req)
     int32_t timeout;
     sscanf(timoutString, "%ld", &timeout);
 
-    plantstore_setSensorTimeoutSleep(timeout);
+    plantstore_setSensorTimeoutSleepMs(timeout);
 
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
@@ -413,17 +412,40 @@ esp_err_t post_api_timeouts_sleep_handler(httpd_req_t *req)
 
 esp_err_t get_api_timeouts_sleep_handler(httpd_req_t *req)
 {
-    uint32_t timeout;
-    if (!plantstore_getSensorTimeoutSleep(&timeout))
-    {
-        char resp[15];
-        sprintf(resp, "%d", DEFAULT_SENSOR_TIMEOUT_SLEEP_MS);
-        httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
-        return ESP_OK;
-    }
+    uint32_t timeout = DEFAULT_SENSOR_TIMEOUT_SLEEP_MS;
+    plantstore_getSensorTimeoutSleepMs(&timeout);
 
     char resp[15];
     sprintf(resp, "%lu", timeout);
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+esp_err_t get_api_timeouts_configurationMode_handler(httpd_req_t *req)
+{
+    uint32_t timeout = DEFAULT_CONFIGURATION_MODE_TIMEOUT_MS;
+    plantstore_getConfigurationModeTimeoutMs(&timeout);
+
+    char resp[15];
+    sprintf(resp, "%lu", timeout);
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+esp_err_t post_api_timeouts_configurationMode_handler(httpd_req_t *req)
+{
+    char timoutString[10];
+    if (!get_single_value(req, timoutString) || !is_number(timoutString))
+    {
+        return ESP_FAIL;
+    }
+
+    int32_t timeout;
+    sscanf(timoutString, "%ld", &timeout);
+
+    plantstore_setConfigurationModeTimeoutMs(timeout);
+
+    const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
