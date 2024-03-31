@@ -19,20 +19,32 @@
 #define SENSOR_ID_KEY "sensor_id"
 #define SENSOR_TIMEOUT_SLEEP_KEY "timeout_sleep"
 
-void plantstore_init()
+static bool plantstore_isInitialized = false;
+
+static void plantstore_init()
 {
     ESP_ERROR_CHECK(nvs_flash_init());
 }
 
-nvs_handle_t plantstore_openNvsReadOnly()
+static nvs_handle_t plantstore_openNvsReadOnly()
 {
+    if (!plantstore_isInitialized)
+    {
+        plantstore_init();
+        plantstore_isInitialized = true;
+    }
     nvs_handle_t nvs_handle;
     ESP_ERROR_CHECK(nvs_open("plantstore", NVS_READONLY, &nvs_handle));
     return nvs_handle;
 }
 
-nvs_handle_t plantstore_openNvsReadWrite()
+static nvs_handle_t plantstore_openNvsReadWrite()
 {
+    if (!plantstore_isInitialized)
+    {
+        plantstore_init();
+        plantstore_isInitialized = true;
+    }
     nvs_handle_t nvs_handle;
     ESP_ERROR_CHECK(nvs_open("plantstore", NVS_READWRITE, &nvs_handle));
     return nvs_handle;
@@ -161,4 +173,17 @@ void plantstore_setSensorTimeoutSleep(uint32_t timeout)
     ESP_ERROR_CHECK(nvs_set_u32(nvs_handle, SENSOR_TIMEOUT_SLEEP_KEY, timeout));
     ESP_ERROR_CHECK(nvs_commit(nvs_handle));
     nvs_close(nvs_handle);
+}
+
+/**
+ * @brief Check if the plantstore is configured
+ * The plantstore is marked as configured, if the wifi credentials are set and at least one of the cloud configurations is set.
+ */
+bool plantstore_isConfigured()
+{
+    // Doing this is fine, because the parameters can be NULL and then the length of the stored values is checked only
+    return plantstore_getWifiCredentials(NULL, NULL, 0, 0) &&
+           (plantstore_getCloudConfigurationHttp(NULL, NULL, 0, 0) ||
+            plantstore_getCloudConfigurationMqtt(NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0) ||
+            plantstore_getCloudConfigurationBlumy(NULL, 0));
 }
