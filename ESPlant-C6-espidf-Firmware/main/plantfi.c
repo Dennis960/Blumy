@@ -1,4 +1,4 @@
-#pragma once
+#include "plantfi.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -13,54 +13,28 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
-#include "plantstore.c"
+#include "plantstore.h"
+#include "defaults.h"
 
-/* FreeRTOS event group to signal when we are connected*/
-static EventGroupHandle_t plantfi_sta_event_group;
+EventGroupHandle_t plantfi_sta_event_group;
 
-/* The event group allows multiple bits for each event, but we only care about two events:
- * - we are connected to the AP with an IP
- * - we failed to connect after the maximum amount of retries */
-#define PLANTFI_CONNECTED_BIT BIT0
-#define PLANTFI_FAIL_BIT BIT1
-#define PLANTFI_PASSWORD_WRONG_BIT BIT2
+const char *PLANTFI_TAG = "PLANTFI";
 
-#define PLANTFI_SSID_MAX_LENGTH 33
-#define PLANTFI_PASSWORD_MAX_LENGTH 65
+int plantfi_retry_num = 0;
 
-static const char *PLANTFI_TAG = "PLANTFI";
+int plantfi_max_retry;
 
-static int plantfi_retry_num = 0;
+plantfi_mode_t plantfi_ap = PLANTFI_MODE_UNINITIALIZED;
+plantfi_mode_t plantfi_sta = PLANTFI_MODE_UNINITIALIZED;
 
-static int plantfi_max_retry;
+char plantfi_ssid[DEFAULT_SSID_MAX_LENGTH];
+char plantfi_password[DEFAULT_PASSWORD_MAX_LENGTH];
 
-typedef enum
-{
-    PLANTFI_MODE_UNINITIALIZED,
-    PLANTFI_MODE_ENABLED,
-    PLANTFI_MODE_DISABLED
-} plantfi_mode_t;
+bool _credentialsChanged = false;
+bool *_userConnectedToAp = NULL;
 
-typedef enum
-{
-    PLANTFI_STA_STATUS_CONNECTED,
-    PLANTFI_STA_STATUS_DISCONNECTED,
-    PLANTIF_STA_STATUS_UNINITIALIZED,
-    PLANTFI_STA_STATUS_FAIL,
-    PLANTFI_STA_STATUS_PASSWORD_WRONG,
-    PLANTFI_STA_STATUS_PENDING
-} plantfi_sta_status_t;
-
-static plantfi_mode_t plantfi_ap = PLANTFI_MODE_UNINITIALIZED;
-static plantfi_mode_t plantfi_sta = PLANTFI_MODE_UNINITIALIZED;
-
-static char plantfi_ssid[PLANTFI_SSID_MAX_LENGTH];
-static char plantfi_password[PLANTFI_PASSWORD_MAX_LENGTH];
-
-static bool _credentialsChanged = false;
-
-static void plantfi_sta_event_handler(void *arg, esp_event_base_t event_base,
-                                      int32_t event_id, void *event_data)
+void plantfi_event_handler(void *arg, esp_event_base_t event_base,
+                           int32_t event_id, void *event_data)
 {
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START)
     {
@@ -101,28 +75,29 @@ static void plantfi_sta_event_handler(void *arg, esp_event_base_t event_base,
             plantstore_setWifiCredentials(plantfi_ssid, plantfi_password);
         }
     }
-}
-
-static void plantfi_ap_event_handler(void *arg, esp_event_base_t event_base,
-                                     int32_t event_id, void *event_data)
-{
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_AP_STACONNECTED)
     {
-        bool *userConnectedToAp = (bool *)arg;
-        *userConnectedToAp = true;
+        if (_userConnectedToAp != NULL)
+        {
+            *_userConnectedToAp = true;
+        }
+        ESP_LOGI(PLANTFI_TAG, "User connected to AP");
     }
 }
 
-static void plantfi_initWifiIfNecessary()
+void plantfi_initWifiIfNecessary()
 {
     if (plantfi_sta != PLANTFI_MODE_UNINITIALIZED || plantfi_ap != PLANTFI_MODE_UNINITIALIZED)
     {
         ESP_LOGI(PLANTFI_TAG, "Wifi already initialized");
         return;
     }
-    // TODO check if these two functions are necessary
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
+    esp_event_handler_instance_t instance_any_id;
+    esp_event_handler_instance_t instance_got_ip;
+    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &plantfi_event_handler, &instance_any_id)); // TODO unregister event handlers on deinit
+    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &plantfi_event_handler, &instance_got_ip));
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
@@ -163,9 +138,8 @@ void plantfi_initAp(const char *ssid, const char *password, int max_connection, 
     {
         ESP_ERROR_CHECK(esp_wifi_start());
     }
+    _userConnectedToAp = userConnectedToAp;
     plantfi_ap = PLANTFI_MODE_ENABLED;
-
-    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, WIFI_EVENT_AP_STACONNECTED, &plantfi_ap_event_handler, &userConnectedToAp));
 }
 
 void plantfi_initSta(const char *ssid, const char *password, int max_retry, bool credentialsChanged)
@@ -190,11 +164,7 @@ void plantfi_initSta(const char *ssid, const char *password, int max_retry, bool
     if (plantfi_sta == PLANTFI_MODE_UNINITIALIZED)
     {
         plantfi_sta_event_group = xEventGroupCreate();
-        esp_event_handler_instance_t instance_any_id;
-        esp_event_handler_instance_t instance_got_ip;
         esp_netif_create_default_wifi_sta();
-        ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &plantfi_sta_event_handler, &instance_any_id)); // TODO unregister event handlers on deinit
-        ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &plantfi_sta_event_handler, &instance_got_ip));
     }
     else
     {
@@ -228,8 +198,8 @@ void plantfi_initSta(const char *ssid, const char *password, int max_retry, bool
  */
 bool plantfi_initSavedSta()
 {
-    char ssid[PLANTFI_SSID_MAX_LENGTH];
-    char password[PLANTFI_PASSWORD_MAX_LENGTH];
+    char ssid[DEFAULT_SSID_MAX_LENGTH];
+    char password[DEFAULT_PASSWORD_MAX_LENGTH];
     if (plantstore_getWifiCredentials(ssid, password, sizeof(ssid), sizeof(password)))
     {
         plantfi_initSta(ssid, password, 5, false);
@@ -255,7 +225,7 @@ esp_err_t plantfi_waitForStaConnection(EventBits_t *bits)
     }
     // TODO
     /* Waiting until either the connection is established (PLANTFI_CONNECTED_BIT) or connection failed for the maximum
-     * number of re-tries (PLANTFI_FAIL_BIT). The bits are set by plantfi_sta_event_handler() (see above) */
+     * number of re-tries (PLANTFI_FAIL_BIT). The bits are set by plantfi_event_handler() (see above) */
     EventBits_t _bits = xEventGroupWaitBits(plantfi_sta_event_group,
                                             PLANTFI_CONNECTED_BIT | PLANTFI_FAIL_BIT | PLANTFI_PASSWORD_WRONG_BIT,
                                             pdFALSE,
@@ -280,14 +250,7 @@ int8_t plantfi_getRssi()
     return ap_info.rssi;
 }
 
-typedef struct
-{
-    int8_t rssi;
-    char ssid[32];
-    uint8_t secure;
-} plantfi_ap_record_t;
-
-static int plantfi_compareWifiApRecords(const void *a, const void *b)
+int plantfi_compareWifiApRecords(const void *a, const void *b)
 {
     return ((wifi_ap_record_t *)b)->rssi - ((wifi_ap_record_t *)a)->rssi;
 }

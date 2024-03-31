@@ -3,18 +3,19 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include "esp_sleep.h"
-
-#include "peripherals/sensors.c"
-#include "secret.c"
-#include "plantfi.c"
-#include "configuration_mode_server.c"
-#include "plantstore.c"
-#include "defaults.h"
+#include "esp_timer.h"
 
 #include "esp_http_client.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <string.h>
+
+#include "peripherals/sensors.h"
+#include "secret.c"
+#include "plantfi.h"
+#include "configuration_mode_server.h"
+#include "plantstore.h"
+#include "defaults.h"
 
 // TODO use udp or mqtt
 void sendSensorData(sensors_full_data_t *sensors_data, int8_t rssi)
@@ -55,10 +56,11 @@ void sendSensorData(sensors_full_data_t *sensors_data, int8_t rssi)
 
 void start_deep_sleep()
 {
-    uint32_t sleepTime = DEFAULT_SENSOR_TIMEOUT_SLEEP_MS;
+    int32_t sleepTime = DEFAULT_SENSOR_TIMEOUT_SLEEP_MS;
     plantstore_getSensorTimeoutSleepMs(&sleepTime);
     ESP_LOGI("DeepSleep", "Going to sleep for %ld ms", sleepTime);
-    esp_deep_sleep(sleepTime * 1000);
+    uint64_t u_sleepTime = sleepTime * 1000;
+    esp_deep_sleep(u_sleepTime);
 }
 
 void configuration_mode(bool isConfigured)
@@ -83,6 +85,8 @@ void configuration_mode(bool isConfigured)
         }
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
+    stop_webserver(webserver);
+    start_deep_sleep();
 }
 
 void sensor_mode()
@@ -114,8 +118,6 @@ void app_main()
     if (isManualReset || !isConfigured)
     {
         configuration_mode(isConfigured);
-        // isConfigured and no user connected to AP
-        start_deep_sleep();
     }
     else
     {

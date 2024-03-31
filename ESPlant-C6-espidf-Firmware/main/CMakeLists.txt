@@ -1,4 +1,4 @@
-idf_component_register(SRCS "plantstore.c" "plantfi.c" "configuration_mode_server.c" "secret.c" "peripherals/config.c" "peripherals/sensors.c" "peripherals/adc.c" "main.c"
+idf_component_register(SRCS "plantstore.c" "plantfi.c" "configuration_mode_server.c" "secret.c" "peripherals/sensors.c" "peripherals/adc.c" "main.c"
                     INCLUDE_DIRS ".")
 
 # TODO Uncomment to flash the littlefs image, comment to save time

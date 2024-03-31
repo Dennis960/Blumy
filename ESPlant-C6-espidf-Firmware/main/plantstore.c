@@ -1,33 +1,18 @@
-#pragma once
+#include "plantstore.h"
 
 #include <string.h>
 
 #include "nvs_flash.h"
 #include "esp_log.h"
 
-#define CREDENTIALS_SSID_KEY "cred_ssid"
-#define CREDENTIALS_PASSWORD_KEY "cred_password"
-#define HTTP_URL_KEY "http_url"
-#define HTTP_AUTH_KEY "http_auth"
-#define MQTT_SERVER_KEY "mqtt_server"
-#define MQTT_PORT_KEY "mqtt_port"
-#define MQTT_USERNAME_KEY "mqtt_username"
-#define MQTT_PASSWORD_KEY "mqtt_password"
-#define MQTT_TOPIC_KEY "mqtt_topic"
-#define MQTT_CLIENTID_KEY "mqtt_clientid"
-#define BLUMY_TOKEN_KEY "blumy_token"
-#define SENSOR_ID_KEY "sensor_id"
-#define SENSOR_TIMEOUT_SLEEP_KEY "timeout_sleep"
-#define SENSOR_TIMEOUT_CONFIG_KEY "timeout_config"
+bool plantstore_isInitialized = false;
 
-static bool plantstore_isInitialized = false;
-
-static void plantstore_init()
+void plantstore_init()
 {
     ESP_ERROR_CHECK(nvs_flash_init());
 }
 
-static nvs_handle_t plantstore_openNvsReadOnly()
+nvs_handle_t plantstore_openNvsReadOnly()
 {
     if (!plantstore_isInitialized)
     {
@@ -39,7 +24,7 @@ static nvs_handle_t plantstore_openNvsReadOnly()
     return nvs_handle;
 }
 
-static nvs_handle_t plantstore_openNvsReadWrite()
+nvs_handle_t plantstore_openNvsReadWrite()
 {
     if (!plantstore_isInitialized)
     {
@@ -159,16 +144,16 @@ void plantstore_setSensorId(int32_t sensorId)
     nvs_close(nvs_handle);
 }
 
-bool plantstore_getSensorTimeoutSleepMs(uint32_t *timeoutMs)
+bool plantstore_getSensorTimeoutSleepMs(int32_t *timeoutMs)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
-    esp_err_t timeout_err = nvs_get_u32(nvs_handle, SENSOR_TIMEOUT_SLEEP_KEY, timeoutMs);
+    esp_err_t timeout_err = nvs_get_i32(nvs_handle, SENSOR_TIMEOUT_SLEEP_KEY, timeoutMs);
     nvs_close(nvs_handle);
 
     return timeout_err == ESP_OK;
 }
 
-void plantstore_setSensorTimeoutSleepMs(uint32_t timeoutMs)
+void plantstore_setSensorTimeoutSleepMs(int32_t timeoutMs)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
     ESP_ERROR_CHECK(nvs_set_u32(nvs_handle, SENSOR_TIMEOUT_SLEEP_KEY, timeoutMs));
@@ -176,11 +161,13 @@ void plantstore_setSensorTimeoutSleepMs(uint32_t timeoutMs)
     nvs_close(nvs_handle);
 }
 
-void plantstore_getConfigurationModeTimeoutMs(int32_t *timeoutMs)
+bool plantstore_getConfigurationModeTimeoutMs(int32_t *timeoutMs)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
     esp_err_t timeout_err = nvs_get_i32(nvs_handle, SENSOR_TIMEOUT_CONFIG_KEY, timeoutMs);
     nvs_close(nvs_handle);
+
+    return timeout_err == ESP_OK;
 }
 
 void plantstore_setConfigurationModeTimeoutMs(int32_t timeoutMs)
@@ -191,10 +178,6 @@ void plantstore_setConfigurationModeTimeoutMs(int32_t timeoutMs)
     nvs_close(nvs_handle);
 }
 
-/**
- * @brief Check if the plantstore is configured
- * The plantstore is marked as configured, if the wifi credentials are set and at least one of the cloud configurations is set.
- */
 bool plantstore_isConfigured()
 {
     // Doing this is fine, because the parameters can be NULL and then the length of the stored values is checked only
