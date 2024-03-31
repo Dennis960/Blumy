@@ -28,8 +28,8 @@ bool plantstore_getCloudConfigurationBlumy(char *token, size_t token_size);
 void plantstore_setCloudConfigurationBlumy(char *token);
 bool plantstore_getSensorId(int32_t *sensorId);
 void plantstore_setSensorId(int32_t sensorId);
-bool plantstore_getSensorTimeoutSleepMs(int32_t *timeoutMs);
-void plantstore_setSensorTimeoutSleepMs(int32_t timeoutMs);
+bool plantstore_getSensorTimeoutSleepMs(uint64_t *timeoutMs);
+void plantstore_setSensorTimeoutSleepMs(uint64_t timeoutMs);
 bool plantstore_getConfigurationModeTimeoutMs(int32_t *timeoutMs);
 void plantstore_setConfigurationModeTimeoutMs(int32_t timeoutMs);
 /**

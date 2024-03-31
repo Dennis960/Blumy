@@ -144,19 +144,19 @@ void plantstore_setSensorId(int32_t sensorId)
     nvs_close(nvs_handle);
 }
 
-bool plantstore_getSensorTimeoutSleepMs(int32_t *timeoutMs)
+bool plantstore_getSensorTimeoutSleepMs(uint64_t *timeoutMs)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
-    esp_err_t timeout_err = nvs_get_i32(nvs_handle, SENSOR_TIMEOUT_SLEEP_KEY, timeoutMs);
+    esp_err_t timeout_err = nvs_get_u64(nvs_handle, SENSOR_TIMEOUT_SLEEP_KEY, timeoutMs);
     nvs_close(nvs_handle);
 
     return timeout_err == ESP_OK;
 }
 
-void plantstore_setSensorTimeoutSleepMs(int32_t timeoutMs)
+void plantstore_setSensorTimeoutSleepMs(uint64_t timeoutMs)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
-    ESP_ERROR_CHECK(nvs_set_u32(nvs_handle, SENSOR_TIMEOUT_SLEEP_KEY, timeoutMs));
+    ESP_ERROR_CHECK(nvs_set_u64(nvs_handle, SENSOR_TIMEOUT_SLEEP_KEY, timeoutMs));
     ESP_ERROR_CHECK(nvs_commit(nvs_handle));
     nvs_close(nvs_handle);
 }
