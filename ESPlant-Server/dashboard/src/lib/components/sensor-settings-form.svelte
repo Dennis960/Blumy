@@ -4,11 +4,13 @@
 	import { funnyPlantNames } from '$lib/funny-plant-names';
 	import type { SensorConfigurationDTO, SensorValueDistributionDTO } from '$lib/types/api.js';
 	import { createEventDispatcher, onMount } from 'svelte';
+	import CopyText from './copy-text.svelte';
 
 	const dispatch = createEventDispatcher();
     export let config: SensorConfigurationDTO|undefined = undefined;
     export let sensorValueDistribution: SensorValueDistributionDTO|undefined = undefined;
     export let error: string|undefined = undefined;
+    export let token: string|undefined = undefined;
 
     let editingConfig: SensorConfigurationDTO = config != undefined ? { ...config } : {
         name: funnyPlantNames[Math.floor(Math.random() * funnyPlantNames.length)],
@@ -135,6 +137,15 @@
                             </div>
                         {/if}
                     </div>
+
+                    {#if token}
+                    <div class="row mb-3">
+                        <CopyText
+                            label="Zugangsschlüssel"
+                            hint="Kopiere den Zugangsschlüssel zur Einrichtung des Sensors."
+                            value={token} />
+                    </div>
+                    {/if}
 
                     <div class="card-footer text-end">
                         <div class="d-flex justify-content-end column-gap-2">

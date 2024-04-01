@@ -10,10 +10,12 @@
 	export let data;
 
 	let config: SensorConfigurationDTO;
+	let token: string;
 
 	onMount(async () => {
 		const sensor = await fetchSensor(data.id);
 		config = sensor.config;
+		token = sensor.token;
 	});
 
 	let error: string;
@@ -44,6 +46,7 @@
 			<SensorSettingsForm
 				config={config}
 				error={error}
+				token={token}
 				sensorValueDistribution={$valueDistributionQuery.data}
 				on:submit={handleSubmit}
 			>
