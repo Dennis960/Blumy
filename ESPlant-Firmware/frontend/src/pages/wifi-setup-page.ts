@@ -41,12 +41,14 @@ export class WifiSetupPage extends BasePage {
                 }
                 this.next();
                 return;
-            } else if (wifiStatus == WifiStatus.CONNECT_FAILED) {
+            } else if (wifiStatus == WifiStatus.FAIL) {
                 this.errorText = "Konnte keine Verbindung zum WLAN herstellen";
-            } else if (wifiStatus == WifiStatus.CONNECT_WRONG_PASSWORD) {
+            } else if (wifiStatus == WifiStatus.PASSWORD_WRONG) {
                 this.errorText = "Falsches Passwort";
-            } else if (wifiStatus == WifiStatus.NO_SSID_AVAIL) {
-                this.errorText = "Die angegebene SSID kann nicht erreicht werden";
+            } else if (wifiStatus == WifiStatus.DISCONNECTED) {
+                this.errorText = "Sensor ist nicht verbunden";
+            } else if (wifiStatus == WifiStatus.UNINITIALIZED) {
+                this.errorText = "Sensor ist nicht initialisiert. Versuche ihn neu zu starten.";
             } else {
                 loadingState.state++;;
                 await new Promise((resolve) => setTimeout(resolve, 1000));

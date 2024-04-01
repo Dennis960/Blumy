@@ -9,13 +9,13 @@ export type Network = {
 };
 
 export enum WifiStatus {
-    IDLE = 0,
-    NO_SSID_AVAIL = 1,
-    CONNECTED = 3,
-    CONNECT_FAILED = 4,
-    CONNECT_WRONG_PASSWORD = 6,
-    DISCONNECTED = 7,
-    ERROR = 8,
+    CONNECTED = 0,
+    DISCONNECTED = 1,
+    UNINITIALIZED = 2,
+    FAIL = 3,
+    PASSWORD_WRONG = 4,
+    PENDING = 5,
+    ERROR = 10,
 }
 
 export enum ResetFlag {
@@ -36,10 +36,11 @@ const fetch = new Proxy(window.fetch, {
     },
 });
 
-async function postDataToEsp(url: string, params?: URLSearchParams) {
+async function postDataToEsp(url: string, params: Record<string, string> | string) {
+    const body = typeof params === "string" ? params : Object.entries(params).map(([key, value]) => key + "=" + value).join("\n") + "\n";
     return await fetch("/api" + url, {
         method: "POST",
-        body: params,
+        body,
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
         },
@@ -65,9 +66,7 @@ async function uploadFile(file: File, url: string) {
 }
 
 export async function setPlantName(name: string) {
-    const params = new URLSearchParams();
-    params.append("name", name);
-    return await postDataToEsp("/plantName", params);
+    return await postDataToEsp("/plantName", name);
 }
 
 export async function getPlantName() {
@@ -83,16 +82,11 @@ export async function getConnectedNetwork(): Promise<Network> {
 }
 
 export async function connectToNetwork(ssid: string, password: string) {
-    const params = new URLSearchParams();
-    params.append("ssid", ssid);
-    params.append("password", password);
-    return await postDataToEsp("/connect", params);
+    return await postDataToEsp("/connect", {ssid, password});
 }
 
 export async function resetEsp(resetFlag: ResetFlag) {
-    const params = new URLSearchParams();
-    params.append("resetFlag", String(resetFlag));
-    return await postDataToEsp("/reset", params);
+    return await postDataToEsp("/reset", String(resetFlag));
 }
 
 /**
@@ -108,12 +102,14 @@ export async function isEspConnected(): Promise<WifiStatus> {
 
 export interface HttpCloudConfiguration extends Record<string, string>{
     type: 'http'
+    sensorId: string,
     url: string
     auth: string
 }
 
 export interface MqttCloudConfiguration extends Record<string, string>{
     type: 'mqtt'
+    sensorId: string,
     server: string,
     port: string,
     username: string,
@@ -130,24 +126,18 @@ export interface BlumyCloudConfiguration extends Record<string, string> {
 export type CloudConfiguration = HttpCloudConfiguration | MqttCloudConfiguration | BlumyCloudConfiguration;
 
 export async function setCloudCredentials(config: CloudConfiguration) {
-    const params = new URLSearchParams(config);
-    return await postDataToEsp("/cloudSetup", params);
-}
-
-export async function setSensorId(id: number) {
-    const params = new URLSearchParams();
-    params.append("sensorId", id.toString());
-    return await postDataToEsp("/sensorId", params);
-}
-
-export async function getSensorId() {
-    return Number(await getDataFromEsp("/sensorId"));
+    if (config.type === 'http') {
+        return await postDataToEsp("/cloudSetup/http", config);
+    } else if (config.type === 'mqtt') {
+        return await postDataToEsp("/cloudSetup/mqtt", config);
+    } else if (config.type === 'cloud') {
+        return await postDataToEsp("/cloudSetup/blumy", config);
+    }
 }
 
 export async function setSleepTimeout(timeout: number) {
-    const params = new URLSearchParams();
-    params.append("sleepTimeout", timeout.toString());
-    return await postDataToEsp("/timeouts/sleep", params);
+    timeout = Math.round(timeout);
+    return await postDataToEsp("/timeouts/sleep", timeout.toString());
 }
 
 export async function getSleepTimeout() {
