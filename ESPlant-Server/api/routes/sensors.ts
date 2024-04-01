@@ -3,9 +3,10 @@ import SensorController from "../controllers/SensorController.js";
 import validate from "../middlewares/validate.js";
 import { z } from "zod";
 import { sensorConfigurationDTOSchema } from "../types/api.js";
-import { isOwner, isUser } from "../middlewares/authenticated.js";
+import { isOwner, isOwnerOrThisSensorRead, isUser } from "../middlewares/authenticated.js";
 
 const router = Router();
+
 const sensorController = new SensorController();
 
 // GET /api/sensors
@@ -15,7 +16,7 @@ router.get("/sensors", isUser, async (req, res) => {
   return res.json(sensors);
 });
 
-router.get("/sensors/:sensorId", isOwner, async (req, res) => {
+router.get("/sensors/:sensorId", isOwnerOrThisSensorRead, async (req, res) => {
   const sensor = await sensorController.getSensor(parseInt(req.params.sensorId));
   return res.json(sensor);
 });
@@ -27,7 +28,7 @@ router.get("/sensors/:sensorId", isOwner, async (req, res) => {
 // -> 400 message: invalid endDate, data: {}
 // -> 400 message: invalid maxDataPoints, data: {}
 // -> 200 message: data found, data: data
-router.get("/sensors/:sensorId/history", isOwner, async (req, res) => {
+router.get("/sensors/:sensorId/history", isOwnerOrThisSensorRead, async (req, res) => {
   const sensorId = parseInt(req.params.sensorId);
   const { startDate, endDate, maxDataPoints } = req.query;
   // check if startDate, endDate and maxDataPoints are valid
@@ -63,6 +64,11 @@ router.get("/sensors/:sensorId/history", isOwner, async (req, res) => {
   return res.json(history);
 });
 
+router.post("/sensors/:sensorId/write-token", isOwner, async (req, res) => {
+  const writeToken = await sensorController.getSensorWriteToken(parseInt(req.params.sensorId));
+  return res.send(writeToken);
+});
+
 router.get("/sensors/:sensorId/value-distribution", isOwner, async (req, res) => {
   const distribution = await sensorController.getSensorValueDistribution(
     parseInt(req.params.sensorId)
@@ -81,7 +87,7 @@ router.post("/sensors/:sensorId/config", isOwner, validate(z.object({
   return res.json(sensor);
 });
 
-router.post("/sensors", validate(z.object({
+router.post("/sensors", isUser, validate(z.object({
   body: sensorConfigurationDTOSchema,
 })), async (req, res) => {
   const config = req.body;

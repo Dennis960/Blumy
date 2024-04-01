@@ -1,6 +1,6 @@
 import passport from "../config/passport.js";
 import { Router } from "express";
-import { isAuthenticated } from "../middlewares/authenticated.js";
+import { isUser } from "../middlewares/authenticated.js";
 
 const router = Router();
 
@@ -19,7 +19,7 @@ router.get(
   })
 );
 
-router.get("/profile", isAuthenticated, (req, res) => {
+router.get("/profile", isUser, (req, res) => {
   res.json(req.user);
 });
 

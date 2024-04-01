@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
-	import { fetchSensor, fetchSensorValueDistribution, updateSensorConfig } from '$lib/api.js';
+	import { fetchSensor, fetchSensorValueDistribution, fetchSensorWriteToken, updateSensorConfig } from '$lib/api.js';
 	import SensorSettingsForm from '$lib/components/sensor-settings-form.svelte';
 	import type { SensorConfigurationDTO } from '$lib/types/api.js';
 	import { createQuery, useQueryClient } from '@tanstack/svelte-query';
@@ -10,12 +10,14 @@
 	export let data;
 
 	let config: SensorConfigurationDTO;
-	let token: string;
+	let shareLink: string|undefined;
+	let writeToken: string|undefined;
 
 	onMount(async () => {
 		const sensor = await fetchSensor(data.id);
 		config = sensor.config;
-		token = sensor.token;
+		writeToken = await fetchSensorWriteToken(data.id);
+		shareLink = sensor.readToken != undefined ? `${location.origin}${base}/sensor/${data.id}?token=${sensor.readToken}` : undefined;
 	});
 
 	let error: string;
@@ -46,7 +48,8 @@
 			<SensorSettingsForm
 				config={config}
 				error={error}
-				token={token}
+				writeToken={writeToken}
+				shareLink={shareLink}
 				sensorValueDistribution={$valueDistributionQuery.data}
 				on:submit={handleSubmit}
 			>

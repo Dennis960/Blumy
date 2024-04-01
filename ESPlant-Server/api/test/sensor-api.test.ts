@@ -6,6 +6,7 @@ import SensorRepository from '../repositories/SensorRepository';
 import SensorEntity from '../entities/SensorEntity.js';
 import { ESPSensorReadingDTO } from '../entities/SensorReadingEntity';
 import SensorController from '../controllers/SensorController.js';
+import { migrateDatabase } from '../migrations.js';
 
 const API_URL = 'http://localhost:4803/api';
 
@@ -20,7 +21,8 @@ const testSensor: SensorEntity = {
     lowerThreshold: 300,
     upperThreshold: 800,
     owner: 1,
-    token: 'test-token'
+    writeToken: 'test-token-write',
+    readToken: 'test-token-read',
 }
 
 const testDate: Omit<ESPSensorReadingDTO, 'sensorAddress'> = {
@@ -53,6 +55,8 @@ beforeAll(async () => {
         await knex.raw(statement)
     }
 
+    await migrateDatabase()
+
     await SensorRepository.create(testSensor)
 
     server = (await import('../index.js')).default
@@ -67,13 +71,13 @@ test('/profile returns 401 if not authenticated', async () => {
     expect(response.status).toBe(401)
 })
 
-test('/profile returns 401 if authenticated with token', async () => {
+test('/profile returns 403 if authenticated with sensor token', async () => {
     const response = await fetch(`${API_URL}/profile`, {
         headers: {
-            'Authorization': `Bearer ${testSensor.token}`,
+            'Authorization': `Bearer ${testSensor.writeToken}`,
         },
     })
-    expect(response.status).toBe(401)
+    expect(response.status).toBe(403)
 })
 
 test('/data returns 401 if not authenticated', async () => {
@@ -106,7 +110,7 @@ test('/data inserts data if authenticated', async () => {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${testSensor.token}`,
+            'Authorization': `Bearer ${testSensor.writeToken}`,
         },
         body: JSON.stringify(testDate),
     })
@@ -122,8 +126,8 @@ test('inserts data received over legacy MQTT API', async () => {
 
     const sensorController = new SensorController()
     await sensorController.addLegacySensorData({
+        plantName: testSensor.name,
         sensorAddress: testSensor.sensorAddress,
-        voltage: 3.2,
         water: 879,
         rssi: -36,
         duration: 3083,
