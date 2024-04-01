@@ -11,7 +11,6 @@
 #include <string.h>
 
 #include "peripherals/sensors.h"
-#include "secret.c"
 #include "plantfi.h"
 #include "configuration_mode_server.h"
 #include "plantstore.h"
@@ -41,7 +40,7 @@ void sendSensorData(sensors_full_data_t *sensors_data, int8_t rssi)
             esp_timer_get_time());
 
     esp_http_client_config_t config = {
-        .url = SECRET_API_URL,
+        .url = DEFAULT_API_URL,
         .method = HTTP_METHOD_POST,
     };
 
