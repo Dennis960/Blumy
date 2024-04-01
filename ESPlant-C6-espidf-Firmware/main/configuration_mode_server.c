@@ -179,20 +179,11 @@ esp_err_t post_api_connect_handler(httpd_req_t *req)
 
 esp_err_t post_api_reset_handler(httpd_req_t *req)
 {
-    char resetFlag[2];
-    if (!get_single_value(req, resetFlag))
-    {
-        return ESP_FAIL;
-    }
-
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
 
-    // TODO 0: reset to sensor mode, 1: reset to configuration mode
-    if (resetFlag[0] == '1')
-    {
-        esp_restart();
-    }
+    sensors_playShutdownSound();
+    esp_restart();
     return ESP_OK;
 }
 
