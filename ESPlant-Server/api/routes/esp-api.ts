@@ -7,12 +7,14 @@ import {
 } from "../entities/SensorReadingEntity.js";
 import validate from "../middlewares/validate.js";
 import { isSensor } from "../middlewares/authenticated.js";
+import passport from "passport";
 
 const router = Router();
 const dataController = new SensorController();
 
 router.post(
   "/v2/data",
+  passport.authenticate("bearer", { session: false }),
   isSensor,
   validate(
     z.object({

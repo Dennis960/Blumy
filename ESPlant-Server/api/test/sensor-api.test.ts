@@ -67,13 +67,13 @@ test('/profile returns 401 if not authenticated', async () => {
     expect(response.status).toBe(401)
 })
 
-test('/profile returns 200 if authenticated with token', async () => {
+test('/profile returns 401 if authenticated with token', async () => {
     const response = await fetch(`${API_URL}/profile`, {
         headers: {
             'Authorization': `Bearer ${testSensor.token}`,
         },
     })
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(401)
 })
 
 test('/data returns 401 if not authenticated', async () => {

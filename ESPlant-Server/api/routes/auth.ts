@@ -19,8 +19,6 @@ router.get(
   })
 );
 
-router.use(passport.authenticate("bearer", { session: false }))
-
 router.get("/profile", isAuthenticated, (req, res) => {
   res.json(req.user);
 });
