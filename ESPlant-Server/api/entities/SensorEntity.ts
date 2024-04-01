@@ -1,7 +1,7 @@
 import sharp from "sharp";
 import { SensorConfigurationDTO } from "../types/api";
 
-type RedactedSensorEntity = Omit<SensorEntity, "owner" | "token">;
+type RedactedSensorEntity = Omit<SensorEntity, "owner" | "readToken" | "writeToken">;
 
 export default class SensorEntity {
   constructor(
@@ -13,7 +13,8 @@ export default class SensorEntity {
     public lowerThreshold: number, // relative to fieldCapacity
     public upperThreshold: number,
     public owner: number,
-    public token: string
+    public writeToken: string,
+    public readToken: string,
   ) {}
 
   public static async fromDTO(

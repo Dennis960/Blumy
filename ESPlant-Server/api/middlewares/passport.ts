@@ -1,8 +1,9 @@
 import { Router } from "express";
 import session from "express-session";
 import KnexSessionStoreFactory from "connect-session-knex";
-import passport from "../config/passport.js";
+import passport, { AuthenticatedUser } from "../config/passport.js";
 import { knex } from "../config/knex.js";
+import { AuthenticateCallback } from "passport";
 
 const SESSION_SECRET = process.env.SESSION_SECRET!;
 if (SESSION_SECRET == undefined) {
@@ -27,7 +28,21 @@ router.use(
     }),
   })
 );
-router.use(passport.initialize());
 router.use(passport.session());
+
+// attempt to validate tokens on all routes
+router.use((req, res, next) => {
+  const callback: AuthenticateCallback = (err, user, info, status) => {
+    if (err) {
+      return next(err)
+    }
+    if (user) {
+      req.user = user as AuthenticatedUser
+    }
+    // if authentication is not successful, do nothing - continue
+    return next()
+  };
+  passport.authenticate("bearer", { session: false }, callback)(req, res, next);
+});
 
 export default router;
