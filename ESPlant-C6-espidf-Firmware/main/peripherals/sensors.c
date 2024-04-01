@@ -345,3 +345,29 @@ void sensors_full_read(sensors_full_data_t *data)
     data->moisture_measurement = moisture_sensor_output.measurement;
     data->moisture_stabilization_time = moisture_sensor_output.stabilization_time;
 }
+
+void sensors_playStartupSound()
+{
+    const int tick = 20;
+    // d g a d
+    sensors_playToneSync(587, tick);
+    vTaskDelay(tick / portTICK_PERIOD_MS);
+    sensors_playToneSync(784, tick);
+    vTaskDelay(tick / portTICK_PERIOD_MS);
+    sensors_playToneSync(880, tick);
+    vTaskDelay(tick / portTICK_PERIOD_MS);
+    sensors_playToneSync(1175, tick);
+}
+
+void sensors_playShutdownSound()
+{
+    const int tick = 20;
+    // d a g d
+    sensors_playToneSync(1175, tick);
+    vTaskDelay(tick / portTICK_PERIOD_MS);
+    sensors_playToneSync(880, tick);
+    vTaskDelay(tick / portTICK_PERIOD_MS);
+    sensors_playToneSync(784, tick);
+    vTaskDelay(tick / portTICK_PERIOD_MS);
+    sensors_playToneSync(587, tick);
+}

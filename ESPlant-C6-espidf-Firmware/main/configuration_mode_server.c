@@ -173,7 +173,7 @@ esp_err_t post_api_connect_handler(httpd_req_t *req)
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
 
-    plantfi_initSta(ssid, password, 5, true);
+    plantfi_configureSta(ssid, password, 5, true);
     return ESP_OK;
 }
 
@@ -416,11 +416,11 @@ esp_err_t post_api_timeouts_sleep_handler(httpd_req_t *req)
 
 esp_err_t get_api_timeouts_sleep_handler(httpd_req_t *req)
 {
-    int32_t timeout = DEFAULT_SENSOR_TIMEOUT_SLEEP_MS;
+    uint64_t timeout = DEFAULT_SENSOR_TIMEOUT_SLEEP_MS;
     plantstore_getSensorTimeoutSleepMs(&timeout);
 
     char resp[15];
-    sprintf(resp, "%lu", timeout);
+    sprintf(resp, "%llu", timeout);
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
@@ -431,7 +431,7 @@ esp_err_t get_api_timeouts_configurationMode_handler(httpd_req_t *req)
     plantstore_getConfigurationModeTimeoutMs(&timeout);
 
     char resp[15];
-    sprintf(resp, "%lu", timeout);
+    sprintf(resp, "%ld", timeout);
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }

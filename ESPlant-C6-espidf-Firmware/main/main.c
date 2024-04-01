@@ -65,13 +65,18 @@ void start_deep_sleep()
 
 void configuration_mode(bool isConfigured)
 {
+    sensors_playStartupSound();
+    plantfi_initWifiApSta();
+    plantfi_configureStaFromPlantstore();
     bool userConnectedToAp = false;
     uint64_t start_time = esp_timer_get_time();
     uint64_t current_time = start_time;
     int32_t timeoutMs = DEFAULT_CONFIGURATION_MODE_TIMEOUT_MS;
     plantstore_getConfigurationModeTimeoutMs(&timeoutMs);
-    ESP_LOGI("MODE", "Starting configuration mode%s", isConfigured ? " (sensor is configured)" : "");
-    plantfi_initAp("Blumy", "", 4, &userConnectedToAp);
+    ESP_LOGI("MODE", "Starting configuration mode%s", isConfigured ? " (sensor is configured)" : "(no config)");
+    plantfi_configureAp("Blumy", "", 4, &userConnectedToAp);
+
+    ESP_LOGI("MODE", "Starting webserver");
     httpd_handle_t webserver = webserver = start_webserver();
     while (1)
     {
@@ -84,16 +89,18 @@ void configuration_mode(bool isConfigured)
                 break;
             }
         }
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
     stop_webserver(webserver);
+    sensors_playShutdownSound();
     start_deep_sleep();
 }
 
 void sensor_mode()
 {
     ESP_LOGI("MODE", "Starting sensor mode");
-    plantfi_initSavedSta();
+    plantfi_initWifiStaOnly();
+    plantfi_configureStaFromPlantstore();
     sensors_initSensors();
     sensors_full_data_t sensors_data;
     sensors_full_read(&sensors_data);
