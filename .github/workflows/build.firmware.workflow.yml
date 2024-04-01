@@ -1,0 +1,36 @@
+name: Build Firmware and Upload Artifact
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "ESPlant-Firmware/**"
+      - ".github/workflows/build.firmware.workflow.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "ESPlant-Firmware/**"
+      - ".github/workflows/build.firmware.workflow.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Build Firmware
+      run: |
+        docker run --rm -v $PWD:/project -w /project/ESPlant-Firmware -u $UID -e HOME=/tmp espressif/idf idf.py build
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: firmware
+        path: |
+          ESPlant-Firmware/build/ESPlant-Firmware.bin
+          ESPlant-Firmware/build/littlefs.bin
+
