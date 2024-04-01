@@ -173,7 +173,7 @@ export default class SensorController {
       sensorAddress: data.sensorAddress,
       date: Date.now(),
       light: -1,
-      voltage: data.voltage,
+      voltage: -1,
       temperature: -1,
       humidity: -1,
       isUsbConnected: false,
