@@ -10,6 +10,10 @@ bool plantstore_isInitialized = false;
 void plantstore_init()
 {
     ESP_ERROR_CHECK(nvs_flash_init());
+    // Open the namespace once in readwrite mode to create it if it does not exist
+    nvs_handle_t nvs_handle;
+    ESP_ERROR_CHECK(nvs_open("plantstore", NVS_READWRITE, &nvs_handle));
+    nvs_close(nvs_handle);
 }
 
 nvs_handle_t plantstore_openNvsReadOnly()
