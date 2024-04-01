@@ -37,14 +37,7 @@ void plantfi_event_handler(void *arg, esp_event_base_t event_base,
 {
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
     {
-        wifi_event_sta_disconnected_t *event = (wifi_event_sta_disconnected_t *)event_data;
-        if (event->reason == WIFI_REASON_AUTH_FAIL) // TODO not working
-        {
-            ESP_LOGI(PLANTFI_TAG, "Password is wrong");
-            xEventGroupSetBits(plantfi_sta_event_group, PLANTFI_PASSWORD_WRONG_BIT);
-            plantfi_sta_status = PLANTFI_STA_STATUS_PASSWORD_WRONG;
-        }
-        else if (plantfi_retry_num < plantfi_max_retry)
+        if (plantfi_retry_num < plantfi_max_retry)
         {
             esp_wifi_connect();
             plantfi_retry_num++;

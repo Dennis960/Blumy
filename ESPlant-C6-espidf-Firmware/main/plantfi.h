@@ -14,7 +14,7 @@ typedef enum
     PLANTFI_STA_STATUS_DISCONNECTED,
     PLANTFI_STA_STATUS_UNINITIALIZED,
     PLANTFI_STA_STATUS_FAIL,
-    PLANTFI_STA_STATUS_PASSWORD_WRONG,
+    PLANTFI_STA_STATUS_PASSWORD_WRONG, // Cannot be determined by the ESP32
     PLANTFI_STA_STATUS_PENDING
 } plantfi_sta_status_t;
 
@@ -24,7 +24,6 @@ typedef struct
     char ssid[32];
     uint8_t secure;
 } plantfi_ap_record_t;
-
 
 void plantfi_event_handler(void *arg, esp_event_base_t event_base,
                            int32_t event_id, void *event_data);
