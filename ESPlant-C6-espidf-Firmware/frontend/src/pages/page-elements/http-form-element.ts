@@ -5,6 +5,7 @@ import { customElement, query } from "lit/decorators.js";
 
 @customElement("http-form-element")
 export class HttpFormElement extends LitElement {
+    @query("#sensorId") sensorInput: InputElement;
     @query("#url") urlInput: InputElement;
     @query("#auth") authInput: InputElement;
     
@@ -12,6 +13,7 @@ export class HttpFormElement extends LitElement {
         this.dispatchEvent(new CustomEvent<HttpCloudConfiguration>('input', {
             detail: {
                 type: 'http',
+                sensorId: this.sensorInput.input.value,
                 url: this.urlInput.input.value,
                 auth: this.authInput.input.value,
             }
@@ -21,6 +23,12 @@ export class HttpFormElement extends LitElement {
     render() {
         return html`
             <input-element-grid>
+                <input-element
+                    id="sensorId"
+                    type="sensorId"
+                    label="Sensor Id"
+                    @input=${this.handleChange}
+                ></input-element>
                 <input-element
                     id="url"
                     type="url"

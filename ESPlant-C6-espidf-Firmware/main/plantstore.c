@@ -61,31 +61,34 @@ void plantstore_setWifiCredentials(char *ssid, char *password)
     nvs_close(nvs_handle);
 }
 
-bool plantstore_getCloudConfigurationHttp(char *url, char *auth, size_t url_size, size_t auth_size)
+bool plantstore_getCloudConfigurationHttp(char *sensorId, char *url, char *auth, size_t sensorId_size, size_t url_size, size_t auth_size)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
 
+    esp_err_t sensorId_err = nvs_get_str(nvs_handle, HTTP_SENSORID_KEY, sensorId, &sensorId_size);
     esp_err_t url_err = nvs_get_str(nvs_handle, HTTP_URL_KEY, url, &url_size);
     esp_err_t auth_err = nvs_get_str(nvs_handle, HTTP_AUTH_KEY, auth, &auth_size);
 
     nvs_close(nvs_handle);
 
-    return url_err == ESP_OK && auth_err == ESP_OK;
+    return sensorId_err == ESP_OK && url_err == ESP_OK && auth_err == ESP_OK;
 }
 
-void plantstore_setCloudConfigurationHttp(char *url, char *auth)
+void plantstore_setCloudConfigurationHttp(char *sensorId, char *url, char *auth)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
+    ESP_ERROR_CHECK(nvs_set_str(nvs_handle, HTTP_SENSORID_KEY, sensorId));
     ESP_ERROR_CHECK(nvs_set_str(nvs_handle, HTTP_URL_KEY, url));
     ESP_ERROR_CHECK(nvs_set_str(nvs_handle, HTTP_AUTH_KEY, auth));
     ESP_ERROR_CHECK(nvs_commit(nvs_handle));
     nvs_close(nvs_handle);
 }
 
-bool plantstore_getCloudConfigurationMqtt(char *server, int16_t *port, char *username, char *password, char *topic, char *clientId, size_t server_size, size_t username_size, size_t password_size, size_t topic_size, size_t clientId_size)
+bool plantstore_getCloudConfigurationMqtt(char *sensorId, char *server, int16_t *port, char *username, char *password, char *topic, char *clientId, size_t sensorId_size, size_t server_size, size_t username_size, size_t password_size, size_t topic_size, size_t clientId_size)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
 
+    esp_err_t sensorId_err = nvs_get_str(nvs_handle, MQTT_SENSORID_KEY, sensorId, &sensorId_size);
     esp_err_t server_err = nvs_get_str(nvs_handle, MQTT_SERVER_KEY, server, &server_size);
     esp_err_t port_err = nvs_get_i16(nvs_handle, MQTT_PORT_KEY, port);
     esp_err_t username_err = nvs_get_str(nvs_handle, MQTT_USERNAME_KEY, username, &username_size);
@@ -95,13 +98,13 @@ bool plantstore_getCloudConfigurationMqtt(char *server, int16_t *port, char *use
 
     nvs_close(nvs_handle);
 
-    return server_err == ESP_OK && port_err == ESP_OK && username_err == ESP_OK &&
-           password_err == ESP_OK && topic_err == ESP_OK && clientId_err == ESP_OK;
+    return sensorId_err == ESP_OK && server_err == ESP_OK && port_err == ESP_OK && username_err == ESP_OK && password_err == ESP_OK && topic_err == ESP_OK && clientId_err == ESP_OK;
 }
 
-void plantstore_setCloudConfigurationMqtt(char *server, int16_t port, char *username, char *password, char *topic, char *clientId)
+void plantstore_setCloudConfigurationMqtt(char *sensorId, char *server, int16_t port, char *username, char *password, char *topic, char *clientId)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
+    ESP_ERROR_CHECK(nvs_set_str(nvs_handle, MQTT_SENSORID_KEY, sensorId));
     ESP_ERROR_CHECK(nvs_set_str(nvs_handle, MQTT_SERVER_KEY, server));
     ESP_ERROR_CHECK(nvs_set_i16(nvs_handle, MQTT_PORT_KEY, port));
     ESP_ERROR_CHECK(nvs_set_str(nvs_handle, MQTT_USERNAME_KEY, username));
@@ -127,23 +130,6 @@ void plantstore_setCloudConfigurationBlumy(char *token)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
     ESP_ERROR_CHECK(nvs_set_str(nvs_handle, BLUMY_TOKEN_KEY, token));
-    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
-    nvs_close(nvs_handle);
-}
-
-bool plantstore_getSensorId(int32_t *sensorId)
-{
-    nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
-    esp_err_t sensorId_err = nvs_get_i32(nvs_handle, SENSOR_ID_KEY, sensorId);
-    nvs_close(nvs_handle);
-
-    return sensorId_err == ESP_OK;
-}
-
-void plantstore_setSensorId(int32_t sensorId)
-{
-    nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
-    ESP_ERROR_CHECK(nvs_set_i32(nvs_handle, SENSOR_ID_KEY, sensorId));
     ESP_ERROR_CHECK(nvs_commit(nvs_handle));
     nvs_close(nvs_handle);
 }
@@ -186,8 +172,8 @@ bool plantstore_isConfigured()
 {
     // Doing this is fine, because the parameters can be NULL and then the length of the stored values is checked only
     return plantstore_getWifiCredentials(NULL, NULL, 0, 0) &&
-           (plantstore_getCloudConfigurationHttp(NULL, NULL, 0, 0) ||
-            plantstore_getCloudConfigurationMqtt(NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0) ||
+           (plantstore_getCloudConfigurationHttp(NULL, NULL, NULL, 0, 0, 0) ||
+            plantstore_getCloudConfigurationMqtt(NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0) ||
             plantstore_getCloudConfigurationBlumy(NULL, 0));
 }
 

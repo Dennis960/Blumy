@@ -5,6 +5,7 @@ import { MqttCloudConfiguration } from "../../api";
 
 @customElement("mqtt-form-element")
 export class MqttForm extends LitElement {
+    @query("#sensorId") sensorInput: InputElement;
     @query("#server") serverInput: InputElement;
     @query("#port") portInput: InputElement;
     @query("#user") userInput: InputElement;
@@ -16,6 +17,7 @@ export class MqttForm extends LitElement {
         this.dispatchEvent(new CustomEvent<MqttCloudConfiguration>('input', {
             detail: {
                 type: 'mqtt',
+                sensorId: this.sensorInput.input.value,
                 server: this.serverInput.input.value,
                 port: this.portInput.input.value,
                 username: this.userInput.input.value,
@@ -29,6 +31,12 @@ export class MqttForm extends LitElement {
     render() {
         return html`
             <input-element-grid>
+                <input-element
+                    id="sensorId"
+                    type="sensorId"
+                    label="Sensor Id"
+                    @input=${this.handleChange}
+                ></input-element>
                 <input-element
                     id="server"
                     type="text"

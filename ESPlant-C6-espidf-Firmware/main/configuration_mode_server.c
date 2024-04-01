@@ -223,14 +223,15 @@ esp_err_t get_api_isConnected_handler(httpd_req_t *req)
 
 esp_err_t post_api_cloudSetup_mqtt_handler(httpd_req_t *req)
 {
+    char sensorId[100];
     char server[100];
     char portString[10];
     char username[100];
     char password[100];
     char topic[100];
     char clientId[100];
-    char *keys[] = {"server", "port", "username", "password", "topic", "clientId"};
-    char *values[] = {server, portString, username, password, topic, clientId};
+    char *keys[] = {"sensorId", "server", "port", "username", "password", "topic", "clientId"};
+    char *values[] = {sensorId, server, portString, username, password, topic, clientId};
     if (!get_values(req, keys, values, 6) || !is_number(portString))
     {
         return ESP_FAIL;
@@ -238,7 +239,7 @@ esp_err_t post_api_cloudSetup_mqtt_handler(httpd_req_t *req)
 
     int16_t port = atoi(portString);
 
-    plantstore_setCloudConfigurationMqtt(server, port, username, password, topic, clientId);
+    plantstore_setCloudConfigurationMqtt(sensorId, server, port, username, password, topic, clientId);
 
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
@@ -247,16 +248,17 @@ esp_err_t post_api_cloudSetup_mqtt_handler(httpd_req_t *req)
 
 esp_err_t post_api_cloudSetup_http_handler(httpd_req_t *req)
 {
+    char sensorId[100];
     char url[100];
     char auth[100];
-    char *keys[] = {"url", "auth"};
-    char *values[] = {url, auth};
+    char *keys[] = {"sensorId", "url", "auth"};
+    char *values[] = {sensorId, url, auth};
     if (!get_values(req, keys, values, 2))
     {
         return ESP_FAIL;
     }
 
-    plantstore_setCloudConfigurationHttp(url, auth);
+    plantstore_setCloudConfigurationHttp(sensorId, url, auth);
 
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
@@ -282,6 +284,7 @@ esp_err_t post_api_cloudSetup_blumy_handler(httpd_req_t *req)
 
 esp_err_t get_api_cloudSetup_mqtt_handler(httpd_req_t *req)
 {
+    char sensorId[100];
     char server[100];
     int16_t port;
     char username[100];
@@ -289,7 +292,7 @@ esp_err_t get_api_cloudSetup_mqtt_handler(httpd_req_t *req)
     char topic[100];
     char clientId[100];
 
-    if (!plantstore_getCloudConfigurationMqtt(server, &port, username, password, topic, clientId, sizeof(server), sizeof(username), sizeof(password), sizeof(topic), sizeof(clientId)))
+    if (!plantstore_getCloudConfigurationMqtt(sensorId, server, &port, username, password, topic, clientId, sizeof(sensorId), sizeof(server), sizeof(username), sizeof(password), sizeof(topic), sizeof(clientId)))
     {
         httpd_resp_send_404(req);
         return ESP_FAIL;
@@ -314,16 +317,18 @@ esp_err_t get_api_cloudSetup_mqtt_handler(httpd_req_t *req)
 
 esp_err_t get_api_cloudSetup_http_handler(httpd_req_t *req)
 {
+    char sensorId[100];
     char url[100];
     char auth[100];
 
-    if (!plantstore_getCloudConfigurationHttp(url, auth, sizeof(url), sizeof(auth)))
+    if (!plantstore_getCloudConfigurationHttp(sensorId, url, auth, sizeof(sensorId), sizeof(url), sizeof(auth)))
     {
         httpd_resp_send_404(req);
         return ESP_FAIL;
     }
 
     cJSON *root = cJSON_CreateObject();
+    cJSON_AddStringToObject(root, "sensorId", sensorId);
     cJSON_AddStringToObject(root, "url", url);
     cJSON_AddStringToObject(root, "auth", auth);
 
@@ -354,36 +359,6 @@ esp_err_t get_api_cloudSetup_blumy_handler(httpd_req_t *req)
 
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     free(resp);
-    return ESP_OK;
-}
-
-esp_err_t post_api_sensorId_handler(httpd_req_t *req)
-{
-    char sensorId[10];
-    if (!get_single_value(req, sensorId) || !is_number(sensorId))
-    {
-        return ESP_FAIL;
-    }
-
-    plantstore_setSensorId(atoi(sensorId));
-
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
-    return ESP_OK;
-}
-
-esp_err_t get_api_sensorId_handler(httpd_req_t *req)
-{
-    int32_t sensorId;
-    if (!plantstore_getSensorId(&sensorId))
-    {
-        httpd_resp_send_404(req);
-        return ESP_FAIL;
-    }
-
-    char resp[10];
-    sprintf(resp, "%ld", sensorId);
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
@@ -552,18 +527,6 @@ httpd_uri_t get_api_cloudSetup_blumy = {
     .handler = get_api_cloudSetup_blumy_handler,
     .user_ctx = NULL};
 
-httpd_uri_t post_api_sensorId = {
-    .uri = "/api/sensorId",
-    .method = HTTP_POST,
-    .handler = post_api_sensorId_handler,
-    .user_ctx = NULL};
-
-httpd_uri_t get_api_sensorId = {
-    .uri = "/api/sensorId",
-    .method = HTTP_GET,
-    .handler = get_api_sensorId_handler,
-    .user_ctx = NULL};
-
 httpd_uri_t post_api_timeouts_sleep = {
     .uri = "/api/timeouts/sleep",
     .method = HTTP_POST,
@@ -625,8 +588,6 @@ httpd_handle_t start_webserver(void)
         httpd_register_uri_handler(server, &get_api_cloudSetup_mqtt);
         httpd_register_uri_handler(server, &get_api_cloudSetup_http);
         httpd_register_uri_handler(server, &get_api_cloudSetup_blumy);
-        httpd_register_uri_handler(server, &post_api_sensorId);
-        httpd_register_uri_handler(server, &get_api_sensorId);
         httpd_register_uri_handler(server, &post_api_timeouts_sleep);
         httpd_register_uri_handler(server, &get_api_timeouts_sleep);
         httpd_register_uri_handler(server, &get_api_update_percentage);
