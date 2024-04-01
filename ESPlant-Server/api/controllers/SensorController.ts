@@ -1,7 +1,6 @@
 import crypto from "crypto";
 import {
   PlantHealthDTO,
-  RSSIHistoryEntry,
   SensorConfigurationDTO,
   SensorCreatedDTO,
   SensorDTO,
@@ -37,11 +36,6 @@ export default class SensorController {
     const detectedWateringReadings =
       SensorService.detectWateringReadings(sensorData);
 
-    const rssiHistory: RSSIHistoryEntry[] = sensorData.map((reading) => ({
-      timestamp: reading.timestamp,
-      rssi: reading.rssi,
-    }));
-
     const waterCapacityHistory: WaterCapacityHistoryEntry[] = sensorData.map(
       (reading) => ({
         timestamp: reading.timestamp,
@@ -53,7 +47,6 @@ export default class SensorController {
     return {
       id,
       waterCapacityHistory,
-      rssiHistory,
     };
   }
 

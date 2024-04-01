@@ -28,11 +28,6 @@ export const sensorConfigurationDTOSchema = z.object({
 
 export type SensorConfigurationDTO = z.infer<typeof sensorConfigurationDTOSchema>;
 
-export interface RSSIHistoryEntry {
-  timestamp: Date;
-  rssi: number;
-}
-
 export interface WaterCapacityHistoryEntry {
   timestamp: Date;
   detectedWatering: boolean;
@@ -88,7 +83,6 @@ export interface SensorOverviewDTO {
 export interface SensorHistoryDTO {
   id: number;
   waterCapacityHistory: WaterCapacityHistoryEntry[];
-  rssiHistory: RSSIHistoryEntry[];
 }
 
 export interface SensorValueDistributionDTO {
