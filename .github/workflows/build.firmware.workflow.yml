@@ -1,4 +1,4 @@
-name: Build Firmware and Upload Artifact
+name: Build Firmware and Upload .bin files
 
 on:
   push:
