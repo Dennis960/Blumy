@@ -12,6 +12,10 @@
 
 #define LITTLE_FS_PARTITION_LABEL "littlefs"
 
+#include "esp_https_ota.h"
+
+float ota_update_percentage = 0;
+
 void initLittleFs()
 {
     esp_vfs_littlefs_conf_t conf = {
@@ -422,7 +426,8 @@ esp_err_t post_api_timeouts_configurationMode_handler(httpd_req_t *req)
 
 esp_err_t get_api_update_percentage_handler(httpd_req_t *req)
 {
-    const char resp[] = "Not Implemented";
+    char resp[10];
+    sprintf(resp, "%.2f", ota_update_percentage);
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
@@ -462,6 +467,78 @@ esp_err_t post_api_hardReset_handler(httpd_req_t *req)
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
 
     esp_restart();
+    return ESP_OK;
+}
+
+esp_err_t post_api_update_firmware_handler(httpd_req_t *req)
+{
+    char url[100];
+    char *keys[] = {"url"};
+    char *values[] = {url};
+    if (!get_values(req, keys, values, 1))
+    {
+        return ESP_FAIL;
+    }
+
+    esp_http_client_config_t config = {
+        .url = url,
+        .cert_pem = NULL,
+        .timeout_ms = 10000,
+    };
+    esp_https_ota_config_t ota_config = {
+        .http_config = config
+        .url = url,
+    };
+    esp_https_ota_handle_t handle = NULL;
+    esp_err_t err = esp_https_ota_begin(&ota_config, &handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE("OTA", "Failed to start OTA (%s)", esp_err_to_name(err));
+        return err;
+    }
+    int otaImageSize = esp_https_ota_get_image_size(handle);
+    if (otaImageSize < 0)
+    {
+        ESP_LOGE("OTA", "Failed to get image size (%d)", otaImageSize);
+        return ESP_FAIL;
+    }
+    const char resp[] = "OK";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    while (1)
+    {
+        err = esp_https_ota_perform(handle);
+        int otaImageLenRead = esp_https_ota_get_image_len_read(handle);
+        ota_update_percentage = (float)otaImageLenRead / otaImageSize * 100;
+        if (err == ESP_ERR_HTTPS_OTA_IN_PROGRESS)
+        {
+            continue;
+        }
+        if (err == ESP_OK)
+        {
+            break;
+        }
+        else
+        {
+            ESP_LOGE("OTA", "Failed to perform OTA (%s)", esp_err_to_name(err));
+            esp_https_ota_abort(handle);
+            return err;
+        }
+    }
+    err = esp_https_ota_finish(handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE("OTA", "Failed to finish OTA (%s)", esp_err_to_name(err));
+        return err;
+    }
+
+    ESP_LOGI("OTA", "OTA finished, restarting");
+    esp_restart();
+}
+
+esp_err_t post_api_update_littlefs_handler(httpd_req_t *req)
+{
+    const char resp[] = "Not Implemented";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
@@ -563,6 +640,30 @@ httpd_uri_t post_api_hardReset = {
     .handler = post_api_hardReset_handler,
     .user_ctx = NULL};
 
+httpd_uri_t get_api_timeouts_configurationMode = {
+    .uri = "/api/timeouts/configurationMode",
+    .method = HTTP_GET,
+    .handler = get_api_timeouts_configurationMode_handler,
+    .user_ctx = NULL};
+
+httpd_uri_t post_api_timeouts_configurationMode = {
+    .uri = "/api/timeouts/configurationMode",
+    .method = HTTP_POST,
+    .handler = post_api_timeouts_configurationMode_handler,
+    .user_ctx = NULL};
+
+httpd_uri_t post_api_update_firmware = {
+    .uri = "/api/update/firmware",
+    .method = HTTP_POST,
+    .handler = post_api_update_firmware_handler,
+    .user_ctx = NULL};
+
+httpd_uri_t post_api_update_littlefs = {
+    .uri = "/api/update/littlefs",
+    .method = HTTP_POST,
+    .handler = post_api_update_littlefs_handler,
+    .user_ctx = NULL};
+
 /* Function for starting the webserver */
 httpd_handle_t start_webserver(void)
 {
@@ -595,6 +696,9 @@ httpd_handle_t start_webserver(void)
         httpd_register_uri_handler(server, &get_api_sensorValue);
         httpd_register_uri_handler(server, &post_api_hardReset);
         httpd_register_uri_handler(server, &get);
+
+        httpd_register_uri_handler(server, &post_api_update_firmware);
+        httpd_register_uri_handler(server, &post_api_update_littlefs);
     }
     /* If server failed to start, handle will be NULL */
     return server;
