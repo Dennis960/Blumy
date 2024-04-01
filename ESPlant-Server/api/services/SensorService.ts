@@ -29,7 +29,7 @@ export default class SensorService {
     if (sensorEntity == undefined) {
       return [];
     }
-    const data = await SensorDataRepository.getAllBySensorId(
+    const data = await SensorDataRepository.getAllBySensorIdAveraged(
       id,
       startDate,
       endDate,

@@ -37,22 +37,30 @@ export default class SensorDataRepository {
     const step = Math.floor(data.length / limit);
     for (let i = 0; i < data.length; i += step) {
       const dataSlice = data.slice(i, i + step);
-      const humidity =
-        dataSlice.reduce((acc, cur) => acc + cur.humidity, 0) / dataSlice.length;
-      const voltage =
-        dataSlice.reduce((acc, cur) => acc + (cur.voltage ?? 0), 0) /
-        dataSlice.length;
-      const duration =
-        dataSlice.reduce((acc, cur) => acc + (cur.duration ?? 0), 0) /
-        dataSlice.length;
-      // TODO calculate averages for other values
-      // make a copy of the last data point and change the values
-      const averagedDataPoint: SensorReadingEntity = {
-        ...dataSlice[dataSlice.length - 1],
-        humidity,
-        voltage,
-        duration,
-      };
+
+      // make a copy of the latest values
+      const averagedDataPoint: SensorReadingEntity = { ...dataSlice[dataSlice.length - 1] };
+
+      // calculate averages in this bucket for summable attributes
+      const attributesToAverage = [
+        "light",
+        "voltage",
+        "temperature",
+        "humidity",
+        "moisture",
+        "moistureStabilizationTime",
+        "humidityRaw",
+        "temperatureRaw",
+        "rssi",
+        "duration",
+      ] satisfies (keyof typeof dataSlice[0])[];
+      const calculateAverage = (property: keyof typeof dataSlice[0]) =>
+        dataSlice.reduce((acc, cur) => acc + (cur[property] as number ?? 0), 0) / dataSlice.length;
+
+      for (const attribute of attributesToAverage) {
+        averagedDataPoint[attribute] = calculateAverage(attribute);
+      }
+
       averagedData.push(averagedDataPoint);
     }
     return averagedData;
@@ -66,7 +74,7 @@ export default class SensorDataRepository {
    * @param maxDataPoints The maximum number of data points. (optional)
    * @returns The data or an empty list if sensor does not exist.
    */
-  static async getAllBySensorId(
+  static async getAllBySensorIdAveraged(
     sensorAddress: number,
     startDate: Date,
     endDate: Date,
@@ -90,7 +98,7 @@ export default class SensorDataRepository {
     const dist = await knex("data")
       .select({
         count: knex.raw("count(*)"),
-        bucket: knex.raw(`floor(water / ${bucketSize}) * ${bucketSize}`),
+        bucket: knex.raw(`floor(moisture / ${bucketSize}) * ${bucketSize}`),
       })
       .where({ sensorAddress: sensorId })
       .andWhere("date", ">=", sinceDate)
