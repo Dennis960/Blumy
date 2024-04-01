@@ -11,6 +11,31 @@ export class NamePage extends BasePage {
     @query("#sleepTimeout") sleepTimeoutElement: InputElement;
     @state() errorText: string = "";
 
+    humanizeDuration(durationMs: number): string {
+        let durationString = "";
+        const durationDays = Math.floor(durationMs / (1000 * 60 * 60 * 24));
+        if (durationDays > 0) {
+            durationString += durationDays + " d ";
+        }
+        const durationHours = Math.floor((durationMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        if (durationHours > 0) {
+            durationString += durationHours + " h ";
+        }
+        const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+        if (durationMinutes > 0) {
+            durationString += durationMinutes + " min ";
+        }
+        const durationSeconds = Math.floor((durationMs % (1000 * 60)) / 1000);
+        if (durationSeconds > 0) {
+            durationString += durationSeconds + " s ";
+        }
+        const durationMilliseconds = Math.floor(durationMs % 1000);
+        if (durationMilliseconds > 0) {
+            durationString += durationMilliseconds + " ms ";
+        }
+        return durationString.trim();
+    }
+
     async submit() {
         let sleepTimeoutString = this.sleepTimeoutElement.input.value;
         if (sleepTimeoutString.length == 0) {
@@ -29,9 +54,9 @@ export class NamePage extends BasePage {
     }
 
     async firstUpdated() {
-        const sleepTimeout = await getSleepTimeout();
+        const sleepTimeout: number = await getSleepTimeout();
         if (sleepTimeout != null) {
-            this.sleepTimeoutElement.input.value = `${sleepTimeout} ms`;
+            this.sleepTimeoutElement.input.value = this.humanizeDuration(sleepTimeout);
         }
     }
 
