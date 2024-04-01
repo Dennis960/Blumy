@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node --import=./log-error.js --watch --loader ts-node/esm ./index.ts",
     "build": "tsc && cp package.json dist/",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "NODE_ENV=test vitest"
   },
   "type": "module",
   "keywords": [],
@@ -43,6 +44,7 @@
     "@types/passport-http-bearer": "^1.0.41",
     "@types/web-push": "^3.6.3",
     "ts-node": "^10.9.1",
-    "typescript": "^5.3.2"
+    "typescript": "^5.3.2",
+    "vitest": "^1.4.0"
   }
 }

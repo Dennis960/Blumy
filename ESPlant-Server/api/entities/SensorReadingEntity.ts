@@ -3,26 +3,49 @@ import { SensorReadingDTO } from "../types/api";
 import SensorEntity from "./SensorEntity";
 
 export const espSensorReadingSchema = z.object({
-  sensorAddress: z.number(),
-  water: z.number(),
+  light: z.number(),
   voltage: z.number(),
-  duration: z.number(),
+  temperature: z.number(),
+  humidity: z.number(),
+  isUsbConnected: z.boolean(),
+  moisture: z.number(),
+  moistureStabilizationTime: z.number(),
+  isMoistureMeasurementSuccessful: z.boolean(),
+  humidityRaw: z.number(),
+  temperatureRaw: z.number(),
   rssi: z.number(),
-  measurementDuration: z.number(),
+  duration: z.number(),
 });
 
 export type ESPSensorReadingDTO = z.infer<typeof espSensorReadingSchema>;
 
+export interface LegacyESPSensorReadingDTO {
+  sensorAddress: number;
+  water: number;
+  voltage: number;
+  duration: number;
+  rssi: number;
+  measurementDuration: number;
+}
+
 export default class SensorReadingEntity {
   constructor(
     public id: number,
+    public clientVersion: number,
     public sensorAddress: number,
     public date: number | string,
-    public water: number,
-    public voltage: number | null,
-    public duration: number | null,
+    public light: number,
+    public voltage: number,
+    public temperature: number,
+    public humidity: number,
+    public isUsbConnected: boolean,
+    public moisture: number,
+    public moistureStabilizationTime: number,
+    public isMoistureMeasurementSuccessful: boolean,
+    public humidityRaw: number,
+    public temperatureRaw: number,
     public rssi: number,
-    public measurementDuration: number | null
+    public duration: number,
   ) {}
 
   public static toDTO(
@@ -32,9 +55,9 @@ export default class SensorReadingEntity {
     return {
       id: reading.id,
       timestamp: new Date(reading.date),
-      water: reading.water,
+      water: reading.moisture,
       availableWaterCapacity:
-        (reading.water - sensor.permanentWiltingPoint) /
+        (reading.moisture - sensor.permanentWiltingPoint) /
         (sensor.fieldCapacity - sensor.permanentWiltingPoint),
       voltage: reading.voltage ?? undefined,
       rssi: reading.rssi,
