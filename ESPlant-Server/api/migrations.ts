@@ -260,6 +260,38 @@ const migrations = [
     name: "add_sensor_token",
     statements: [`ALTER TABLE sensor ADD COLUMN token TEXT;`],
   },
+  {
+    name: 'add_new_attributes',
+    statements: [
+      // create new table
+      `CREATE TABLE IF NOT EXISTS data_new (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      clientVersion INTEGER NOT NULL,
+      sensorAddress INTEGER NOT NULL,
+      date INTEGER NOT NULL,
+      light INTEGER NOT NULL,
+      voltage INTEGER NOT NULL,
+      temperature INTEGER NOT NULL,
+      humidity INTEGER NOT NULL,
+      isUsbConnected BOOLEAN NOT NULL,
+      moisture INTEGER NOT NULL,
+      moistureStabilizationTime INTEGER NOT NULL,
+      isMoistureMeasurementSuccessful BOOLEAN NOT NULL,
+      humidityRaw INTEGER NOT NULL,
+      temperatureRaw INTEGER NOT NULL,
+      rssi INTEGER NOT NULL,
+      duration INTEGER NOT NULL,
+      FOREIGN KEY (sensorAddress) REFERENCES sensor(sensorAddress)
+      );`,
+      // copy data to new table, filling missing values
+      `INSERT INTO data_new (id, clientVersion, sensorAddress, date, light, voltage, temperature, humidity, isUsbConnected, moisture, moistureStabilizationTime, isMoistureMeasurementSuccessful, humidityRaw, temperatureRaw, rssi, duration)
+      SELECT id, 1, sensorAddress, date, -1, coalesce(voltage, -1), -1, -1, 0, water, coalesce(measurementDuration, -1), 1, -1, -1, coalesce(rssi, -1), duration FROM data;`,
+      // drop old table
+      "DROP TABLE data;",
+      // rename new table
+      "ALTER TABLE data_new RENAME TO data;",
+    ],
+  }
 ];
 
 export async function migrateDatabase() {

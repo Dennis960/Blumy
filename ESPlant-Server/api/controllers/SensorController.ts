@@ -15,7 +15,7 @@ import {
 import SensorDataRepository from "../repositories/SensorDataRepository.js";
 import SensorRepository from "../repositories/SensorRepository.js";
 import SensorService from "../services/SensorService.js";
-import { ESPSensorReadingDTO } from "../entities/SensorReadingEntity.js";
+import { ESPSensorReadingDTO, LegacyESPSensorReadingDTO } from "../entities/SensorReadingEntity.js";
 import SensorEntity from "../entities/SensorEntity.js";
 
 const OFFLINE_TIMEOUT = 120 * 60 * 1000; // 2 hours
@@ -173,15 +173,43 @@ export default class SensorController {
     };
   }
 
-  public async addSensorData(data: ESPSensorReadingDTO) {
+  public async addLegacySensorData(data: LegacyESPSensorReadingDTO) {
     return await SensorDataRepository.create({
+      clientVersion: 1,
       sensorAddress: data.sensorAddress,
       date: Date.now(),
-      water: data.water,
+      light: -1,
       voltage: data.voltage,
-      duration: data.duration,
+      temperature: -1,
+      humidity: -1,
+      isUsbConnected: false,
+      moisture: data.water,
+      moistureStabilizationTime: data.measurementDuration,
+      isMoistureMeasurementSuccessful: true,
+      humidityRaw: -1,
+      temperatureRaw: -1,
       rssi: data.rssi,
-      measurementDuration: data.measurementDuration,
+      duration: data.duration,
+    });
+  }
+
+  public async addSensorData(sensorAddress: number, data: ESPSensorReadingDTO) {
+    return await SensorDataRepository.create({
+      clientVersion: 2,
+      sensorAddress,
+      date: Date.now(),
+      light: data.light,
+      voltage: data.voltage,
+      temperature: data.temperature,
+      humidity: data.humidity,
+      isUsbConnected: data.isUsbConnected,
+      moisture: data.moisture,
+      moistureStabilizationTime: data.moistureStabilizationTime,
+      isMoistureMeasurementSuccessful: data.isMoistureMeasurementSuccessful,
+      humidityRaw: data.humidityRaw,
+      temperatureRaw: data.temperatureRaw,
+      rssi: data.rssi,
+      duration: data.duration,
     });
   }
 

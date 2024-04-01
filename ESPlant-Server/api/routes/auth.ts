@@ -19,8 +19,7 @@ router.get(
   })
 );
 
-// TODO for backwards compatibility, sensor auth is not enabled yet
-//router.use(passport.authenticate("bearer", { session: false }))
+router.use(passport.authenticate("bearer", { session: false }))
 
 router.get("/profile", isAuthenticated, (req, res) => {
   res.json(req.user);

@@ -47,7 +47,6 @@ passport.use(
   )
 );
 
-// TODO for backwards compatibility, sensor auth is not enabled yet
 passport.use(
   new BearerStrategy(async function (token, done) {
     const sensorId = await SensorRepository.getIdByToken(token);
