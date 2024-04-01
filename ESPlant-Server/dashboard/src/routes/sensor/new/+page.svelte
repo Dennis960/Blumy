@@ -35,14 +35,14 @@
 								<div class="col-12 col-md-6 col-lg-4">
 									<CopyText
 										label="Zugangsschlüssel"
-										value={createdSensor.token}
+										value={createdSensor.tokens.write}
 										hint="Kopiere den Zugangsschlüssel zur Einrichtung des Sensors." />
 								</div>
 							</div>
 						</div>
 						<div class="card-footer text-end">
 							<div class="d-flex justify-content-end column-gap-2">
-								<a href={`${base}/sensor/${createdSensor.id}`} class="btn btn-primary">Abschließen</a>
+								<a href={`${base}/sensor/${createdSensor.id}`} class="btn btn-primary">Fertig</a>
 							</div>
 						</div>
 					</div>

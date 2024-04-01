@@ -67,7 +67,7 @@ export default class SensorController {
 
     return {
       id,
-      token: sensorEntity.token,
+      readToken: sensorEntity.readToken,
       config,
       lastUpdate:
         lastReading != undefined
@@ -86,6 +86,15 @@ export default class SensorController {
       sensorHealth,
       plantHealth,
     };
+  }
+
+  public async getSensorWriteToken(id: number): Promise<string | undefined> {
+    const sensorEntity = await SensorRepository.getById(id);
+    if (sensorEntity == undefined) {
+      return undefined;
+    }
+
+    return sensorEntity.writeToken
   }
 
   public async getSensorOverview(ownerId: number): Promise<SensorOverviewDTO> {
@@ -239,29 +248,42 @@ export default class SensorController {
     return SensorEntity.toDTO(sensorEntity);
   }
 
-  private generateToken(): string {
-    let token = 'blumy_';
+  private generateToken(prefix: string, length: number) {
+    let token = prefix;
     const possibleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 32; i++) {
+    for (let i = 0; i < length; i++) {
         let randomIndex = crypto.randomInt(0, possibleChars.length);
         token += possibleChars[randomIndex];
     }
     return token;
   }
 
+  private generateWriteToken(): string {
+    return this.generateToken('blumy_', 32);
+  }
+
+  private generateReadToken(): string {
+    return this.generateToken('', 16);
+  }
+
   public async create(ownerId: number, config: SensorConfigurationDTO): Promise<SensorCreatedDTO> {
-    const token = this.generateToken();
+    const writeToken = this.generateWriteToken();
+    const readToken = this.generateReadToken();
     const sensorEntityPartial = await SensorEntity.fromDTO(0, config);
     const creatingSensorEntity = {
       ...sensorEntityPartial,
       sensorAddress: undefined,
       owner: ownerId,
-      token,
+      writeToken,
+      readToken,
     };
     const sensorEntity = await SensorRepository.create(creatingSensorEntity);
 
     return {
-      token,
+      tokens: {
+        read: sensorEntity.readToken,
+        write: sensorEntity.writeToken,
+      },
       id: sensorEntity.sensorAddress,
       config: SensorEntity.toDTO(sensorEntity),
     };

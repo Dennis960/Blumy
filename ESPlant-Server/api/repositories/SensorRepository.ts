@@ -15,10 +15,18 @@ export default class SensorRepository {
       .first();
   }
 
-  static async getIdByToken(token: string): Promise<number | undefined> {
+  static async getIdByWriteToken(writeToken: string): Promise<number | undefined> {
     return await knex<SensorEntity>("sensor")
       .select("*")
-      .where({ token })
+      .where({ writeToken })
+      .first()
+      .then((r) => r?.sensorAddress);
+  }
+
+  static async getIdByReadToken(readToken: string): Promise<number | undefined> {
+    return await knex<SensorEntity>("sensor")
+      .select("*")
+      .where({ readToken })
       .first()
       .then((r) => r?.sensorAddress);
   }

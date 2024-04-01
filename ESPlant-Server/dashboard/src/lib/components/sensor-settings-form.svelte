@@ -10,7 +10,8 @@
     export let config: SensorConfigurationDTO|undefined = undefined;
     export let sensorValueDistribution: SensorValueDistributionDTO|undefined = undefined;
     export let error: string|undefined = undefined;
-    export let token: string|undefined = undefined;
+    export let writeToken: string|undefined = undefined;
+    export let shareLink: string|undefined = undefined;
 
     let editingConfig: SensorConfigurationDTO = config != undefined ? { ...config } : {
         name: funnyPlantNames[Math.floor(Math.random() * funnyPlantNames.length)],
@@ -138,12 +139,25 @@
                         {/if}
                     </div>
 
-                    {#if token}
+                    {#if writeToken}
                     <div class="row mb-3">
-                        <CopyText
-                            label="Zugangsschlüssel"
-                            hint="Kopiere den Zugangsschlüssel zur Einrichtung des Sensors."
-                            value={token} />
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <CopyText
+                                label="Zugangsschlüssel"
+                                hint="Kopiere den Zugangsschlüssel zur Einrichtung des Sensors."
+                                value={writeToken} />
+                        </div>
+                    </div>
+                    {/if}
+
+                    {#if shareLink}
+                    <div class="row mb-3">
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <CopyText
+                                label="Share-Link"
+                                hint="Jeder mit diesem Link hat Zugriff auf die Sensorwerte."
+                                value={shareLink} />
+                        </div>
                     </div>
                     {/if}
 

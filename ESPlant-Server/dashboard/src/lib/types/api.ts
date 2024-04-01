@@ -10,7 +10,7 @@ export interface SensorReadingDTO {
 export interface SensorConfigurationDTO {
   name: string;
   imageUrl?: string|undefined; // data URL for now
-  fieldCapacity: number; // max water value
+fieldCapacity: number; // max water value
   /*
    * Typical permanent wilting points:
    *   26-32% of field capacity for fine-textured soil
@@ -53,7 +53,7 @@ export interface PlantHealthDTO {
 
 export interface SensorDTO {
   id: number;
-  token: string;
+  readToken: string;
   config: SensorConfigurationDTO;
   sensorHealth: SensorHealthDTO;
   plantHealth: PlantHealthDTO;
@@ -73,7 +73,10 @@ export interface SensorDTO {
 
 export interface SensorCreatedDTO {
   id: number;
-  token: string;
+  tokens: {
+    write: string;
+    read: string;
+  };
   config: SensorConfigurationDTO;
 }
 
@@ -84,7 +87,6 @@ export interface SensorOverviewDTO {
 export interface SensorHistoryDTO {
   id: number;
   waterCapacityHistory: WaterCapacityHistoryEntry[];
-  rssiHistory: RSSIHistoryEntry[];
 }
 
 export interface SensorValueDistributionDTO {

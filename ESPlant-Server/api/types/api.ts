@@ -52,7 +52,7 @@ export interface PlantHealthDTO {
 
 export interface SensorDTO {
   id: number;
-  token: string;
+  readToken: string;
   config: SensorConfigurationDTO;
   sensorHealth: SensorHealthDTO;
   plantHealth: PlantHealthDTO;
@@ -72,7 +72,10 @@ export interface SensorDTO {
 
 export interface SensorCreatedDTO {
   id: number;
-  token: string;
+  tokens: {
+    write: string;
+    read: string;
+  };
   config: SensorConfigurationDTO;
 }
 

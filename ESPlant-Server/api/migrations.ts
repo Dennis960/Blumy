@@ -291,7 +291,14 @@ const migrations = [
       // rename new table
       "ALTER TABLE data_new RENAME TO data;",
     ],
-  }
+  },
+  {
+    name: "add_sensor_read_token",
+    statements: [
+      `ALTER TABLE sensor RENAME COLUMN token TO writeToken;`,
+      `ALTER TABLE sensor ADD COLUMN readToken TEXT;`
+    ],
+  },
 ];
 
 export async function migrateDatabase() {

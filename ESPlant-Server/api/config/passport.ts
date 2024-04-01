@@ -1,6 +1,12 @@
 import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth2";
-import { Strategy as BearerStrategy } from "passport-http-bearer";
+import {
+  Strategy as GoogleStrategy,
+  VerifyFunctionWithRequest as GoogleVerifyFunctionWithRequest,
+} from "passport-google-oauth2";
+import {
+  Strategy as BearerStrategy,
+  VerifyFunctionWithRequest as BearerVerifyFunctionWithRequest,
+} from "passport-http-bearer";
 import UserRepository from "../repositories/UserRepository.js";
 import SensorRepository from "../repositories/SensorRepository.js";
 
@@ -14,8 +20,8 @@ if (GOOGLE_CLIENT_SECRET == undefined) {
   throw new Error("GOOGLE_CLIENT_SECRET must be set");
 }
 
-interface AuthenticatedUser {
-  kind: "user" | "sensor";
+export interface AuthenticatedUser {
+  kind: "user" | "sensor-read" | "sensor-write";
   userId?: number;
   sensorId?: number;
 }
@@ -26,6 +32,28 @@ declare global {
   }
 }
 
+const verifyGoogle: GoogleVerifyFunctionWithRequest = async (
+  req,
+  accessToken,
+  refreshToken,
+  profile,
+  done
+) => {
+  if (req.user != undefined) {
+    // token auth overrides google auth (session)
+    return done(null, req.user);
+  }
+
+  const user = await UserRepository.findOrCreate({
+    googleId: profile.id,
+  });
+
+  return done(null, {
+    kind: "user",
+    userId: user.id,
+  } satisfies AuthenticatedUser);
+};
+
 passport.use(
   new GoogleStrategy(
     {
@@ -33,34 +61,39 @@ passport.use(
       clientSecret: GOOGLE_CLIENT_SECRET,
       callbackURL:
         process.env["GOOGLE_CALLBACK_URL"] ?? "/api/auth/google/callback",
+      passReqToCallback: true,
     },
-    async function (accessToken, refreshToken, profile, done) {
-      const user = await UserRepository.findOrCreate({
-        googleId: profile.id,
-      });
-
-      return done(null, {
-        kind: "user",
-        userId: user.id,
-      } satisfies AuthenticatedUser);
-    }
+    verifyGoogle
   )
 );
 
-passport.use(
-  new BearerStrategy(async function (token, done) {
-    const sensorId = await SensorRepository.getIdByToken(token);
+const verifyBearer: BearerVerifyFunctionWithRequest = async function (
+  req,
+  token,
+  done
+) {
+  let sensorId: number | undefined = undefined;
 
-    if (sensorId == null) {
-      return done(null, false);
-    }
-
+  sensorId = await SensorRepository.getIdByWriteToken(token);
+  if (sensorId != undefined) {
     return done(null, {
-      kind: "sensor",
+      kind: "sensor-write",
       sensorId,
     } satisfies AuthenticatedUser);
-  })
-);
+  }
+
+  sensorId = await SensorRepository.getIdByReadToken(token);
+  if (sensorId != undefined) {
+    return done(null, {
+      kind: "sensor-read",
+      sensorId,
+    } satisfies AuthenticatedUser);
+  }
+
+  return done(null, false);
+};
+
+passport.use(new BearerStrategy({ passReqToCallback: true }, verifyBearer));
 
 passport.serializeUser<AuthenticatedUser>(function (user, done) {
   done(null, user);
