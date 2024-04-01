@@ -67,17 +67,17 @@ void configuration_mode(bool isConfigured)
 {
     sensors_playStartupSound();
     plantfi_initWifiApSta();
-    plantfi_configureStaFromPlantstore();
     bool userConnectedToAp = false;
     uint64_t start_time = esp_timer_get_time();
     uint64_t current_time = start_time;
     int32_t timeoutMs = DEFAULT_CONFIGURATION_MODE_TIMEOUT_MS;
     plantstore_getConfigurationModeTimeoutMs(&timeoutMs);
-    ESP_LOGI("MODE", "Starting configuration mode%s", isConfigured ? " (sensor is configured)" : "(no config)");
+    ESP_LOGI("MODE", "Starting configuration mode%s", isConfigured ? " (sensor is configured)" : " (no config)");
     plantfi_configureAp("Blumy", "", 4, &userConnectedToAp);
 
     ESP_LOGI("MODE", "Starting webserver");
     httpd_handle_t webserver = webserver = start_webserver();
+    plantfi_configureStaFromPlantstore();
     while (1)
     {
         if (isConfigured && !userConnectedToAp)

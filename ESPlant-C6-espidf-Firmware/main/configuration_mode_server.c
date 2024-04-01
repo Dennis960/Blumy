@@ -488,6 +488,17 @@ esp_err_t get_api_sensor_value_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
+esp_err_t post_api_hardReset_handler(httpd_req_t *req)
+{
+    plantstore_hardReset();
+
+    const char resp[] = "OK";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+
+    esp_restart();
+    return ESP_OK;
+}
+
 httpd_uri_t get = {
     .uri = "/*",
     .method = HTTP_GET,
@@ -592,6 +603,12 @@ httpd_uri_t get_api_sensorValue = {
     .handler = get_api_sensor_value_handler,
     .user_ctx = NULL};
 
+httpd_uri_t post_api_hardReset = {
+    .uri = "/api/hardReset",
+    .method = HTTP_POST,
+    .handler = post_api_hardReset_handler,
+    .user_ctx = NULL};
+
 /* Function for starting the webserver */
 httpd_handle_t start_webserver(void)
 {
@@ -624,6 +641,7 @@ httpd_handle_t start_webserver(void)
         httpd_register_uri_handler(server, &get_api_update_percentage);
         httpd_register_uri_handler(server, &get_api_connectedNetwork);
         httpd_register_uri_handler(server, &get_api_sensorValue);
+        httpd_register_uri_handler(server, &post_api_hardReset);
         httpd_register_uri_handler(server, &get);
     }
     /* If server failed to start, handle will be NULL */
