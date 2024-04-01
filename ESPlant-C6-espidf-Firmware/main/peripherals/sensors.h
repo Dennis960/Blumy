@@ -45,3 +45,5 @@ bool sensors_read_moisture(sensors_moisture_sensor_output_t *output);
 void sensors_initSensors();
 void sensors_deinitSensors();
 void sensors_full_read(sensors_full_data_t *data);
+void sensors_playStartupSound();
+void sensors_playShutdownSound();

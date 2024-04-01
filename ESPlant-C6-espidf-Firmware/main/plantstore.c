@@ -190,3 +190,11 @@ bool plantstore_isConfigured()
             plantstore_getCloudConfigurationMqtt(NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0) ||
             plantstore_getCloudConfigurationBlumy(NULL, 0));
 }
+
+void plantstore_hardReset()
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
+    ESP_ERROR_CHECK(nvs_erase_all(nvs_handle));
+    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    nvs_close(nvs_handle);
+}
