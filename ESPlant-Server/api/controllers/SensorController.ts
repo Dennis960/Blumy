@@ -74,6 +74,7 @@ export default class SensorController {
 
     return {
       id,
+      token: sensorEntity.token,
       config,
       lastUpdate:
         lastReading != undefined
