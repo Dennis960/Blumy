@@ -1,6 +1,6 @@
 import mqtt from 'mqtt';
 import SensorController from './controllers/SensorController.js';
-import { ESPSensorReadingDTO } from './entities/SensorReadingEntity.js';
+import { LegacyESPSensorReadingDTO } from './entities/SensorReadingEntity.js';
 
 const client = mqtt.connect(process.env.MQTT_URL || 'mqtt://localhost:1883');
 client.on('connect', () => {
@@ -18,8 +18,8 @@ const sensorController = new SensorController();
 client.on('message', async (topic, message) => {
   const body = message.toString();
   try {
-    const data: ESPSensorReadingDTO = JSON.parse(body);
-    await sensorController.addSensorData(data);
+    const data: LegacyESPSensorReadingDTO = JSON.parse(body);
+    await sensorController.addLegacySensorData(data);
   } catch (error) {
     console.error('error parsing mqtt message', error);
     console.log('message', body);

@@ -11,17 +11,17 @@ import { isAuthenticated } from "./middlewares/authenticated.js";
 const router = Router();
 router.use(json());
 router.use(cors());
-router.use(superjson);
 router.use(passport);
 
 // must be public
 router.use(authRoutes);
 
-// TODO public for now, add auth later
-router.use(espApiRoutes);
-
 // restricted
 router.use(isAuthenticated);
+
+router.use(espApiRoutes);
+
+router.use(superjson); // apply superjson to all dashboard API routes
 router.use(sensorRoutes);
 router.use(webPushRoutes);
 

@@ -38,6 +38,8 @@ app.use((req, res) => {
   res.status(404).send("Sorry, but this page does not exist.");
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
+
+export default server;

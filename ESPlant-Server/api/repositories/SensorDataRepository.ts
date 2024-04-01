@@ -37,18 +37,19 @@ export default class SensorDataRepository {
     const step = Math.floor(data.length / limit);
     for (let i = 0; i < data.length; i += step) {
       const dataSlice = data.slice(i, i + step);
-      const water =
-        dataSlice.reduce((acc, cur) => acc + cur.water, 0) / dataSlice.length;
+      const humidity =
+        dataSlice.reduce((acc, cur) => acc + cur.humidity, 0) / dataSlice.length;
       const voltage =
         dataSlice.reduce((acc, cur) => acc + (cur.voltage ?? 0), 0) /
         dataSlice.length;
       const duration =
         dataSlice.reduce((acc, cur) => acc + (cur.duration ?? 0), 0) /
         dataSlice.length;
+      // TODO calculate averages for other values
       // make a copy of the last data point and change the values
       const averagedDataPoint: SensorReadingEntity = {
         ...dataSlice[dataSlice.length - 1],
-        water,
+        humidity,
         voltage,
         duration,
       };
