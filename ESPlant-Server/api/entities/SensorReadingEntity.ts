@@ -21,11 +21,11 @@ export type ESPSensorReadingDTO = z.infer<typeof espSensorReadingSchema>;
 
 export interface LegacyESPSensorReadingDTO {
   sensorAddress: number;
+  plantName: string;
   water: number;
-  voltage: number;
   duration: number;
-  rssi: number;
   measurementDuration: number;
+  rssi: number;
 }
 
 export default class SensorReadingEntity {
