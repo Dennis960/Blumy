@@ -15,7 +15,7 @@ dependencies:
     component_hash: null
     source:
       type: idf
-    version: 5.2.1
+    version: 5.3.0
   joltwallet/littlefs:
     component_hash: 703c642136031deca2579bdc19721a397f9fd9033b1c667c7b89fe23fa394c40
     source:
