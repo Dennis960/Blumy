@@ -78,6 +78,9 @@ router.get("/sensors/:sensorId/value-distribution", isOwner, async (req, res) =>
 
 router.post("/sensors/:sensorId/config", isOwner, validate(z.object({
   body: sensorConfigurationDTOSchema,
+  params: z.object({
+    sensorId: z.string().regex(/^\d+$/),
+  }),
 })), async (req, res) => {
   const config = req.body;
   const sensor = await sensorController.updateSensorConfig(
