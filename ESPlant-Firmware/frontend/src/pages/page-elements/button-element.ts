@@ -25,7 +25,7 @@ export class ButtonElement extends LitElement {
                 background-color: var(--secondary-base);
                 color: var(--text-light);
             }
-            button:disabled {
+            button.disabled {
                 opacity: 0.5;
                 cursor: not-allowed;
             }

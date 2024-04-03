@@ -48,6 +48,7 @@ export class InputElement extends LitElement {
         | "url"
         | "week" = "text";
     @property() initialValue: any;
+    @property() readonly: boolean;
 
     @query("#input")
     input: HTMLInputElement;
@@ -65,6 +66,7 @@ export class InputElement extends LitElement {
                 <input
                     id="input"
                     type="${this.type}"
+                    ?readonly="${this.readonly}"
                 />
                 <slot></slot>
             </div>

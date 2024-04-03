@@ -36,14 +36,18 @@ export class CollapsibleElement extends LitElement {
         details[open] summary::marker {
             color: var(--text-light);
         }
+
+        summary:before {
+            line-height: 1;
+        }
           
         details[open] summary:before {
-            content: "-";
+            content: "☑";
             margin-right: 0.5rem;
         }
           
         details:not([open]) summary:before {
-            content: "+";
+            content: "☐";
             margin-right: 0.5rem;
         }
 
@@ -68,7 +72,7 @@ export class CollapsibleElement extends LitElement {
                 <div class="content">
                     <slot></slot>
                 </div>
-            </button>
+            </details>
         `;
     }
 }

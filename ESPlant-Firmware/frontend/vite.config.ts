@@ -1,27 +1,23 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
 import { viteSingleFile } from "vite-plugin-singlefile";
-import mockDevServerPlugin from 'vite-plugin-mock-dev-server'
+import mockDevServerPlugin from "vite-plugin-mock-dev-server";
 
 export default defineConfig({
-  plugins: [
-    mockDevServerPlugin(),
-    // viteSingleFile(),
-  ],
-  build: {
-    rollupOptions: {
-      input: {
-        index: resolve(__dirname, "index.html"),
-        home: resolve(__dirname, "home.html"),
-      },
+    plugins: [mockDevServerPlugin(), viteSingleFile()],
+    build: {
+        rollupOptions: {
+            input: {
+                index: resolve(__dirname, "index.html"),
+            },
+        },
+        outDir: "../data",
+        target: "es2022",
+        modulePreload: false,
     },
-    outDir: "../data",
-    target: "es2022",
-    modulePreload: false,
-  },
-  server: {
-    proxy: {
-      '/api': {}
-    }
-  }
+    server: {
+        proxy: {
+            "/api": {},
+        },
+    },
 });

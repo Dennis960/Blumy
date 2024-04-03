@@ -1,7 +1,7 @@
 import { StateController } from "@lit-app/state";
 import { css, html } from "lit";
-import { customElement, state } from "lit/decorators.js";
-import { getConnectedNetwork, isEspConnected, WifiStatus } from "../api";
+import { customElement } from "lit/decorators.js";
+import { WifiStatus, getConnectedNetwork, isConnected } from "../api";
 import { networkState } from "../states";
 import { BasePage } from "./base-page";
 
@@ -26,12 +26,16 @@ export class WelcomePage extends BasePage {
         super();
         (async () => {
             while (this.shouldReadWifiStatus) {
-                const wifiStatus = await isEspConnected();
+                const wifiStatus = await isConnected();
                 if (wifiStatus == WifiStatus.CONNECTED) {
                     const network = await getConnectedNetwork();
                     networkState.state = {
-                        isConnected: true,
-                        network: network,
+                        isConnected: network.status == WifiStatus.CONNECTED,
+                        network: {
+                            rssi: 0, // TODO
+                            ssid: network.ssid,
+                            secure: 0, // TODO
+                        },
                     };
                 }
                 await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -50,8 +54,8 @@ export class WelcomePage extends BasePage {
             <description-element>
                 Blumy ist aktuell
                 ${networkState.state.isConnected
-                        ?  "mit dem Internet"
-                        : "vom Internet"}
+                    ? "mit dem Internet"
+                    : "vom Internet"}
                 <span
                     class="${networkState.state.isConnected ? "green" : "red"}"
                     >${networkState.state.isConnected

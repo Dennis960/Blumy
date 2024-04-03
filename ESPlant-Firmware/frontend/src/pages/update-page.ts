@@ -1,7 +1,10 @@
-import { html } from "lit";
-import { css } from "lit";
-import { property, query, state, customElement } from "lit/decorators.js";
-import { getUpdatePercentage, resetEsp, ResetFlag, updateFirmware, updateFs } from "../api";
+import { css, html } from "lit";
+import { customElement, property, query, state } from "lit/decorators.js";
+import {
+    getUpdateFirmwareUrl,
+    getUpdatePercentage,
+    updateFirmware,
+} from "../api";
 import { BasePage } from "./base-page";
 import { InputElement } from "./page-elements/input-element";
 
@@ -17,66 +20,69 @@ export class UpdatePage extends BasePage {
     @property({ type: String }) onlineStatus: string;
     @state() errorText: string = "";
 
-    @query("#littlefs") littlefsElement: InputElement;
-    @query("#firmware") firmwareElement: InputElement;
+    @query("#url") urlElement: InputElement;
 
     @state() littlefsProgress: number = 0;
-    @state() firmwareProgress: number = 0;
+    @state() updateAvailable: boolean = false;
 
-    async upload() {
-        if (
-            !this.littlefsElement.input.files[0] &&
-            !this.firmwareElement.input.files[0]
-        ) {
-            this.errorText = "Bitte Datei für den Upload auswählen";
+    updateProgressTimeout: number;
+
+    async updateProgress() {
+        this.littlefsProgress = await getUpdatePercentage();
+        if (this.littlefsProgress < 100) {
+            this.updateProgressTimeout = window.setTimeout(
+                () => this.updateProgress(),
+                200
+            );
+        }
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+
+        if (this.updateProgressTimeout) {
+            window.clearTimeout(this.updateProgressTimeout);
+        }
+    }
+
+    async firstUpdated() {
+        const updateUrl = await getUpdateFirmwareUrl();
+        if (updateUrl) {
+            this.urlElement.input.value = updateUrl.url;
+        }
+    }
+
+    async isUpdateAvailable(url: string) {
+        // TODO check update server for updates and compare firmware versions
+        return true;
+    }
+
+    async searchForUpdates() {
+        this.errorText = "";
+        const url = this.urlElement.input.value;
+        if (!url) {
+            this.errorText = "Bitte gib eine URL ein";
             return;
         }
-        console.log(this.littlefsElement.input.files[0]);
-        
-        if (this.littlefsElement.input.files[0]) {
-            let finished = false;
-            (async () => {
-                while (!finished) {
-                    await new Promise((resolve) => setTimeout(resolve, 300));
-                    await getUpdatePercentage().then((percentage) => {
-                        this.littlefsProgress = percentage;
-                    });
-                }
-            })();
-            const res = await updateFs(this.littlefsElement.input.files[0]);
-            finished = true;
-            if (!res.ok) {
-                this.errorText = "Fehler, Gerät antwortet nicht";
-                return;
-            }
-            if (!this.errorText) {
-                this.littlefsProgress = 100;
-            }
+
+        this.updateAvailable = await this.isUpdateAvailable(url);
+        if (this.updateAvailable) {
+            this.errorText = "Es ist ein Update verfügbar";
+        } else {
+            this.errorText = "Kein Update verfügbar";
         }
-        if (this.firmwareElement.input.files[0]) {
-            let finished = false;
-            (async () => {
-                while (!finished) {
-                    await new Promise((resolve) => setTimeout(resolve, 300));
-                    await getUpdatePercentage().then((percentage) => {
-                        this.firmwareProgress = percentage;
-                    });
-                }
-            })();
-            const res = await updateFirmware(
-                this.firmwareElement.input.files[0]
-            );
-            finished = true;
-            if (!res.ok) {
-                this.errorText = "Fehler, Gerät antwortet nicht";
-                return;
-            }
-            if (!this.errorText) {
-                this.firmwareProgress = 100;
-            }
+    }
+
+    async updateFirmware() {
+        this.errorText = "";
+        const url = this.urlElement.input.value;
+        if (!url) {
+            this.errorText = "Bitte gib eine URL ein";
+            return;
         }
-        resetEsp(ResetFlag.CONFIGURATION_FLAG);
-        // TODO: open "Waiting for esp to restart" screen
+
+        await updateFirmware(url);
+        this.updateProgress();
     }
 
     render() {
@@ -84,20 +90,12 @@ export class UpdatePage extends BasePage {
             <title-element>Firmware aktualisieren</title-element>
             <input-element-grid>
                 <input-element
-                    id="littlefs"
-                    label="littlefs.bin"
-                    type="file"
+                    id="url"
+                    label="Update Url"
+                    type="text"
                 ></input-element>
                 <progress-bar-element
                     progress="${this.littlefsProgress}"
-                ></progress-bar-element>
-                <input-element
-                    id="firmware"
-                    label="firmware.bin"
-                    type="file"
-                ></input-element>
-                <progress-bar-element
-                    progress="${this.firmwareProgress}"
                 ></progress-bar-element>
             </input-element-grid>
             <error-text-element text="${this.errorText}"></error-text-element>
@@ -112,11 +110,21 @@ export class UpdatePage extends BasePage {
                     @click="${this.next}"
                     ?secondary="${true}"
                 ></button-element>
-                <button-element
-                    name="Hochladen"
-                    @click="${this.upload}"
-                    ?secondary="${true}"
-                ></button-element>
+                ${this.updateAvailable
+                    ? html`
+                          <button-element
+                              name="Firmware aktualisieren"
+                              @click="${this.updateFirmware}"
+                              ?secondary="${true}"
+                          ></button-element>
+                      `
+                    : html`
+                          <button-element
+                              name="Nach Updates suchen"
+                              @click="${this.searchForUpdates}"
+                              ?secondary="${true}"
+                          ></button-element>
+                      `}
             </button-nav-element>
         `;
     }

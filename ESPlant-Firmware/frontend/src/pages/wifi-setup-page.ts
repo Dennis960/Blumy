@@ -1,6 +1,12 @@
 import { html } from "lit";
 import { customElement, query, state } from "lit/decorators.js";
-import { connectToNetwork, isEspConnected, Network, WifiStatus } from "../api";
+import {
+    connectToNetwork,
+    getConnectedNetwork,
+    isConnected,
+    Network,
+    WifiStatus,
+} from "../api";
 import { loadingState, networkState } from "../states";
 import { BasePage } from "./base-page";
 import { InputElement } from "./page-elements/input-element";
@@ -25,7 +31,7 @@ export class WifiSetupPage extends BasePage {
         // wait 500 ms for the device to connect to the network
         await new Promise((resolve) => setTimeout(resolve, 500));
         for (let i = 0; i < 10; i++) {
-            const wifiStatus = await isEspConnected();
+            const wifiStatus = await isConnected();
 
             if (wifiStatus == WifiStatus.ERROR) {
                 this.errorText = "Fehler, Sensor antwortet nicht";
@@ -48,9 +54,10 @@ export class WifiSetupPage extends BasePage {
             } else if (wifiStatus == WifiStatus.DISCONNECTED) {
                 this.errorText = "Sensor ist nicht verbunden";
             } else if (wifiStatus == WifiStatus.UNINITIALIZED) {
-                this.errorText = "Sensor ist nicht initialisiert. Versuche ihn neu zu starten.";
+                this.errorText =
+                    "Sensor ist nicht initialisiert. Versuche ihn neu zu starten.";
             } else {
-                loadingState.state++;;
+                loadingState.state++;
                 await new Promise((resolve) => setTimeout(resolve, 1000));
                 loadingState.state--;
                 continue;
@@ -66,6 +73,20 @@ export class WifiSetupPage extends BasePage {
         } else if (!networkState.state.isConnected) {
             this.connect();
         }
+    }
+
+    async firstUpdated() {
+        if (networkState.state.network) {
+            return;
+        }
+        const network = await getConnectedNetwork();
+        if (!network.ssid) {
+            return;
+        }
+
+        networkState.state.network.ssid = network.ssid;
+        this.ssidElement.input.value = network.ssid;
+        this.passwordElement.input.focus();
     }
 
     render() {

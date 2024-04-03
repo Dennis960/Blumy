@@ -168,6 +168,23 @@ void plantstore_setConfigurationModeTimeoutMs(int32_t timeoutMs)
     nvs_close(nvs_handle);
 }
 
+void plantstore_setFirmwareUpdateUrl(char *url)
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
+    ESP_ERROR_CHECK(nvs_set_str(nvs_handle, FIRMWARE_UPDATE_URL_KEY, url));
+    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    nvs_close(nvs_handle);
+}
+
+bool plantstore_getFirmwareUpdateUrl(char *url, size_t url_size)
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
+    esp_err_t url_err = nvs_get_str(nvs_handle, FIRMWARE_UPDATE_URL_KEY, url, &url_size);
+    nvs_close(nvs_handle);
+
+    return url_err == ESP_OK;
+}
+
 bool plantstore_isConfigured()
 {
     // Doing this is fine, because the parameters can be NULL and then the length of the stored values is checked only

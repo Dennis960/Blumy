@@ -6,14 +6,27 @@ import { customElement, query } from "lit/decorators.js";
 @customElement("cloud-form-element")
 export class CloudFormElement extends LitElement {
     @query("#token") tokenInput: InputElement;
-    
+
+    public getConfig(): BlumyCloudConfiguration {
+        return {
+            type: "cloud",
+            token: this.tokenInput.input.value,
+        };
+    }
+
+    public setConfig(config: BlumyCloudConfiguration) {
+        this.tokenInput.input.value = config.token;
+    }
+
     private handleChange() {
-        this.dispatchEvent(new CustomEvent<BlumyCloudConfiguration>('input-config', {
-            detail: {
-                type: 'cloud',
-                token: this.tokenInput.input.value,
-            }
-        }))
+        this.dispatchEvent(
+            new CustomEvent<BlumyCloudConfiguration>("input-config", {
+                detail: {
+                    type: "cloud",
+                    token: this.tokenInput.input.value,
+                },
+            })
+        );
     }
 
     render() {

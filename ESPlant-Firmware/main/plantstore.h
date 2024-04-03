@@ -18,6 +18,7 @@
 #define BLUMY_TOKEN_KEY "blumy_token"
 #define SENSOR_TIMEOUT_SLEEP_KEY "timeout_sleep"
 #define SENSOR_TIMEOUT_CONFIG_KEY "timeout_config"
+#define FIRMWARE_UPDATE_URL_KEY "update_url"
 
 bool plantstore_getWifiCredentials(char *ssid, char *password, size_t ssid_size, size_t password_size);
 void plantstore_setWifiCredentials(char *ssid, char *password);
@@ -31,6 +32,8 @@ bool plantstore_getSensorTimeoutSleepMs(uint64_t *timeoutMs);
 void plantstore_setSensorTimeoutSleepMs(uint64_t timeoutMs);
 bool plantstore_getConfigurationModeTimeoutMs(int32_t *timeoutMs);
 void plantstore_setConfigurationModeTimeoutMs(int32_t timeoutMs);
+void plantstore_setFirmwareUpdateUrl(char *url);
+bool plantstore_getFirmwareUpdateUrl(char *url, size_t url_size);
 /**
  * @brief Check if the plantstore is configured
  * The plantstore is marked as configured, if the wifi credentials are set and at least one of the cloud configurations is set.
