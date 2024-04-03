@@ -4,7 +4,7 @@ import { customElement, query } from "lit/decorators.js";
 import { MqttCloudConfiguration } from "../../api";
 
 @customElement("mqtt-form-element")
-export class MqttForm extends LitElement {
+export class MqttFormElement extends LitElement {
     @query("#sensorId") sensorInput: InputElement;
     @query("#server") serverInput: InputElement;
     @query("#port") portInput: InputElement;
@@ -13,19 +13,44 @@ export class MqttForm extends LitElement {
     @query("#topic") topicInput: InputElement;
     @query("#client-id") clientIdInput: InputElement;
 
+    public getConfig(): MqttCloudConfiguration {
+        return {
+            type: "mqtt",
+            sensorId: this.sensorInput.input.value,
+            server: this.serverInput.input.value,
+            port: this.portInput.input.value,
+            username: this.userInput.input.value,
+            password: this.passwordInput.input.value,
+            topic: this.topicInput.input.value,
+            clientId: this.clientIdInput.input.value,
+        };
+    }
+
+    public setConfig(config: MqttCloudConfiguration) {
+        this.sensorInput.input.value = config.sensorId;
+        this.serverInput.input.value = config.server;
+        this.portInput.input.value = config.port;
+        this.userInput.input.value = config.username;
+        this.passwordInput.input.value = config.password;
+        this.topicInput.input.value = config.topic;
+        this.clientIdInput.input.value = config.clientId;
+    }
+
     private handleChange() {
-        this.dispatchEvent(new CustomEvent<MqttCloudConfiguration>('input', {
-            detail: {
-                type: 'mqtt',
-                sensorId: this.sensorInput.input.value,
-                server: this.serverInput.input.value,
-                port: this.portInput.input.value,
-                username: this.userInput.input.value,
-                password: this.passwordInput.input.value,
-                topic: this.topicInput.input.value,
-                clientId: this.clientIdInput.input.value,
-            }
-        }))
+        this.dispatchEvent(
+            new CustomEvent<MqttCloudConfiguration>("input", {
+                detail: {
+                    type: "mqtt",
+                    sensorId: this.sensorInput.input.value,
+                    server: this.serverInput.input.value,
+                    port: this.portInput.input.value,
+                    username: this.userInput.input.value,
+                    password: this.passwordInput.input.value,
+                    topic: this.topicInput.input.value,
+                    clientId: this.clientIdInput.input.value,
+                },
+            })
+        );
     }
 
     render() {

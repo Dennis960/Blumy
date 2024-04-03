@@ -14,6 +14,8 @@
 const unsigned long maxStabilizationTime = 500;
 const int stabilizationDifference = 5;
 
+bool isSensorsInit = false;
+
 unsigned long millis()
 {
     return esp_timer_get_time() / 1000;
@@ -316,6 +318,7 @@ void sensors_initSensors()
 
     adc_initAdc();
     initAht(TEMPERATURE_SENSOR_SDA, TEMPERATURE_SENSOR_SCL);
+    isSensorsInit = true;
 }
 
 void sensors_deinitSensors()
@@ -331,6 +334,10 @@ void sensors_deinitSensors()
 
 void sensors_full_read(sensors_full_data_t *data)
 {
+    if (!isSensorsInit)
+    {
+        sensors_initSensors();
+    }
     data->light = sensors_readLightPercentage();
     data->voltage = sensors_readVoltage();
     sensors_aht_data_t aht_data;

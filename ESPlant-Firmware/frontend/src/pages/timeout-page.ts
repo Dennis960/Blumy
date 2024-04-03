@@ -5,7 +5,7 @@ import { BasePage } from "./base-page";
 import { InputElement } from "./page-elements/input-element";
 import timestring from "timestring";
 
-@customElement("name-page")
+@customElement("timeout-page")
 export class NamePage extends BasePage {
     @property({ type: String }) onlineStatus: string;
     @query("#sleepTimeout") sleepTimeoutElement: InputElement;

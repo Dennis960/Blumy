@@ -2,7 +2,8 @@ import { defineMock } from "vite-plugin-mock-dev-server";
 
 export default defineMock(
     {
-        url: "/api/sensor/value",
-        body: 234,
+        url: "/api/update/firmware",
+        method: "POST",
+        body: "OK",
     }
 );

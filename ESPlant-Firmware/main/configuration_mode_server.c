@@ -442,20 +442,41 @@ esp_err_t get_api_connectedNetwork_handler(httpd_req_t *req)
         httpd_resp_send_404(req);
         return ESP_FAIL;
     }
+    plantfi_sta_status_t status = plantfi_get_sta_status();
 
-    httpd_resp_send(req, ssid, HTTPD_RESP_USE_STRLEN);
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddStringToObject(root, "ssid", ssid);
+    // cJSON_AddStringToObject(root, "password", password);
+    cJSON_AddNumberToObject(root, "status", status);
+
+    char *resp = cJSON_Print(root);
+    cJSON_Delete(root);
+
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    free(resp);
     return ESP_OK;
 }
 
-esp_err_t get_api_sensor_value_handler(httpd_req_t *req)
+esp_err_t get_api_sensor_data_handler(httpd_req_t *req)
 {
-    sensors_moisture_sensor_output_t moisture_output;
-    sensors_read_moisture(&moisture_output);
+    sensors_full_data_t sensors_data;
+    sensors_full_read(&sensors_data);
 
-    int moisture = moisture_output.measurement;
-    char resp[10];
-    sprintf(resp, "%d", moisture);
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddNumberToObject(root, "temperature", sensors_data.temperature);
+    cJSON_AddNumberToObject(root, "humidity", sensors_data.humidity);
+    cJSON_AddNumberToObject(root, "light", sensors_data.light);
+    cJSON_AddNumberToObject(root, "moisture", sensors_data.moisture_measurement);
+    cJSON_AddNumberToObject(root, "voltage", sensors_data.voltage);
+    cJSON_AddBoolToObject(root, "usb", sensors_data.is_usb_connected);
+
+    char *resp = cJSON_Print(root);
+    cJSON_Delete(root);
+
+    httpd_resp_set_type(req, "application/json");
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    free(resp);
     return ESP_OK;
 }
 
@@ -480,15 +501,15 @@ esp_err_t post_api_update_firmware_handler(httpd_req_t *req)
         return ESP_FAIL;
     }
 
+    plantstore_setFirmwareUpdateUrl(url);
+
     esp_http_client_config_t config = {
         .url = url,
         .cert_pem = NULL,
         .timeout_ms = 10000,
     };
-    esp_https_ota_config_t ota_config = {
-        .http_config = config
-        .url = url,
-    };
+    esp_https_ota_config_t ota_config;
+    ota_config.http_config = &config;
     esp_https_ota_handle_t handle = NULL;
     esp_err_t err = esp_https_ota_begin(&ota_config, &handle);
     if (err != ESP_OK)
@@ -535,10 +556,24 @@ esp_err_t post_api_update_firmware_handler(httpd_req_t *req)
     esp_restart();
 }
 
-esp_err_t post_api_update_littlefs_handler(httpd_req_t *req)
+esp_err_t get_api_update_firmware_handler(httpd_req_t *req)
 {
-    const char resp[] = "Not Implemented";
+    char url[100];
+    if (!plantstore_getFirmwareUpdateUrl(url, sizeof(url)))
+    {
+        httpd_resp_send_404(req);
+        return ESP_FAIL;
+    }
+
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddStringToObject(root, "url", url);
+
+    char *resp = cJSON_Print(root);
+    cJSON_Delete(root);
+
+    httpd_resp_set_type(req, "application/json");
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    free(resp);
     return ESP_OK;
 }
 
@@ -628,10 +663,10 @@ httpd_uri_t get_api_connectedNetwork = {
     .handler = get_api_connectedNetwork_handler,
     .user_ctx = NULL};
 
-httpd_uri_t get_api_sensorValue = {
-    .uri = "/api/sensor/value",
+httpd_uri_t get_api_sensorData = {
+    .uri = "/api/sensor/data",
     .method = HTTP_GET,
-    .handler = get_api_sensor_value_handler,
+    .handler = get_api_sensor_data_handler,
     .user_ctx = NULL};
 
 httpd_uri_t post_api_hardReset = {
@@ -658,10 +693,10 @@ httpd_uri_t post_api_update_firmware = {
     .handler = post_api_update_firmware_handler,
     .user_ctx = NULL};
 
-httpd_uri_t post_api_update_littlefs = {
-    .uri = "/api/update/littlefs",
-    .method = HTTP_POST,
-    .handler = post_api_update_littlefs_handler,
+httpd_uri_t get_api_update_firmware = {
+    .uri = "/api/update/firmware",
+    .method = HTTP_GET,
+    .handler = get_api_update_firmware_handler,
     .user_ctx = NULL};
 
 /* Function for starting the webserver */
@@ -691,14 +726,16 @@ httpd_handle_t start_webserver(void)
         httpd_register_uri_handler(server, &get_api_cloudSetup_blumy);
         httpd_register_uri_handler(server, &post_api_timeouts_sleep);
         httpd_register_uri_handler(server, &get_api_timeouts_sleep);
+        httpd_register_uri_handler(server, &get_api_timeouts_configurationMode);
+        httpd_register_uri_handler(server, &post_api_timeouts_configurationMode);
         httpd_register_uri_handler(server, &get_api_update_percentage);
         httpd_register_uri_handler(server, &get_api_connectedNetwork);
-        httpd_register_uri_handler(server, &get_api_sensorValue);
+        httpd_register_uri_handler(server, &get_api_sensorData);
         httpd_register_uri_handler(server, &post_api_hardReset);
         httpd_register_uri_handler(server, &get);
 
         httpd_register_uri_handler(server, &post_api_update_firmware);
-        httpd_register_uri_handler(server, &post_api_update_littlefs);
+        httpd_register_uri_handler(server, &get_api_update_firmware);
     }
     /* If server failed to start, handle will be NULL */
     return server;

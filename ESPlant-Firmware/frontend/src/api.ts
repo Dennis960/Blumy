@@ -2,10 +2,7 @@ import { loadingState } from "./states";
 export type Network = {
     rssi: number;
     ssid: string;
-    bssid: string;
-    channel: number;
     secure: number;
-    hidden: boolean;
 };
 
 export enum WifiStatus {
@@ -18,10 +15,42 @@ export enum WifiStatus {
     ERROR = 10,
 }
 
-export enum ResetFlag {
-    SENSOR_FLAG = 0,
-    CONFIGURATION_FLAG = 1,
+export interface SensorData {
+    temperature: number;
+    humidity: number;
+    light: number;
+    moisture: number;
+    voltage: number;
+    usb: boolean;
 }
+
+export interface HttpCloudConfiguration extends Record<string, string> {
+    type: "http";
+    sensorId: string;
+    url: string;
+    auth: string;
+}
+
+export interface MqttCloudConfiguration extends Record<string, string> {
+    type: "mqtt";
+    sensorId: string;
+    server: string;
+    port: string;
+    username: string;
+    password: string;
+    topic: string;
+    clientId: string;
+}
+
+export interface BlumyCloudConfiguration extends Record<string, string> {
+    type: "cloud";
+    token: string;
+}
+
+export type CloudConfiguration =
+    | HttpCloudConfiguration
+    | MqttCloudConfiguration
+    | BlumyCloudConfiguration;
 
 /* fetch loading state indicator */
 const fetch = new Proxy(window.fetch, {
@@ -36,14 +65,20 @@ const fetch = new Proxy(window.fetch, {
     },
 });
 
-async function postDataToEsp(url: string, params: Record<string, string> | string) {
-    const body = typeof params === "string" ? params : Object.entries(params).map(([key, value]) => key + "=" + value).join("\n") + "\n";
+async function postDataToEsp(
+    url: string,
+    params?: Record<string, string> | string
+) {
+    const body = params
+        ? typeof params === "string"
+            ? params
+            : Object.entries(params)
+                  .map(([key, value]) => key + "=" + value)
+                  .join("\n") + "\n"
+        : undefined;
     return await fetch("/api" + url, {
         method: "POST",
         body,
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
     });
 }
 
@@ -56,43 +91,19 @@ async function getDataFromEsp(url: string) {
         });
 }
 
-async function uploadFile(file: File, url: string) {
-    const formData = new FormData();
-    formData.append("upload", file);
-    return await fetch("/api" + url, {
-        method: "POST",
-        body: formData,
-    });
+export async function connectToNetwork(ssid: string, password: string) {
+    return await postDataToEsp("/connect", { ssid, password });
 }
 
-export async function setPlantName(name: string) {
-    return await postDataToEsp("/plantName", name);
-}
-
-export async function getPlantName() {
-    return await getDataFromEsp("/plantName");
+export async function resetEsp() {
+    return await postDataToEsp("/reset");
 }
 
 export async function getNetworks(): Promise<Network[]> {
     return await getDataFromEsp("/networks");
 }
 
-export async function getConnectedNetwork(): Promise<Network> {
-    return await getDataFromEsp("/connectedNetwork");
-}
-
-export async function connectToNetwork(ssid: string, password: string) {
-    return await postDataToEsp("/connect", {ssid, password});
-}
-
-export async function resetEsp(resetFlag: ResetFlag) {
-    return await postDataToEsp("/reset", String(resetFlag));
-}
-
-/**
- * @returns WifiStatus
- */
-export async function isEspConnected(): Promise<WifiStatus> {
+export async function isConnected(): Promise<WifiStatus> {
     const res = await getDataFromEsp("/isConnected");
     if (res == null) {
         return WifiStatus.ERROR;
@@ -100,38 +111,35 @@ export async function isEspConnected(): Promise<WifiStatus> {
     return Number(res);
 }
 
-export interface HttpCloudConfiguration extends Record<string, string>{
-    type: 'http'
-    sensorId: string,
-    url: string
-    auth: string
+export async function getConnectedNetwork(): Promise<{ ssid: string, status: WifiStatus }> {
+    return await getDataFromEsp("/connectedNetwork");
 }
-
-export interface MqttCloudConfiguration extends Record<string, string>{
-    type: 'mqtt'
-    sensorId: string,
-    server: string,
-    port: string,
-    username: string,
-    password: string,
-    topic: string,
-    clientId: string
-}
-
-export interface BlumyCloudConfiguration extends Record<string, string> {
-    type: 'cloud'
-    token: string
-}
-
-export type CloudConfiguration = HttpCloudConfiguration | MqttCloudConfiguration | BlumyCloudConfiguration;
 
 export async function setCloudCredentials(config: CloudConfiguration) {
-    if (config.type === 'http') {
+    if (config.type === "http") {
         return await postDataToEsp("/cloudSetup/http", config);
-    } else if (config.type === 'mqtt') {
+    } else if (config.type === "mqtt") {
         return await postDataToEsp("/cloudSetup/mqtt", config);
-    } else if (config.type === 'cloud') {
+    } else if (config.type === "cloud") {
         return await postDataToEsp("/cloudSetup/blumy", config);
+    }
+}
+
+export async function getCloudCredentials<T extends CloudConfiguration["type"]>(
+    type: T
+): Promise<
+    T extends "http"
+        ? HttpCloudConfiguration
+        : T extends "mqtt"
+        ? MqttCloudConfiguration
+        : BlumyCloudConfiguration
+> {
+    if (type === "http") {
+        return await getDataFromEsp("/cloudSetup/http");
+    } else if (type === "mqtt") {
+        return await getDataFromEsp("/cloudSetup/mqtt");
+    } else if (type === "cloud") {
+        return await getDataFromEsp("/cloudSetup/blumy");
     }
 }
 
@@ -144,18 +152,34 @@ export async function getSleepTimeout() {
     return Number(await getDataFromEsp("/timeouts/sleep"));
 }
 
+export async function setConfigurationModeTimeout(timeout: number) {
+    timeout = Math.round(timeout);
+    return await postDataToEsp(
+        "/timeouts/configurationMode",
+        timeout.toString()
+    );
+}
+
+export async function getConfigurationModeTimeout() {
+    return Number(await getDataFromEsp("/timeouts/configurationMode"));
+}
+
 export async function getUpdatePercentage() {
     return Number(await getDataFromEsp("/update/percentage"));
 }
 
-export async function updateFs(file: File) {
-    return await uploadFile(file, "/update/littlefs");
+export async function getSensorData(): Promise<SensorData> {
+    return await getDataFromEsp("/sensor/data");
 }
 
-export async function updateFirmware(file: File) {
-    return await uploadFile(file, "/update/firmware");
+export async function hardResetEsp() {
+    return await postDataToEsp("/hardReset");
 }
 
-export async function getSensorValue() {
-    return Number(await getDataFromEsp("/sensor/value"));
+export async function updateFirmware(url: string) {
+    return await postDataToEsp("/update/firmware", url);
+}
+
+export async function getUpdateFirmwareUrl(): Promise<{ url: string }> {
+    return await getDataFromEsp("/update/firmware");
 }

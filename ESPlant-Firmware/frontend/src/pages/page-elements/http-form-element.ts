@@ -8,16 +8,33 @@ export class HttpFormElement extends LitElement {
     @query("#sensorId") sensorInput: InputElement;
     @query("#url") urlInput: InputElement;
     @query("#auth") authInput: InputElement;
-    
+
+    public getConfig(): HttpCloudConfiguration {
+        return {
+            type: "http",
+            sensorId: this.sensorInput.input.value,
+            url: this.urlInput.input.value,
+            auth: this.authInput.input.value,
+        };
+    }
+
+    public setConfig(config: HttpCloudConfiguration) {
+        this.sensorInput.input.value = config.sensorId;
+        this.urlInput.input.value = config.url;
+        this.authInput.input.value = config.auth;
+    }
+
     private handleChange() {
-        this.dispatchEvent(new CustomEvent<HttpCloudConfiguration>('input', {
-            detail: {
-                type: 'http',
-                sensorId: this.sensorInput.input.value,
-                url: this.urlInput.input.value,
-                auth: this.authInput.input.value,
-            }
-        }))
+        this.dispatchEvent(
+            new CustomEvent<HttpCloudConfiguration>("input", {
+                detail: {
+                    type: "http",
+                    sensorId: this.sensorInput.input.value,
+                    url: this.urlInput.input.value,
+                    auth: this.authInput.input.value,
+                },
+            })
+        );
     }
 
     render() {

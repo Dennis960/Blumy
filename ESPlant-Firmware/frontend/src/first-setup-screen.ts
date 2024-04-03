@@ -5,8 +5,9 @@ import "./elements/dots-stepper-element";
 import "./elements/header-element";
 import "./elements/loader-bar-element";
 import "./pages/cloud-page";
-import "./pages/name-page";
+import "./pages/home-page";
 import "./pages/reset-page";
+import "./pages/timeout-page";
 import "./pages/update-page";
 import "./pages/welcome-page";
 import "./pages/wifi-scanner-page";
@@ -27,8 +28,8 @@ export class FirstSetupScreen extends LitElement {
             width: 100%;
         }
         .page {
-            padding: 0 1rem;
-            max-width: 24rem;
+            padding: 0 1rem 1rem 1rem;
+            max-width: 30rem;
             width: 100%;
             box-sizing: border-box;
         }
@@ -70,10 +71,10 @@ export class FirstSetupScreen extends LitElement {
                 @next="${this.next}"
                 @back="${this.back}"
             ></update-page>`,
-            html`<name-page
+            html`<timeout-page
                 @next="${this.next}"
                 @back="${this.back}"
-            ></name-page>`,
+            ></timeout-page>`,
             html`<wifi-scanner-page
                 @next="${this.next}"
                 @back="${this.back}"
@@ -87,8 +88,10 @@ export class FirstSetupScreen extends LitElement {
                 @back="${this.back}"
             ></cloud-page>`,
             html`<reset-page
+                @next="${this.next}"
                 @back="${this.back}"
             ></reset-page>`,
+            html`<home-page @back="${this.back}"></home-page>`,
         ];
     }
 
