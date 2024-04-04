@@ -62,7 +62,7 @@ void start_deep_sleep()
     uint64_t sleepTime = DEFAULT_SENSOR_TIMEOUT_SLEEP_MS;
     plantstore_getSensorTimeoutSleepMs(&sleepTime);
     sleepTime *= 1000;
-    ESP_LOGI("DeepSleep", "Going to sleep for %llu ms", sleepTime);
+    ESP_LOGI("DeepSleep", "Going to sleep for %llu us", sleepTime);
     esp_deep_sleep(sleepTime);
 }
 
