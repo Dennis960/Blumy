@@ -433,13 +433,18 @@ esp_err_t post_api_update_firmware_handler(httpd_req_t *req)
 
     plantstore_setFirmwareUpdateUrl(url);
 
+    const char resp[] = "OK";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+
     esp_http_client_config_t config = {
         .url = url,
         .cert_pem = NULL,
         .timeout_ms = 10000,
     };
-    esp_https_ota_config_t ota_config;
-    ota_config.http_config = &config;
+    esp_https_ota_config_t ota_config = {
+        .http_config = &config,
+        .http_client_init_cb = NULL,
+    };
     esp_https_ota_handle_t handle = NULL;
     esp_err_t err = esp_https_ota_begin(&ota_config, &handle);
     if (err != ESP_OK)
@@ -453,8 +458,6 @@ esp_err_t post_api_update_firmware_handler(httpd_req_t *req)
         ESP_LOGE("OTA", "Failed to get image size (%d)", otaImageSize);
         return ESP_FAIL;
     }
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     while (1)
     {
         err = esp_https_ota_perform(handle);
@@ -484,6 +487,7 @@ esp_err_t post_api_update_firmware_handler(httpd_req_t *req)
 
     ESP_LOGI("OTA", "OTA finished, restarting");
     esp_restart();
+    return ESP_OK;
 }
 
 esp_err_t get_api_update_firmware_handler(httpd_req_t *req)
