@@ -48,7 +48,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: frontend
-          path: ESPlant-Firmware/main/index_html.c
+          path: ESPlant-Firmware/main
 
       - name: Build Firmware
         run: |
