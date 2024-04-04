@@ -27,6 +27,8 @@ app.use("/api", api);
 app.use("/pages", sirv("pages", { single: true, dev: true }));
 // serve dashboard
 app.use("/dashboard", sirv("dashboard", { single: true }));
+// serve firmware static folder
+app.use("/firmware", express.static("firmware"));
 
 // redirect root to dashboard
 app.get("/", (req, res) => {
