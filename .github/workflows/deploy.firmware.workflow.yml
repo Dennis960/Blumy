@@ -79,7 +79,7 @@ jobs:
         with:
           SSH_PRIVATE_KEY: ${{ secrets.HOPPING_KEY }}
           ARGS: "-rlgoDzvc -i"
-          SOURCE: "ESPlant-Firmware/data/firmware.bin"
+          SOURCE: "ESPlant-Firmware/data/ESPlant-Firmware.bin"
           REMOTE_HOST: ${{ secrets.HOPPING_HOST }}
           REMOTE_USER: ${{ secrets.HOPPING_USER }}
           TARGET: ${{ secrets.HOPPING_HOST_PATH }}/api/firmware/firmware.bin
