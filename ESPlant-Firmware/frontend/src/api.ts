@@ -111,7 +111,10 @@ export async function isConnected(): Promise<WifiStatus> {
     return Number(res);
 }
 
-export async function getConnectedNetwork(): Promise<{ ssid: string, status: WifiStatus }> {
+export async function getConnectedNetwork(): Promise<{
+    ssid: string;
+    status: WifiStatus;
+}> {
     return await getDataFromEsp("/connectedNetwork");
 }
 
@@ -177,7 +180,7 @@ export async function hardResetEsp() {
 }
 
 export async function updateFirmware(url: string) {
-    return await postDataToEsp("/update/firmware", url);
+    return await postDataToEsp("/update/firmware", { url });
 }
 
 export async function getUpdateFirmwareUrl(): Promise<{ url: string }> {
