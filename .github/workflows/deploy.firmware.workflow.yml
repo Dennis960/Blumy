@@ -1,4 +1,4 @@
-name: Build Firmware and Upload .bin files
+name: Build Firmware and Upload .bin files to Hopping
 
 on:
   push:
@@ -6,13 +6,13 @@ on:
       - main
     paths:
       - "ESPlant-Firmware/**"
-      - ".github/workflows/build.firmware.workflow.yml"
+      - ".github/workflows/deploy.firmware.workflow.yml"
   pull_request:
     branches:
       - main
     paths:
       - "ESPlant-Firmware/**"
-      - ".github/workflows/build.firmware.workflow.yml"
+      - ".github/workflows/deploy.firmware.workflow.yml"
 
 jobs:
   build-frontend:
@@ -58,6 +58,28 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: |
-            ESPlant-Firmware/build/ESPlant-Firmware.bin
-            ESPlant-Firmware/build/littlefs.bin
+          path: ESPlant-Firmware/build/ESPlant-Firmware.bin
+
+  deploy-firmware:
+    runs-on: ubuntu-latest
+    needs: build-firmware
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Firmware Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware
+          path: ESPlant-Firmware/data
+
+      - name: Upload Firmware Artifact
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.HOPPING_KEY }}
+          ARGS: "-rlgoDzvc -i"
+          SOURCE: "ESPlant-Firmware/data/firmware.bin"
+          REMOTE_HOST: ${{ secrets.HOPPING_HOST }}
+          REMOTE_USER: ${{ secrets.HOPPING_USER }}
+          TARGET: ${{ secrets.HOPPING_HOST_PATH }}/api/firmware/firmware.bin
