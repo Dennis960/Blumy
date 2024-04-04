@@ -2,6 +2,5 @@
 nvs, data, nvs, 0x9000, 0x6000,
 otadata, data, ota, , 0x2000,
 phy_init, data, phy, , 0x1000,
-littlefs, data, spiffs, , 0x80000,
 ota_0, app, ota_0, , 0x180000
 ota_1, app, ota_1, , 0x180000

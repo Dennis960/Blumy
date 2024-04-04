@@ -11,7 +11,7 @@ export default defineConfig({
                 index: resolve(__dirname, "index.html"),
             },
         },
-        outDir: "../data",
+        outDir: "../main/data",
         target: "es2022",
         modulePreload: false,
     },

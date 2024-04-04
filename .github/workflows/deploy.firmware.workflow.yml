@@ -34,7 +34,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: frontend
-          path: ESPlant-Firmware/data
+          path: ESPlant-Firmware/main/index_html.c
 
   build-firmware:
     runs-on: ubuntu-latest
@@ -48,7 +48,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: frontend
-          path: ESPlant-Firmware/data
+          path: ESPlant-Firmware/main/index_html.c
 
       - name: Build Firmware
         run: |
@@ -72,14 +72,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: firmware
-          path: ESPlant-Firmware/data
+          path: ESPlant-Firmware/build/ESPlant-Firmware.bin
 
       - name: Upload Firmware Artifact
         uses: easingthemes/ssh-deploy@main
         with:
           SSH_PRIVATE_KEY: ${{ secrets.HOPPING_KEY }}
           ARGS: "-rlgoDzvc -i"
-          SOURCE: "ESPlant-Firmware/data/ESPlant-Firmware.bin"
+          SOURCE: "ESPlant-Firmware/build/ESPlant-Firmware.bin"
           REMOTE_HOST: ${{ secrets.HOPPING_HOST }}
           REMOTE_USER: ${{ secrets.HOPPING_USER }}
           TARGET: ${{ secrets.HOPPING_HOST_PATH }}/api/firmware/firmware.bin

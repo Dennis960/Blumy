@@ -22,14 +22,14 @@ export class UpdatePage extends BasePage {
 
     @query("#url") urlElement: InputElement;
 
-    @state() littlefsProgress: number = 0;
+    @state() firmwareUpdateProgress: number = 0;
     @state() updateAvailable: boolean = false;
 
     updateProgressTimeout: number;
 
     async updateProgress() {
-        this.littlefsProgress = await getUpdatePercentage();
-        if (this.littlefsProgress < 100) {
+        this.firmwareUpdateProgress = await getUpdatePercentage();
+        if (this.firmwareUpdateProgress < 100) {
             this.updateProgressTimeout = window.setTimeout(
                 () => this.updateProgress(),
                 200
@@ -95,7 +95,7 @@ export class UpdatePage extends BasePage {
                     type="text"
                 ></input-element>
                 <progress-bar-element
-                    progress="${this.littlefsProgress}"
+                    progress="${this.firmwareUpdateProgress}"
                 ></progress-bar-element>
             </input-element-grid>
             <error-text-element text="${this.errorText}"></error-text-element>
