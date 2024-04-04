@@ -85,4 +85,4 @@ jobs:
           SOURCE: "firmware"
           REMOTE_HOST: ${{ secrets.HOPPING_HOST }}
           REMOTE_USER: ${{ secrets.HOPPING_USER }}
-          TARGET: ${{ secrets.HOPPING_HOST_PATH }}/api/firmware
+          TARGET: ${{ secrets.HOPPING_HOST_PATH }}/api
