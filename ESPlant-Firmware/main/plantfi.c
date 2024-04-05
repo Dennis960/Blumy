@@ -180,7 +180,7 @@ bool plantfi_configureStaFromPlantstore()
     if (plantstore_getWifiCredentials(ssid, password, sizeof(ssid), sizeof(password)))
     {
         ESP_LOGI(PLANTFI_TAG, "Wifi credentials found for %s", ssid);
-        plantfi_configureSta(ssid, password, 5, false);
+        plantfi_configureSta(ssid, password, 3, false);
         return true;
     }
     else
