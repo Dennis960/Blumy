@@ -45,16 +45,23 @@ void sendSensorData(sensors_full_data_t *sensors_data, int8_t rssi)
     };
 
     esp_http_client_handle_t client = esp_http_client_init(&config);
-    esp_http_client_set_post_field(client, data, strlen(data));
-    esp_http_client_set_header(client, "Content-Type", "application/json");
-    esp_http_client_set_header(client, "Authorization", bearer);
+    if (client == NULL)
+    {
+        ESP_LOGE("HTTP", "Failed to initialize HTTP client");
+        return;
+    }
+    ESP_ERROR_CHECK(esp_http_client_set_post_field(client, data, strlen(data)));
+    ESP_ERROR_CHECK(esp_http_client_set_header(client, "Content-Type", "application/json"));
+    ESP_ERROR_CHECK(esp_http_client_set_header(client, "Authorization", bearer));
     ESP_ERROR_CHECK(esp_http_client_perform(client));
 
-    esp_http_client_cleanup(client);
 
     ESP_LOGI("Data", "%s", data);
     int status_code = esp_http_client_get_status_code(client);
     ESP_LOGI("HTTP", "Status Code: %d", status_code);
+    // TODO also send firmware version. Status code can show if updates are available
+    // TODO also update plantstore settings if available in response
+    ESP_ERROR_CHECK(esp_http_client_cleanup(client));
 }
 
 void start_deep_sleep()
