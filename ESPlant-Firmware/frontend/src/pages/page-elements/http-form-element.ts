@@ -26,7 +26,7 @@ export class HttpFormElement extends LitElement {
 
     private handleChange() {
         this.dispatchEvent(
-            new CustomEvent<HttpCloudConfiguration>("input", {
+            new CustomEvent<HttpCloudConfiguration>("input-config", {
                 detail: {
                     type: "http",
                     sensorId: this.sensorInput.input.value,

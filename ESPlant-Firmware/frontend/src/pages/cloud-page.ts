@@ -122,27 +122,30 @@ export class CloudPage extends BasePage {
                 ?open=${this.configurationState["cloud"].open}
                 @opened=${() => this.handleOpen("cloud")}
                 @closed=${() => this.handleClose("cloud")}
-                @handleChange=${() => this.handleChange}
             >
-                <cloud-form-element></cloud-form-element>
+                <cloud-form-element
+                    @input-config=${this.handleChange}
+                ></cloud-form-element>
             </collapsible-element>
             <collapsible-element
                 summary="HTTP"
                 ?open=${this.configurationState["http"].open}
                 @opened=${() => this.handleOpen("http")}
                 @closed=${() => this.handleClose("http")}
-                @handleChange=${() => this.handleChange}
             >
-                <http-form-element></http-form-element>
+                <http-form-element
+                    @input-config=${this.handleChange}
+                ></http-form-element>
             </collapsible-element>
             <collapsible-element
                 summary="MQTT"
                 ?open=${this.configurationState["mqtt"].open}
                 @opened=${() => this.handleOpen("mqtt")}
                 @closed=${() => this.handleClose("mqtt")}
-                @handleChange=${() => this.handleChange}
             >
-                <mqtt-form-element></mqtt-form-element>
+                <mqtt-form-element
+                    @input-config=${this.handleChange}
+                ></mqtt-form-element>
             </collapsible-element>
             <error-text-element text="${this.errorText}"></error-text-element>
             <button-nav-element>
