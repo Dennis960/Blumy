@@ -36,12 +36,12 @@ battery_springs = battery_springs.translate(
 )
 
 battery_spring_2_width = 21
-battery_spring_2_width_tolerance = 1
+battery_spring_2_width_tolerance = 2
 battery_spring_2_height = 9.5
-battery_spring_2_thickness = 1
+battery_spring_2_thickness = 1.2
 battery_spring_2_inserter_width = 5
 battery_spring_2_inserter_height = 1.5
-battery_spring_2_gap_width = 2
+battery_spring_2_gap_width = 1.5
 battery_spring_2_gap_height = 5
 battery_spring_2_nipple_pos_y = 0.5
 battery_spring_2_nipple_width = 2
