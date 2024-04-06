@@ -38,7 +38,7 @@ export class MqttFormElement extends LitElement {
 
     private handleChange() {
         this.dispatchEvent(
-            new CustomEvent<MqttCloudConfiguration>("input", {
+            new CustomEvent<MqttCloudConfiguration>("input-config", {
                 detail: {
                     type: "mqtt",
                     sensorId: this.sensorInput.input.value,
