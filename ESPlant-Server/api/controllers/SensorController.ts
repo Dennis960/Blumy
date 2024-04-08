@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import {
+  LightHistoryEntry,
   PlantHealthDTO,
   SensorConfigurationDTO,
   SensorCreatedDTO,
@@ -44,9 +45,22 @@ export default class SensorController {
       })
     );
 
+    const lightHistory: LightHistoryEntry[] = sensorData.map((reading) => ({
+      timestamp: reading.timestamp,
+      light: reading.light,
+    }));
+
+    const weatherHistory = sensorData.map((reading) => ({
+      timestamp: reading.timestamp,
+      temperature: reading.temperature,
+      humidity: reading.humidity,
+    }));
+
     return {
       id,
       waterCapacityHistory,
+      lightHistory,
+      weatherHistory,
     };
   }
 
@@ -154,21 +168,27 @@ export default class SensorController {
   private getSensorHealth(
     lastReading: SensorReadingDTO | undefined
   ): SensorHealthDTO {
-    const status = {
+    const status: Pick<SensorHealthDTO, 'signalStrength'|'battery'> = {
       signalStrength:
         lastReading == undefined ||
         lastReading.timestamp < new Date(Date.now() - OFFLINE_TIMEOUT)
-          ? ("offline" as const)
+          ? "offline"
           : lastReading.rssi > -55
-          ? ("strong" as const)
+          ? "strong"
           : lastReading.rssi > -67
-          ? ("moderate" as const)
-          : ("weak" as const),
-      lowBattery: lastReading != undefined && false, // TODO
+          ? "moderate"
+          : "weak",
+      battery: lastReading == undefined ||
+        lastReading.voltage < 1.9
+          ? "empty"
+          : lastReading.voltage < 2.2
+          ? "low"
+          : "full",
     };
 
-    const warning = status.signalStrength == "weak" || status.lowBattery;
-    const critical = status.signalStrength == "offline";
+    const warning = status.signalStrength == "weak" || status.battery == "low";
+    const critical = status.signalStrength == "offline" || status.battery == "empty";
+
     return {
       ...status,
       warning,

@@ -16,6 +16,7 @@ export default class SensorRepository {
   }
 
   static async getIdByWriteToken(writeToken: string): Promise<number | undefined> {
+    // TODO prevent duplicate tokens
     return await knex<SensorEntity>("sensor")
       .select("*")
       .where({ writeToken })
@@ -24,6 +25,7 @@ export default class SensorRepository {
   }
 
   static async getIdByReadToken(readToken: string): Promise<number | undefined> {
+    // TODO prevent duplicate tokens
     return await knex<SensorEntity>("sensor")
       .select("*")
       .where({ readToken })

@@ -3,6 +3,8 @@
 	import type { SensorDTO, SensorHistoryDTO } from '$lib/types/api';
 	import Litepicker from '$lib/components/litepicker.svelte';
 	import WaterCapacityGraph from './water-capacity-graph.svelte';
+	import LightGraph from './light-graph.svelte';
+	import WeatherGraph from './weather-graph.svelte';
 
 	export let sensor: SensorDTO;
 	export let history: SensorHistoryDTO;
@@ -42,20 +44,33 @@
 			</div>
 		</div>
 	</div>
-	<div class="card-body">
-		<div class="graph ratio ratio-4x3">
+	<div class="card-body charts">
+		<div class="charts__graph">
 			<WaterCapacityGraph {sensor} {history} />
+		</div>
+		<div class="charts__graph">
+			<WeatherGraph {sensor} {history} />
+		</div>
+		<div class="charts__graph">
+			<LightGraph {sensor} {history} />
 		</div>
 	</div>
 </section>
 
 <style>
-	/* disable graph touch events on mobile to allow touch scrolling */
-	.graph {
+	.charts {
+		height: calc(100vh - 200px);
+		display: grid;
+		grid-template-rows: 6fr 1fr 1fr;
+	}
+
+	.charts__graph {
+		height: 100%;
+		/* disable graph touch events on mobile to allow touch scrolling */
 		pointer-events: none;
 	}
 	@media (hover: hover) {
-		.graph {
+		.charts__graph {
 			pointer-events: auto;
 		}
 	}

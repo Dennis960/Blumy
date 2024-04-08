@@ -98,7 +98,7 @@
 					title="Sensor-Status"
 					value={sensor.sensorHealth.signalStrength == 'offline'
 						? 'Offline'
-						: sensor.sensorHealth.lowBattery
+						: sensor.sensorHealth.battery == 'low'
 						? 'Batterie schwach'
 						: sensor.sensorHealth.signalStrength == 'weak'
 						? 'Empfang schlecht'
@@ -109,7 +109,7 @@
 					<svelte:fragment slot="icon">
 						{#if sensor.sensorHealth.signalStrength == 'offline'}
 							<IconWifiOff size={16} />
-						{:else if sensor.sensorHealth.lowBattery || sensor.sensorHealth.signalStrength == 'weak'}
+						{:else if sensor.sensorHealth.battery == 'low' || sensor.sensorHealth.signalStrength == 'weak'}
 							<IconAlertTriangle size={16} />
 						{:else if sensor.sensorHealth.signalStrength == 'strong'}
 							<IconWifi2 size={16} />
