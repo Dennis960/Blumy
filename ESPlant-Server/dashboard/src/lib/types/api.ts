@@ -1,33 +1,35 @@
+import { z } from "zod";
+
 export interface SensorReadingDTO {
   id: number;
   timestamp: Date;
-  water: number; // sensor units in range 0-1000
+  moisture: number; // sensor units in range 0-1000
   availableWaterCapacity: number; // sensor unit relative to field capacity
-  voltage: number | undefined;
-  rssi: number;
+  voltage: number; // 1.8 - 3.2 Volt
+  rssi: number; // dBm
+  light: number; // 0.0 - 1.0
+  temperature: number; // °C
+  humidity: number; // %
 }
 
-export interface SensorConfigurationDTO {
-  name: string;
-  imageUrl?: string|undefined; // data URL for now
-fieldCapacity: number; // max water value
+export const sensorConfigurationDTOSchema = z.object({
+  name: z.string(),
+  imageUrl: z.string().optional(), // data URL for now
   /*
    * Typical permanent wilting points:
    *   26-32% of field capacity for fine-textured soil
    *   10-15% of field capacity for coarse-textured soil
    * ref. https://www.sciencedirect.com/science/article/pii/B9780128117484000170
    */
-  permanentWiltingPoint: number; // min water value
+  fieldCapacity: z.number(), // max water value
+  permanentWiltingPoint: z.number(), // min water value
   // difference between fc and pwp in %: available water capacity
   // thresholds for available water capacity
-  upperThreshold: number;
-  lowerThreshold: number;
-}
+  upperThreshold: z.number(),
+  lowerThreshold: z.number(),
+});
 
-export interface RSSIHistoryEntry {
-  timestamp: Date;
-  rssi: number;
-}
+export type SensorConfigurationDTO = z.infer<typeof sensorConfigurationDTOSchema>;
 
 export interface WaterCapacityHistoryEntry {
   timestamp: Date;
@@ -35,11 +37,22 @@ export interface WaterCapacityHistoryEntry {
   waterCapacity: number;
 }
 
+export interface LightHistoryEntry {
+  timestamp: Date;
+  light: number;
+}
+
+export interface WeatherHistoryEntry {
+  timestamp: Date;
+  temperature: number;
+  humidity: number;
+}
+
 export interface SensorHealthDTO {
   warning: boolean;
   critical: boolean;
   signalStrength: "offline" | "strong" | "moderate" | "weak";
-  lowBattery: boolean;
+  battery: "empty" | "low" | "full";
 }
 
 export interface PlantHealthDTO {
@@ -87,6 +100,8 @@ export interface SensorOverviewDTO {
 export interface SensorHistoryDTO {
   id: number;
   waterCapacityHistory: WaterCapacityHistoryEntry[];
+  lightHistory: LightHistoryEntry[];
+  weatherHistory: WeatherHistoryEntry[];
 }
 
 export interface SensorValueDistributionDTO {

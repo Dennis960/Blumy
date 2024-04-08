@@ -55,12 +55,15 @@ export default class SensorReadingEntity {
     return {
       id: reading.id,
       timestamp: new Date(reading.date),
-      water: reading.moisture,
+      moisture: reading.moisture,
       availableWaterCapacity:
         (reading.moisture - sensor.permanentWiltingPoint) /
         (sensor.fieldCapacity - sensor.permanentWiltingPoint),
       voltage: reading.voltage ?? undefined,
       rssi: reading.rssi,
+      light: reading.light,
+      temperature: reading.temperature,
+      humidity: reading.humidity,
     };
   }
 }
