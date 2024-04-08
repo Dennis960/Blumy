@@ -3,10 +3,13 @@ import { z } from "zod";
 export interface SensorReadingDTO {
   id: number;
   timestamp: Date;
-  water: number; // sensor units in range 0-1000
+  moisture: number; // sensor units in range 0-1000
   availableWaterCapacity: number; // sensor unit relative to field capacity
-  voltage: number | undefined;
-  rssi: number;
+  voltage: number; // 1.8 - 3.2 Volt
+  rssi: number; // dBm
+  light: number; // 0.0 - 1.0
+  temperature: number; // °C
+  humidity: number; // %
 }
 
 export const sensorConfigurationDTOSchema = z.object({
@@ -34,11 +37,22 @@ export interface WaterCapacityHistoryEntry {
   waterCapacity: number;
 }
 
+export interface LightHistoryEntry {
+  timestamp: Date;
+  light: number;
+}
+
+export interface WeatherHistoryEntry {
+  timestamp: Date;
+  temperature: number;
+  humidity: number;
+}
+
 export interface SensorHealthDTO {
   warning: boolean;
   critical: boolean;
   signalStrength: "offline" | "strong" | "moderate" | "weak";
-  lowBattery: boolean;
+  battery: "empty" | "low" | "full";
 }
 
 export interface PlantHealthDTO {
@@ -86,6 +100,8 @@ export interface SensorOverviewDTO {
 export interface SensorHistoryDTO {
   id: number;
   waterCapacityHistory: WaterCapacityHistoryEntry[];
+  lightHistory: LightHistoryEntry[];
+  weatherHistory: WeatherHistoryEntry[];
 }
 
 export interface SensorValueDistributionDTO {

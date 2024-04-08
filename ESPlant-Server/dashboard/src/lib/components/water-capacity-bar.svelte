@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { IconDropletFilled } from '$lib/icons';
 	import type { SensorDTO } from '$lib/types/api';
 
 	export let sensor: SensorDTO;
