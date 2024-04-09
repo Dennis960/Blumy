@@ -13,7 +13,11 @@
 		IconWifiOff,
 		IconWifi2,
 		IconWifi1,
-		IconClock
+		IconClock,
+		IconBatteryOff,
+		IconBattery2,
+		IconBattery4,
+		IconBatteryCharging2
 	} from '$lib/icons';
 	import type { SensorDTO } from '$lib/types/api';
 	import NotificationToggle from './notification-toggle.svelte';
@@ -121,16 +125,31 @@
 
 				<SensorStatusDatagridItem
 					title="Letzte Aktualisierung"
-					critical={sensor.sensorHealth.critical}
+					critical={sensor.sensorHealth.signalStrength == 'offline'}
 				>
 					<svelte:fragment slot="icon">
-						{#if sensor.sensorHealth.signalStrength == 'offline'}
-							<IconWifiOff size={20} />
-						{:else}
-							<IconClock size={20} />
-						{/if}
+						<IconClock size={20} />
 					</svelte:fragment>
 					<Time slot="value" relative timestamp={sensor.lastUpdate.timestamp} />
+				</SensorStatusDatagridItem>
+
+				<SensorStatusDatagridItem
+					title="Batteriestatus"
+					value={Math.floor(100 * sensor.lastUpdate.batteryCapacity) + '%'}
+					warning={sensor.sensorHealth.battery == 'low'}
+					critical={sensor.sensorHealth.battery == 'empty'}
+				>
+					<svelte:fragment slot="icon">
+						{#if sensor.sensorHealth.battery == 'empty'}
+							<IconBatteryOff size={20} />
+						{:else if sensor.sensorHealth.battery == 'low'}
+							<IconBattery2 size={20} />
+						{:else if sensor.sensorHealth.battery == 'usb'}
+							<IconBatteryCharging2 size={20} />
+						{:else}
+							<IconBattery4 size={20} />
+						{/if}
+					</svelte:fragment>
 				</SensorStatusDatagridItem>
 			{/if}
 		</div>
