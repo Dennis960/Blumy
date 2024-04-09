@@ -13,6 +13,10 @@ export { default as IconBucketDroplet } from '@tabler/icons-svelte/dist/svelte/i
 export { default as IconCalendar } from '@tabler/icons-svelte/dist/svelte/icons/IconCalendar.svelte';
 export { default as IconSettings } from '@tabler/icons-svelte/dist/svelte/icons/IconSettings.svelte';
 export { default as IconPlant } from '@tabler/icons-svelte/dist/svelte/icons/IconPlant.svelte';
+export { default as IconBattery2 } from '@tabler/icons-svelte/dist/svelte/icons/IconBattery2.svelte';
+export { default as IconBattery4 } from '@tabler/icons-svelte/dist/svelte/icons/IconBattery4.svelte';
+export { default as IconBatteryOff } from '@tabler/icons-svelte/dist/svelte/icons/IconBatteryOff.svelte';
+export { default as IconBatteryCharging2 } from '@tabler/icons-svelte/dist/svelte/icons/IconBatteryCharging2.svelte';
 
 export { default as IconChevronLeftRaw } from '@tabler/icons/chevron-left.svg?raw';
 export { default as IconChevronRightRaw } from '@tabler/icons/chevron-right.svg?raw';

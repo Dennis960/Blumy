@@ -45,15 +45,21 @@
 		</div>
 	</div>
 	<div class="card-body charts">
-		<div class="charts__graph">
-			<WaterCapacityGraph {sensor} {history} />
-		</div>
-		<div class="charts__graph">
-			<WeatherGraph {sensor} {history} />
-		</div>
-		<div class="charts__graph">
-			<LightGraph {sensor} {history} />
-		</div>
+		{#if history.waterCapacityHistory.length > 2}
+			<div class="charts__graph">
+				<WaterCapacityGraph {sensor} {history} />
+			</div>
+		{/if}
+		{#if history.weatherHistory.length > 2}
+			<div class="charts__graph">
+				<WeatherGraph {sensor} {history} />
+			</div>
+		{/if}
+		{#if history.lightHistory.length > 2}
+			<div class="charts__graph">
+				<LightGraph {sensor} {history} />
+			</div>
+		{/if}
 	</div>
 </section>
 
