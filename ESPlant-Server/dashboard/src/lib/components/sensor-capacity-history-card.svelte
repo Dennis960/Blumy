@@ -5,6 +5,8 @@
 	import WaterCapacityGraph from './water-capacity-graph.svelte';
 	import LightGraph from './light-graph.svelte';
 	import WeatherGraph from './weather-graph.svelte';
+	import RssiGraph from './rssi-graph.svelte';
+	import VoltageGraph from './voltage-graph.svelte';
 
 	export let sensor: SensorDTO;
 	export let history: SensorHistoryDTO;
@@ -28,6 +30,9 @@
 		newEndDate.setHours(23, 59, 59, 999);
 		dateRange = { startDate: newStartDate, endDate: newEndDate };
 	}
+
+	// true if "debug" is in the URL query
+	const debugMode = new URLSearchParams(location.search).has('debug');
 </script>
 
 <section class="card">
@@ -44,30 +49,44 @@
 			</div>
 		</div>
 	</div>
-	<div class="card-body charts">
-		{#if history.waterCapacityHistory.length > 2}
-			<div class="charts__graph">
-				<WaterCapacityGraph {sensor} {history} />
-			</div>
-		{/if}
-		{#if history.weatherHistory.length > 2}
-			<div class="charts__graph">
-				<WeatherGraph {sensor} {history} />
-			</div>
-		{/if}
-		{#if history.lightHistory.length > 2}
-			<div class="charts__graph">
-				<LightGraph {sensor} {history} />
+	<div class="card-body">
+		<div class="charts">
+			{#if history.waterCapacityHistory.length > 2}
+				<div class="charts__graph">
+					<WaterCapacityGraph {sensor} {history} />
+				</div>
+			{/if}
+			{#if history.weatherHistory.length > 2}
+				<div class="charts__graph">
+					<WeatherGraph {history} />
+				</div>
+			{/if}
+			{#if history.lightHistory.length > 2}
+				<div class="charts__graph">
+					<LightGraph {history} />
+				</div>
+			{/if}
+		</div>
+
+		{#if debugMode && history.debugHistory.length > 2}
+			<div>
+				<div class="charts__graph">
+					<RssiGraph {history} />
+				</div>
+				<div class="charts__graph">
+					<VoltageGraph {history} />
+				</div>
 			</div>
 		{/if}
 	</div>
 </section>
 
+
 <style>
 	.charts {
 		height: calc(100vh - 200px);
 		display: grid;
-		grid-template-rows: 6fr 1fr 1fr;
+		grid-template-rows: minmax(0, 6fr) minmax(0, 1fr) minmax(0, 1fr);
 	}
 
 	.charts__graph {
