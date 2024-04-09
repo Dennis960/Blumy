@@ -56,11 +56,18 @@ export default class SensorController {
       humidity: reading.humidity,
     }));
 
+    const debugHistory = sensorData.map((reading) => ({
+      timestamp: reading.timestamp,
+      rssi: reading.rssi,
+      voltage: reading.voltage,
+    }));
+
     return {
       id,
       waterCapacityHistory,
       lightHistory,
       weatherHistory,
+      debugHistory,
     };
   }
 

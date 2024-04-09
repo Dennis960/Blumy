@@ -48,6 +48,12 @@ export interface WeatherHistoryEntry {
   humidity: number;
 }
 
+export interface DebugHistoryEntry {
+  timestamp: Date;
+  rssi: number;
+  voltage: number;
+}
+
 export interface SensorHealthDTO {
   warning: boolean;
   critical: boolean;
@@ -103,6 +109,7 @@ export interface SensorHistoryDTO {
   waterCapacityHistory: WaterCapacityHistoryEntry[];
   lightHistory: LightHistoryEntry[];
   weatherHistory: WeatherHistoryEntry[];
+  debugHistory: DebugHistoryEntry[];
 }
 
 export interface SensorValueDistributionDTO {

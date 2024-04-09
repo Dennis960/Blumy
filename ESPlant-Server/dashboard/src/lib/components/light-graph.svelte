@@ -2,10 +2,9 @@
 	import type { SensorDTO, SensorHistoryDTO } from '$lib/types/api';
 	import Apexchart, { type ChartOptions } from './apexchart.svelte';
 
-	export let sensor: SensorDTO;
 	export let history: SensorHistoryDTO;
 
-	function getOptions(sensor: SensorDTO, history: SensorHistoryDTO): ChartOptions {
+	function getOptions(history: SensorHistoryDTO): ChartOptions {
 		// resample data into fixed-interval timestamp buckets
 
 		const minDate = history.lightHistory[0].timestamp;
@@ -76,7 +75,7 @@
 		};
 	}
 
-	$: chartOptions = getOptions(sensor, history);
+	$: chartOptions = getOptions(history);
 </script>
 
 <Apexchart options={chartOptions} />
