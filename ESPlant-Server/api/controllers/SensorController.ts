@@ -88,6 +88,7 @@ export default class SensorController {
           ? {
               timestamp: lastReading.timestamp,
               waterCapacity: lastReading.availableWaterCapacity,
+              batteryCapacity: Math.min(1, Math.max(0, (lastReading.voltage - 2.14) / (3.00 - 2.14))),
             }
           : undefined,
       prediction:
@@ -179,9 +180,11 @@ export default class SensorController {
           ? "moderate"
           : "weak",
       battery: lastReading == undefined ||
-        lastReading.voltage < 1.9
+          lastReading.voltage > 4
+          ? "usb"
+          : lastReading.voltage < 2.3
           ? "empty"
-          : lastReading.voltage < 2.2
+          : lastReading.voltage < 2.4
           ? "low"
           : "full",
     };

@@ -5,6 +5,7 @@
 	import WaterCapacityBar from './water-capacity-bar.svelte';
 	import {
 		IconAlertTriangle,
+		IconBatteryOff,
 		IconClockExclamation,
 		IconDroplet,
 		IconDropletFilled,
@@ -64,7 +65,9 @@
 							<IconDroplet size={16} />
 						{:else if sensor.sensorHealth.signalStrength == 'offline'}
 							<IconWifiOff size={16} />
-						{:else if sensor.sensorHealth.lowBattery || sensor.sensorHealth.signalStrength == 'weak'}
+						{:else if sensor.sensorHealth.battery == 'empty'}
+							<IconBatteryOff size={16} />
+						{:else if sensor.sensorHealth.battery == 'low' || sensor.sensorHealth.signalStrength == 'weak'}
 							<IconAlertTriangle size={16} />
 						{/if}
 					</div>

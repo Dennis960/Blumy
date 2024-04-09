@@ -52,7 +52,7 @@ export interface SensorHealthDTO {
   warning: boolean;
   critical: boolean;
   signalStrength: "offline" | "strong" | "moderate" | "weak";
-  battery: "empty" | "low" | "full";
+  battery: "empty" | "low" | "full" | "usb";
 }
 
 export interface PlantHealthDTO {
@@ -74,6 +74,7 @@ export interface SensorDTO {
     | {
         timestamp: Date;
         waterCapacity: number;
+        batteryCapacity: number;
       }
     | undefined;
   prediction:
