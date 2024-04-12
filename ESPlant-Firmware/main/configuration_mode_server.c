@@ -354,6 +354,35 @@ esp_err_t post_api_timeouts_configurationMode_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
+esp_err_t get_api_timeouts_wdt_handler(httpd_req_t *req)
+{
+    uint64_t timeout = DEFAULT_WATCHDOG_TIMEOUT_MS;
+    plantstore_getWatchdogTimeoutMs(&timeout);
+
+    char resp[15];
+    sprintf(resp, "%llu", timeout);
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+esp_err_t post_api_timeouts_wdt_handler(httpd_req_t *req)
+{
+    char timoutString[10];
+    if (!get_single_value(req, timoutString) || !is_number(timoutString))
+    {
+        return ESP_FAIL;
+    }
+
+    uint64_t timeout;
+    sscanf(timoutString, "%llu", &timeout);
+
+    plantstore_setWatchdogTimeoutMs(timeout);
+
+    const char resp[] = "OK";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
 esp_err_t get_api_update_percentage_handler(httpd_req_t *req)
 {
     char resp[10];
@@ -615,6 +644,18 @@ httpd_uri_t post_api_timeouts_configurationMode = {
     .handler = post_api_timeouts_configurationMode_handler,
     .user_ctx = NULL};
 
+httpd_uri_t get_api_timeouts_wdt = {
+    .uri = "/api/timeouts/wdt",
+    .method = HTTP_GET,
+    .handler = get_api_timeouts_wdt_handler,
+    .user_ctx = NULL};
+
+httpd_uri_t post_api_timeouts_wdt = {
+    .uri = "/api/timeouts/wdt",
+    .method = HTTP_POST,
+    .handler = post_api_timeouts_wdt_handler,
+    .user_ctx = NULL};
+
 httpd_uri_t post_api_update_firmware = {
     .uri = "/api/update/firmware",
     .method = HTTP_POST,
@@ -661,6 +702,8 @@ httpd_handle_t start_webserver(void)
         httpd_register_uri_handler(server, &get_api_timeouts_sleep);
         httpd_register_uri_handler(server, &get_api_timeouts_configurationMode);
         httpd_register_uri_handler(server, &post_api_timeouts_configurationMode);
+        httpd_register_uri_handler(server, &get_api_timeouts_wdt);
+        httpd_register_uri_handler(server, &post_api_timeouts_wdt);
         httpd_register_uri_handler(server, &get_api_update_percentage);
         httpd_register_uri_handler(server, &get_api_connectedNetwork);
         httpd_register_uri_handler(server, &get_api_sensorData);

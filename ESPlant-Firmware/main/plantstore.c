@@ -168,6 +168,23 @@ void plantstore_setConfigurationModeTimeoutMs(int32_t timeoutMs)
     nvs_close(nvs_handle);
 }
 
+bool plantstore_getWatchdogTimeoutMs(uint64_t *timeoutMs)
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
+    esp_err_t timeout_err = nvs_get_u64(nvs_handle, WATCHDOG_TIMEOUT_KEY, timeoutMs);
+    nvs_close(nvs_handle);
+
+    return timeout_err == ESP_OK;
+}
+
+void plantstore_setWatchdogTimeoutMs(uint64_t timeoutMs)
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
+    ESP_ERROR_CHECK(nvs_set_u64(nvs_handle, WATCHDOG_TIMEOUT_KEY, timeoutMs));
+    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    nvs_close(nvs_handle);
+}
+
 void plantstore_setFirmwareUpdateUrl(char *url)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
@@ -201,3 +218,23 @@ void plantstore_hardReset()
     ESP_ERROR_CHECK(nvs_commit(nvs_handle));
     nvs_close(nvs_handle);
 }
+
+
+#ifdef BLUMY_DEBUG
+bool plantstore_debugGetWdtReached(uint8_t *reached)
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
+    esp_err_t reached_err = nvs_get_u8(nvs_handle, DEBUG_WDT_REACHED_KEY, reached);
+    nvs_close(nvs_handle);
+
+    return reached_err == ESP_OK;
+}
+
+void plantstore_debugSetWdtReached(uint8_t reached)
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
+    ESP_ERROR_CHECK(nvs_set_u8(nvs_handle, DEBUG_WDT_REACHED_KEY, reached));
+    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    nvs_close(nvs_handle);
+}
+#endif

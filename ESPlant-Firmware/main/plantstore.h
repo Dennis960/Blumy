@@ -2,6 +2,7 @@
 
 #include "nvs_flash.h"
 #include "esp_log.h"
+#include "defaults.h"
 
 #define CREDENTIALS_SSID_KEY "cred_ssid"
 #define CREDENTIALS_PASSWORD_KEY "cred_password"
@@ -18,7 +19,12 @@
 #define BLUMY_TOKEN_KEY "blumy_token"
 #define SENSOR_TIMEOUT_SLEEP_KEY "timeout_sleep"
 #define SENSOR_TIMEOUT_CONFIG_KEY "timeout_config"
+#define WATCHDOG_TIMEOUT_KEY "timeout_wdt"
 #define FIRMWARE_UPDATE_URL_KEY "update_url"
+
+#ifdef BLUMY_DEBUG
+#define DEBUG_WDT_REACHED_KEY "debug_wdt"
+#endif
 
 bool plantstore_getWifiCredentials(char *ssid, char *password, size_t ssid_size, size_t password_size);
 void plantstore_setWifiCredentials(char *ssid, char *password);
@@ -32,6 +38,8 @@ bool plantstore_getSensorTimeoutSleepMs(uint64_t *timeoutMs);
 void plantstore_setSensorTimeoutSleepMs(uint64_t timeoutMs);
 bool plantstore_getConfigurationModeTimeoutMs(int32_t *timeoutMs);
 void plantstore_setConfigurationModeTimeoutMs(int32_t timeoutMs);
+bool plantstore_getWatchdogTimeoutMs(uint64_t *timeoutMs);
+void plantstore_setWatchdogTimeoutMs(uint64_t timeoutMs);
 void plantstore_setFirmwareUpdateUrl(char *url);
 bool plantstore_getFirmwareUpdateUrl(char *url, size_t url_size);
 /**
@@ -40,3 +48,8 @@ bool plantstore_getFirmwareUpdateUrl(char *url, size_t url_size);
  */
 bool plantstore_isConfigured();
 void plantstore_hardReset();
+
+#ifdef BLUMY_DEBUG
+bool plantstore_debugGetWdtReached(uint8_t *reached);
+void plantstore_debugSetWdtReached(uint8_t reached);
+#endif

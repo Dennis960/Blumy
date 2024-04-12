@@ -25,6 +25,16 @@ void sendSensorData(sensors_full_data_t *sensors_data, int8_t rssi)
     char bearer[60];
     sprintf(bearer, "Bearer %s", token);
 
+#ifdef BLUMY_DEBUG
+    uint8_t debug_wdt_reached = 1;
+    plantstore_debugGetWdtReached(&debug_wdt_reached);
+    if (debug_wdt_reached)
+    {
+        rssi = 127; // debug value that is easy to spot
+        plantstore_debugSetWdtReached(0);
+    }
+#endif
+
     sprintf(data, "{\"light\":%2.2f,\"voltage\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f,\"isUsbConnected\":%s,\"moisture\":%d,\"moistureStabilizationTime\":%lu,\"isMoistureMeasurementSuccessful\":%s,\"humidityRaw\":%lu,\"temperatureRaw\":%lu,\"rssi\":%d,\"duration\":%lld}",
             sensors_data->light,
             sensors_data->voltage,
@@ -54,7 +64,6 @@ void sendSensorData(sensors_full_data_t *sensors_data, int8_t rssi)
     ESP_ERROR_CHECK(esp_http_client_set_header(client, "Content-Type", "application/json"));
     ESP_ERROR_CHECK(esp_http_client_set_header(client, "Authorization", bearer));
     ESP_ERROR_CHECK(esp_http_client_perform(client));
-
 
     ESP_LOGI("Data", "%s", data);
     int status_code = esp_http_client_get_status_code(client);
@@ -106,9 +115,41 @@ void configuration_mode(bool isConfigured)
     start_deep_sleep();
 }
 
+void watchdog_callback(void *arg)
+{
+    ESP_LOGE("Watchdog", "Watchdog timeout reached, going to sleep");
+#ifdef BLUMY_DEBUG
+    uint8_t debug_wdt_reached = 1;
+    plantstore_debugGetWdtReached(&debug_wdt_reached);
+    if (!debug_wdt_reached)
+    {
+        plantstore_debugSetWdtReached(1);
+    }
+#endif
+    start_deep_sleep();
+}
+
+esp_timer_handle_t init_watchdog()
+{
+    esp_timer_create_args_t watchdog_args = {
+        .callback = &watchdog_callback,
+        .name = "watchdog",
+    };
+    esp_timer_handle_t watchdog_timer;
+    ESP_ERROR_CHECK(esp_timer_create(&watchdog_args, &watchdog_timer));
+    uint64_t watchdog_timeout = DEFAULT_WATCHDOG_TIMEOUT_MS;
+    plantstore_getWatchdogTimeoutMs(&watchdog_timeout);
+
+    ESP_LOGI("Watchdog", "Starting watchdog with timeout %llu ms", watchdog_timeout);
+    ESP_ERROR_CHECK(esp_timer_start_once(watchdog_timer, watchdog_timeout * 1000));
+
+    return watchdog_timer;
+}
+
 void sensor_mode()
 {
     ESP_LOGI("MODE", "Starting sensor mode");
+    esp_timer_handle_t watchdog_timer = init_watchdog();
     plantfi_initWifiStaOnly();
     plantfi_configureStaFromPlantstore();
     sensors_initSensors();
@@ -126,6 +167,7 @@ void sensor_mode()
         ESP_LOGE("WIFI", "Failed to connect to wifi");
     }
     sensors_deinitSensors(); // optional
+    ESP_ERROR_CHECK(esp_timer_stop(watchdog_timer));
     start_deep_sleep();
 }
 
