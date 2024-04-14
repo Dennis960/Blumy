@@ -22,10 +22,6 @@
 #define WATCHDOG_TIMEOUT_KEY "timeout_wdt"
 #define FIRMWARE_UPDATE_URL_KEY "update_url"
 
-#ifdef BLUMY_DEBUG
-#define DEBUG_WDT_REACHED_KEY "debug_wdt"
-#endif
-
 bool plantstore_getWifiCredentials(char *ssid, char *password, size_t ssid_size, size_t password_size);
 void plantstore_setWifiCredentials(char *ssid, char *password);
 bool plantstore_getCloudConfigurationHttp(char *sensorId, char *url, char *auth, size_t sensorId_size, size_t url_size, size_t auth_size);
@@ -48,8 +44,3 @@ bool plantstore_getFirmwareUpdateUrl(char *url, size_t url_size);
  */
 bool plantstore_isConfigured();
 void plantstore_hardReset();
-
-#ifdef BLUMY_DEBUG
-bool plantstore_debugGetWdtReached(uint8_t *reached);
-void plantstore_debugSetWdtReached(uint8_t reached);
-#endif
