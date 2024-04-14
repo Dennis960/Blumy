@@ -7,6 +7,7 @@
 #include "esp_timer.h"
 #include "driver/i2c.h"
 #include "aht20.h"
+#include "esp_log.h"
 
 #include "peripherals/adc.h"
 #include "peripherals/config.h"
@@ -117,11 +118,13 @@ void sensors_setGreenLedBrightness(float brightness)
 
 void enableLightSensor()
 {
+    ESP_LOGI("SENSORS", "Enabling light sensor");
     gpio_set_level(LIGHT_SENSOR_IN, 1);
 }
 
 void disableLightSensor()
 {
+    ESP_LOGI("SENSORS", "Disabling light sensor");
     gpio_set_level(LIGHT_SENSOR_IN, 0);
 }
 
@@ -130,6 +133,7 @@ void disableLightSensor()
  */
 float sensors_readLightPercentage()
 {
+    ESP_LOGI("SENSORS", "Reading light sensor");
     enableLightSensor();
     vTaskDelay(20 / portTICK_PERIOD_MS); // Wait for the sensor to stabilize (statistically >10ms is enough)
     int light_sensor_value = adc_analogReadAverageRaw(ADC_LIGHT_SENSOR_CHANNEL, 20, 5);
@@ -140,16 +144,19 @@ float sensors_readLightPercentage()
 
 void enableVoltageMeasurement()
 {
+    ESP_LOGI("SENSORS", "Enabling voltage measurement");
     gpio_set_level(VOLTAGE_MEASUREMENT_SELECT, 0);
 }
 
 void disableVoltageMeasurement()
 {
+    ESP_LOGI("SENSORS", "Disabling voltage measurement");
     gpio_set_level(VOLTAGE_MEASUREMENT_SELECT, 1);
 }
 
 float sensors_readVoltage()
 {
+    ESP_LOGI("SENSORS", "Reading voltage");
     enableVoltageMeasurement();
     int voltage = adc_analogReadAverageVoltage(ADC_VOLTAGE_MEASUREMENT_CHANNEL, 10, 3);
     disableVoltageMeasurement();
@@ -160,6 +167,7 @@ float sensors_readVoltage()
 
 bool sensors_isUsbConnected()
 {
+    ESP_LOGI("SENSORS", "Checking if USB is connected");
     return gpio_get_level(POWER_USB_VIN);
 }
 
@@ -167,6 +175,7 @@ aht20_dev_handle_t aht_handle = NULL;
 
 void configureI2cBus(int sda, int scl)
 {
+    ESP_LOGI("SENSORS", "Configuring I2C bus");
     i2c_config_t conf = {
         .mode = I2C_MODE_MASTER,
         .sda_io_num = sda,
@@ -182,6 +191,7 @@ void configureI2cBus(int sda, int scl)
 
 void initAht(int sda, int scl)
 {
+    ESP_LOGI("SENSORS", "Initializing AHT20 sensor");
     configureI2cBus(sda, scl);
     aht20_i2c_config_t i2c_config = {
         .i2c_addr = AHT20_ADDRRES_0,
@@ -192,6 +202,7 @@ void initAht(int sda, int scl)
 
 void sensors_aht_read_data(sensors_aht_data_t *data)
 {
+    ESP_LOGI("SENSORS", "Reading AHT20 sensor data");
     uint32_t temperature_raw, humidity_raw;
     float temperature, humidity;
     ESP_ERROR_CHECK(aht20_read_temperature_humidity(aht_handle, &temperature_raw, &temperature, &humidity_raw, &humidity));
@@ -203,6 +214,7 @@ void sensors_aht_read_data(sensors_aht_data_t *data)
 
 void deinitAht()
 {
+    ESP_LOGI("SENSORS", "Deinitializing AHT20 sensor");
     ESP_ERROR_CHECK(aht20_del_sensor(aht_handle));
     ESP_ERROR_CHECK(i2c_driver_delete(I2C_NUM_0));
 }
@@ -210,6 +222,7 @@ void deinitAht()
 // Moisture sensor
 bool measure_stabilized_output(sensors_moisture_sensor_output_t *output)
 {
+    ESP_LOGI("SENSORS", "Measuring moisture sensor");
     const int numberOfMeasurements = 5;
     unsigned long measurementStartTime = millis();
     unsigned long stabilization_time;
@@ -255,11 +268,13 @@ bool measure_stabilized_output(sensors_moisture_sensor_output_t *output)
  */
 void setupMoistureSensor(long frequency, int dutyCycle)
 {
+    ESP_LOGI("SENSORS", "Setting up moisture sensor");
     analogWrite(MOISTURE_SQUARE_WAVE_SIGNAL, frequency, dutyCycle / 255.0, MOISTURE_SQUARE_WAVE_SIGNAL_CHANNEL);
 }
 
 void resetToZero()
 {
+    ESP_LOGI("SENSORS", "Resetting moisture sensor to zero");
     int strength = 1;
     int analogValue = adc_analogReadVoltage(ADC_MOISTURE_SENSOR_CHANNEL);
     analogWrite(MOISTURE_SQUARE_WAVE_SIGNAL, 0, 0, MOISTURE_SQUARE_WAVE_SIGNAL_CHANNEL);
@@ -279,11 +294,13 @@ void resetToZero()
 
 void stopMoistureSensor()
 {
+    ESP_LOGI("SENSORS", "Stopping moisture sensor");
     ledc_stop(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_3, 0);
 }
 
 bool sensors_read_moisture(sensors_moisture_sensor_output_t *output)
 {
+    ESP_LOGI("SENSORS", "Reading moisture sensor");
     resetToZero();
     setupMoistureSensor(12800, 2);
     bool success = measure_stabilized_output(output);
@@ -295,6 +312,7 @@ bool sensors_read_moisture(sensors_moisture_sensor_output_t *output)
 
 void sensors_initSensors()
 {
+    ESP_LOGI("SENSORS", "Initializing sensors");
     // Set digital output pins
     gpio_config_t io_conf = {
         .mode = GPIO_MODE_OUTPUT,
@@ -323,6 +341,7 @@ void sensors_initSensors()
 
 void sensors_deinitSensors()
 {
+    ESP_LOGI("SENSORS", "Deinitializing sensors");
     adc_deinitAdc();
     deinitAht();
     stopMoistureSensor();
@@ -334,6 +353,7 @@ void sensors_deinitSensors()
 
 void sensors_full_read(sensors_full_data_t *data)
 {
+    ESP_LOGI("SENSORS", "Reading all sensors");
     if (!isSensorsInit)
     {
         sensors_initSensors();
@@ -355,6 +375,7 @@ void sensors_full_read(sensors_full_data_t *data)
 
 void sensors_playStartupSound()
 {
+    ESP_LOGI("SENSORS", "Playing startup sound");
     const int tick = 20;
     // d g a d
     sensors_playToneSync(587, tick);
@@ -368,6 +389,7 @@ void sensors_playStartupSound()
 
 void sensors_playShutdownSound()
 {
+    ESP_LOGI("SENSORS", "Playing shutdown sound");
     const int tick = 20;
     // d a g d
     sensors_playToneSync(1175, tick);
