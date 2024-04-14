@@ -35,6 +35,7 @@ bool *_userConnectedToAp = NULL;
 void plantfi_event_handler(void *arg, esp_event_base_t event_base,
                            int32_t event_id, void *event_data)
 {
+    ESP_LOGI(PLANTFI_TAG, "Event dispatched from event loop base=%s, event_id=%ld", event_base, event_id);
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
     {
         if (plantfi_retry_num < plantfi_max_retry)
