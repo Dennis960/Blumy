@@ -76,17 +76,20 @@ void configuration_mode(bool isConfigured)
 {
     sensors_playStartupSound();
     plantfi_initWifiApSta();
-    bool userConnectedToAp = false;
     uint64_t start_time = esp_timer_get_time();
     uint64_t current_time = start_time;
     int32_t timeoutMs = DEFAULT_CONFIGURATION_MODE_TIMEOUT_MS;
     plantstore_getConfigurationModeTimeoutMs(&timeoutMs);
     ESP_LOGI("MODE", "Starting configuration mode%s", isConfigured ? " (sensor is configured)" : " (no config)");
+    bool userConnectedToAp = false;
     plantfi_configureAp("Blumy", "", 4, &userConnectedToAp);
 
     ESP_LOGI("MODE", "Starting webserver");
     httpd_handle_t webserver = webserver = start_webserver();
     plantfi_configureStaFromPlantstore();
+
+    bool wasBootButtonPressed = false;
+    sensors_attach_boot_button_interrupt(&wasBootButtonPressed);
     while (1)
     {
         if (isConfigured && !userConnectedToAp)
@@ -98,7 +101,12 @@ void configuration_mode(bool isConfigured)
                 break;
             }
         }
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        if (wasBootButtonPressed)
+        {
+            ESP_LOGI("MODE", "Boot button pressed, going to sleep");
+            break;
+        }
+        vTaskDelay(10 / portTICK_PERIOD_MS); // Reset watchdog
     }
     stop_webserver(webserver);
     sensors_playShutdownSound();
