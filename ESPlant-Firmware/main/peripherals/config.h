@@ -38,4 +38,4 @@
 // #define RXD GPIO_NUM_?
 
 // Init shutdown when pressing boot button in configuration mode
-// # define ENABLE_BOOT_BUTTON_INTERRUPT
+// # define ENABLE_BOOT_BUTTON_INTERRUPT disabled because I assume it caused usb jtag to not work
