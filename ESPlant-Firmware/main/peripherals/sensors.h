@@ -48,3 +48,4 @@ void sensors_full_read(sensors_full_data_t *data);
 void sensors_playStartupSound();
 void sensors_playShutdownSound();
 void sensors_attach_boot_button_interrupt(bool *wasBootButtonPressed);
+void sensors_detach_boot_button_interrupt();

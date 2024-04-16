@@ -36,3 +36,6 @@
 // #define USB_DP GPIO_NUM_13
 // #define TXD GPIO_NUM_?
 // #define RXD GPIO_NUM_?
+
+// Init shutdown when pressing boot button in configuration mode
+// # define ENABLE_BOOT_BUTTON_INTERRUPT

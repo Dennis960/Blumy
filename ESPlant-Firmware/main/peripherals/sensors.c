@@ -409,6 +409,7 @@ void boot_button_isr(void *arg)
 
 void sensors_attach_boot_button_interrupt(bool *wasBootButtonPressed)
 {
+#ifdef ENABLE_BOOT_BUTTON_INTERRUPT
     gpio_config_t io_conf;
     io_conf.intr_type = GPIO_INTR_NEGEDGE;
     io_conf.pin_bit_mask = 1ULL << BOOT_BUTTON;
@@ -418,4 +419,13 @@ void sensors_attach_boot_button_interrupt(bool *wasBootButtonPressed)
     gpio_config(&io_conf);
     gpio_install_isr_service(0);
     gpio_isr_handler_add(BOOT_BUTTON, boot_button_isr, wasBootButtonPressed);
+#endif
+}
+
+void sensors_detach_boot_button_interrupt()
+{
+#ifdef ENABLE_BOOT_BUTTON_INTERRUPT
+    gpio_isr_handler_remove(BOOT_BUTTON);
+    gpio_uninstall_isr_service();
+#endif
 }

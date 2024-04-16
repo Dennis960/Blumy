@@ -109,6 +109,7 @@ void configuration_mode(bool isConfigured)
         vTaskDelay(10 / portTICK_PERIOD_MS); // Reset watchdog
     }
     stop_webserver(webserver);
+    sensors_detach_boot_button_interrupt();
     sensors_playShutdownSound();
     start_deep_sleep();
 }
