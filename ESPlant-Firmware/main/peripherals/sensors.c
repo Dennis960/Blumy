@@ -400,3 +400,22 @@ void sensors_playShutdownSound()
     vTaskDelay(tick / portTICK_PERIOD_MS);
     sensors_playToneSync(587, tick);
 }
+
+void boot_button_isr(void *arg)
+{
+    bool *wasBootButtonPressed = (bool *)arg;
+    *wasBootButtonPressed = true;
+}
+
+void sensors_attach_boot_button_interrupt(bool *wasBootButtonPressed)
+{
+    gpio_config_t io_conf;
+    io_conf.intr_type = GPIO_INTR_NEGEDGE;
+    io_conf.pin_bit_mask = 1ULL << BOOT_BUTTON;
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pull_up_en = 1;
+    io_conf.pull_down_en = 0;
+    gpio_config(&io_conf);
+    gpio_install_isr_service(0);
+    gpio_isr_handler_add(BOOT_BUTTON, boot_button_isr, wasBootButtonPressed);
+}

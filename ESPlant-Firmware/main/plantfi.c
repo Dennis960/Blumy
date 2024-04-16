@@ -32,11 +32,9 @@ char plantfi_password[DEFAULT_PASSWORD_MAX_LENGTH];
 bool _credentialsChanged = false;
 bool *_userConnectedToAp = NULL;
 
-void plantfi_event_handler(void *arg, esp_event_base_t event_base,
-                           int32_t event_id, void *event_data)
+void plantfi_wifi_event_handler(int32_t event_id)
 {
-    ESP_LOGI(PLANTFI_TAG, "Event dispatched from event loop base=%s, event_id=%ld", event_base, event_id);
-    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
+    if (event_id == WIFI_EVENT_STA_DISCONNECTED)
     {
         if (plantfi_retry_num < plantfi_max_retry)
         {
@@ -51,7 +49,7 @@ void plantfi_event_handler(void *arg, esp_event_base_t event_base,
         }
         ESP_LOGI(PLANTFI_TAG, "connect to the AP fail");
     }
-    else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_CONNECTED)
+    else if (event_id == WIFI_EVENT_STA_CONNECTED)
     {
         ESP_LOGI(PLANTFI_TAG, "connect to the AP success");
         if (_credentialsChanged)
@@ -61,14 +59,7 @@ void plantfi_event_handler(void *arg, esp_event_base_t event_base,
         }
         plantfi_sta_status = PLANTFI_STA_STATUS_CONNECTED;
     }
-    else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
-    {
-        ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
-        ESP_LOGI(PLANTFI_TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
-        plantfi_retry_num = 0;
-        xEventGroupSetBits(plantfi_sta_event_group, PLANTFI_CONNECTED_BIT);
-    }
-    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_AP_STACONNECTED)
+    else if (event_id == WIFI_EVENT_AP_STACONNECTED)
     {
         if (_userConnectedToAp != NULL)
         {
@@ -76,16 +67,49 @@ void plantfi_event_handler(void *arg, esp_event_base_t event_base,
         }
         ESP_LOGI(PLANTFI_TAG, "User connected to AP");
     }
+    else
+    {
+        ESP_LOGI(PLANTFI_TAG, "No handler for event_id %ld", event_id);
+    }
+}
+
+void plantfi_ip_event_handler(int32_t event_id, void *event_data)
+{
+    if (event_id == IP_EVENT_STA_GOT_IP)
+    {
+        ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
+        ESP_LOGI(PLANTFI_TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
+        plantfi_retry_num = 0;
+        xEventGroupSetBits(plantfi_sta_event_group, PLANTFI_CONNECTED_BIT);
+    }
+    else
+    {
+        ESP_LOGI(PLANTFI_TAG, "No handler for event_id %ld", event_id);
+    }
+}
+
+void plantfi_event_handler(void *arg, esp_event_base_t event_base,
+                           int32_t event_id, void *event_data)
+{
+    ESP_LOGI(PLANTFI_TAG, "Event dispatched from event loop base=%s, event_id=%ld", event_base, event_id);
+    if (event_base == WIFI_EVENT)
+    {
+        plantfi_wifi_event_handler(event_id);
+    }
+    else if (event_base == IP_EVENT)
+    {
+        plantfi_ip_event_handler(event_id, event_data);
+    }
 }
 
 void plantfi_initWifi(bool staOnly)
 {
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
-    esp_event_handler_instance_t instance_any_id;
-    esp_event_handler_instance_t instance_got_ip;
-    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &plantfi_event_handler, &instance_any_id)); // TODO unregister event handlers on deinit
-    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &plantfi_event_handler, &instance_got_ip));
+    esp_event_handler_instance_t instance_any_wifi_event;
+    esp_event_handler_instance_t instance_any_ip_event;
+    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &plantfi_event_handler, &instance_any_wifi_event)); // TODO unregister event handlers on deinit
+    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &plantfi_event_handler, &instance_any_ip_event));
 
     esp_netif_create_default_wifi_sta();
     if (!staOnly)
