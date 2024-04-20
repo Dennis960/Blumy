@@ -2816,6 +2816,13 @@
     (effects (font (size 1.27 1.27)) (justify left top))
     (uuid 23398f5f-ef2a-4662-9e99-966a89b0ff6a)
   )
+  (text_box "TODO: This regulator does not support >200mA, change it to e.g. C15483"
+    (at 46.355 145.415 0) (size 26.035 8.89)
+    (stroke (width 0) (type default))
+    (fill (type none))
+    (effects (font (size 1.27 1.27)) (justify left top))
+    (uuid 464d488a-02d3-46eb-8985-f0c5838d8e37)
+  )
 
   (text "Capacitor formed\nby solder pads" (at 30.48 54.61 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
