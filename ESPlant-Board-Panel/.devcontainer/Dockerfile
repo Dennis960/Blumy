@@ -1,6 +1,6 @@
 FROM ubuntu
 
-ARG KICAD_VERSION="7.0"
+ARG KICAD_VERSION="8.0"
 
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
@@ -18,4 +18,4 @@ RUN export DEBIAN_FRONTEND="noninteractive" && apt-get -qq update && \
       libgraphicsmagick1-dev libmagickcore-dev openscad && \
       rm -rf /var/lib/apt/lists/*
 
-RUN pip install kikit
+RUN pip install kikit --break-system-packages
