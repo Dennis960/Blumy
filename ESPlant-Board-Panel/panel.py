@@ -52,7 +52,6 @@ fiducials = {
 text = {
     "type": "simple",
     "hoffset": "2mm",
-    "vjustify": "left",
     "orientation": "90deg",
     "text": "JLCJLCJLCJLC",
     "anchor": "ml"
