@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, pgEnum, primaryKey } from 'drizzle-orm/pg-core';
 
 export const providerType = pgEnum("provider_type", ["google"]);
 
@@ -15,10 +15,15 @@ export const users = pgTable("user", {
 export const oauthAccounts = pgTable("oauth_account", {
     userId: text("user_id")
         .notNull()
-        .references(() => users.id)
-        .primaryKey(),
-    provider: providerType("provider").notNull().primaryKey(),
+        .references(() => users.id),
+    provider: providerType("provider").notNull(),
     providerUserId: text("provider_user_id").notNull()
+}, (table) => {
+    return {
+        pk: primaryKey({
+            columns: [table.userId, table.provider]
+        })
+    }
 });
 
 // Used by lucia

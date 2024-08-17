@@ -15,9 +15,6 @@ const config = {
 			$components: './src/lib/components',
 			$server: './src/lib/server',
 		},
-		paths: {
-			base: "/dashboard",
-		},
 		adapter: adapter(),
 	}
 };

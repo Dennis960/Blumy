@@ -9,7 +9,8 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
-		"format": "prettier --plugin-search-dir . --write ."
+		"format": "prettier --plugin-search-dir . --write .",
+		"drizzle": "drizzle-kit generate"
 	},
 	"devDependencies": {
 		"@lucia-auth/adapter-drizzle": "^1.1.0",
@@ -39,6 +40,7 @@
 		"lodash-es": "^4.17.21",
 		"lucia": "^3.2.0",
 		"nouislider": "^15.7.1",
+		"pg": "^8.12.0",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.1.2",
 		"superjson": "^2.2.1",
