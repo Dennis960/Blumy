@@ -1,5 +1,5 @@
 import sharp from "sharp";
-import { SensorConfigurationDTO } from "../types/api";
+import { SensorConfigurationDTO } from "../../../../api/types/api";
 
 type RedactedSensorEntity = Omit<SensorEntity, "owner" | "readToken" | "writeToken">;
 

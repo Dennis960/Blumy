@@ -11,10 +11,10 @@ import {
   SensorReadingDTO,
   SensorValueDistributionDTO,
   WaterCapacityHistoryEntry,
-} from "../types/api.js";
+} from "../../../../api/types/api.js";
 import SensorDataRepository from "../repositories/SensorDataRepository.js";
 import SensorRepository from "../repositories/SensorRepository.js";
-import SensorService from "../services/SensorService.js";
+import SensorService from "../../../../api/services/SensorService.js";
 import { ESPSensorReadingDTO, LegacyESPSensorReadingDTO } from "../entities/SensorReadingEntity.js";
 import SensorEntity from "../entities/SensorEntity.js";
 

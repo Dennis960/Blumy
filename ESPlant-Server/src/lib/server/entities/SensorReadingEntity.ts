@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SensorReadingDTO } from "../types/api";
+import { SensorReadingDTO } from "../../../../api/types/api";
 import SensorEntity from "./SensorEntity";
 
 export const espSensorReadingSchema = z.object({
