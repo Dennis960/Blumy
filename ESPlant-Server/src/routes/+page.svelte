@@ -1,22 +1,25 @@
 <script lang="ts">
-	import { createQuery } from '@tanstack/svelte-query';
-	import { fetchSensorOverview } from '$lib/api';
+	import { invalidate } from '$app/navigation';
 	import SensorCard from '$lib/components/sensor-card.svelte';
+	import { onMount } from 'svelte';
 
-	$: query = createQuery({
-		queryKey: ['sensor-overview'],
-		queryFn: () => fetchSensorOverview(),
-		refetchInterval: 60 * 60 * 1000, // refetch every hour
-		initialData: {
-			sensors: []
-		}
+	export let data;
+
+	onMount(() => {
+		const interval = setInterval(
+			() => {
+				invalidate('sensor-overview');
+			},
+			60 * 60 * 1000
+		);
+		return () => clearInterval(interval);
 	});
 </script>
 
 <div class="page-body">
 	<div class="container-xl">
 		<div class="row row-deck row-cards">
-			{#each $query.data.sensors as sensor (sensor.id)}
+			{#each data.sensors as sensor (sensor.id)}
 				<div class="col-12 col-md-6 col-lg-4">
 					<SensorCard {sensor} />
 				</div>

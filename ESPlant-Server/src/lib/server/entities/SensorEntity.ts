@@ -1,5 +1,5 @@
+import type { SensorConfigurationDTO } from "$lib/types/api";
 import sharp from "sharp";
-import { SensorConfigurationDTO } from "../../../../api/types/api";
 
 type RedactedSensorEntity = Omit<SensorEntity, "owner" | "readToken" | "writeToken">;
 
@@ -15,7 +15,7 @@ export default class SensorEntity {
     public owner: number,
     public writeToken: string,
     public readToken: string,
-  ) {}
+  ) { }
 
   public static async fromDTO(
     id: number,

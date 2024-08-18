@@ -1,117 +1,67 @@
-import { RequestHandler } from "express";
-import SensorRepository from "../repositories/SensorRepository.js";
+import SensorRepository from '$lib/server/repositories/SensorRepository';
+import { error } from '@sveltejs/kit';
+import type { Session, User } from 'lucia';
 
-export const isUser: RequestHandler = (req, res, next) => {
-  if (req.user == undefined) {
-    return res.status(401).send({
-      message: "not authenticated",
-    });
-  }
-
-  if (req.user?.kind != "user") {
-    return res.status(403).send({
-      message: "user not logged in",
-    });
-  }
-
-  return next();
-};
-
-export const isSensorWrite: RequestHandler = (req, res, next) => {
-  if (req.user == undefined) {
-    return res.status(401).send({
-      message: "not authenticated",
-    });
-  }
-
-  if (req.user?.kind != "sensor-write") {
-    return res.status(403).send({
-      message: "missing write token",
-    });
-  }
-
-  return next();
-};
-
-export const isOwner: RequestHandler = async (req, res, next) => {
-  if (req.user == undefined) {
-    return res.status(401).send({
-      message: "not authenticated",
-    });
-  }
-
-  if (req.user?.kind != "user") {
-    return res.status(403).send({
-      message: "user not logged in",
-    });
-  }
-
-  if (req.params.sensorId == undefined) {
-    throw new Error(
-      "Illegal usage of isOwner middleware - sensorId parameter missing"
-    );
-  }
-
-  const sensorId = parseInt(req.params.sensorId);
-  const ownerId = await SensorRepository.getOwner(sensorId);
-  if (ownerId == undefined) {
-    return res.status(404).send({
-      message: "sensor not found",
-    });
-  }
-
-  if (req.user?.userId != ownerId) {
-    return res.status(403).send({
-      message: "not an owner of this sensor",
-    });
-  }
-
-  return next();
-};
-
-export const isOwnerOrThisSensorRead: RequestHandler = async (req, res, next) => {
-  if (req.user == undefined) {
-    return res.status(401).send({
-      message: "not authenticated",
-    });
-  }
-
-  if (req.params.sensorId == undefined) {
-    throw new Error(
-      "Illegal usage of isOwnerOrSensorRead middleware - sensorId parameter missing"
-    );
-  }
-
-  const sensorId = parseInt(req.params.sensorId);
-
-  if (req.user?.kind == "sensor-read") {
-    if (req.user?.sensorId != sensorId) {
-      return res.status(403).send({
-        message: "wrong sensor for read token",
-      });
+export const authenticated = (user: User | null, session: Session | null) => ({
+  isAuthenticated: function () {
+    if (!user) {
+      throw error(401, 'not authenticated');
     }
 
-    return next();
-  }
+    if (session && session.fresh) {
+      throw error(403, 'user not logged in');
+    }
+    return user;
+  },
 
-  if (req.user?.kind == "user") {
+  isSensorWrite: function () {
+    user = this.isAuthenticated();
+    SensorRepository.getIdByReadToken
+
+    if (user!.kind !== 'sensor-write') {
+      throw error(403, 'missing write token');
+    }
+  },
+
+  isOwner: async function (sensorId: number) {
+    user = this.isAuthenticated();
+
+    if (user.kind !== 'user') {
+      throw error(403, 'user not logged in');
+    }
+
     const ownerId = await SensorRepository.getOwner(sensorId);
-    if (ownerId == undefined) {
-      return res.status(404).send({
-        message: "sensor not found",
-      });
+    if (ownerId === undefined) {
+      throw error(404, 'sensor not found');
     }
 
-    if (req.user?.userId != ownerId) {
-      return res.status(403).send({
-        message: "not an owner of this sensor",
-      });
+    if (user.id !== ownerId) {
+      throw error(403, 'not an owner of this sensor');
+    }
+  },
+
+  isOwnerOrThisSensorRead: async function (sensorId: number) {
+    user = this.isAuthenticated();
+
+    if (user.kind === 'sensor-read') {
+      if (user.sensorId !== sensorId) {
+        throw error(403, 'wrong sensor for read token');
+      }
+      return;
     }
 
-    return next();
+    if (user.kind === 'user') {
+      const ownerId = await SensorRepository.getOwner(sensorId);
+      if (ownerId === undefined) {
+        throw error(404, 'sensor not found');
+      }
+
+      if (user.id !== ownerId) {
+        throw error(403, 'not an owner of this sensor');
+      }
+      return;
+    }
+
+    throw error(403, 'not authenticated');
   }
-
-  return res.status(403).send({
-    message: "not authenticated",
-  });
-};
+});

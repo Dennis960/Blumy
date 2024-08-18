@@ -1,37 +1,32 @@
-import { knex } from "../config/knex.js";
-import UserEntity from "../entities/UserEntity.js";
+import { oauthAccounts, users } from "$lib/server/db/schema";
+import { db } from "$lib/server/db/worker";
+import { and, eq } from "drizzle-orm";
 
 export default class UserRepository {
-  static async findById(id: number): Promise<UserEntity | undefined> {
-    return await knex<UserEntity>("user")
-      .select("id", "googleId")
-      .where({ id })
-      .first();
+  static async findById(id: string) {
+    const user = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
+
+    return user[0];
   }
 
   static async findByGoogleId(
     googleId: string
-  ): Promise<UserEntity | undefined> {
-    return await knex<UserEntity>("user")
-      .select("id", "googleId")
-      .where({ googleId })
-      .first();
-  }
+  ) {
+    return await db
+      .select()
+      .from(users)
+      .innerJoin(oauthAccounts, eq(users.id, oauthAccounts.userId))
+      .where(
+        and(
+          eq(oauthAccounts.provider, "google"),
+          eq(oauthAccounts.providerUserId, googleId)
+        ))
+      .limit(1)
+      .then((results) => results.pop());
 
-  static async create(user: Omit<UserEntity, "id">): Promise<UserEntity> {
-    return (await knex<UserEntity>("user")
-      .insert(user)
-      .returning(["id", "googleId"])
-      .then((rows) => rows[0]))!;
-  }
-
-  static async findOrCreate(
-    createUser: Omit<UserEntity, "id">
-  ): Promise<UserEntity> {
-    let user = await UserRepository.findByGoogleId(createUser.googleId);
-    if (user == undefined) {
-      user = await UserRepository.create(createUser);
-    }
-    return user;
   }
 }

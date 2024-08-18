@@ -1,5 +1,6 @@
-import SensorReadingEntity from "../entities/SensorReadingEntity";
-import { knex } from "../config/knex.js";
+import { db } from "$lib/server/db/worker";
+import { sensorReadings } from "$lib/server/db/schema";
+import { and, eq, gte, lte, desc, sql, asc } from "drizzle-orm";
 
 export default class SensorDataRepository {
   /**
@@ -8,13 +9,15 @@ export default class SensorDataRepository {
    * @returns The id of the inserted data or throws an error if the sensor does not exist.
    */
   static async create(
-    data: Omit<SensorReadingEntity, "id">
+    data: typeof sensorReadings.$inferInsert
   ): Promise<number | undefined> {
     data.date = Date.now();
-    return knex<SensorReadingEntity>("data").insert({
-      id: undefined,
-      ...data
-    }).returning("id");
+    const insertedRecord = await db
+      .insert(sensorReadings)
+      .values({ ...data })
+      .returning({ id: sensorReadings.id });
+
+    return insertedRecord[0]?.id;
   }
 
   /**
@@ -27,21 +30,21 @@ export default class SensorDataRepository {
    * @returns The averaged data.
    */
   private static dataToAverage(
-    data: SensorReadingEntity[],
+    data: typeof sensorReadings.$inferSelect[],
     limit: number
-  ): SensorReadingEntity[] {
+  ) {
     if (data.length <= limit) {
       return data;
     }
-    const averagedData: SensorReadingEntity[] = [];
+    const averagedData: typeof sensorReadings.$inferSelect[] = [];
     const step = Math.floor(data.length / limit);
     for (let i = 0; i < data.length; i += step) {
       const dataSlice = data.slice(i, i + step);
 
-      // make a copy of the latest values
-      const averagedDataPoint: SensorReadingEntity = { ...dataSlice[dataSlice.length - 1] };
+      // Make a copy of the latest values
+      const averagedDataPoint = { ...dataSlice[dataSlice.length - 1] };
 
-      // calculate averages in this bucket for summable attributes
+      // Calculate averages in this bucket for summable attributes
       const attributesToAverage = [
         "light",
         "voltage",
@@ -54,6 +57,7 @@ export default class SensorDataRepository {
         "rssi",
         "duration",
       ] satisfies (keyof typeof dataSlice[0])[];
+
       const calculateAverage = (property: keyof typeof dataSlice[0]) =>
         dataSlice.reduce((acc, cur) => acc + (cur[property] as number ?? 0), 0) / dataSlice.length;
 
@@ -79,14 +83,21 @@ export default class SensorDataRepository {
     startDate: Date,
     endDate: Date,
     maxDataPoints: number
-  ): Promise<SensorReadingEntity[]> {
-    // return maxDataPoints averaged data points between startDate and endDate
-    const data = await knex<SensorReadingEntity>("data")
-      .select("*")
-      .where({ sensorAddress })
-      .andWhere("date", ">=", startDate)
-      .andWhere("date", "<=", endDate)
-      .orderBy("date", "desc");
+  ) {
+    // Fetch data between startDate and endDate
+    const data = await db
+      .select()
+      .from(sensorReadings)
+      .where(
+        and(
+          eq(sensorReadings.sensorAddress, sensorAddress),
+          gte(sensorReadings.date, startDate.getTime()),
+          lte(sensorReadings.date, endDate.getTime())
+        )
+      )
+      .orderBy(desc(sensorReadings.date));
+
+    // Return the averaged data
     return this.dataToAverage(data, maxDataPoints);
   }
 
@@ -94,16 +105,20 @@ export default class SensorDataRepository {
     sensorId: number,
     sinceDate: Date,
     bucketSize: number
-  ): Promise<{ bucket: number; count: number }[]> {
-    const dist = await knex("data")
+  ) {
+    const dist = await db
       .select({
-        count: knex.raw("count(*)"),
-        bucket: knex.raw(`floor(moisture / ${bucketSize}) * ${bucketSize}`),
+        count: sql`count(*)`.as("count"),
+        bucket: sql`floor(${sensorReadings.moisture} / ${bucketSize}) * ${bucketSize}`.as("bucket")
       })
-      .where({ sensorAddress: sensorId })
-      .andWhere("date", ">=", sinceDate)
-      .groupBy("bucket")
-      .orderBy("bucket");
+      .from(sensorReadings)
+      .where(and(
+        eq(sensorReadings.sensorAddress, sensorId),
+        gte(sensorReadings.date, sinceDate.getTime())
+      ))
+      .groupBy((table) => table.bucket)
+      .orderBy((table) => asc(table.bucket));
+
     return dist;
   }
 }

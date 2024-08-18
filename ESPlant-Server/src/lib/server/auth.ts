@@ -14,7 +14,19 @@ export const lucia = new Lucia(adapter, {
 		attributes: {
 			secure: !dev
 		}
+	},
+	getUserAttributes: (attributes) => {
+		return {
+			id: attributes.id
+		};
 	}
 });
 
 export const google = new Google(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, PUBLIC_BASE_URL + "/api/auth/google/callback");
+
+declare module "lucia" {
+	interface Register {
+		Lucia: typeof lucia;
+		DatabaseUserAttributes: typeof users.$inferSelect;
+	}
+}

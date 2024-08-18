@@ -1,26 +1,29 @@
 <script lang="ts">
-	import { createQuery } from '@tanstack/svelte-query';
+	import { invalidate } from '$app/navigation';
 	import SensorRow from '$lib/components/sensor-row.svelte';
-	import Time from '$lib/components/time.svelte';
 	import SensorStatusCard from '$lib/components/sensor-status-card.svelte';
-	import { fetchSensorOverview } from '$lib/api';
-	import { SortKey, sortQueryDataBy } from '$lib/sort-query-data';
 	import TableSorter, { type SortDirection } from '$lib/components/table-sorter.svelte';
-	import { IconPlant, IconBucketDroplet } from '$lib/icons';
+	import Time from '$lib/components/time.svelte';
+	import { IconBucketDroplet, IconPlant } from '$lib/icons';
+	import { SortKey, sortQueryDataBy } from '$lib/sort-query-data';
+	import { onMount } from 'svelte';
 
-	$: query = createQuery({
-		queryKey: ['sensor-overview'],
-		queryFn: () => fetchSensorOverview(),
-		refetchInterval: 60 * 60 * 1000, // refetch every hour
-		initialData: {
-			sensors: []
-		}
+	export let data;
+
+	onMount(() => {
+		const interval = setInterval(
+			() => {
+				invalidate('sensor-overview');
+			},
+			60 * 60 * 1000
+		);
+		return () => clearInterval(interval);
 	});
 
-	$: totalSensors = $query.data.sensors.length;
-	$: poorPlantHealth = $query.data.sensors.filter((sensor) => sensor.plantHealth.critical).length;
-	$: poorSensorHealth = $query.data.sensors.filter((sensor) => sensor.sensorHealth.critical).length;
-	$: minNextWatering = $query.data.sensors
+	$: totalSensors = data.sensors.length;
+	$: poorPlantHealth = data.sensors.filter((sensor) => sensor.plantHealth.critical).length;
+	$: poorSensorHealth = data.sensors.filter((sensor) => sensor.sensorHealth.critical).length;
+	$: minNextWatering = data.sensors
 		.map((sensor) => sensor.prediction?.nextWatering!)
 		.filter((nextWatering) => nextWatering != undefined)
 		.map((nw) => new Date(nw)) // TODO use superjson for API responses
@@ -51,7 +54,7 @@
 		sortKey = key;
 		sortAsc = asc;
 	}
-	$: queryDataSorted = sortQueryDataBy($query.data, sortKey, sortAsc);
+	$: queryDataSorted = sortQueryDataBy(data, sortKey, sortAsc);
 </script>
 
 <div class="page-body">

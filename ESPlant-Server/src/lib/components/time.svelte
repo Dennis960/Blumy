@@ -10,7 +10,7 @@
 	export let timestamp: Date = new Date();
 	export let relative = false;
 
-	let interval: NodeJS.Timer;
+	let interval: NodeJS.Timeout;
 
 	onMount(() => {
 		if (relative) {

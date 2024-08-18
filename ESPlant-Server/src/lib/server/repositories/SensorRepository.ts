@@ -1,62 +1,66 @@
-import SensorEntity from "../entities/SensorEntity.js";
-import { knex } from "../config/knex.js";
+import { db } from "$lib/server/db/worker";
+import { sensors } from "$lib/server/db/schema";
+
+import { eq } from "drizzle-orm";
 
 export default class SensorRepository {
   /**
-   * Get sensor
+   * Get sensor by its address.
    * @param sensorAddress The address of the sensor.
    */
-  static async getById(
-    sensorAddress: number
-  ): Promise<SensorEntity | undefined> {
-    return await knex<SensorEntity>("sensor")
-      .select("*")
-      .where({ sensorAddress })
-      .first();
+  static async getById(sensorAddress: number) {
+    return await db
+      .select()
+      .from(sensors)
+      .where(eq(sensors.sensorAddress, sensorAddress))
+      .limit(1)
+      .then((results) => results.pop());
   }
 
-  static async getIdByWriteToken(writeToken: string): Promise<number | undefined> {
-    // TODO prevent duplicate tokens
-    return await knex<SensorEntity>("sensor")
-      .select("*")
-      .where({ writeToken })
-      .first()
-      .then((r) => r?.sensorAddress);
+  static async getIdByWriteToken(writeToken: string) {
+    return await db
+      .select({ sensorAddress: sensors.sensorAddress })
+      .from(sensors)
+      .where(eq(sensors.writeToken, writeToken))
+      .limit(1)
+      .then((results) => results.pop()?.sensorAddress);
   }
 
-  static async getIdByReadToken(readToken: string): Promise<number | undefined> {
-    // TODO prevent duplicate tokens
-    return await knex<SensorEntity>("sensor")
-      .select("*")
-      .where({ readToken })
-      .first()
-      .then((r) => r?.sensorAddress);
+  static async getIdByReadToken(readToken: string) {
+    return await db
+      .select({ sensorAddress: sensors.sensorAddress })
+      .from(sensors)
+      .where(eq(sensors.readToken, readToken))
+      .limit(1)
+      .then((results) => results.pop()?.sensorAddress);
   }
 
-  static async getAll(): Promise<SensorEntity[]> {
-    return await knex<SensorEntity>("sensor").select("*");
+  static async getAll() {
+    return await db.select().from(sensors);
   }
 
   /**
-   * Get all sensors.
-   * @returns All sensors.
+   * Get all sensors owned by a specific owner.
+   * @returns All sensors for the owner.
    */
-  static async getAllForOwner(owner: number): Promise<SensorEntity[]> {
-    return await knex<SensorEntity>("sensor").select("*").where({ owner });
+  static async getAllForOwner(owner: string) {
+    return await db
+      .select()
+      .from(sensors)
+      .where(eq(sensors.owner, owner));
   }
 
   /**
-   * @param sensorAddress The address of the sensor.
-   * @param name The name of the sensor.
-   * @returns The sensor
+   * Create a new sensor.
+   * @param sensor The sensor details.
+   * @returns The created sensor.
    */
-  static async create(
-    sensor: Omit<SensorEntity, "sensorAddress">
-  ): Promise<SensorEntity> {
-    return (await knex<SensorEntity>("sensor")
-      .insert(sensor)
-      .returning("*")
-      .then((rows) => rows[0]))!;
+  static async create(sensor: typeof sensors.$inferInsert) {
+    return await db
+      .insert(sensors)
+      .values(sensor)
+      .returning()
+      .then((rows) => rows[0]);
   }
 
   /**
@@ -66,39 +70,54 @@ export default class SensorRepository {
    * @returns Nothing or throws an error if the sensor does not exist.
    */
   static async updateName(sensorAddress: number, name: string) {
-    const id = await knex<SensorEntity>("sensor")
-      .update({ name })
-      .where({ sensorAddress })
-      .returning(["sensorAddress"])
+    const updatedSensor = await db
+      .update(sensors)
+      .set({ name })
+      .where(eq(sensors.sensorAddress, sensorAddress))
+      .returning({ sensorAddress: sensors.sensorAddress })
       .then((rows) => rows[0]);
-    if (!id) {
+
+    if (!updatedSensor) {
       return Promise.reject("Sensor does not exist");
     }
   }
 
-  static async update(
-    sensorAddress: number,
-    changes: Partial<SensorEntity>
-  ): Promise<SensorEntity> {
+  /**
+   * Update the details of a sensor.
+   * @param sensorAddress The address of the sensor.
+   * @param changes The changes to be applied.
+   * @returns The updated sensor.
+   */
+  static async update(sensorAddress: number, changes: Partial<typeof sensors.$inferInsert>) {
     if ("sensorAddress" in changes) {
       delete changes["sensorAddress"];
     }
-    const sensor = await knex<SensorEntity>("sensor")
-      .update(changes)
-      .where({ sensorAddress })
-      .returning("*")
-      .then((r) => r[0]);
-    if (sensor == undefined) {
+
+    const updatedSensor = await db
+      .update(sensors)
+      .set(changes)
+      .where(eq(sensors.sensorAddress, sensorAddress))
+      .returning()
+      .then((rows) => rows[0]);
+
+    if (!updatedSensor) {
       return Promise.reject("Sensor does not exist");
     }
-    return sensor;
+
+    return updatedSensor;
   }
 
-  static async getOwner(sensorAddress: number): Promise<number | undefined> {
-    return await knex<SensorEntity>("sensor")
-      .select("owner")
-      .where({ sensorAddress })
-      .first()
-      .then((r) => r?.owner);
+  /**
+   * Get the owner of a sensor.
+   * @param sensorAddress The address of the sensor.
+   * @returns The owner's ID or null if not found.
+   */
+  static async getOwner(sensorAddress: number) {
+    return await db
+      .select({ owner: sensors.owner })
+      .from(sensors)
+      .where(eq(sensors.sensorAddress, sensorAddress))
+      .limit(1)
+      .then((results) => results.pop()?.owner);
   }
 }

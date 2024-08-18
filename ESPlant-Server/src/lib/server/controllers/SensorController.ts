@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import {
+import type {
   LightHistoryEntry,
   PlantHealthDTO,
   SensorConfigurationDTO,
@@ -11,12 +11,12 @@ import {
   SensorReadingDTO,
   SensorValueDistributionDTO,
   WaterCapacityHistoryEntry,
-} from "../../../../api/types/api.js";
-import SensorDataRepository from "../repositories/SensorDataRepository.js";
-import SensorRepository from "../repositories/SensorRepository.js";
-import SensorService from "../../../../api/services/SensorService.js";
-import { ESPSensorReadingDTO, LegacyESPSensorReadingDTO } from "../entities/SensorReadingEntity.js";
-import SensorEntity from "../entities/SensorEntity.js";
+} from "$lib/types/api";
+import type { ESPSensorReadingDTO, LegacyESPSensorReadingDTO } from "$lib/server/entities/SensorReadingEntity";
+import SensorDataRepository from "../repositories/SensorDataRepository";
+import SensorEntity from "../entities/SensorEntity";
+import SensorRepository from "../repositories/SensorRepository";
+import SensorService from "../services/SensorService";
 
 const OFFLINE_TIMEOUT = 120 * 60 * 1000; // 2 hours
 
@@ -93,33 +93,33 @@ export default class SensorController {
       lastUpdate:
         lastReading != undefined
           ? {
-              timestamp: lastReading.timestamp,
-              waterCapacity: lastReading.availableWaterCapacity,
-              batteryCapacity: Math.min(1, Math.max(0, (lastReading.voltage - 2.14) / (3.00 - 2.14))),
-            }
+            timestamp: lastReading.timestamp,
+            waterCapacity: lastReading.availableWaterCapacity,
+            batteryCapacity: Math.min(1, Math.max(0, (lastReading.voltage - 2.14) / (3.00 - 2.14))),
+          }
           : undefined,
       prediction:
         model != undefined
           ? {
-              nextWatering: model.predictTimestamp(config.lowerThreshold),
-              predictedWaterCapacity: model.predictEntries(60 * 60 * 1000, 24),
-            }
+            nextWatering: model.predictTimestamp(config.lowerThreshold),
+            predictedWaterCapacity: model.predictEntries(60 * 60 * 1000, 24),
+          }
           : undefined,
       sensorHealth,
       plantHealth,
     };
   }
 
-  public async getSensorWriteToken(id: number): Promise<string | undefined> {
+  public async getSensorWriteToken(id: number): Promise<string | null> {
     const sensorEntity = await SensorRepository.getById(id);
     if (sensorEntity == undefined) {
-      return undefined;
+      return null;
     }
 
     return sensorEntity.writeToken
   }
 
-  public async getSensorOverview(ownerId: number): Promise<SensorOverviewDTO> {
+  public async getSensorOverview(ownerId: string): Promise<SensorOverviewDTO> {
     const sensorsIds = await SensorRepository.getAllForOwner(ownerId);
 
     const sensors = await Promise.all(
@@ -176,24 +176,24 @@ export default class SensorController {
   private getSensorHealth(
     lastReading: SensorReadingDTO | undefined
   ): SensorHealthDTO {
-    const status: Pick<SensorHealthDTO, 'signalStrength'|'battery'> = {
+    const status: Pick<SensorHealthDTO, 'signalStrength' | 'battery'> = {
       signalStrength:
         lastReading == undefined ||
-        lastReading.timestamp < new Date(Date.now() - OFFLINE_TIMEOUT)
+          lastReading.timestamp < new Date(Date.now() - OFFLINE_TIMEOUT)
           ? "offline"
           : lastReading.rssi > -55
-          ? "strong"
-          : lastReading.rssi > -67
-          ? "moderate"
-          : "weak",
+            ? "strong"
+            : lastReading.rssi > -67
+              ? "moderate"
+              : "weak",
       battery: lastReading == undefined ||
-          lastReading.voltage > 4
-          ? "usb"
-          : lastReading.voltage < 2.3
+        lastReading.voltage > 4
+        ? "usb"
+        : lastReading.voltage < 2.3
           ? "empty"
           : lastReading.voltage < 2.4
-          ? "low"
-          : "full",
+            ? "low"
+            : "full",
     };
 
     const warning = status.signalStrength == "weak" || status.battery == "low";
@@ -282,8 +282,8 @@ export default class SensorController {
     let token = prefix;
     const possibleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     for (let i = 0; i < length; i++) {
-        let randomIndex = crypto.randomInt(0, possibleChars.length);
-        token += possibleChars[randomIndex];
+      const randomIndex = crypto.randomInt(0, possibleChars.length);
+      token += possibleChars[randomIndex];
     }
     return token;
   }
@@ -296,7 +296,7 @@ export default class SensorController {
     return this.generateToken('', 16);
   }
 
-  public async create(ownerId: number, config: SensorConfigurationDTO): Promise<SensorCreatedDTO> {
+  public async create(ownerId: string, config: SensorConfigurationDTO): Promise<SensorCreatedDTO> {
     const writeToken = this.generateWriteToken();
     const readToken = this.generateReadToken();
     const sensorEntityPartial = await SensorEntity.fromDTO(0, config);

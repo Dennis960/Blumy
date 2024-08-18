@@ -1,24 +1,17 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import { base } from '$app/paths';
-	import { fetchSensor, fetchSensorValueDistribution, fetchSensorWriteToken, updateSensorConfig } from '$lib/api.js';
+	import { fetchSensorValueDistribution, updateSensorConfig } from '$lib/api';
 	import SensorSettingsForm from '$lib/components/sensor-settings-form.svelte';
-	import type { SensorConfigurationDTO } from '$lib/types/api.js';
+	import type { SensorConfigurationDTO } from '$lib/types/api';
 	import { createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import { onMount } from 'svelte';
 
 	export let data;
 
 	let config: SensorConfigurationDTO;
-	let shareLink: string|undefined;
-	let writeToken: string|undefined;
-
-	onMount(async () => {
-		const sensor = await fetchSensor(data.id);
-		config = sensor.config;
-		writeToken = await fetchSensorWriteToken(data.id);
-		shareLink = sensor.readToken != undefined ? `${location.origin}${base}/sensor/${data.id}?token=${sensor.readToken}` : undefined;
-	});
+	let shareLink: string | undefined;
+	let writeToken: string | undefined;
 
 	let error: string;
 
@@ -40,16 +33,26 @@
 		queryFn: () => fetchSensorValueDistribution(data.id),
 		refetchInterval: 15 * 60 * 1000
 	});
+
+	onMount(() => {
+		const interval = setInterval(
+			() => {
+				invalidate('sensor-value-distribution');
+			},
+			15 * 60 * 1000
+		);
+		return () => clearInterval(interval);
+	});
 </script>
 
 <div class="page-header">
 	<div class="container">
 		{#if config != undefined}
 			<SensorSettingsForm
-				config={config}
-				error={error}
-				writeToken={writeToken}
-				shareLink={shareLink}
+				{config}
+				{error}
+				{writeToken}
+				{shareLink}
 				sensorValueDistribution={$valueDistributionQuery.data}
 				on:submit={handleSubmit}
 			>

@@ -1,5 +1,5 @@
-import { PushSubscription } from "web-push";
-import SubscriptionRepository from "../repositories/SubscriptionRepository.js";
+import type { PushSubscription } from "web-push";
+import SubscriptionRepository from "../repositories/SubscriptionRepository";
 
 export default class SubscriptionController {
   public static async getIsSubscribed(
@@ -9,8 +9,8 @@ export default class SubscriptionController {
     return await SubscriptionRepository.exists({
       sensorAddress,
       endpoint: subscription.endpoint,
-      keys_p256dh: subscription.keys.p256dh,
-      keys_auth: subscription.keys.auth,
+      keysP256dh: subscription.keys.p256dh,
+      keysAuth: subscription.keys.auth,
     });
   }
 
@@ -21,8 +21,8 @@ export default class SubscriptionController {
     await SubscriptionRepository.create({
       sensorAddress,
       endpoint: subscription.endpoint,
-      keys_p256dh: subscription.keys.p256dh,
-      keys_auth: subscription.keys.auth,
+      keysP256dh: subscription.keys.p256dh,
+      keysAuth: subscription.keys.auth,
       lastNotification: null,
     });
     console.log(`Subscribed to sensor ${sensorAddress}`);

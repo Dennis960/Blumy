@@ -1,5 +1,5 @@
 {
-  "id": "cf3be4c3-ab9c-4555-9614-b36e2bf907d5",
+  "id": "0608ca2f-c7c8-413e-b96f-8a5a0b4aa8cf",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -55,6 +55,226 @@
       },
       "uniqueConstraints": {}
     },
+    "public.data": {
+      "name": "data",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "client_version": {
+          "name": "client_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "sensor_address": {
+          "name": "sensor_address",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "light": {
+          "name": "light",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": -1
+        },
+        "voltage": {
+          "name": "voltage",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": -1
+        },
+        "temperature": {
+          "name": "temperature",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": -1
+        },
+        "humidity": {
+          "name": "humidity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": -1
+        },
+        "is_usb_connected": {
+          "name": "is_usb_connected",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "moisture": {
+          "name": "moisture",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "moisture_stabilization_time": {
+          "name": "moisture_stabilization_time",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": -1
+        },
+        "is_moisture_measurement_successful": {
+          "name": "is_moisture_measurement_successful",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "humidity_raw": {
+          "name": "humidity_raw",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": -1
+        },
+        "temperature_raw": {
+          "name": "temperature_raw",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": -1
+        },
+        "rssi": {
+          "name": "rssi",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": -1
+        },
+        "duration": {
+          "name": "duration",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "data_sensor_address_sensor_sensor_address_fk": {
+          "name": "data_sensor_address_sensor_sensor_address_fk",
+          "tableFrom": "data",
+          "tableTo": "sensor",
+          "columnsFrom": [
+            "sensor_address"
+          ],
+          "columnsTo": [
+            "sensor_address"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.sensor": {
+      "name": "sensor",
+      "schema": "",
+      "columns": {
+        "sensor_address": {
+          "name": "sensor_address",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'new sensor'"
+        },
+        "field_capacity": {
+          "name": "field_capacity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1024
+        },
+        "permanent_wilting_point": {
+          "name": "permanent_wilting_point",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 128
+        },
+        "lower_threshold": {
+          "name": "lower_threshold",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0.2
+        },
+        "upper_threshold": {
+          "name": "upper_threshold",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0.8
+        },
+        "image": {
+          "name": "image",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "owner": {
+          "name": "owner",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "write_token": {
+          "name": "write_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "read_token": {
+          "name": "read_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sensor_owner_user_id_fk": {
+          "name": "sensor_owner_user_id_fk",
+          "tableFrom": "sensor",
+          "tableTo": "user",
+          "columnsFrom": [
+            "owner"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "public.session": {
       "name": "session",
       "schema": "",
@@ -89,6 +309,66 @@
           ],
           "columnsTo": [
             "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.subscription": {
+      "name": "subscription",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "sensor_address": {
+          "name": "sensor_address",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_notification": {
+          "name": "last_notification",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "endpoint": {
+          "name": "endpoint",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "keys_p256dh": {
+          "name": "keys_p256dh",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "keys_auth": {
+          "name": "keys_auth",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "subscription_sensor_address_sensor_sensor_address_fk": {
+          "name": "subscription_sensor_address_sensor_sensor_address_fk",
+          "tableFrom": "subscription",
+          "tableTo": "sensor",
+          "columnsFrom": [
+            "sensor_address"
+          ],
+          "columnsTo": [
+            "sensor_address"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"

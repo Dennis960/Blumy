@@ -2,7 +2,7 @@
 	import Slider, { type SliderOptions } from '$lib/components/slider.svelte';
 	import WaterCapacityDistribution from '$lib/components/water-capacity-distribution.svelte';
 	import { funnyPlantNames } from '$lib/funny-plant-names';
-	import type { SensorConfigurationDTO, SensorValueDistributionDTO } from '$lib/types/api.js';
+	import type { SensorConfigurationDTO, SensorValueDistributionDTO } from '$lib/types/api';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import CopyText from './copy-text.svelte';
 
@@ -78,7 +78,7 @@
 
 <div class="row row-gap-3 align-items-center">
     <div class="col-12">
-        <form on:submit={handleSubmit}>
+        <form action="/sensor" method="POST">
             <section class="card">
                 <div class="card-header">
                     <h1 class="card-title">Sensor-Einstellungen</h1>

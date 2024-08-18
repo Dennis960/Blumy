@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { SensorReadingDTO } from "../../../../api/types/api";
 import SensorEntity from "./SensorEntity";
+import type { SensorReadingDTO } from "$lib/types/api";
 
 export const espSensorReadingSchema = z.object({
   light: z.number(),
@@ -46,7 +46,7 @@ export default class SensorReadingEntity {
     public temperatureRaw: number,
     public rssi: number,
     public duration: number,
-  ) {}
+  ) { }
 
   public static toDTO(
     reading: SensorReadingEntity,

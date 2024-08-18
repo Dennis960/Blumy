@@ -1,66 +1,79 @@
-import SubscriptionEntity from "../entities/SubscriptionEntity.js";
-import { knex } from "../config/knex.js";
+import { subscriptions } from "$lib/server/db/schema";
+import { db } from "$lib/server/db/worker";
+import { and, eq } from "drizzle-orm";
 
 export default class SubscriptionRepository {
   static async create(
-    subscription: Omit<SubscriptionEntity, "id">
-  ): Promise<SubscriptionEntity> {
-    return (await knex<SubscriptionEntity>("subscription")
-      .insert(subscription)
-      .returning([
-        "id",
-        "sensorAddress",
-        "lastNotification",
-        "endpoint",
-        "keys_p256dh",
-        "keys_auth",
-      ])
-      .then((rows) => rows[0]))!;
+    subscription: typeof subscriptions.$inferInsert
+  ) {
+    const insertedRecord = await db
+      .insert(subscriptions)
+      .values({ ...subscription })
+      .returning();
+
+    return insertedRecord[0]!;
   }
 
   static async delete(subscription: { endpoint: string }): Promise<void> {
-    await knex<SubscriptionEntity>("subscription").delete().where(subscription);
+    await db
+      .delete(subscriptions)
+      .where(eq(subscriptions.endpoint, subscription.endpoint));
   }
 
   static async exists(
-    subscription: Partial<SubscriptionEntity>
+    subscription: Partial<typeof subscriptions.$inferInsert>
   ): Promise<boolean> {
-    const existingSubscription = await knex<SubscriptionEntity>("subscription")
-      .where(subscription)
-      .first();
+    if (
+      !subscription.sensorAddress ||
+      !subscription.endpoint ||
+      !subscription.keysP256dh ||
+      !subscription.keysAuth
+    ) {
+      return false;
+    }
+    const existingSubscription = await db
+      .select()
+      .from(subscriptions)
+      .where(and(
+        eq(subscriptions.sensorAddress, subscription.sensorAddress),
+        eq(subscriptions.endpoint, subscription.endpoint),
+        eq(subscriptions.keysP256dh, subscription.keysP256dh),
+        eq(subscriptions.keysAuth, subscription.keysAuth)
+      ))
+      .limit(1)
+      .then((results) => results.pop());
+
     return existingSubscription != undefined;
   }
 
   static async getBySensorAddress(
     sensorAddress: number
-  ): Promise<SubscriptionEntity[]> {
-    return await knex<SubscriptionEntity>("subscription")
-      .select(
-        "id",
-        "sensorAddress",
-        "lastNotification",
-        "endpoint",
-        "keys_p256dh",
-        "keys_auth"
-      )
-      .where({ sensorAddress });
+  ) {
+    return await db
+      .select({
+        id: subscriptions.id,
+        sensorAddress: subscriptions.sensorAddress,
+        lastNotification: subscriptions.lastNotification,
+        endpoint: subscriptions.endpoint,
+        keysP256dh: subscriptions.keysP256dh,
+        keysAuth: subscriptions.keysAuth,
+      })
+      .from(subscriptions)
+      .where(eq(subscriptions.sensorAddress, sensorAddress));
   }
 
   static async updateLastNotification(
     sensorAddress: number,
     lastNotification: Date
   ) {
-    return await knex<SubscriptionEntity>("subscription")
-      .where({ sensorAddress })
-      .update({ lastNotification })
-      .returning([
-        "id",
-        "sensorAddress",
-        "lastNotification",
-        "endpoint",
-        "keys_p256dh",
-        "keys_auth",
-      ])
-      .then((rows) => rows[0]);
+    const updatedRecord = await db
+      .update(subscriptions)
+      .set({
+        lastNotification: lastNotification.getTime()
+      })
+      .where(eq(subscriptions.sensorAddress, sensorAddress))
+      .returning();
+
+    return updatedRecord[0];
   }
 }
