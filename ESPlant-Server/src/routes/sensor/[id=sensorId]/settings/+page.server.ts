@@ -14,12 +14,12 @@ export const load: PageServerLoad = async function ({ depends, params }) {
 		throw error(404, 'Sensor not found');
 	}
 	const writeToken = await new SensorController().getSensorWriteToken(id);
-	const shareLink = sensor.readToken != undefined ? `${location.origin}${base}/sensor/${id}?token=${sensor.readToken}` : undefined;
+	const shareLink = sensor.readToken != undefined ? `${base}/sensor/${id}?token=${sensor.readToken}` : undefined;
 
 	return {
 		sensor,
 		sensorValueDistribution,
 		writeToken,
-		shareLink
+		shareLink,
 	};
 };

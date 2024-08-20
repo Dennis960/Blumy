@@ -1,5 +1,5 @@
-import { db } from "$lib/server/db/worker";
 import { sensors } from "$lib/server/db/schema";
+import { db } from "$lib/server/db/worker";
 
 import { eq } from "drizzle-orm";
 
@@ -64,25 +64,6 @@ export default class SensorRepository {
   }
 
   /**
-   * Update the name of a sensor.
-   * @param sensorAddress The address of the sensor.
-   * @param name The new name of the sensor.
-   * @returns Nothing or throws an error if the sensor does not exist.
-   */
-  static async updateName(sensorAddress: number, name: string) {
-    const updatedSensor = await db
-      .update(sensors)
-      .set({ name })
-      .where(eq(sensors.sensorAddress, sensorAddress))
-      .returning({ sensorAddress: sensors.sensorAddress })
-      .then((rows) => rows[0]);
-
-    if (!updatedSensor) {
-      return Promise.reject("Sensor does not exist");
-    }
-  }
-
-  /**
    * Update the details of a sensor.
    * @param sensorAddress The address of the sensor.
    * @param changes The changes to be applied.
@@ -93,6 +74,7 @@ export default class SensorRepository {
       delete changes["sensorAddress"];
     }
 
+    // TODO this fails
     const updatedSensor = await db
       .update(sensors)
       .set(changes)
@@ -110,7 +92,7 @@ export default class SensorRepository {
   /**
    * Get the owner of a sensor.
    * @param sensorAddress The address of the sensor.
-   * @returns The owner's ID or null if not found.
+   * @returns The owner's ID or undefined if not found.
    */
   static async getOwner(sensorAddress: number) {
     return await db

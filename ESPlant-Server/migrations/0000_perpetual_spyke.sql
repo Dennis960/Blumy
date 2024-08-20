@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS "data" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"client_version" integer DEFAULT 1 NOT NULL,
 	"sensor_address" integer NOT NULL,
-	"date" integer NOT NULL,
+	"date" timestamp with time zone DEFAULT now() NOT NULL,
 	"light" integer DEFAULT -1 NOT NULL,
 	"voltage" integer DEFAULT -1 NOT NULL,
 	"temperature" integer DEFAULT -1 NOT NULL,
@@ -31,16 +31,16 @@ CREATE TABLE IF NOT EXISTS "data" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "sensor" (
-	"sensor_address" integer PRIMARY KEY NOT NULL,
+	"sensor_address" serial PRIMARY KEY NOT NULL,
 	"name" text DEFAULT 'new sensor' NOT NULL,
 	"field_capacity" integer DEFAULT 1024 NOT NULL,
 	"permanent_wilting_point" integer DEFAULT 128 NOT NULL,
 	"lower_threshold" real DEFAULT 0.2 NOT NULL,
 	"upper_threshold" real DEFAULT 0.8 NOT NULL,
-	"image" "bytea",
-	"owner" text,
-	"write_token" text,
-	"read_token" text
+	"image_base64" text,
+	"owner" text NOT NULL,
+	"write_token" text NOT NULL,
+	"read_token" text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "session" (

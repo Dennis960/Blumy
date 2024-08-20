@@ -1,4 +1,4 @@
-import crypto from "crypto";
+import type { ESPSensorReadingDTO, LegacyESPSensorReadingDTO } from "$lib/server/entities/SensorReadingEntity";
 import type {
   LightHistoryEntry,
   PlantHealthDTO,
@@ -12,9 +12,10 @@ import type {
   SensorValueDistributionDTO,
   WaterCapacityHistoryEntry,
 } from "$lib/types/api";
-import type { ESPSensorReadingDTO, LegacyESPSensorReadingDTO } from "$lib/server/entities/SensorReadingEntity";
-import SensorDataRepository from "../repositories/SensorDataRepository";
+import crypto from "crypto";
+import type { sensors } from "../db/schema";
 import SensorEntity from "../entities/SensorEntity";
+import SensorDataRepository from "../repositories/SensorDataRepository";
 import SensorRepository from "../repositories/SensorRepository";
 import SensorService from "../services/SensorService";
 
@@ -210,7 +211,6 @@ export default class SensorController {
     return await SensorDataRepository.create({
       clientVersion: 1,
       sensorAddress: data.sensorAddress,
-      date: Date.now(),
       light: -1,
       voltage: -1,
       temperature: -1,
@@ -230,7 +230,6 @@ export default class SensorController {
     return await SensorDataRepository.create({
       clientVersion: 2,
       sensorAddress,
-      date: Date.now(),
       light: data.light,
       voltage: data.voltage,
       temperature: data.temperature,
@@ -268,13 +267,13 @@ export default class SensorController {
 
   public async updateSensorConfig(
     sensorId: number,
-    config: SensorConfigurationDTO
+    config: Partial<typeof sensors.$inferSelect>
   ): Promise<SensorConfigurationDTO> {
-    const sensorEntityPartial = await SensorEntity.fromDTO(sensorId, config);
     const sensorEntity = await SensorRepository.update(
       sensorId,
-      sensorEntityPartial
+      config
     );
+    
     return SensorEntity.toDTO(sensorEntity);
   }
 
@@ -300,7 +299,8 @@ export default class SensorController {
     const writeToken = this.generateWriteToken();
     const readToken = this.generateReadToken();
     const sensorEntityPartial = await SensorEntity.fromDTO(0, config);
-    const creatingSensorEntity = {
+
+    const creatingSensorEntity: typeof sensors.$inferInsert = {
       ...sensorEntityPartial,
       sensorAddress: undefined,
       owner: ownerId,

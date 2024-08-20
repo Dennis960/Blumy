@@ -1,5 +1,5 @@
 {
-  "id": "0608ca2f-c7c8-413e-b96f-8a5a0b4aa8cf",
+  "id": "245a2454-844c-44e7-aa0a-d9c45e45b367",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -80,9 +80,10 @@
         },
         "date": {
           "name": "date",
-          "type": "integer",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "light": {
           "name": "light",
@@ -192,7 +193,7 @@
       "columns": {
         "sensor_address": {
           "name": "sensor_address",
-          "type": "integer",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
@@ -231,9 +232,9 @@
           "notNull": true,
           "default": 0.8
         },
-        "image": {
-          "name": "image",
-          "type": "bytea",
+        "image_base64": {
+          "name": "image_base64",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -241,19 +242,19 @@
           "name": "owner",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "write_token": {
           "name": "write_token",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "read_token": {
           "name": "read_token",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},

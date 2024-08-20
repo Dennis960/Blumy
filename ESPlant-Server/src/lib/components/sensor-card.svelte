@@ -25,15 +25,18 @@
 		sensor.prediction != undefined &&
 		sensor.prediction.nextWatering.toLocaleDateString() ==
 			new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString();
+
+	$: imageUrl = `data:image/png;base64,${sensor.config.imageBase64}`;
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <section on:click={() => goto(`${base}/sensor/${sensor.id}`)} class="card d-flex flex-column">
 	<div class="h-100 row row-0">
 		<div class="col-4">
 			<span
 				class="w-100 h-100 ratio ratio-1x1 d-block bg-cover rounded-start-1"
-				style="background-image: url({sensor.config.imageUrl})"
+				style="background-image: url({imageUrl})"
 			/>
 		</div>
 		<div class="col-8">

@@ -2,7 +2,9 @@ import SensorController from '$lib/server/controllers/SensorController';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async function ({ params, url }) {
+export const load: PageServerLoad = async function ({ params, url, depends }) {
+	depends("sensor-history");
+	depends("sensor");
 	const id = parseInt(params.id);
 
 	let startDate = new Date();

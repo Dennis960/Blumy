@@ -1,5 +1,5 @@
 import SensorRepository from '$lib/server/repositories/SensorRepository';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import type { Session, User } from 'lucia';
 
 export const authenticated = (user: User | null, session: Session | null) => ({
@@ -10,6 +10,16 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 
     if (session && session.fresh) {
       throw error(403, 'user not logged in');
+    }
+    return user;
+  },
+  isAuthenticatedElseRedirect: function () {
+    if (!user) {
+      throw redirect(302, '/login');
+    }
+
+    if (session && session.fresh) {
+      throw redirect(302, '/login');
     }
     return user;
   },

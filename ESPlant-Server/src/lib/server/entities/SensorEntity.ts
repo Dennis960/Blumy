@@ -7,7 +7,7 @@ export default class SensorEntity {
   constructor(
     public sensorAddress: number,
     public name: string,
-    public image: Buffer | null,
+    public imageBase64: string | null,
     public fieldCapacity: number, // sensor unit
     public permanentWiltingPoint: number,
     public lowerThreshold: number, // relative to fieldCapacity
@@ -21,23 +21,24 @@ export default class SensorEntity {
     id: number,
     dto: SensorConfigurationDTO
   ): Promise<RedactedSensorEntity> {
-    let image: Buffer | null = null;
+    let image: string | null = null;
 
-    if (dto.imageUrl?.startsWith("data:image/")) {
-      const buf = Buffer.from(dto.imageUrl.split(",")[1], "base64");
+    if (dto.imageBase64 !== undefined) {
+      const buf = Buffer.from(dto.imageBase64, "base64");
       image = await sharp(buf)
         .resize(800, 800, {
           fit: "inside",
           withoutEnlargement: true,
         })
         .toFormat("webp")
-        .toBuffer();
+        .toBuffer()
+        .then((buf) => buf.toString("base64"));
     }
 
     return {
       sensorAddress: id,
       name: dto.name,
-      image,
+      imageBase64: image,
       fieldCapacity: dto.fieldCapacity,
       permanentWiltingPoint: dto.permanentWiltingPoint,
       lowerThreshold: dto.lowerThreshold,
@@ -46,15 +47,13 @@ export default class SensorEntity {
   }
 
   public static toDTO(entity: RedactedSensorEntity): SensorConfigurationDTO {
-    const emptyImage =
-      "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+    const emptyImageBase64 =
+      "data:image/webp;base64,UklGRjgCAABXRUJQVlA4IBwAAAAwAQCdASoQAAIA" +
+      "AAABAAEAAAICRAEAOw==";
 
     return {
       name: entity.name,
-      imageUrl:
-        entity.image != undefined
-          ? "data:image/webp;base64," + entity.image.toString("base64")
-          : emptyImage,
+      imageBase64: entity.imageBase64 ?? emptyImageBase64,
       fieldCapacity: entity.fieldCapacity,
       permanentWiltingPoint: entity.permanentWiltingPoint,
       lowerThreshold: entity.lowerThreshold,

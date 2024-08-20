@@ -4,7 +4,7 @@ declare global {
 			user: import("lucia").User | null;
 			session: import("lucia").Session | null;
 			middleware: {
-				auth: ReturnType<typeof import("$lib/server/middlewares/authenticated").authenticated>;
+				security: ReturnType<typeof import("$lib/server/middlewares/authenticated").authenticated>;
 			}
 		}
 	}

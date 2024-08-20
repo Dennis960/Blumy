@@ -33,11 +33,13 @@
 	$: waterTomorrow =
 		sensor.prediction != undefined &&
 		sensor.prediction.nextWatering.getTime() < new Date().getTime() + 48 * 60 * 60 * 1000;
+
+	$: imageUrl = `data:image/png;base64,${sensor.config.imageBase64}`;
 </script>
 
 <section class="card">
 	<span
-		style="background-image: url({sensor.config.imageUrl})"
+		style="background-image: url({imageUrl})"
 		class="img-responsive img-responsive-16x9 card-img-top"
 	/>
 	<div class="card-header">
@@ -55,8 +57,8 @@
 					value={sensor.plantHealth.drowning
 						? '>100%'
 						: sensor.plantHealth.wilting
-						? '<0%'
-						: Math.round(sensor.lastUpdate.waterCapacity * 100) + '%'}
+							? '<0%'
+							: Math.round(sensor.lastUpdate.waterCapacity * 100) + '%'}
 					warning={sensor.plantHealth.overwatered || sensor.plantHealth.underwatered}
 					critical={sensor.plantHealth.drowning || sensor.plantHealth.wilting}
 				>
@@ -103,10 +105,10 @@
 					value={sensor.sensorHealth.signalStrength == 'offline'
 						? 'Offline'
 						: sensor.sensorHealth.battery == 'low'
-						? 'Batterie schwach'
-						: sensor.sensorHealth.signalStrength == 'weak'
-						? 'Empfang schlecht'
-						: 'Ok'}
+							? 'Batterie schwach'
+							: sensor.sensorHealth.signalStrength == 'weak'
+								? 'Empfang schlecht'
+								: 'Ok'}
 					critical={sensor.sensorHealth.critical}
 					warning={sensor.sensorHealth.warning}
 				>

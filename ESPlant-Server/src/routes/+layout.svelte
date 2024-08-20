@@ -37,9 +37,9 @@
 			<div class="collapse navbar-collapse" id="navbarNav">
 				<ul class="navbar-nav">
 					<li class="nav-item">
-						<a class="nav-link {$page.url.pathname == `/` ? 'active' : ''}" href={$page.url.origin}
-							>Sensoren</a
-						>
+						<a class="nav-link {$page.url.pathname == `/` ? 'active' : ''}" href={$page.url.origin}>
+							Sensoren
+						</a>
 					</li>
 				</ul>
 			</div>

@@ -1,12 +1,13 @@
 <script lang="ts">
+	import { page } from '$app/stores';
+	import Litepicker from '$lib/components/litepicker.svelte';
 	import { IconCalendar, IconChevronLeftRaw, IconChevronRightRaw } from '$lib/icons';
 	import type { SensorDTO, SensorHistoryDTO } from '$lib/types/api';
-	import Litepicker from '$lib/components/litepicker.svelte';
-	import WaterCapacityGraph from './water-capacity-graph.svelte';
 	import LightGraph from './light-graph.svelte';
-	import WeatherGraph from './weather-graph.svelte';
 	import RssiGraph from './rssi-graph.svelte';
 	import VoltageGraph from './voltage-graph.svelte';
+	import WaterCapacityGraph from './water-capacity-graph.svelte';
+	import WeatherGraph from './weather-graph.svelte';
 
 	export let sensor: SensorDTO;
 	export let history: SensorHistoryDTO;
@@ -32,7 +33,7 @@
 	}
 
 	// true if "debug" is in the URL query
-	const debugMode = new URLSearchParams(location.search).has('debug');
+	const debugMode = $page.url.searchParams.has('debug');
 </script>
 
 <section class="card">
@@ -80,7 +81,6 @@
 		{/if}
 	</div>
 </section>
-
 
 <style>
 	.charts {

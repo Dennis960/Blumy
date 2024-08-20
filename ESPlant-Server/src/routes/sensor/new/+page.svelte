@@ -1,28 +1,17 @@
 <script lang="ts">
 	import { base } from '$app/paths';
-	import { createSensor } from '$lib/api';
 	import CopyText from '$lib/components/copy-text.svelte';
 	import SensorSettingsForm from '$lib/components/sensor-settings-form.svelte';
-	import type { SensorConfigurationDTO, SensorCreatedDTO } from '$lib/types/api';
+	import type { SensorCreatedDTO } from '$lib/types/api';
 
 	let error: string;
 	let createdSensor: SensorCreatedDTO;
-
-	async function handleSubmit(e: CustomEvent<{ value: SensorConfigurationDTO }>) {
-		try {
-			createdSensor = await createSensor(e.detail.value);
-		} catch (e) {
-			console.error(e);
-			error = `${e}`;
-			return;
-		}
-	}
 </script>
 
 <div class="page-header">
 	<div class="container">
 		{#if createdSensor == undefined}
-			<SensorSettingsForm {error} on:submit={handleSubmit} />
+			<SensorSettingsForm {error} bind:createdSensor />
 		{:else}
 			<div class="row row-gap-3 align-items-center">
 				<div class="col-12">

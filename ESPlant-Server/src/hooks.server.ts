@@ -39,7 +39,7 @@ export const handle: Handle = sequence(
     },
     async ({ event, resolve }) => {
         event.locals.middleware = {
-            auth: authenticated(event.locals.user, event.locals.session)
+            security: authenticated(event.locals.user, event.locals.session)
         }
         return resolve(event);
     }

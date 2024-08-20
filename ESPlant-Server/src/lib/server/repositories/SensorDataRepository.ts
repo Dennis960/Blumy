@@ -1,6 +1,6 @@
 import { db } from "$lib/server/db/worker";
 import { sensorReadings } from "$lib/server/db/schema";
-import { and, eq, gte, lte, desc, sql, asc } from "drizzle-orm";
+import { and, eq, gte, lte, desc, sql, asc, count } from "drizzle-orm";
 
 export default class SensorDataRepository {
   /**
@@ -11,7 +11,7 @@ export default class SensorDataRepository {
   static async create(
     data: typeof sensorReadings.$inferInsert
   ): Promise<number | undefined> {
-    data.date = Date.now();
+    data.date = new Date();
     const insertedRecord = await db
       .insert(sensorReadings)
       .values({ ...data })
@@ -91,8 +91,8 @@ export default class SensorDataRepository {
       .where(
         and(
           eq(sensorReadings.sensorAddress, sensorAddress),
-          gte(sensorReadings.date, startDate.getTime()),
-          lte(sensorReadings.date, endDate.getTime())
+          gte(sensorReadings.date, startDate),
+          lte(sensorReadings.date, endDate)
         )
       )
       .orderBy(desc(sensorReadings.date));
@@ -108,15 +108,15 @@ export default class SensorDataRepository {
   ) {
     const dist = await db
       .select({
-        count: sql`count(*)`.as("count"),
-        bucket: sql`floor(${sensorReadings.moisture} / ${bucketSize}) * ${bucketSize}`.as("bucket")
+        count: count(),
+        bucket: sql<number>`floor(${sensorReadings.moisture} / ${bucketSize}) * ${bucketSize}`
       })
       .from(sensorReadings)
       .where(and(
         eq(sensorReadings.sensorAddress, sensorId),
-        gte(sensorReadings.date, sinceDate.getTime())
+        gte(sensorReadings.date, sinceDate)
       ))
-      .groupBy((table) => table.bucket)
+      .groupBy(sensorReadings.moisture)
       .orderBy((table) => asc(table.bucket));
 
     return dist;

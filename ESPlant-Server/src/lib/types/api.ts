@@ -14,7 +14,7 @@ export interface SensorReadingDTO {
 
 export const sensorConfigurationDTOSchema = z.object({
   name: z.string(),
-  imageUrl: z.string().optional(), // data URL for now
+  imageBase64: z.string().optional(), // data URL for now
   /*
    * Typical permanent wilting points:
    *   26-32% of field capacity for fine-textured soil
@@ -77,18 +77,18 @@ export interface SensorDTO {
   sensorHealth: SensorHealthDTO;
   plantHealth: PlantHealthDTO;
   lastUpdate:
-    | {
-        timestamp: Date;
-        waterCapacity: number;
-        batteryCapacity: number;
-      }
-    | undefined;
+  | {
+    timestamp: Date;
+    waterCapacity: number;
+    batteryCapacity: number;
+  }
+  | undefined;
   prediction:
-    | {
-        nextWatering: Date;
-        predictedWaterCapacity: WaterCapacityHistoryEntry[];
-      }
-    | undefined;
+  | {
+    nextWatering: Date;
+    predictedWaterCapacity: WaterCapacityHistoryEntry[];
+  }
+  | undefined;
 }
 
 export interface SensorCreatedDTO {

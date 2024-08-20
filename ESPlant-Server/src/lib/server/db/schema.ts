@@ -1,6 +1,5 @@
 import {
     boolean,
-    customType,
     integer,
     pgEnum,
     pgTable,
@@ -8,31 +7,10 @@ import {
     real,
     serial,
     text,
-    timestamp,
+    timestamp
 } from 'drizzle-orm/pg-core';
 
 export const providerType = pgEnum("provider_type", ["google"]);
-
-/**
- * Custom type for bytea columns, which are used to store binary data such as images.
- */
-const bytea = customType<{ data: string; notNull: false; default: false }>({
-    dataType() {
-        return "bytea";
-    },
-    toDriver(val) {
-        let newVal = val;
-        if (val.startsWith("0x")) {
-            newVal = val.slice(2);
-        }
-
-        return Buffer.from(newVal, "hex");
-    },
-    fromDriver(val) {
-        //@ts-expect-error val is a Buffer
-        return val.toString("hex");
-    },
-});
 
 // User table, used by Lucia
 export const users = pgTable("user", {
@@ -77,10 +55,10 @@ export const sensors = pgTable("sensor", {
     permanentWiltingPoint: integer("permanent_wilting_point").notNull().default(128),
     lowerThreshold: real("lower_threshold").notNull().default(0.2),
     upperThreshold: real("upper_threshold").notNull().default(0.8),
-    image: bytea("image"),
-    owner: text("owner").references(() => users.id),
-    writeToken: text("write_token"),
-    readToken: text("read_token"),
+    imageBase64: text("image_base64"),
+    owner: text("owner").references(() => users.id).notNull(),
+    writeToken: text("write_token").notNull(),
+    readToken: text("read_token").notNull(),
 });
 
 export const sensorReadings = pgTable("data", {
@@ -89,7 +67,10 @@ export const sensorReadings = pgTable("data", {
     sensorAddress: integer("sensor_address")
         .notNull()
         .references(() => sensors.sensorAddress),
-    date: integer("date").notNull(),
+    date: timestamp("date", {
+        withTimezone: true,
+        mode: "date",
+    }).notNull().defaultNow(),
     light: integer("light").notNull().default(-1),
     voltage: integer("voltage").notNull().default(-1),
     temperature: integer("temperature").notNull().default(-1),
