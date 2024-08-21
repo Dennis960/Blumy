@@ -1,26 +1,29 @@
 <script lang="ts">
-	import type { SensorDTO, SensorHistoryDTO } from '$lib/types/api';
+	import type { SensorHistoryDTO } from '$lib/types/api';
 	import Apexchart, { type ChartOptions } from './apexchart.svelte';
 
 	export let history: SensorHistoryDTO;
 
 	function getOptions(history: SensorHistoryDTO): ChartOptions {
 		return {
-			series: [ {
-                name: 'Temperatur',
-                data: history.weatherHistory.map((entry) => ({
-                    x: entry.timestamp,
-                    y: entry.temperature
-                })),
-                color: 'var(--tblr-primary)'
-            }, {
-                name: 'Luftfeuchtigkeit',
-                data: history.weatherHistory.map((entry) => ({
-                    x: entry.timestamp,
-                    y: entry.humidity
-                })),
-                color: 'var(--tblr-secondary)'
-            } ],
+			series: [
+				{
+					name: 'Temperatur',
+					data: history.weatherHistory.map((entry) => ({
+						x: entry.timestamp,
+						y: entry.temperature
+					})),
+					color: 'var(--tblr-primary)'
+				},
+				{
+					name: 'Luftfeuchtigkeit',
+					data: history.weatherHistory.map((entry) => ({
+						x: entry.timestamp,
+						y: entry.humidity
+					})),
+					color: 'var(--tblr-secondary)'
+				}
+			],
 			chart: {
 				type: 'line',
 				animations: {
@@ -51,19 +54,19 @@
 			xaxis: {
 				type: 'datetime'
 			},
-            yaxis: [
-                {
-                    title: {
-                        text: 'Temperatur',
-                    },
-                },
-                {
-                    opposite: true,
-                    title: {
-                        text: 'Luftfeuchtigkeit',
-                    },
-                },
-            ],
+			yaxis: [
+				{
+					title: {
+						text: 'Temperatur'
+					}
+				},
+				{
+					opposite: true,
+					title: {
+						text: 'Luftfeuchtigkeit'
+					}
+				}
+			]
 		};
 	}
 

@@ -10,6 +10,7 @@
 	} from '$lib/types/api';
 	import type { ActionResult } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
+	import Base64Image from './base64-image.svelte';
 	import CopyText from './copy-text.svelte';
 
 	export let config: SensorConfigurationDTO | undefined = undefined;
@@ -58,11 +59,6 @@
 				values: [0, 250, 500, 750, 1000]
 			}
 		};
-		if (initialConfig.imageBase64 !== undefined) {
-			const url = `data:image/png;base64,${initialConfig.imageBase64}`;
-			image = new Image();
-			image.src = url;
-		}
 	});
 
 	function handleImageInput(e: Event) {
@@ -126,10 +122,17 @@
 					<div class="row mb-3">
 						<div class="col-12 col-md-6 col-lg-4">
 							<label for="image" class="form-label">Foto</label>
-							<span
-								class="avatar avatar-2xl mb-2"
-								style={image && `background-image: url(${image.src})`}
-							/>
+							{#if image}
+								<span
+									class="avatar avatar-2xl mb-2"
+									style={`background-image: url(${image.src})`}
+								/>
+							{:else}
+								<Base64Image
+									class="avatar avatar-2xl mb-2"
+									imageBase64={initialConfig.imageBase64}
+								/>
+							{/if}
 							<input
 								type="file"
 								accept="image/*"
@@ -137,7 +140,7 @@
 								id="image"
 								name="image"
 								on:change={handleImageInput}
-								required={image === undefined}
+								required={image === undefined && initialConfig.imageBase64 === undefined}
 								capture="environment"
 							/>
 						</div>

@@ -1,3 +1,5 @@
+<svelte:options accessors />
+
 <script context="module" lang="ts">
 	export type SortDirection = 'asc' | 'desc' | undefined;
 </script>
@@ -7,7 +9,7 @@
 
 	import { createEventDispatcher } from 'svelte';
 
-    export let sortKey: SortKey;
+	export let sortKey: SortKey;
 	export let sortDirection: SortDirection = undefined;
 
 	$: asc = sortDirection === 'asc';
@@ -29,9 +31,9 @@
 		handleSortClick();
 	}
 </script>
-<svelte:options accessors/>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="sort-container" on:click={click}>
 	<slot />
 	<div class="sort-icons">

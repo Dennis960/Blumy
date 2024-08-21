@@ -33,7 +33,7 @@ export default class SensorReadingEntity {
     public id: number,
     public clientVersion: number,
     public sensorAddress: number,
-    public date: number | string,
+    public date: Date,
     public light: number,
     public voltage: number,
     public temperature: number,

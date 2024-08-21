@@ -6,8 +6,8 @@
 	$: color = sensor.plantHealth.critical
 		? 'danger'
 		: sensor.plantHealth.warning
-		? 'warning'
-		: 'primary';
+			? 'warning'
+			: 'primary';
 </script>
 
 <div class="progress-container">

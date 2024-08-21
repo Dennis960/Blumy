@@ -12,7 +12,7 @@ export default class SensorEntity {
     public permanentWiltingPoint: number,
     public lowerThreshold: number, // relative to fieldCapacity
     public upperThreshold: number,
-    public owner: number,
+    public owner: string,
     public writeToken: string,
     public readToken: string,
   ) { }
@@ -47,13 +47,9 @@ export default class SensorEntity {
   }
 
   public static toDTO(entity: RedactedSensorEntity): SensorConfigurationDTO {
-    const emptyImageBase64 =
-      "data:image/webp;base64,UklGRjgCAABXRUJQVlA4IBwAAAAwAQCdASoQAAIA" +
-      "AAABAAEAAAICRAEAOw==";
-
     return {
       name: entity.name,
-      imageBase64: entity.imageBase64 ?? emptyImageBase64,
+      imageBase64: entity.imageBase64 ?? undefined,
       fieldCapacity: entity.fieldCapacity,
       permanentWiltingPoint: entity.permanentWiltingPoint,
       lowerThreshold: entity.lowerThreshold,

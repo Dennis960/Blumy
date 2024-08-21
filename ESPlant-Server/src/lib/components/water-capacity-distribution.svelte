@@ -1,7 +1,4 @@
 <script lang="ts">
-	import type { SensorConfigurationDTO, SensorValueDistributionDTO } from '$lib/types/api';
-	import { debounce } from 'lodash-es';
-	import Apexchart, { type ChartOptions } from './apexchart.svelte';
 	import {
 		IconDropletFilled2Svg,
 		IconDropletFilledSvg,
@@ -9,6 +6,9 @@
 		IconGraveSvg,
 		IconScubeMaskSvg
 	} from '$lib/icons';
+	import type { SensorConfigurationDTO, SensorValueDistributionDTO } from '$lib/types/api';
+	import { debounce } from 'lodash-es';
+	import Apexchart, { type ChartOptions } from './apexchart.svelte';
 
 	export let sensorValueDistribution: SensorValueDistributionDTO;
 	export let sensorConfig: SensorConfigurationDTO;

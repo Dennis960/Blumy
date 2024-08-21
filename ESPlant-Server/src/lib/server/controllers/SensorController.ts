@@ -27,7 +27,7 @@ export default class SensorController {
     startDate: Date,
     endDate: Date,
     limit: number = 1000
-  ): Promise<SensorHistoryDTO | undefined> {
+  ): Promise<SensorHistoryDTO> {
     const sensorData = await SensorService.getReadings(
       id,
       startDate,
@@ -273,7 +273,7 @@ export default class SensorController {
       sensorId,
       config
     );
-    
+
     return SensorEntity.toDTO(sensorEntity);
   }
 

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import dayjs from 'dayjs';
 	import 'dayjs/locale/de';
 	import relativeTime from 'dayjs/plugin/relativeTime.js';
+	import { onMount } from 'svelte';
 
 	dayjs.extend(relativeTime);
 	dayjs.locale('de');

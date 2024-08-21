@@ -1,6 +1,8 @@
 import SensorController from '$lib/server/controllers/SensorController';
+import SubscriptionController from '$lib/server/controllers/SubscriptionController';
 import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import type { PushSubscription } from 'web-push';
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async function ({ params, url, depends }) {
 	depends("sensor-history");
@@ -50,3 +52,27 @@ export const load: PageServerLoad = async function ({ params, url, depends }) {
 		sensorData
 	};
 };
+
+export const actions = {
+	subscribe: async ({ request, params, locals }) => {
+		await locals.middleware.security.isOwner(parseInt(params.id));
+		const data = await request.formData();
+		const subscription: PushSubscription = JSON.parse(data.get('subscription') as string);
+		await SubscriptionController.subscribe(parseInt(params.id), subscription);
+		return {};
+	},
+	unsubscribe: async ({ request, params, locals }) => {
+		await locals.middleware.security.isOwner(parseInt(params.id));
+		const data = await request.formData();
+		const subscription: PushSubscription = JSON.parse(data.get('subscription') as string);
+		await SubscriptionController.unsubscribe(parseInt(params.id), subscription);
+		return {};
+	},
+	checkSubscription: async ({ request, params, locals }) => {
+		await locals.middleware.security.isOwner(parseInt(params.id));
+		const data = await request.formData();
+		const subscription: PushSubscription = JSON.parse(data.get('subscription') as string);
+		const subscribed = await SubscriptionController.getIsSubscribed(parseInt(params.id), subscription);
+		return subscribed;
+	}
+} satisfies Actions;

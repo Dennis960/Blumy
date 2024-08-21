@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import type { SensorDTO } from '$lib/types/api';
+	import { base } from '$app/paths';
 	import Time from '$lib/components/time.svelte';
-	import WaterCapacityBar from './water-capacity-bar.svelte';
 	import {
 		IconAlertTriangle,
 		IconBatteryOff,
@@ -13,7 +12,9 @@
 		IconScubaMask,
 		IconWifiOff
 	} from '$lib/icons';
-	import { base } from '$app/paths';
+	import type { SensorDTO } from '$lib/types/api';
+	import Base64Image from './base64-image.svelte';
+	import WaterCapacityBar from './water-capacity-bar.svelte';
 
 	export let sensor: SensorDTO;
 
@@ -25,8 +26,6 @@
 		sensor.prediction != undefined &&
 		sensor.prediction.nextWatering.toLocaleDateString() ==
 			new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString();
-
-	$: imageUrl = `data:image/png;base64,${sensor.config.imageBase64}`;
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -34,9 +33,9 @@
 <section on:click={() => goto(`${base}/sensor/${sensor.id}`)} class="card d-flex flex-column">
 	<div class="h-100 row row-0">
 		<div class="col-4">
-			<span
+			<Base64Image
 				class="w-100 h-100 ratio ratio-1x1 d-block bg-cover rounded-start-1"
-				style="background-image: url({imageUrl})"
+				imageBase64={sensor.config.imageBase64}
 			/>
 		</div>
 		<div class="col-8">

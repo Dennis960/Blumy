@@ -32,5 +32,5 @@
 </script>
 
 <div class="datepicker-inline" bind:this={container}>
-	<slot></slot>
+	<slot />
 </div>

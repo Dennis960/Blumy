@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SensorDTO, SensorHistoryDTO } from '$lib/types/api';
+	import type { SensorHistoryDTO } from '$lib/types/api';
 	import Apexchart, { type ChartOptions } from './apexchart.svelte';
 
 	export let history: SensorHistoryDTO;

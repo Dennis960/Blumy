@@ -46,7 +46,7 @@
 									})),
 								color: 'var(--tblr-primary)'
 							}
-					  ]
+						]
 					: [])
 			],
 			stroke: {

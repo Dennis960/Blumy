@@ -1,5 +1,5 @@
 import { calculateDerivative, exponentialRegression } from "$lib/server/util/ml";
-import type { SensorReadingDTO } from "$lib/types/api";
+import type { SensorReadingDTO, WaterCapacityHistoryEntry } from "$lib/types/api";
 import SensorReadingEntity from "../entities/SensorReadingEntity";
 import SensorDataRepository from "../repositories/SensorDataRepository";
 import SensorRepository from "../repositories/SensorRepository";

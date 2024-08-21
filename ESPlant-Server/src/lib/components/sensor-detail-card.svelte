@@ -1,25 +1,26 @@
 <script lang="ts">
 	import { base } from '$app/paths';
 	import {
-		IconSettings,
 		IconAlertTriangle,
-		IconScubaMask,
-		IconGrave,
-		IconDropletFilled,
-		IconDroplet,
-		IconDropletFilled2,
-		IconClockExclamation,
-		IconBucketDroplet,
-		IconWifiOff,
-		IconWifi2,
-		IconWifi1,
-		IconClock,
-		IconBatteryOff,
 		IconBattery2,
 		IconBattery4,
-		IconBatteryCharging2
+		IconBatteryCharging2,
+		IconBatteryOff,
+		IconBucketDroplet,
+		IconClock,
+		IconClockExclamation,
+		IconDroplet,
+		IconDropletFilled,
+		IconDropletFilled2,
+		IconGrave,
+		IconScubaMask,
+		IconSettings,
+		IconWifi1,
+		IconWifi2,
+		IconWifiOff
 	} from '$lib/icons';
 	import type { SensorDTO } from '$lib/types/api';
+	import Base64Image from './base64-image.svelte';
 	import NotificationToggle from './notification-toggle.svelte';
 	import SensorStatusDatagridItem from './sensor-status-datagrid-item.svelte';
 	import Time from './time.svelte';
@@ -33,14 +34,12 @@
 	$: waterTomorrow =
 		sensor.prediction != undefined &&
 		sensor.prediction.nextWatering.getTime() < new Date().getTime() + 48 * 60 * 60 * 1000;
-
-	$: imageUrl = `data:image/png;base64,${sensor.config.imageBase64}`;
 </script>
 
 <section class="card">
-	<span
-		style="background-image: url({imageUrl})"
+	<Base64Image
 		class="img-responsive img-responsive-16x9 card-img-top"
+		imageBase64={sensor.config.imageBase64}
 	/>
 	<div class="card-header">
 		<h1 class="card-title">{sensor.config.name}</h1>

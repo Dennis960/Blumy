@@ -142,8 +142,8 @@
 								</tr>
 							</thead>
 							<tbody>
-								{#each queryDataSorted as sensor (sensor.id)}
-									<SensorRow {sensor} />
+								{#each data.sensorHistories as sensorHistory (sensorHistory.sensor.id)}
+									<SensorRow sensor={sensorHistory.sensor} sensorHistory={sensorHistory.history} />
 								{/each}
 							</tbody>
 						</table>

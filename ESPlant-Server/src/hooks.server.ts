@@ -1,11 +1,28 @@
+import { env } from "$env/dynamic/private";
+import { env as publicEnv } from "$env/dynamic/public";
 import { lucia } from "$lib/server/auth";
 import { db } from "$lib/server/db/worker";
 import { authenticated } from "$lib/server/middlewares/authenticated";
+import NotificationService from "$lib/server/services/NotificationService";
 import type { Handle } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import cron from "node-cron";
+import webpush from 'web-push';
 
 await migrate(db, { migrationsFolder: "migrations" });
+
+webpush.setVapidDetails(
+    "mailto:" + env.VAPID_EMAIL,
+    publicEnv.PUBLIC_VAPID_KEY,
+    env.PRIVATE_VAPID_KEY
+);
+
+// send notifications every day at 8, 12, 16 and 20
+cron.schedule("0 8,12,16,20 * * *", async () => {
+    await NotificationService.triggerPushNotifications();
+});
+
 
 export const handle: Handle = sequence(
     async ({ event, resolve }) => {

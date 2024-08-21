@@ -24,11 +24,9 @@ export const authenticated = (user: User | null, session: Session | null) => ({
     return user;
   },
 
-  isSensorWrite: function () {
+  isSensorWrite: async function (sensorId: number, writeToken: string) {
     user = this.isAuthenticated();
-    SensorRepository.getIdByReadToken
-
-    if (user!.kind !== 'sensor-write') {
+    if (sensorId !== await SensorRepository.getIdByWriteToken(writeToken)) {
       throw error(403, 'missing write token');
     }
   },
@@ -36,8 +34,8 @@ export const authenticated = (user: User | null, session: Session | null) => ({
   isOwner: async function (sensorId: number) {
     user = this.isAuthenticated();
 
-    if (user.kind !== 'user') {
-      throw error(403, 'user not logged in');
+    if (!user) {
+      throw error(403, 'not authenticated');
     }
 
     const ownerId = await SensorRepository.getOwner(sensorId);
@@ -50,17 +48,14 @@ export const authenticated = (user: User | null, session: Session | null) => ({
     }
   },
 
-  isOwnerOrThisSensorRead: async function (sensorId: number) {
+  isOwnerOrThisSensorRead: async function (sensorId: number, readToken?: string) {
     user = this.isAuthenticated();
 
-    if (user.kind === 'sensor-read') {
-      if (user.sensorId !== sensorId) {
+    if (readToken) {
+      if (sensorId !== await SensorRepository.getIdByReadToken(readToken)) {
         throw error(403, 'wrong sensor for read token');
       }
-      return;
-    }
-
-    if (user.kind === 'user') {
+    } else {
       const ownerId = await SensorRepository.getOwner(sensorId);
       if (ownerId === undefined) {
         throw error(404, 'sensor not found');
@@ -69,9 +64,6 @@ export const authenticated = (user: User | null, session: Session | null) => ({
       if (user.id !== ownerId) {
         throw error(403, 'not an owner of this sensor');
       }
-      return;
     }
-
-    throw error(403, 'not authenticated');
   }
 });

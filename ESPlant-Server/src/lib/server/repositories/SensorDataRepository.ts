@@ -32,7 +32,7 @@ export default class SensorDataRepository {
   private static dataToAverage(
     data: typeof sensorReadings.$inferSelect[],
     limit: number
-  ) {
+  ): typeof sensorReadings.$inferSelect[] {
     if (data.length <= limit) {
       return data;
     }

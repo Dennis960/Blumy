@@ -1,10 +1,10 @@
-import { json } from "@sveltejs/kit";
-import type { RequestHandler } from "./$types";
 import SensorController from "$lib/server/controllers/SensorController";
 import type { SensorConfigurationDTO } from "$lib/types/api";
+import { json } from "@sveltejs/kit";
+import type { RequestHandler } from "./$types";
 
 export const PUT = (async (event) => {
-    event.locals.middleware.security.isOwner(parseInt(event.params.id))
+    await event.locals.middleware.security.isOwner(parseInt(event.params.id))
     const data = await event.request.formData();
     const sensorId = parseInt(event.params.id);
 
@@ -23,7 +23,7 @@ export const PUT = (async (event) => {
         upperThreshold: Number(data.get("upperThreshold")),
         fieldCapacity: Number(data.get("fieldCapacity")),
     }
-    
+
     const newConfig = await new SensorController().updateSensorConfig(sensorId, config);
     return json(newConfig);
 }) satisfies RequestHandler;

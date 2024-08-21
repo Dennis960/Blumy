@@ -47,24 +47,24 @@
 				type: 'datetime'
 			},
 			yaxis: {
-				min: (min) => Math.min(min, 2.00),
-				max: (max) => Math.max(max, 3.10)
+				min: (min) => Math.min(min, 2.0),
+				max: (max) => Math.max(max, 3.1)
 			},
 			annotations: {
 				yaxis: [
 					{
-						y: 2.70,
-						y2: 3.10,
+						y: 2.7,
+						y2: 3.1,
 						fillColor: 'var(--tblr-green)'
 					},
 					{
-						y: 2.50,
-						y2: 2.70,
+						y: 2.5,
+						y2: 2.7,
 						fillColor: 'var(--tblr-warning)'
 					},
 					{
-						y: 2.10,
-						y2: 2.50,
+						y: 2.1,
+						y2: 2.5,
 						fillColor: 'var(--tblr-danger)'
 					}
 				]

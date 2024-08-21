@@ -74,7 +74,6 @@ export default class SensorRepository {
       delete changes["sensorAddress"];
     }
 
-    // TODO this fails
     const updatedSensor = await db
       .update(sensors)
       .set(changes)

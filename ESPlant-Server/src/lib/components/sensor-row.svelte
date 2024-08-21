@@ -1,31 +1,22 @@
 <script lang="ts">
-	import Time from '$lib/components/time.svelte';
 	import { browser } from '$app/environment';
-	import SensorSparkline from './sensor-sparkline.svelte';
 	import { goto } from '$app/navigation';
-	import type { SensorDTO } from '$lib/types/api';
-	import { fetchSensorHistory } from '$lib/api';
-	import { createQuery } from '@tanstack/svelte-query';
-	import {
-		IconClockExclamation,
-		IconWifiOff,
-		IconAlertTriangle,
-		IconWifi2,
-		IconWifi1
-	} from '$lib/icons';
-	import WaterCapacityBar from './water-capacity-bar.svelte';
 	import { base } from '$app/paths';
+	import Time from '$lib/components/time.svelte';
+	import {
+		IconAlertTriangle,
+		IconClockExclamation,
+		IconWifi1,
+		IconWifi2,
+		IconWifiOff
+	} from '$lib/icons';
+	import type { SensorDTO, SensorHistoryDTO } from '$lib/types/api';
+	import Base64Image from './base64-image.svelte';
+	import SensorSparkline from './sensor-sparkline.svelte';
+	import WaterCapacityBar from './water-capacity-bar.svelte';
 
 	export let sensor: SensorDTO;
-
-	$: historyQuery = createQuery({
-		queryKey: ['sensor-sparkline', sensor.id],
-		queryFn: async () => {
-			const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
-			return await fetchSensorHistory(sensor.id, threeDaysAgo, new Date());
-		},
-		refetchInterval: 15 * 60 * 1000
-	});
+	export let sensorHistory: SensorHistoryDTO;
 
 	$: waterToday =
 		sensor.prediction != undefined &&
@@ -39,14 +30,14 @@
 
 <tr on:click={() => goto(`${base}/sensor/${sensor.id}`)}>
 	<th class="w-1">
-		<span class="avatar avatar-xs" style="background-image: url({sensor.config.imageUrl})" />
+		<Base64Image class="avatar avatar-xs" imageBase64={sensor.config.imageBase64} />
 	</th>
 	<th scope="row" class="sensor-name">{sensor.config.name}</th>
 	<td>
 		{#if sensor.lastUpdate == undefined}
 			<span>Keine Daten</span>
 		{:else}
-			<WaterCapacityBar sensor={sensor} />
+			<WaterCapacityBar {sensor} />
 		{/if}
 	</td>
 
@@ -94,10 +85,8 @@
 	</td>
 
 	<td class="w-1 graph">
-		{#if $historyQuery.data != undefined && $historyQuery.data.waterCapacityHistory.length > 0}
-			{#if browser}
-				<SensorSparkline {sensor} history={$historyQuery.data} />
-			{/if}
+		{#if browser && sensorHistory.waterCapacityHistory.length > 0}
+			<SensorSparkline {sensor} history={sensorHistory} />
 		{/if}
 	</td>
 

@@ -7,6 +7,7 @@
 	} from '$lib/api';
 	import type { SensorDTO } from '$lib/types/api';
 	import { onMount } from 'svelte';
+	import { env } from '$env/dynamic/public';
 
 	export let sensor: SensorDTO;
 
@@ -17,7 +18,7 @@
 		const sw = await navigator.serviceWorker.ready;
 		subscription = await sw.pushManager.getSubscription();
 		if (subscription == null) {
-			const key = await fetchPublicVapidKey();
+			const key = env.PUBLIC_VAPID_KEY;
 			subscription = await sw.pushManager.subscribe({
 				userVisibleOnly: true,
 				applicationServerKey: key

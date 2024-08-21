@@ -76,19 +76,15 @@ export interface SensorDTO {
   config: SensorConfigurationDTO;
   sensorHealth: SensorHealthDTO;
   plantHealth: PlantHealthDTO;
-  lastUpdate:
-  | {
+  lastUpdate?: {
     timestamp: Date;
     waterCapacity: number;
     batteryCapacity: number;
-  }
-  | undefined;
-  prediction:
-  | {
+  };
+  prediction?: {
     nextWatering: Date;
     predictedWaterCapacity: WaterCapacityHistoryEntry[];
-  }
-  | undefined;
+  };
 }
 
 export interface SensorCreatedDTO {
