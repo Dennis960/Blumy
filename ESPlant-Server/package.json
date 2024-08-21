@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "vite dev --host",
 		"build": "vite build",
-		"preview": "vite preview",
+		"preview": "vite preview --host",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
@@ -40,12 +40,10 @@
 		"litepicker": "^2.0.12",
 		"lodash-es": "^4.17.21",
 		"lucia": "^3.2.0",
-		"node-cron": "^3.0.3",
 		"nouislider": "^15.7.1",
 		"pg": "^8.12.0",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.1.2",
-		"sharp": "^0.33.5",
 		"superjson": "^2.2.1",
 		"svelte": "^4.2.8",
 		"svelte-apexcharts": "^1.0.2",
@@ -56,6 +54,9 @@
 		"vite": "^5.0.10",
 		"web-push": "^3.6.7",
 		"zod": "^3.22.4"
+	},
+	"dependencies": {
+		"sharp": "^0.33.5"
 	},
 	"type": "module"
 }

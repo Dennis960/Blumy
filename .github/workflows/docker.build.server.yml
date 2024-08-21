@@ -1,0 +1,27 @@
+name: Build and Push server Docker Image to ghcr.io
+on:
+  release:
+    types: [published]
+  push:
+    branches:
+      - main
+    paths:
+      - ESPlant-Server/**
+      - .github/workflows/docker.build.server.yml
+
+jobs:
+  docker_publish:
+    runs-on: "ubuntu-20.04"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # https://github.com/marketplace/actions/push-to-ghcr
+      - name: Build and publish a Docker image for ${{ github.repository }}
+        uses: Dennis960/push-to-ghcr@master
+        with:
+          image_tag: ${{ github.run_number }},latest
+          image_name: ${{ github.repository }}/server
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          dockerfile: ESPlant-Server/Dockerfile.build
+          context: ESPlant-Server
