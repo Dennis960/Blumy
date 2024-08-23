@@ -15,11 +15,13 @@ on:
 
 jobs:
   test-playwright:
+    if: github.event_name != 'workflow_dispatch'
     uses: ./.github/workflows/test.playwright.esplant-server.workflow.yml
 
   docker_publish:
     runs-on: "ubuntu-20.04"
     needs: ["test-playwright"]
+    if: github.event_name != 'workflow_dispatch'
 
     steps:
       - uses: actions/checkout@v4
