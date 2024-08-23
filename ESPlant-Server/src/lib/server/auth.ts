@@ -1,11 +1,10 @@
-import { Lucia } from "lucia";
 import { dev } from "$app/environment";
+import { env as privateEnv } from "$env/dynamic/private";
 import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
+import { Google } from "arctic";
+import { Lucia } from "lucia";
 import { sessions, users } from "./db/schema";
 import { db } from "./db/worker";
-import { Google } from "arctic";
-import { env as privateEnv } from "$env/dynamic/private";
-import { env as publicEnv } from "$env/dynamic/public";
 
 const adapter = new DrizzlePostgreSQLAdapter(db, sessions, users);
 
@@ -22,7 +21,7 @@ export const lucia = new Lucia(adapter, {
 	}
 });
 
-export const google = new Google(privateEnv.GOOGLE_CLIENT_ID, privateEnv.GOOGLE_CLIENT_SECRET, publicEnv.PUBLIC_BASE_URL + "/api/auth/google/callback");
+export const google = new Google(privateEnv.GOOGLE_CLIENT_ID, privateEnv.GOOGLE_CLIENT_SECRET, privateEnv.ORIGIN + "/api/auth/google/callback");
 
 declare module "lucia" {
 	interface Register {

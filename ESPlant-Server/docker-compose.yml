@@ -13,7 +13,7 @@ services:
       - ./db:/var/lib/postgresql/data
 
   server:
-    image: ghcr.io/dennis960/ESPlant/server:${SERVER_TAG:-latest}
+    image: ghcr.io/dennis960/esplant/server:${IMAGE_BRANCH:-main}.${IMAGE_NUMBER:-latest}
     restart: always
     ports:
       - 3000:3000
@@ -31,6 +31,8 @@ services:
       - VAPID_EMAIL=${VAPID_EMAIL:?VAPID_EMAIL not set}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:?GOOGLE_CLIENT_ID not set}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:?GOOGLE_CLIENT_SECRET not set}
-      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:?PUBLIC_BASE_URL not set}
 
       - BODY_SIZE_LIMIT=${BODY_SIZE_LIMIT:-Infinity}
+
+      - ORIGIN=${ORIGIN:?ORIGIN not set. Set it to the URL of the server (e.g. http://localhost:3000 for dev).}
+      - PORT=${PORT:-3000}
