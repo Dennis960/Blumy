@@ -11,7 +11,7 @@ const testPool = new Pool({
     port: Number(process.env.POSTGRES_PORT),
     user: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,
-    database: `${process.env.POSTGRES_DB}`,
+    database: process.env.POSTGRES_DB,
 });
 
 const _testDb = drizzle(testPool, { schema });
@@ -20,14 +20,7 @@ await migrate(_testDb, { migrationsFolder: "migrations" });
 export const testDb = _testDb;
 
 export async function resetDatabase() {
-    [
-        sessions,
-        oauthAccounts,
-        sensorReadings,
-        subscriptions,
-        sensors,
-        users,
-    ].forEach(async (table) => {
+    for (const table of [sessions, oauthAccounts, sensorReadings, subscriptions, sensors, users]) {
         await testDb.delete(table);
-    });
+    }
 }

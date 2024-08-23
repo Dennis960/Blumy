@@ -1,8 +1,7 @@
 import { sessions, users } from '$lib/server/db/schema';
 import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
 import { type BrowserContext } from '@playwright/test';
-import { eq } from 'drizzle-orm';
-import { Lucia, type User } from 'lucia';
+import { Lucia } from 'lucia';
 import { testDb } from './test-db';
 
 const adapter = new DrizzlePostgreSQLAdapter(testDb, sessions, users);
@@ -22,14 +21,9 @@ export const lucia = new Lucia(adapter, {
 
 
 export const createTestUser = async () => {
-    const testUser: User = {
-        id: 'test-user',
-    };
-    const user = (await testDb.select().from(users).where(eq(users.id, testUser.id)))[0]
-    if (!user) {
-        return await testDb.insert(users).values(testUser).returning().then((users) => users[0]);
-    }
-    return user;
+    return await testDb.insert(users).values({
+        id: "test-user",
+    }).returning().then((users) => users[0]);
 }
 
 export async function authenticateTestUser(context: BrowserContext) {
