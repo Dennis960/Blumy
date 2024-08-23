@@ -28,7 +28,7 @@ jobs:
       - name: Build and publish a Docker image for ${{ github.repository }}
         uses: Dennis960/push-to-ghcr@master
         with:
-          image_tag: ${{ github.ref_name }}_${{ github.run_number }}
+          image_tag: ${{ github.run_id }}
           image_name: ${{ github.repository }}/server
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dockerfile: ESPlant-Server/Dockerfile.build
@@ -55,8 +55,8 @@ jobs:
           SCRIPT_AFTER: |
             echo "Deploying with Docker Compose"
             cd ${{ secrets.HOPPING_HOST_PATH }}
-            echo "setting SERVER_TAG to ${{ github.ref_name }}_${{ github.run_number }}"
-            export SERVER_TAG=${{ github.ref_name }}_${{ github.run_number }}
+            echo "setting SERVER_TAG to ${{ github.run_id }}"
+            export SERVER_TAG=${{ github.run_id }}
             echo "Running Docker Compose"
             docker compose pull
             docker compose up -d
