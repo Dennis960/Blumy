@@ -13,7 +13,7 @@ import webpush from 'web-push';
 
 await migrate(db, { migrationsFolder: "migrations" });
 
-if (!TEST) {
+if (TEST === "1") {
     webpush.setVapidDetails(
         "mailto:" + privateEnv.VAPID_EMAIL,
         publicEnv.PUBLIC_VAPID_KEY,

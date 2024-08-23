@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev --host",
-		"build": "vite build",
+		"build": "TEST=0 vite build",
 		"preview": "vite preview --host",
 		"test": "POSTGRES_DB=esplant_test TEST=1 npm run test:integration && npm run test:unit",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
