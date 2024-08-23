@@ -48,6 +48,9 @@ jobs:
           POSTGRES_USER: esplant
           POSTGRES_PASSWORD: esplant
           POSTGRES_DB: esplant_test
+
+          GOOGLE_CLIENT_ID: DOES_NOT_MATTER
+          GOOGLE_CLIENT_SECRET: DOES_NOT_MATTER
         working-directory: ESPlant-Server
         run: npm run test:integration
       - uses: actions/upload-artifact@v4
