@@ -57,7 +57,7 @@
 			</div>
 
 			<div class="col-12 col-md-7 col-lg-8">
-				{#if data.sensor != undefined && data.sensorData != undefined}{/if}
+				<!-- {#if data.sensor != undefined && data.sensorData != undefined}{/if} -->
 			</div>
 		</div>
 	</div>
