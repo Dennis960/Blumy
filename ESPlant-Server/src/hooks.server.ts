@@ -1,4 +1,5 @@
-import { env } from "$env/dynamic/private";
+import { TEST } from "$env/static/private";
+import { env as privateEnv } from "$env/dynamic/private";
 import { env as publicEnv } from "$env/dynamic/public";
 import { lucia } from "$lib/server/auth";
 import { db } from "$lib/server/db/worker";
@@ -12,11 +13,11 @@ import webpush from 'web-push';
 
 await migrate(db, { migrationsFolder: "migrations" });
 
-if (!env.TEST) {
+if (!TEST) {
     webpush.setVapidDetails(
-        "mailto:" + env.VAPID_EMAIL,
+        "mailto:" + privateEnv.VAPID_EMAIL,
         publicEnv.PUBLIC_VAPID_KEY,
-        env.PRIVATE_VAPID_KEY
+        privateEnv.PRIVATE_VAPID_KEY
     );
 }
 
