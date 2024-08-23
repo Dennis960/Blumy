@@ -51,6 +51,7 @@ jobs:
 
           GOOGLE_CLIENT_ID: DOES_NOT_MATTER
           GOOGLE_CLIENT_SECRET: DOES_NOT_MATTER
+          PUBLIC_BASE_URL: http://localhost:4173
         working-directory: ESPlant-Server
         run: npm run test:integration
       - uses: actions/upload-artifact@v4
