@@ -13,7 +13,7 @@ services:
       - ./db:/var/lib/postgresql/data
 
   server:
-    image: ghcr.io/dennis960/ESPlant/server:latest
+    image: ghcr.io/dennis960/ESPlant/server:${SERVER_TAG:-latest}
     restart: always
     ports:
       - 3000:3000

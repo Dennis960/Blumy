@@ -3,9 +3,10 @@ on:
   push:
   pull_request:
     branches: [main]
+  workflow_call:
 
 jobs:
-  test:
+  test-playwright:
     timeout-minutes: 60
     runs-on: ubuntu-latest
 
