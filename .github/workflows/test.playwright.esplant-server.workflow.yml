@@ -83,5 +83,5 @@ jobs:
           path: ESPlant-Server/test-results
           retention-days: 30
       - name: Run CTRF annotations
-        run: npx github-actions-ctrf ESPlant-Server/ctrf/ctrf-report.json
+        run: npx github-actions-ctrf ESPlant-Server/test-results/ctrf-report.json
         if: always()
