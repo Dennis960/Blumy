@@ -1,0 +1,36 @@
+version: '3.4'
+name: esplant
+
+services:
+  db:
+    image: postgres:alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-esplant}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-esplant}
+      - POSTGRES_DB=esplant
+    volumes:
+      - ./db:/var/lib/postgresql/data
+
+  server:
+    image: ghcr.io/dennis960/ESPlant/server:${SERVER_TAG:-latest}
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-esplant}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-esplant}
+      - POSTGRES_DB=esplant
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+
+      - PUBLIC_VAPID_KEY=${PUBLIC_VAPID_KEY:?PUBLIC_VAPID_KEY not set}
+      - PRIVATE_VAPID_KEY=${PRIVATE_VAPID_KEY:?PRIVATE_VAPID_KEY not set}
+      - VAPID_EMAIL=${VAPID_EMAIL:?VAPID_EMAIL not set}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:?GOOGLE_CLIENT_ID not set}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:?GOOGLE_CLIENT_SECRET not set}
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:?PUBLIC_BASE_URL not set}
+
+      - BODY_SIZE_LIMIT=${BODY_SIZE_LIMIT:-Infinity}

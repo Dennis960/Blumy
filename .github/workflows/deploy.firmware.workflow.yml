@@ -66,6 +66,7 @@ jobs:
   deploy-firmware:
     runs-on: ubuntu-latest
     needs: build-firmware
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout Repository
