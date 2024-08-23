@@ -1,5 +1,5 @@
 {
-  "id": "06d0abf8-d388-4df3-89d3-25f01ef9a863",
+  "id": "58019bac-e7bb-4949-9aed-dcb027c700e9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -87,28 +87,28 @@
         },
         "light": {
           "name": "light",
-          "type": "integer",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "default": -1
         },
         "voltage": {
           "name": "voltage",
-          "type": "integer",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "default": -1
         },
         "temperature": {
           "name": "temperature",
-          "type": "integer",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "default": -1
         },
         "humidity": {
           "name": "humidity",
-          "type": "integer",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "default": -1

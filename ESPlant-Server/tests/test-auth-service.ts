@@ -20,14 +20,20 @@ export const lucia = new Lucia(adapter, {
     }
 });
 
-const testUser: User = {
-    id: 'test-user',
-};
+
+export const createTestUser = async () => {
+    const testUser: User = {
+        id: 'test-user',
+    };
+    const user = (await testDb.select().from(users).where(eq(users.id, testUser.id)))[0]
+    if (!user) {
+        return await testDb.insert(users).values(testUser).returning().then((users) => users[0]);
+    }
+    return user;
+}
 
 export async function authenticateTestUser(context: BrowserContext) {
-    if ((await testDb.select().from(users).where(eq(users.id, testUser.id))).length === 0) {
-        await testDb.insert(users).values(testUser);
-    }
+    const testUser = await createTestUser();
     const session = await lucia.createSession(testUser.id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
 
@@ -40,4 +46,5 @@ export async function authenticateTestUser(context: BrowserContext) {
         path: '/',
         domain: 'localhost',
     }]);
+    return testUser;
 }
