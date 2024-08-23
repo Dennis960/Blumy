@@ -20,14 +20,14 @@ await migrate(_testDb, { migrationsFolder: "migrations" });
 export const testDb = _testDb;
 
 export async function resetDatabase() {
-    await Promise.all([
+    [
         sessions,
-        users,
         oauthAccounts,
-        sensors,
+        users,
         sensorReadings,
         subscriptions,
-    ].map(async (table) => {
+        sensors,
+    ].forEach(async (table) => {
         await testDb.delete(table);
-    }));
+    });
 }
