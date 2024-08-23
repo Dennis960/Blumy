@@ -48,10 +48,12 @@ jobs:
           key: playwright-${{ hashFiles('ESPlant-Server/package-lock.json') }}
 
       - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         working-directory: ESPlant-Server
         run: npm ci
 
       - name: Install Playwright Browsers
+        if: steps.cache-playwright.outputs.cache-hit != 'true'
         working-directory: ESPlant-Server
         run: npx playwright install --with-deps
 
