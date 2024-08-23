@@ -9,9 +9,10 @@ services:
     environment:
       - POSTGRES_USER=esplant
       - POSTGRES_PASSWORD=esplant
-      - POSTGRES_DB=esplant
+      - POSTGRES_MULTIPLE_DATABASES=esplant,esplant_test
     volumes:
       - db-data:/var/lib/postgresql/data
+      - ./pg-init-scripts:/docker-entrypoint-initdb.d
   server:
     image: server-dev
     depends_on:

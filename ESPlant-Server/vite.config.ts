@@ -8,5 +8,8 @@ export default defineConfig({
 	})],
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}']
+	},
+	build: {
+		chunkSizeWarningLimit: 1000,
 	}
 });

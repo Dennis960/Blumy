@@ -1,18 +1,20 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { authenticateTestUser } from './test-auth-service';
+import { resetDatabase } from './test-db';
 
-test('has title', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+test.beforeEach(async () => {
+  await resetDatabase();
+})
 
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Playwright/);
+test('unauthenticated user should see login button', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page.getByTestId("login-button-google")).toBeAttached();
 });
 
-test('get started link', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+test('authenticated user should not see login button', async ({ page, context }) => {
+  await authenticateTestUser(context);
 
-  // Click the get started link.
-  await page.getByRole('link', { name: 'Get started' }).click();
-
-  // Expects page to have a heading with the name of Installation.
-  await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
+  await page.goto('http://localhost:4173/');
+  await expect(page.getByTestId("login-button-google")).not.toBeAttached();
 });

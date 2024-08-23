@@ -1,6 +1,6 @@
-import adapter from "@sveltejs/adapter-node";
-import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
-import { sveltePreprocess } from "svelte-preprocess";
+import adapter from '@sveltejs/adapter-node';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import { sveltePreprocess } from 'svelte-preprocess';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -13,9 +13,14 @@ const config = {
 		alias: {
 			$lib: './src/lib',
 			$components: './src/lib/components',
-			$server: './src/lib/server',
+			$server: './src/lib/server'
 		},
-		adapter: adapter(),
+		adapter: adapter()
+	},
+	vitePlugin: {
+		experimental: {
+			disableSvelteResolveWarnings: true
+		}
 	}
 };
 
