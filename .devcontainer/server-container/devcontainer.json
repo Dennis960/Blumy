@@ -1,0 +1,26 @@
+{
+	"name": "server container",
+	"service": "server",
+	"workspaceFolder": "/workspace",
+	"dockerComposeFile": "../../docker-compose.dev.yml",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-azuretools.vscode-docker",
+				"github.vscode-github-actions",
+				"GitHub.copilot",
+				"GitHub.copilot-chat",
+				"redhat.vscode-yaml",
+				"svelte.svelte-vscode",
+				"ckolkman.vscode-postgres",
+				"esbenp.prettier-vscode",
+				"csstools.postcss"
+			],
+			"settings": {
+				"svelte.ask-to-enable-ts-plugin": false,
+				// "javascript.suggest.autoImports": false, // uncomment when experiencing performance issues with intellisense
+				// "typescript.suggest.autoImports": false,
+			}
+		}
+	}
+}

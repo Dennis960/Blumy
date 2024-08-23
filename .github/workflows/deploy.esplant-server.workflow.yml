@@ -1,109 +1,50 @@
 name: Deploy ESPlant-Server
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "ESPlant-Server/**"
-      - "ESPlant-Pages/**"
-      - ".github/workflows/deploy.esplant-server.workflow.yml"
-  pull_request:
-    branches:
-      - main
-    paths:
-      - "ESPlant-Server/**"
-      - "ESPlant-Pages/**"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Run number to deploy"
+        required: true
+        default: "latest"
+        type: string
+      branch:
+        description: "Branch to deploy"
+        required: true
+        default: "main"
+        type: string
+      environment:
+        description: "Environment to deploy to"
+        required: true
+        type: choice
+        default: "production"
+        # TODO implement this
+        options:
+          - "production"
+          - "staging"
+          - "development"
+
 jobs:
-  build-api:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "20"
-      - name: Install api dependencies
-        working-directory: ./ESPlant-Server/api
-        run: npm install
-      - name: Build api
-        working-directory: ./ESPlant-Server/api
-        run: npm run build
-      - name: Upload server artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: ESPlant-Api
-          path: ./ESPlant-Server/api/dist
-  build-dashboard:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "20"
-      - name: Install dashboard dependencies
-        working-directory: ./ESPlant-Server/dashboard
-        run: npm install
-      - name: Build dashboard
-        working-directory: ./ESPlant-Server/dashboard
-        run: npm run build
-      - name: Upload dashboard artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: ESPlant-Dashboard
-          path: ./ESPlant-Server/api/dashboard
-  build-pages:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "20"
-      - name: Install pages dependencies
-        working-directory: ./ESPlant-Pages
-        run: npm install
-      - name: Build pages
-        working-directory: ./ESPlant-Pages
-        run: npm run build
-      - name: Upload pages artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: ESPlant-Pages
-          path: ./ESPlant-Pages/dist
   deploy:
     runs-on: ubuntu-latest
-    needs: ["build-api", "build-dashboard", "build-pages"]
-    if: github.ref == 'refs/heads/main'
     steps:
-      - name: Download api artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: ESPlant-Api
-          path: ESPlant-Api
-      - name: Download dashboard artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: ESPlant-Dashboard
-          path: ESPlant-Api/dashboard
-      - name: Download pages artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: ESPlant-Pages
-          path: ESPlant-Api/pages
+      - uses: actions/checkout@v4
       - name: Deploy to server
         uses: easingthemes/ssh-deploy@main
         with:
           SSH_PRIVATE_KEY: ${{ secrets.HOPPING_KEY }}
           ARGS: "-rlgoDzvc -i"
-          SOURCE: "ESPlant-Api/"
+          SOURCE: "ESPlant-Server/docker-compose.yml"
           REMOTE_HOST: ${{ secrets.HOPPING_HOST }}
           REMOTE_USER: ${{ secrets.HOPPING_USER }}
-          TARGET: ${{ secrets.HOPPING_HOST_PATH }}/api
+          TARGET: ${{ secrets.HOPPING_HOST_PATH }}/
           SCRIPT_BEFORE: |
             echo "Nothing to do before deploy"
           SCRIPT_AFTER: |
-            echo "Install dependencies for api"
-            cd ${{ secrets.HOPPING_HOST_PATH }}api
-            npm install
-            echo "Restarting esplant-service"
-            sudo systemctl restart esplant.service
-            echo "Create data directory if not exists"
-            mkdir -p ${{ secrets.HOPPING_HOST_PATH }}data
+            echo "Deploying with Docker Compose"
+            cd ${{ secrets.HOPPING_HOST_PATH }}
+            echo "setting SERVER_TAG to ${{ github.event.inputs.version }}"
+            export SERVER_TAG=${{ github.event.inputs.version }}
+            echo "Running Docker Compose"
+            docker compose pull
+            docker compose up -d
+            echo "Deployment complete"

@@ -1,0 +1,51 @@
+<script>
+	// TODO remove all vendors except litepicker
+	import { page } from '$app/stores';
+	import '@tabler/core/dist/css/tabler-vendors.css';
+	import '@tabler/core/dist/css/tabler.css';
+	import { onMount } from 'svelte';
+	import { pwaInfo } from 'virtual:pwa-info';
+
+	onMount(async () => {
+		// @ts-ignore
+		await import('@tabler/core/dist/js/tabler.js');
+		$page.url.origin;
+	});
+
+	$: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : '';
+</script>
+
+<svelte:head>
+	{@html webManifestLink}
+</svelte:head>
+
+<div class="page">
+	<header class="navbar navbar-expand-sm d-print-none">
+		<div class="container-xl">
+			<button
+				class="navbar-toggler"
+				type="button"
+				data-bs-toggle="collapse"
+				data-bs-target="#navbarNav"
+				aria-controls="navbarNav"
+				aria-expanded="false"
+				aria-label="Toggle navigation"
+			>
+				<span class="navbar-toggler-icon" />
+			</button>
+			<a class="navbar-brand ms-2 ms-lg-0 me-auto" href={$page.url.origin}>ES-Plant Dashboard</a>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link {$page.url.pathname == `/` ? 'active' : ''}" href={$page.url.origin}>
+							Sensoren
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</header>
+	<div class="page-wrapper">
+		<slot />
+	</div>
+</div>

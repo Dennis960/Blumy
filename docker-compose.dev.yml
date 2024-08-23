@@ -1,0 +1,34 @@
+version: "3.4"
+name: esplant-dev
+
+services:
+  db:
+    image: postgres:alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=esplant
+      - POSTGRES_PASSWORD=esplant
+      - POSTGRES_MULTIPLE_DATABASES=esplant,esplant_test
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./pg-init-scripts:/docker-entrypoint-initdb.d
+  server:
+    image: server-dev
+    depends_on:
+      - db
+    build:
+      context: ESPlant-Server
+      dockerfile: ./Dockerfile.dev
+    volumes:
+      - .:/workspace:cached
+    command: sleep infinity
+    environment:
+      - POSTGRES_USER=esplant
+      - POSTGRES_PASSWORD=esplant
+      - POSTGRES_DB=esplant
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+
+volumes:
+  db-data:
