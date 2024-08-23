@@ -20,8 +20,8 @@ on:
         # TODO implement this
         options:
           - "production"
-          - "staging"
-          - "development"
+        #   - "staging"
+        #   - "development"
 
 jobs:
   deploy:
