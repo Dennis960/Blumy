@@ -23,10 +23,10 @@ export async function resetDatabase() {
     [
         sessions,
         oauthAccounts,
-        users,
         sensorReadings,
         subscriptions,
         sensors,
+        users,
     ].forEach(async (table) => {
         await testDb.delete(table);
     });
