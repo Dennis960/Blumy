@@ -12,11 +12,13 @@ import webpush from 'web-push';
 
 await migrate(db, { migrationsFolder: "migrations" });
 
-webpush.setVapidDetails(
-    "mailto:" + env.VAPID_EMAIL,
-    publicEnv.PUBLIC_VAPID_KEY,
-    env.PRIVATE_VAPID_KEY
-);
+if (!env.TEST) {
+    webpush.setVapidDetails(
+        "mailto:" + env.VAPID_EMAIL,
+        publicEnv.PUBLIC_VAPID_KEY,
+        env.PRIVATE_VAPID_KEY
+    );
+}
 
 // send notifications every day at 8, 12, 16 and 20
 // cron.schedule("0 8,12,16,20 * * *", async () => {
