@@ -18,7 +18,7 @@ const config: PlaywrightTestConfig = {
 			],
 		},
 	},
-	reporter: "line",
+	reporter: [["line"], ["playwright-ctrf-json-reporter"]],
 };
 
 export default config;
