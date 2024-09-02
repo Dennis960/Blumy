@@ -6,7 +6,7 @@
 	import { onMount } from 'svelte';
 	// @ts-expect-error no declaration file
 	import { pwaInfo } from 'virtual:pwa-info';
-	import { PUBLIC_MODE } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 
 	export let data;
 
@@ -38,7 +38,7 @@
 				<span class="navbar-toggler-icon" />
 			</button>
 			<a class="navbar-brand ms-2 ms-lg-0 me-auto" href={$page.url.origin}
-				>Blumy Dashboard{PUBLIC_MODE === 'test' ? ' - Test' : ''}</a
+				>Blumy Dashboard{env.PUBLIC_MODE === 'test' ? ' - Test' : ''}</a
 			>
 			<div class="collapse navbar-collapse" id="navbarNav">
 				<ul class="navbar-nav">

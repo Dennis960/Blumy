@@ -78,6 +78,7 @@ jobs:
           GOOGLE_CLIENT_ID: DOES_NOT_MATTER
           GOOGLE_CLIENT_SECRET: DOES_NOT_MATTER
           PUBLIC_BASE_URL: http://localhost:4173
+          PUBLIC_MODE: test
         working-directory: Blumy-Server
         run: npm run test:integration
 
