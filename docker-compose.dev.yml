@@ -30,5 +30,7 @@ services:
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
 
+      - PUBLIC_MODE=test
+
 volumes:
   db-data:
