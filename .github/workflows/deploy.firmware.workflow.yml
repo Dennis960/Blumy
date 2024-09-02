@@ -5,13 +5,13 @@ on:
     branches:
       - main
     paths:
-      - "ESPlant-Firmware/**"
+      - "Blumy-Firmware/**"
       - ".github/workflows/deploy.firmware.workflow.yml"
   pull_request:
     branches:
       - main
     paths:
-      - "ESPlant-Firmware/**"
+      - "Blumy-Firmware/**"
       - ".github/workflows/deploy.firmware.workflow.yml"
 
 jobs:
@@ -24,17 +24,17 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
-        working-directory: ESPlant-Firmware/frontend
+        working-directory: Blumy-Firmware/frontend
 
       - name: Build Frontend
         run: npm run build
-        working-directory: ESPlant-Firmware/frontend
+        working-directory: Blumy-Firmware/frontend
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: frontend
-          path: ESPlant-Firmware/main/index_html.c
+          path: Blumy-Firmware/main/index_html.c
 
   build-firmware:
     runs-on: ubuntu-latest
@@ -48,20 +48,20 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: frontend
-          path: ESPlant-Firmware/main
+          path: Blumy-Firmware/main
 
       - name: Build Firmware
         run: |
-          docker run --rm -v $PWD:/project -w /project/ESPlant-Firmware -u $UID -e HOME=/tmp espressif/idf idf.py build
+          docker run --rm -v $PWD:/project -w /project/Blumy-Firmware -u $UID -e HOME=/tmp espressif/idf idf.py build
 
-      - name: Rename ESPlant-Firmware to firmware
-        run: mv ESPlant-Firmware/build/ESPlant-Firmware.bin ESPlant-Firmware/build/firmware.bin
+      - name: Rename Blumy-Firmware to firmware
+        run: mv Blumy-Firmware/build/Blumy-Firmware.bin Blumy-Firmware/build/firmware.bin
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: ESPlant-Firmware/build/firmware.bin
+          path: Blumy-Firmware/build/firmware.bin
 
   deploy-firmware:
     runs-on: ubuntu-latest
