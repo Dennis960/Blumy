@@ -36,3 +36,4 @@ services:
 
       - ORIGIN=${ORIGIN:?ORIGIN not set. Set it to the URL of the server (e.g. http://localhost:3000 for dev).}
       - PORT=3000
+      - PUBLIC_MODE=${PUBLIC_MODE:-production}
