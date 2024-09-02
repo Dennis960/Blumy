@@ -8,6 +8,8 @@
 	import { pwaInfo } from 'virtual:pwa-info';
 	import { PUBLIC_MODE } from '$env/static/public';
 
+	export let data;
+
 	onMount(async () => {
 		// @ts-expect-error no declaration file
 		await import('@tabler/core/dist/js/tabler.js');
@@ -47,6 +49,17 @@
 					</li>
 				</ul>
 			</div>
+			{#if data.authenticated}
+				<div class="collapse navbar-collapse" id="navbarNav">
+					<ul class="navbar-nav">
+						<li class="nav-item">
+							<form method="POST" action="/auth?/logout">
+								<button class="nav-link" data-testid="logout-button">Log out</button>
+							</form>
+						</li>
+					</ul>
+				</div>
+			{/if}
 		</div>
 	</header>
 	<div class="page-wrapper">
