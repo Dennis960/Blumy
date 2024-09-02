@@ -4,7 +4,8 @@ import { error } from '@sveltejs/kit';
 import type { PushSubscription } from 'web-push';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async function ({ params, url, depends }) {
+export const load: PageServerLoad = async function ({ params, url, depends, locals }) {
+	await locals.middleware.security.isOwnerOrThisSensorRead(params.id, url.searchParams.get('token'));
 	depends("sensor-history");
 	depends("sensor");
 	const id = parseInt(params.id);
@@ -54,22 +55,22 @@ export const load: PageServerLoad = async function ({ params, url, depends }) {
 };
 
 export const actions = {
-	subscribe: async ({ request, params, locals }) => {
-		await locals.middleware.security.isOwner(parseInt(params.id));
+	subscribe: async ({ request, params, locals, url }) => {
+		await locals.middleware.security.isOwnerOrThisSensorRead(params.id, url.searchParams.get('token'));
 		const data = await request.formData();
 		const subscription: PushSubscription = JSON.parse(data.get('subscription') as string);
 		await SubscriptionController.subscribe(parseInt(params.id), subscription);
 		return {};
 	},
-	unsubscribe: async ({ request, params, locals }) => {
-		await locals.middleware.security.isOwner(parseInt(params.id));
+	unsubscribe: async ({ request, params, locals, url }) => {
+		await locals.middleware.security.isOwnerOrThisSensorRead(params.id, url.searchParams.get('token'));
 		const data = await request.formData();
 		const subscription: PushSubscription = JSON.parse(data.get('subscription') as string);
 		await SubscriptionController.unsubscribe(parseInt(params.id), subscription);
 		return {};
 	},
-	checkSubscription: async ({ request, params, locals }) => {
-		await locals.middleware.security.isOwner(parseInt(params.id));
+	checkSubscription: async ({ request, params, locals, url }) => {
+		await locals.middleware.security.isOwnerOrThisSensorRead(params.id, url.searchParams.get('token'));
 		const data = await request.formData();
 		const subscription: PushSubscription = JSON.parse(data.get('subscription') as string);
 		const subscribed = await SubscriptionController.getIsSubscribed(parseInt(params.id), subscription);

@@ -1,20 +1,22 @@
 <script lang="ts">
 	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
+	import type Litepicker from 'litepicker';
+	import type { ILPConfiguration } from 'litepicker/dist/types/interfaces';
 
-	export let options: any = {};
+	export let options: ILPConfiguration;
 
 	const dispatch = createEventDispatcher();
 
 	let container: HTMLDivElement;
-	let litepicker: any;
+	let litepicker: Litepicker;
 	onMount(async () => {
 		const Litepicker = (await import('litepicker')).default;
 		litepicker = new Litepicker({
-			element: container.firstChild ?? container,
 			...options,
+			element: (container.firstChild as HTMLElement) ?? container,
 			setup: (picker) => {
 				options.setup?.(picker);
-				(<any>picker).on('selected', (date1: any, date2: any) => {
+				picker.on('selected', (date1, date2) => {
 					dispatch('selected', {
 						startDate: date1.dateInstance,
 						endDate: date2.dateInstance

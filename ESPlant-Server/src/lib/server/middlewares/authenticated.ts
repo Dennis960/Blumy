@@ -24,6 +24,7 @@ export const authenticated = (user: User | null, session: Session | null) => ({
     return user;
   },
 
+  // @enforce-await
   isSensorWrite: async function (sensorId: number, writeToken: string) {
     user = this.isAuthenticated();
     if (sensorId !== await SensorRepository.getIdByWriteToken(writeToken)) {
@@ -31,6 +32,7 @@ export const authenticated = (user: User | null, session: Session | null) => ({
     }
   },
 
+  // @enforce-await
   isOwner: async function (sensorId: number) {
     user = this.isAuthenticated();
 
@@ -48,8 +50,10 @@ export const authenticated = (user: User | null, session: Session | null) => ({
     }
   },
 
-  isOwnerOrThisSensorRead: async function (sensorId: number, readToken?: string) {
+  // @enforce-await
+  isOwnerOrThisSensorRead: async function (sensorId: number | string, readToken?: string | null) {
     user = this.isAuthenticated();
+    sensorId = parseInt(sensorId.toString());
 
     if (readToken) {
       if (sensorId !== await SensorRepository.getIdByReadToken(readToken)) {

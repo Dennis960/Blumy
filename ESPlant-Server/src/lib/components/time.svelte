@@ -10,6 +10,7 @@
 	export let timestamp: Date = new Date();
 	export let relative = false;
 
+	// eslint-disable-next-line no-undef
 	let interval: NodeJS.Timeout;
 
 	onMount(() => {

@@ -12,10 +12,11 @@
 		endDate: data.endDate
 	};
 
-	function updateDate(dateRange: { startDate: Date; endDate: Date }) {
+	async function updateDate(dateRange: { startDate: Date; endDate: Date }) {
 		$page.url.searchParams.set('from', dateRange.startDate.getTime().toString());
 		$page.url.searchParams.set('to', dateRange.endDate.getTime().toString());
-		goto($page.url);
+		await goto($page.url);
+		invalidate('sensor-history');
 	}
 
 	$: if (

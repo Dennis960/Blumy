@@ -24,7 +24,8 @@
 	$: poorPlantHealth = data.sensors.filter((sensor) => sensor.plantHealth.critical).length;
 	$: poorSensorHealth = data.sensors.filter((sensor) => sensor.sensorHealth.critical).length;
 	$: minNextWatering = data.sensors
-		.map((sensor) => sensor.prediction?.nextWatering!)
+		.filter((sensor) => sensor.prediction)
+		.map((sensor) => sensor.prediction!.nextWatering)
 		.filter((nextWatering) => nextWatering != undefined)
 		.map((nw) => new Date(nw)) // TODO use superjson for API responses
 		.sort((a, b) => a.getTime() - b.getTime())[0];
@@ -142,8 +143,13 @@
 								</tr>
 							</thead>
 							<tbody>
-								{#each data.sensorHistories as sensorHistory (sensorHistory.sensor.id)}
-									<SensorRow sensor={sensorHistory.sensor} sensorHistory={sensorHistory.history} />
+								{#each queryDataSorted as sensor (sensor.id)}
+									<SensorRow
+										{sensor}
+										sensorHistory={data.sensorHistories.filter(
+											(history) => history.sensor.id === sensor.id
+										)[0].history}
+									/>
 								{/each}
 							</tbody>
 						</table>

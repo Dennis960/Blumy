@@ -4,18 +4,19 @@
 	import '@tabler/core/dist/css/tabler-vendors.css';
 	import '@tabler/core/dist/css/tabler.css';
 	import { onMount } from 'svelte';
+	// @ts-expect-error no declaration file
 	import { pwaInfo } from 'virtual:pwa-info';
 
 	onMount(async () => {
-		// @ts-ignore
+		// @ts-expect-error no declaration file
 		await import('@tabler/core/dist/js/tabler.js');
-		$page.url.origin;
 	});
 
 	$: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : '';
 </script>
 
 <svelte:head>
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 	{@html webManifestLink}
 </svelte:head>
 

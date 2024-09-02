@@ -9,6 +9,7 @@
 		SensorValueDistributionDTO
 	} from '$lib/types/api';
 	import type { ActionResult } from '@sveltejs/kit';
+	import { PipsMode } from 'nouislider';
 	import { onMount } from 'svelte';
 	import Base64Image from './base64-image.svelte';
 	import CopyText from './copy-text.svelte';
@@ -54,7 +55,7 @@
 			connect: true,
 			range: { min: [0], max: [1024] },
 			pips: {
-				mode: 'values' as any,
+				mode: PipsMode.Values,
 				density: 3,
 				values: [0, 250, 500, 750, 1000]
 			}
