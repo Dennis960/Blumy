@@ -1,5 +1,5 @@
 version: "3.4"
-name: esplant-dev
+name: blumy-dev
 
 services:
   db:
@@ -7,9 +7,9 @@ services:
     ports:
       - 5432:5432
     environment:
-      - POSTGRES_USER=esplant
-      - POSTGRES_PASSWORD=esplant
-      - POSTGRES_MULTIPLE_DATABASES=esplant,esplant_test
+      - POSTGRES_USER=blumy
+      - POSTGRES_PASSWORD=blumy
+      - POSTGRES_MULTIPLE_DATABASES=blumy,blumy_test
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./pg-init-scripts:/docker-entrypoint-initdb.d
@@ -18,15 +18,15 @@ services:
     depends_on:
       - db
     build:
-      context: ESPlant-Server
+      context: Blumy-Server
       dockerfile: ./Dockerfile.dev
     volumes:
       - .:/workspace:cached
     command: sleep infinity
     environment:
-      - POSTGRES_USER=esplant
-      - POSTGRES_PASSWORD=esplant
-      - POSTGRES_DB=esplant
+      - POSTGRES_USER=blumy
+      - POSTGRES_PASSWORD=blumy
+      - POSTGRES_DB=blumy
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
 
