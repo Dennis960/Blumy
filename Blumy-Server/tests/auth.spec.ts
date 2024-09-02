@@ -6,15 +6,15 @@ test.beforeEach(async () => {
   await resetDatabase();
 })
 
-test('unauthenticated user should see login button', async ({ page }) => {
+test('unauthenticated user should not see logout button', async ({ page }) => {
   await page.goto('/');
 
-  await expect(page.getByTestId("login-button-google")).toBeAttached();
+  await expect(page.getByTestId("logout-button")).not.toBeAttached();
 });
 
-test('authenticated user should not see login button', async ({ page, context }) => {
+test('authenticated user should see logout button', async ({ page, context }) => {
   await authenticateTestUser(context);
 
   await page.goto('http://localhost:4173/');
-  await expect(page.getByTestId("login-button-google")).not.toBeAttached();
+  await expect(page.getByTestId("logout-button")).toBeAttached();
 });
