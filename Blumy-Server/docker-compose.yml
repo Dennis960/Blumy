@@ -16,7 +16,7 @@ services:
     image: ghcr.io/dennis960/blumy/server:${IMAGE_BRANCH:-main}.${IMAGE_NUMBER:-latest}
     restart: always
     ports:
-      - 3000:3000
+      - ${PORT:-3000}:3000
     depends_on:
       - db
     environment:
@@ -35,4 +35,4 @@ services:
       - BODY_SIZE_LIMIT=${BODY_SIZE_LIMIT:-Infinity}
 
       - ORIGIN=${ORIGIN:?ORIGIN not set. Set it to the URL of the server (e.g. http://localhost:3000 for dev).}
-      - PORT=${PORT:-3000}
+      - PORT=3000
