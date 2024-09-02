@@ -17,11 +17,9 @@ on:
         required: true
         type: choice
         default: "production"
-        # TODO implement this
         options:
           - "production"
-        #   - "staging"
-        #   - "development"
+          - "test"
 
 jobs:
   deploy:
@@ -31,17 +29,17 @@ jobs:
       - name: Deploy to server
         uses: easingthemes/ssh-deploy@main
         with:
-          SSH_PRIVATE_KEY: ${{ secrets.HOPPING_KEY }}
+          SSH_PRIVATE_KEY: ${{ secrets.BLUMY_KEY }}
           ARGS: "-rlgoDzvc -i"
           SOURCE: "Blumy-Server/docker-compose.yml"
-          REMOTE_HOST: ${{ secrets.HOPPING_HOST }}
-          REMOTE_USER: ${{ secrets.HOPPING_USER }}
-          TARGET: ${{ secrets.HOPPING_HOST_PATH }}/
+          REMOTE_HOST: ${{ secrets.BLUMY_HOST }}
+          REMOTE_USER: ${{ secrets.BLUMY_USER }}
+          TARGET: ${{ github.event.inputs.environment == 'production' && secrets.BLUMY_HOST_PATH || secrets.BLUMY_TEST_HOST_PATH }}/
           SCRIPT_BEFORE: |
             echo "Nothing to do before deploy"
           SCRIPT_AFTER: |
             echo "Deploying with Docker Compose"
-            cd ${{ secrets.HOPPING_HOST_PATH }}
+            cd ${{ github.event.inputs.environment == 'production' && secrets.BLUMY_HOST_PATH || secrets.BLUMY_TEST_HOST_PATH }}
             echo "setting IMAGE_BRANCH to ${{ github.event.inputs.branch }}"
             export IMAGE_BRANCH=${{ github.event.inputs.branch }}
             echo "setting IMAGE_NUMBER to ${{ github.event.inputs.version }}"
