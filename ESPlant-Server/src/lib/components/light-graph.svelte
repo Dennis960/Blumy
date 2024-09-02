@@ -29,7 +29,7 @@
 			} else {
 				resampledData.push({
 					x: date,
-					y: yValues.reduce((a, b) => a + b, 0) / yValues.length ?? null
+					y: yValues.reduce((a, b) => a + b, 0) / yValues.length
 				});
 			}
 		}

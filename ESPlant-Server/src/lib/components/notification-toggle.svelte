@@ -1,13 +1,8 @@
 <script lang="ts">
-	import {
-		checkSubscription,
-		fetchPublicVapidKey,
-		submitSubscription,
-		submitUnsubscription
-	} from '$lib/api';
+	import { env } from '$env/dynamic/public';
+	import { checkSubscription, submitSubscription, submitUnsubscription } from '$lib/api';
 	import type { SensorDTO } from '$lib/types/api';
 	import { onMount } from 'svelte';
-	import { env } from '$env/dynamic/public';
 
 	export let sensor: SensorDTO;
 
