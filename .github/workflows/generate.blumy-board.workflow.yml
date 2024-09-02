@@ -45,10 +45,10 @@ jobs:
       - name: Upload to server
         uses: easingthemes/ssh-deploy@main
         with:
-          SSH_PRIVATE_KEY: ${{ secrets.HOPPING_KEY }}
+          SSH_PRIVATE_KEY: ${{ secrets.BLUMY_KEY }}
           ARGS: "-rlgoDzvc -i"
           SOURCE: "Blumy-Board/"
-          REMOTE_HOST: ${{ secrets.HOPPING_HOST }}
-          REMOTE_USER: ${{ secrets.HOPPING_USER }}
-          TARGET: ${{ secrets.HOPPING_HOST_PATH }}/api/pages/Blumy-Board
+          REMOTE_HOST: ${{ secrets.BLUMY_HOST }}
+          REMOTE_USER: ${{ secrets.BLUMY_USER }}
+          TARGET: ${{ secrets.BLUMY_HOST_PATH }}/api/pages/Blumy-Board
         
