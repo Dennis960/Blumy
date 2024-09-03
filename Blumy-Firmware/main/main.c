@@ -42,6 +42,10 @@ void sendSensorData(sensors_full_data_t *sensors_data, int8_t rssi)
     esp_http_client_config_t config = {
         .url = DEFAULT_API_URL,
         .method = HTTP_METHOD_POST,
+        .cert_pem = Null,
+        .skip_cert_common_name_check = true,
+        .use_global_ca_store = false,
+        .event_handler = NULL,
     };
 
     esp_http_client_handle_t client = esp_http_client_init(&config);
