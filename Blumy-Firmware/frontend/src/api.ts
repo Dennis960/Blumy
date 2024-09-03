@@ -45,6 +45,7 @@ export interface MqttCloudConfiguration extends Record<string, string> {
 export interface BlumyCloudConfiguration extends Record<string, string> {
     type: "cloud";
     token: string;
+    url: string;
 }
 
 export type CloudConfiguration =
@@ -146,6 +147,24 @@ export async function getCloudCredentials<T extends CloudConfiguration["type"]>(
     }
 }
 
+export async function testCloudConnection(
+    config: CloudConfiguration
+): Promise<boolean> {
+    if (config.type === "http") {
+        return await postDataToEsp("/cloudTest/http", config).then((res) =>
+            res.json()
+        );
+    } else if (config.type === "mqtt") {
+        return await postDataToEsp("/cloudTest/mqtt", config).then((res) =>
+            res.json()
+        );
+    } else if (config.type === "cloud") {
+        return await postDataToEsp("/cloudTest/blumy", config).then((res) =>
+            res.json()
+        );
+    }
+}
+
 export async function setSleepTimeout(timeout: number) {
     timeout = Math.round(timeout);
     return await postDataToEsp("/timeouts/sleep", timeout.toString());
@@ -185,4 +204,10 @@ export async function updateFirmware(url: string) {
 
 export async function getUpdateFirmwareUrl(): Promise<{ url: string }> {
     return await getDataFromEsp("/update/firmware");
+}
+
+export async function checkUpdateAvailable(url: string): Promise<boolean> {
+    return await postDataToEsp("/update/check", { url }).then((res) =>
+        res.json()
+    );
 }

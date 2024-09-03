@@ -3,6 +3,7 @@ import "./page-elements/button-element";
 import "./page-elements/button-nav-element";
 import "./page-elements/description-element";
 import "./page-elements/error-text-element";
+import "./page-elements/success-text-element";
 import "./page-elements/input-element";
 import "./page-elements/progress-bar-element";
 import "./page-elements/title-element";

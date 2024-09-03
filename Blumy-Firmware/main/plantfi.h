@@ -3,6 +3,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_event.h"
+#include "peripherals/sensors.h"
 
 #define PLANTFI_CONNECTED_BIT BIT0
 #define PLANTFI_FAIL_BIT BIT1
@@ -50,3 +51,5 @@ int8_t plantfi_getRssi();
  */
 void plantfi_scan_networks(plantfi_ap_record_t *ap_records, int *num_ap_records);
 plantfi_sta_status_t plantfi_get_sta_status();
+void plantfi_send_sensor_data(sensors_full_data_t *sensors_data, int8_t rssi);
+bool plantfi_test_blumy_connection(char *token, char *url);

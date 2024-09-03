@@ -1,6 +1,7 @@
 import { css, html } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
 import {
+    checkUpdateAvailable,
     getUpdateFirmwareUrl,
     getUpdatePercentage,
     updateFirmware,
@@ -19,6 +20,7 @@ export class UpdatePage extends BasePage {
     ];
     @property({ type: String }) onlineStatus: string;
     @state() errorText: string = "";
+    @state() successText: string = "";
 
     @query("#url") urlElement: InputElement;
 
@@ -53,12 +55,12 @@ export class UpdatePage extends BasePage {
     }
 
     async isUpdateAvailable(url: string) {
-        // TODO check update server for updates and compare firmware versions
-        return true;
+        return await checkUpdateAvailable(url);
     }
 
     async searchForUpdates() {
         this.errorText = "";
+        this.successText = "";
         const url = this.urlElement.input.value;
         if (!url) {
             this.errorText = "Bitte gib eine URL ein";
@@ -67,9 +69,10 @@ export class UpdatePage extends BasePage {
 
         this.updateAvailable = await this.isUpdateAvailable(url);
         if (this.updateAvailable) {
-            this.errorText = "Es ist ein Update verfügbar";
+            this.successText = "Es ist ein Update verfügbar";
         } else {
-            this.errorText = "Kein Update verfügbar";
+            this.errorText =
+                "Die Verbindung zum Update Server konnte nicht hergestellt werden";
         }
     }
 
@@ -99,6 +102,9 @@ export class UpdatePage extends BasePage {
                 ></progress-bar-element>
             </input-element-grid>
             <error-text-element text="${this.errorText}"></error-text-element>
+            <success-text-element
+                text="${this.successText}"
+            ></success-text-element>
             <button-nav-element>
                 <button-element
                     name="Zurück"

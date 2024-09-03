@@ -15,6 +15,8 @@
 
 #include "plantstore.h"
 #include "defaults.h"
+#include <esp_http_client.h>
+#include "esp_timer.h"
 
 EventGroupHandle_t plantfi_sta_event_group;
 
@@ -322,4 +324,77 @@ plantfi_sta_status_t plantfi_get_sta_status()
         }
     }
     return plantfi_sta_status;
+}
+
+// TODO use udp or mqtt
+void plantfi_send_sensor_data(sensors_full_data_t *sensors_data, int8_t rssi)
+{
+    char token[50];
+    char url[100];
+    plantstore_getCloudConfigurationBlumy(token, url, sizeof(token), sizeof(url));
+    char data[400];
+    char bearer[60];
+    sprintf(bearer, "Bearer %s", token);
+
+    sprintf(data, "{\"light\":%2.2f,\"voltage\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f,\"isUsbConnected\":%s,\"moisture\":%d,\"moistureStabilizationTime\":%lu,\"isMoistureMeasurementSuccessful\":%s,\"humidityRaw\":%lu,\"temperatureRaw\":%lu,\"rssi\":%d,\"duration\":%lld}",
+            sensors_data->light,
+            sensors_data->voltage,
+            sensors_data->temperature,
+            sensors_data->humidity,
+            sensors_data->is_usb_connected ? "true" : "false",
+            sensors_data->moisture_measurement,
+            sensors_data->moisture_stabilization_time,
+            sensors_data->moisture_measurement_successful ? "true" : "false",
+            sensors_data->humidity_raw,
+            sensors_data->temperature_raw,
+            rssi,
+            esp_timer_get_time());
+
+    esp_http_client_config_t config = {
+        .url = url,
+        .method = HTTP_METHOD_POST,
+    };
+
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+    if (client == NULL)
+    {
+        ESP_LOGE("HTTP", "Failed to initialize HTTP client");
+        return;
+    }
+    ESP_ERROR_CHECK(esp_http_client_set_post_field(client, data, strlen(data)));
+    ESP_ERROR_CHECK(esp_http_client_set_header(client, "Content-Type", "application/json"));
+    ESP_ERROR_CHECK(esp_http_client_set_header(client, "Authorization", bearer));
+    ESP_ERROR_CHECK(esp_http_client_perform(client));
+
+    ESP_LOGI("Data", "%s", data);
+    int status_code = esp_http_client_get_status_code(client);
+    ESP_LOGI("HTTP", "Status Code: %d", status_code);
+    // TODO also send firmware version. Status code can show if updates are available
+    // TODO also update plantstore settings if available in response
+    ESP_ERROR_CHECK(esp_http_client_cleanup(client));
+}
+
+bool plantfi_test_blumy_connection(char *token, char *url)
+{
+    char bearer[60];
+    sprintf(bearer, "Bearer %s", token);
+
+    esp_http_client_config_t config = {
+        .url = url,
+        .method = HTTP_METHOD_GET,
+    };
+
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+    if (client == NULL)
+    {
+        ESP_LOGE("HTTP", "Failed to initialize HTTP client");
+        return false;
+    }
+    ESP_ERROR_CHECK(esp_http_client_set_header(client, "Authorization", bearer));
+    ESP_ERROR_CHECK(esp_http_client_perform(client));
+
+    int status_code = esp_http_client_get_status_code(client);
+    ESP_LOGI("HTTP", "Status Code: %d", status_code);
+    ESP_ERROR_CHECK(esp_http_client_cleanup(client));
+    return status_code == 200;
 }

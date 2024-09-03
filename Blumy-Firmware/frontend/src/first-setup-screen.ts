@@ -66,31 +66,16 @@ export class FirstSetupScreen extends LitElement {
             html`<welcome-page
                 @next="${this.next}"
                 @skip="${this.nextScreen}"
-            ></welcome-page>`,
-            html`<update-page
-                @next="${this.next}"
-                @back="${this.back}"
-            ></update-page>`,
-            html`<timeout-page
-                @next="${this.next}"
-                @back="${this.back}"
-            ></timeout-page>`,
+            />`,
             html`<wifi-scanner-page
                 @next="${this.next}"
                 @back="${this.back}"
-            ></wifi-scanner-page>`,
-            html`<wifi-setup-page
-                @next="${this.next}"
-                @back="${this.back}"
-            ></wifi-setup-page>`,
-            html`<cloud-page
-                @next="${this.next}"
-                @back="${this.back}"
-            ></cloud-page>`,
-            html`<reset-page
-                @next="${this.next}"
-                @back="${this.back}"
-            ></reset-page>`,
+            />`,
+            html`<wifi-setup-page @next="${this.next}" @back="${this.back}" />`,
+            html`<update-page @next="${this.next}" @back="${this.back}" />`,
+            html`<timeout-page @next="${this.next}" @back="${this.back}" />`,
+            html`<cloud-page @next="${this.next}" @back="${this.back}" />`,
+            html`<reset-page @next="${this.next}" @back="${this.back}" />`,
             html`<home-page @back="${this.back}"></home-page>`,
         ];
     }

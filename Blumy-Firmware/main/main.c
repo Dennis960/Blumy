@@ -16,53 +16,6 @@
 #include "plantstore.h"
 #include "defaults.h"
 
-// TODO use udp or mqtt
-void sendSensorData(sensors_full_data_t *sensors_data, int8_t rssi)
-{
-    char token[50];
-    plantstore_getCloudConfigurationBlumy(token, sizeof(token));
-    char data[400];
-    char bearer[60];
-    sprintf(bearer, "Bearer %s", token);
-
-    sprintf(data, "{\"light\":%2.2f,\"voltage\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f,\"isUsbConnected\":%s,\"moisture\":%d,\"moistureStabilizationTime\":%lu,\"isMoistureMeasurementSuccessful\":%s,\"humidityRaw\":%lu,\"temperatureRaw\":%lu,\"rssi\":%d,\"duration\":%lld}",
-            sensors_data->light,
-            sensors_data->voltage,
-            sensors_data->temperature,
-            sensors_data->humidity,
-            sensors_data->is_usb_connected ? "true" : "false",
-            sensors_data->moisture_measurement,
-            sensors_data->moisture_stabilization_time,
-            sensors_data->moisture_measurement_successful ? "true" : "false",
-            sensors_data->humidity_raw,
-            sensors_data->temperature_raw,
-            rssi,
-            esp_timer_get_time());
-
-    esp_http_client_config_t config = {
-        .url = DEFAULT_API_URL,
-        .method = HTTP_METHOD_POST,
-    };
-
-    esp_http_client_handle_t client = esp_http_client_init(&config);
-    if (client == NULL)
-    {
-        ESP_LOGE("HTTP", "Failed to initialize HTTP client");
-        return;
-    }
-    ESP_ERROR_CHECK(esp_http_client_set_post_field(client, data, strlen(data)));
-    ESP_ERROR_CHECK(esp_http_client_set_header(client, "Content-Type", "application/json"));
-    ESP_ERROR_CHECK(esp_http_client_set_header(client, "Authorization", bearer));
-    ESP_ERROR_CHECK(esp_http_client_perform(client));
-
-    ESP_LOGI("Data", "%s", data);
-    int status_code = esp_http_client_get_status_code(client);
-    ESP_LOGI("HTTP", "Status Code: %d", status_code);
-    // TODO also send firmware version. Status code can show if updates are available
-    // TODO also update plantstore settings if available in response
-    ESP_ERROR_CHECK(esp_http_client_cleanup(client));
-}
-
 void start_deep_sleep()
 {
     uint64_t sleepTime = DEFAULT_SENSOR_TIMEOUT_SLEEP_MS;
@@ -151,7 +104,7 @@ void sensor_mode()
     if (bits & PLANTFI_CONNECTED_BIT)
     {
         int8_t rssi = plantfi_getRssi();
-        sendSensorData(&sensors_data, rssi);
+        plantfi_send_sensor_data(&sensors_data, rssi);
     }
     else
     {
@@ -165,10 +118,17 @@ void sensor_mode()
 void app_main()
 {
     bool isConfigured = plantstore_isConfigured();
+    bool resetReasonOta = false;
+    plantstore_getResetReasonOta(&resetReasonOta);
+    if (resetReasonOta)
+    {
+        plantstore_setResetReasonOta(false);
+    }
     bool isManualReset = (esp_reset_reason() == ESP_RST_POWERON ||
                           esp_reset_reason() == ESP_RST_JTAG ||
                           esp_reset_reason() == ESP_RST_SDIO ||
-                          esp_reset_reason() == ESP_RST_USB);
+                          esp_reset_reason() == ESP_RST_USB ||
+                          resetReasonOta);
 
     if (isManualReset || !isConfigured)
     {

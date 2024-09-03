@@ -1,7 +1,7 @@
-import { BasePage } from "./base-page";
 import { css, html } from "lit";
-import { SensorData, getSensorData } from "../api";
 import { customElement, query, state } from "lit/decorators.js";
+import { getSensorData } from "../api";
+import { BasePage } from "./base-page";
 import { InputElement } from "./page-elements/input-element";
 
 @customElement("home-page")
