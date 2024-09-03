@@ -5,13 +5,13 @@ on:
     branches:
       - main
     paths:
-      - "Blumy-Firmware/**"
+      - "Firmware/**"
       - ".github/workflows/deploy.firmware.workflow.yml"
   pull_request:
     branches:
       - main
     paths:
-      - "Blumy-Firmware/**"
+      - "Firmware/**"
       - ".github/workflows/deploy.firmware.workflow.yml"
 
 jobs:
@@ -24,17 +24,17 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
-        working-directory: Blumy-Firmware/frontend
+        working-directory: Firmware/frontend
 
       - name: Build Frontend
         run: npm run build
-        working-directory: Blumy-Firmware/frontend
+        working-directory: Firmware/frontend
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: frontend
-          path: Blumy-Firmware/main/index_html.c
+          path: Firmware/main/index_html.c
 
   build-firmware:
     runs-on: ubuntu-latest
@@ -48,20 +48,20 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: frontend
-          path: Blumy-Firmware/main
+          path: Firmware/main
 
       - name: Build Firmware
         run: |
-          docker run --rm -v $PWD:/project -w /project/Blumy-Firmware -u $UID -e HOME=/tmp espressif/idf idf.py build
+          docker run --rm -v $PWD:/project -w /project/Firmware -u $UID -e HOME=/tmp espressif/idf idf.py build
 
-      - name: Rename Blumy-Firmware to firmware
-        run: mv Blumy-Firmware/build/Blumy-Firmware.bin Blumy-Firmware/build/firmware.bin
+      - name: Rename Firmware to firmware
+        run: mv Firmware/build/Firmware.bin Firmware/build/firmware.bin
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: Blumy-Firmware/build/firmware.bin
+          path: Firmware/build/firmware.bin
 
   deploy-firmware:
     runs-on: ubuntu-latest
