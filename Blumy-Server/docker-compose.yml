@@ -1,5 +1,5 @@
 version: '3.4'
-name: blumy
+name: blumy-${PUBLIC_MODE:-production}
 
 services:
   db:
