@@ -202,14 +202,15 @@ esp_err_t post_api_cloudSetup_http_handler(httpd_req_t *req)
 esp_err_t post_api_cloudSetup_blumy_handler(httpd_req_t *req)
 {
     char token[100];
-    char *keys[] = {"token"};
-    char *values[] = {token};
-    if (!get_values(req, keys, values, 1))
+    char url[100];
+    char *keys[] = {"token", "url"};
+    char *values[] = {token, url};
+    if (!get_values(req, keys, values, 2))
     {
         return ESP_FAIL;
     }
 
-    plantstore_setCloudConfigurationBlumy(token);
+    plantstore_setCloudConfigurationBlumy(token, url);
 
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
@@ -277,22 +278,52 @@ esp_err_t get_api_cloudSetup_http_handler(httpd_req_t *req)
 
 esp_err_t get_api_cloudSetup_blumy_handler(httpd_req_t *req)
 {
-    char token[100];
+    char token[100] = "";
+    char url[100] = DEFAULT_API_URL;
 
-    if (!plantstore_getCloudConfigurationBlumy(token, sizeof(token)))
-    {
-        httpd_resp_send_404(req);
-        return ESP_FAIL;
-    }
+    plantstore_getCloudConfigurationBlumy(token, url, sizeof(token), sizeof(url));
 
     cJSON *root = cJSON_CreateObject();
     cJSON_AddStringToObject(root, "token", token);
+    cJSON_AddStringToObject(root, "url", url);
 
     char *resp = cJSON_Print(root);
     cJSON_Delete(root);
 
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     free(resp);
+    return ESP_OK;
+}
+
+esp_err_t post_api_cloudTest_mqtt_handler(httpd_req_t *req)
+{
+    // TODO implement this check
+    const char resp[] = "false";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+esp_err_t post_api_cloudTest_http_handler(httpd_req_t *req)
+{
+    // TODO implement this check
+    const char resp[] = "false";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+esp_err_t post_api_cloudTest_blumy_handler(httpd_req_t *req)
+{
+    char token[100];
+    char url[100];
+    char *keys[] = {"token", "url"};
+    char *values[] = {token, url};
+    if (!get_values(req, keys, values, 2))
+    {
+        return ESP_FAIL;
+    }
+
+    const bool connectionOk = plantfi_test_blumy_connection(token, url);
+    char resp[6];
+    sprintf(resp, "%s", connectionOk ? "true" : "false");
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
@@ -450,20 +481,15 @@ esp_err_t post_api_hardReset_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
-esp_err_t post_api_update_firmware_handler(httpd_req_t *req)
+void ota_update_task(void *pvParameter)
 {
     char url[100];
-    char *keys[] = {"url"};
-    char *values[] = {url};
-    if (!get_values(req, keys, values, 1))
+    if (!plantstore_getFirmwareUpdateUrl(url, 100))
     {
-        return ESP_FAIL;
+        ESP_LOGE("OTA", "No firmware update URL set");
+        vTaskDelete(NULL);
+        return;
     }
-
-    plantstore_setFirmwareUpdateUrl(url);
-
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
 
     esp_http_client_config_t config = {
         .url = url,
@@ -479,13 +505,17 @@ esp_err_t post_api_update_firmware_handler(httpd_req_t *req)
     if (err != ESP_OK)
     {
         ESP_LOGE("OTA", "Failed to start OTA (%s)", esp_err_to_name(err));
-        return err;
+        vTaskDelete(NULL);
+        return;
     }
+
     int otaImageSize = esp_https_ota_get_image_size(handle);
     if (otaImageSize < 0)
     {
         ESP_LOGE("OTA", "Failed to get image size (%d)", otaImageSize);
-        return ESP_FAIL;
+        esp_https_ota_abort(handle);
+        vTaskDelete(NULL);
+        return;
     }
     while (1)
     {
@@ -504,18 +534,39 @@ esp_err_t post_api_update_firmware_handler(httpd_req_t *req)
         {
             ESP_LOGE("OTA", "Failed to perform OTA (%s)", esp_err_to_name(err));
             esp_https_ota_abort(handle);
-            return err;
+            vTaskDelete(NULL);
+            return;
         }
     }
     err = esp_https_ota_finish(handle);
     if (err != ESP_OK)
     {
         ESP_LOGE("OTA", "Failed to finish OTA (%s)", esp_err_to_name(err));
-        return err;
+        vTaskDelete(NULL);
+        return;
     }
 
     ESP_LOGI("OTA", "OTA finished, restarting");
+    plantstore_setResetReasonOta(true);
     esp_restart();
+    vTaskDelete(NULL);
+}
+
+esp_err_t post_api_update_firmware_handler(httpd_req_t *req)
+{
+    char url[100];
+    char *keys[] = {"url"};
+    char *values[] = {url};
+    if (!get_values(req, keys, values, 1))
+    {
+        return ESP_FAIL;
+    }
+
+    plantstore_setFirmwareUpdateUrl(url);
+
+    const char resp[] = "OK";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    xTaskCreate(ota_update_task, "ota_update_task", 8192, NULL, 5, NULL);
     return ESP_OK;
 }
 
@@ -537,6 +588,46 @@ esp_err_t get_api_update_firmware_handler(httpd_req_t *req)
     httpd_resp_set_type(req, "application/json");
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     free(resp);
+    return ESP_OK;
+}
+
+esp_err_t post_api_update_check_handler(httpd_req_t *req)
+{
+    char url[100];
+    char *keys[] = {"url"};
+    char *values[] = {url};
+    if (!get_values(req, keys, values, 1))
+    {
+        return ESP_FAIL;
+    }
+
+    esp_http_client_config_t config = {
+        .url = url,
+        .method = HTTP_METHOD_HEAD,
+        .timeout_ms = 10000,
+        .cert_pem = NULL,
+    };
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+    if (client == NULL)
+    {
+        ESP_LOGE("HTTP", "Failed to initialize HTTP client");
+        return ESP_FAIL;
+    }
+    esp_err_t err = esp_http_client_perform(client);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE("HTTP", "Failed to perform HTTP request (%s)", esp_err_to_name(err));
+        return err;
+    }
+    int status_code = esp_http_client_get_status_code(client);
+    int content_length = esp_http_client_get_content_length(client);
+    ESP_LOGI("HTTP", "Status code: %d, Content length: %d", status_code, content_length);
+
+    char resp[6];
+    sprintf(resp, "%s", status_code == 200 ? "true" : "false");
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+
+    esp_http_client_cleanup(client);
     return ESP_OK;
 }
 
@@ -594,6 +685,22 @@ httpd_uri_t get_api_cloudSetup_blumy = {
     .uri = "/api/cloudSetup/blumy",
     .method = HTTP_GET,
     .handler = get_api_cloudSetup_blumy_handler,
+    .user_ctx = NULL};
+
+httpd_uri_t post_api_cloudTest_mqtt = {
+    .uri = "/api/cloudTest/mqtt",
+    .method = HTTP_POST,
+    .handler = post_api_cloudTest_mqtt_handler,
+    .user_ctx = NULL};
+httpd_uri_t post_api_cloudTest_http = {
+    .uri = "/api/cloudTest/http",
+    .method = HTTP_POST,
+    .handler = post_api_cloudTest_http_handler,
+    .user_ctx = NULL};
+httpd_uri_t post_api_cloudTest_blumy = {
+    .uri = "/api/cloudTest/blumy",
+    .method = HTTP_POST,
+    .handler = post_api_cloudTest_blumy_handler,
     .user_ctx = NULL};
 
 httpd_uri_t post_api_timeouts_sleep = {
@@ -668,6 +775,12 @@ httpd_uri_t get_api_update_firmware = {
     .handler = get_api_update_firmware_handler,
     .user_ctx = NULL};
 
+httpd_uri_t post_api_update_check = {
+    .uri = "/api/update/check",
+    .method = HTTP_POST,
+    .handler = post_api_update_check_handler,
+    .user_ctx = NULL};
+
 httpd_uri_t get = {
     .uri = "*",
     .method = HTTP_GET,
@@ -698,6 +811,9 @@ httpd_handle_t start_webserver(void)
         httpd_register_uri_handler(server, &get_api_cloudSetup_mqtt);
         httpd_register_uri_handler(server, &get_api_cloudSetup_http);
         httpd_register_uri_handler(server, &get_api_cloudSetup_blumy);
+        httpd_register_uri_handler(server, &post_api_cloudTest_mqtt);
+        httpd_register_uri_handler(server, &post_api_cloudTest_http);
+        httpd_register_uri_handler(server, &post_api_cloudTest_blumy);
         httpd_register_uri_handler(server, &post_api_timeouts_sleep);
         httpd_register_uri_handler(server, &get_api_timeouts_sleep);
         httpd_register_uri_handler(server, &get_api_timeouts_configurationMode);
@@ -710,6 +826,7 @@ httpd_handle_t start_webserver(void)
         httpd_register_uri_handler(server, &post_api_hardReset);
         httpd_register_uri_handler(server, &post_api_update_firmware);
         httpd_register_uri_handler(server, &get_api_update_firmware);
+        httpd_register_uri_handler(server, &post_api_update_check);
 
         // Every other get request returns index.html
         httpd_register_uri_handler(server, &get);

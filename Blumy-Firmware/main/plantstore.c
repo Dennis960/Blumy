@@ -115,21 +115,23 @@ void plantstore_setCloudConfigurationMqtt(char *sensorId, char *server, int16_t 
     nvs_close(nvs_handle);
 }
 
-bool plantstore_getCloudConfigurationBlumy(char *token, size_t token_size)
+bool plantstore_getCloudConfigurationBlumy(char *token, char *url, size_t token_size, size_t url_size)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
 
     esp_err_t token_err = nvs_get_str(nvs_handle, BLUMY_TOKEN_KEY, token, &token_size);
+    esp_err_t url_err = nvs_get_str(nvs_handle, BLUMY_URL_KEY, url, &url_size);
 
     nvs_close(nvs_handle);
 
-    return token_err == ESP_OK;
+    return token_err == ESP_OK && url_err == ESP_OK;
 }
 
-void plantstore_setCloudConfigurationBlumy(char *token)
+void plantstore_setCloudConfigurationBlumy(char *token, char *url)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
     ESP_ERROR_CHECK(nvs_set_str(nvs_handle, BLUMY_TOKEN_KEY, token));
+    ESP_ERROR_CHECK(nvs_set_str(nvs_handle, BLUMY_URL_KEY, url));
     ESP_ERROR_CHECK(nvs_commit(nvs_handle));
     nvs_close(nvs_handle);
 }
@@ -202,13 +204,33 @@ bool plantstore_getFirmwareUpdateUrl(char *url, size_t url_size)
     return url_err == ESP_OK;
 }
 
+void plantstore_setResetReasonOta(bool ota)
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
+    ESP_ERROR_CHECK(nvs_set_u8(nvs_handle, RESET_REASON_OTA_KEY, ota));
+    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    nvs_close(nvs_handle);
+}
+
+bool plantstore_getResetReasonOta(bool *ota)
+{
+    uint8_t _ota;
+    nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
+    esp_err_t ota_err = nvs_get_u8(nvs_handle, RESET_REASON_OTA_KEY, &_ota);
+    nvs_close(nvs_handle);
+
+    *ota = _ota != 0;
+
+    return ota_err == ESP_OK;
+}
+
 bool plantstore_isConfigured()
 {
     // Doing this is fine, because the parameters can be NULL and then the length of the stored values is checked only
     return plantstore_getWifiCredentials(NULL, NULL, 0, 0) &&
            (plantstore_getCloudConfigurationHttp(NULL, NULL, NULL, 0, 0, 0) ||
             plantstore_getCloudConfigurationMqtt(NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0) ||
-            plantstore_getCloudConfigurationBlumy(NULL, 0));
+            plantstore_getCloudConfigurationBlumy(NULL, NULL, 0, 0));
 }
 
 void plantstore_hardReset()
