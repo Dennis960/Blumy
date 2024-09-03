@@ -18,7 +18,7 @@ services:
     depends_on:
       - db
     build:
-      context: Blumy-Server
+      context: Server
       dockerfile: ./Dockerfile.dev
     volumes:
       - .:/workspace:cached
