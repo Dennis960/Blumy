@@ -8,16 +8,11 @@ on:
   workflow_dispatch:
 jobs:
   export:
-    runs-on: ubuntu-latest
+    runs-on: kicad/kicad:nightly
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v3
-      - name: Add KiCad PPA and install KiCad
-        run: |
-          sudo add-apt-repository --yes ppa:kicad/kicad-dev-nightly
-          sudo apt update
-          sudo apt install --install-recommends kicad-nightly
       - name: Create dist folder
         run: |
           mkdir -p Board/dist
@@ -50,5 +45,5 @@ jobs:
           SOURCE: "Board/"
           REMOTE_HOST: ${{ secrets.BLUMY_HOST }}
           REMOTE_USER: ${{ secrets.BLUMY_USER }}
-          TARGET: ${{ secrets.BLUMY_HOST_PATH }}/api/pages/Board
-        
+          # For now, the target is the same as the firmware path
+          TARGET: ${{ secrets.BLUMY_FIRMWARE_PATH }}/
