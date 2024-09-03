@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 jobs:
   export:
-    runs-on: kicad/kicad:nightly-full
+    runs-on: kicad/kicad:8.0
     permissions:
       contents: write
     steps:
@@ -18,11 +18,11 @@ jobs:
           mkdir -p Board/dist
       - name: Export Board
         run: |
-          kicad-cli-nightly sch export pdf Board/Board.kicad_sch -o Board/dist/Board-schematic.pdf
-          kicad-cli-nightly sch export svg Board/Board.kicad_sch -o Board/dist/Board-schematic.svg
-          kicad-cli-nightly pcb export pdf Board/Board.kicad_pcb --layers F.Cu,B.Cu,F.Silkscreen,B.Silkscreen,User.Drawings,User.Comments,Edge.Cuts -o Board/dist/Board-pcb.pdf
-          kicad-cli-nightly pcb export vrml Board/Board.kicad_pcb -o Board/dist/Board.wrl
-          kicad-cli-nightly pcb export step Board/Board.kicad_pcb --drill-origin --no-dnp --subst-models -o Board/dist/Board.step
+          kicad-cli sch export pdf Board/Board.kicad_sch -o Board/dist/Board-schematic.pdf
+          kicad-cli sch export svg Board/Board.kicad_sch -o Board/dist/Board-schematic.svg
+          kicad-cli pcb export pdf Board/Board.kicad_pcb --layers F.Cu,B.Cu,F.Silkscreen,B.Silkscreen,User.Drawings,User.Comments,Edge.Cuts -o Board/dist/Board-pcb.pdf
+          kicad-cli pcb export vrml Board/Board.kicad_pcb -o Board/dist/Board.wrl
+          kicad-cli pcb export step Board/Board.kicad_pcb --drill-origin --no-dnp --subst-models -o Board/dist/Board.step
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
