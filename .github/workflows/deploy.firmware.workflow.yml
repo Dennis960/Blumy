@@ -86,4 +86,4 @@ jobs:
           SOURCE: "firmware"
           REMOTE_HOST: ${{ secrets.BLUMY_HOST }}
           REMOTE_USER: ${{ secrets.BLUMY_USER }}
-          TARGET: ${{ secrets.BLUMY_HOST_PATH }}/api
+          TARGET: ${{ secrets.BLUMY_FIRMWARE_PATH }}
