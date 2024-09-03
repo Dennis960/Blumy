@@ -18,7 +18,9 @@
 	onMount(async () => {
 		const NoUiSlider = (await import('nouislider')).default;
 		slider = NoUiSlider.create(container, options);
-		slider.on('update', (newValues) => {
+		slider.on('update', () => {
+			const newValues = slider.getPositions();
+
 			if (JSON.stringify(newValues) === JSON.stringify(values)) return;
 			values = newValues;
 			dispatch('input', { values: newValues });

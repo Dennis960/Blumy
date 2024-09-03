@@ -24,7 +24,7 @@
 			(bucket <= sensorConfig.lowerThreshold * sensorConfig.fieldCapacity ||
 				bucket >= sensorConfig.upperThreshold * sensorConfig.fieldCapacity);
 
-		const sensorValueMax = 1024;
+		const sensorValueMax = 2500;
 		const distributionMap: Map<number, number> = new Map();
 		for (
 			let x = 0;
