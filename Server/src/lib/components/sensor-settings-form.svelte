@@ -24,14 +24,16 @@
 	export let formAction = '/sensor';
 	export let formMethod: 'POST' | 'PUT' = 'POST';
 
+	const MAX_FIELD_CAPACITY = 2500;
+
 	let initialConfig: SensorConfigurationDTO =
 		config != undefined
 			? { ...config }
 			: {
 					name: funnyPlantNames[Math.floor(Math.random() * funnyPlantNames.length)],
 					imageBase64: undefined,
-					fieldCapacity: 1024,
-					permanentWiltingPoint: 1024 * 0.3,
+					fieldCapacity: MAX_FIELD_CAPACITY,
+					permanentWiltingPoint: MAX_FIELD_CAPACITY * 0.3,
 					upperThreshold: 0.8,
 					lowerThreshold: 0.2
 				};
@@ -41,10 +43,23 @@
 	let sliderValues: (number | string)[] = [];
 
 	$: [permanentWiltingPoint, lowerThreshold, upperThreshold, fieldCapacity] = sliderValues.map(
-		(v) => (typeof v === 'number' ? Math.floor(v) : Math.floor(parseFloat(v)))
+		(v) => Math.floor((parseFloat(v.toString()) / 100) * MAX_FIELD_CAPACITY)
 	);
 
 	onMount(async () => {
+		const sliderLabels = ['Lufttrocken', 'Trocken', 'Feucht', 'Nass', 'Unter Wasser'];
+		const format = {
+			to: function (value: number) {
+				value = Math.floor((value / MAX_FIELD_CAPACITY) * (sliderLabels.length - 1));
+				return sliderLabels[value];
+			},
+			from: function (value: string) {
+				if (!Number.isNaN(parseFloat(value))) {
+					return parseFloat(value);
+				}
+				return (sliderLabels.indexOf(value) / (sliderLabels.length - 1)) * MAX_FIELD_CAPACITY;
+			}
+		};
 		sliderOptions = {
 			start: [
 				initialConfig.permanentWiltingPoint,
@@ -53,12 +68,21 @@
 				initialConfig.fieldCapacity
 			],
 			connect: true,
-			range: { min: [0], max: [1024] },
+			range: { min: 0, max: MAX_FIELD_CAPACITY },
+			step: MAX_FIELD_CAPACITY / ((sliderLabels.length - 1) * 5),
+			format: format,
 			pips: {
 				mode: PipsMode.Values,
-				density: 3,
-				values: [0, 250, 500, 750, 1000]
-			}
+				format: format,
+				values: sliderLabels.map(format.from),
+				density: 5
+			},
+			tooltips: [
+				{ to: () => 'Vertrocknet' },
+				{ to: () => 'Braucht Wasser' },
+				{ to: () => 'Zu viel Wasser' },
+				{ to: () => 'Überflutet' }
+			]
 		};
 	});
 
@@ -230,7 +254,7 @@
 
 <style>
 	.slider {
-		padding-bottom: 2.5rem;
+		padding-bottom: 8rem;
 	}
 
 	.slider :global(.noUi-connects) {
@@ -247,5 +271,17 @@
 
 	.slider :global(.noUi-connects > div:nth-child(3)) {
 		background: var(--tblr-warning);
+	}
+
+	.slider :global(.noUi-value-horizontal) {
+		-webkit-transform: translate(-50%, 25px);
+		transform: translate(-50%, 25px);
+		writing-mode: vertical-lr;
+	}
+	.slider :global(.noUi-tooltip) {
+		display: none;
+	}
+	.slider :global(.noUi-active .noUi-tooltip) {
+		display: block;
 	}
 </style>
