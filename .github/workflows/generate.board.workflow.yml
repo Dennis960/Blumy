@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 jobs:
   export:
-    runs-on: kicad/kicad:nightly
+    runs-on: kicad/kicad:nightly-full
     permissions:
       contents: write
     steps:
