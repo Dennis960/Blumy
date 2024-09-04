@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { base } from '$app/paths';
 	import Time from '$lib/components/time.svelte';
 	import {
 		IconAlertTriangle,
@@ -30,7 +28,7 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<section on:click={() => goto(`${base}/sensor/${sensor.id}`)} class="card d-flex flex-column">
+<section on:click class="card d-flex flex-column cursor-pointer">
 	<div class="h-100 row row-0">
 		<div class="col-4">
 			<Base64Image
@@ -43,7 +41,7 @@
 				<div class="row">
 					<div class="col me-auto">
 						<h1 class="card-title mb-2 text-nowrap text-truncate">
-							<a href="{base}/sensor/{sensor.id}">{sensor.config.name}</a>
+							<span>{sensor.config.name}</span>
 						</h1>
 					</div>
 					<div

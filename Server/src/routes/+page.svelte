@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import SensorCard from '$lib/components/sensor-card.svelte';
 	import { onMount } from 'svelte';
 
@@ -21,7 +21,7 @@
 		<div class="row row-deck row-cards">
 			{#each data.sensors as sensor (sensor.id)}
 				<div class="col-12 col-md-6 col-lg-4">
-					<SensorCard {sensor} />
+					<SensorCard on:click={() => goto(`/sensor/${sensor.id}`)} {sensor} />
 				</div>
 			{/each}
 			<div class="col-12">

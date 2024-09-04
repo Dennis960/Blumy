@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
-	import { base } from '$app/paths';
 	import SensorSettingsForm from '$lib/components/sensor-settings-form.svelte';
 	import { onMount } from 'svelte';
 
@@ -34,7 +33,7 @@
 				formAction="/api/sensors/{data.id}/settings"
 				formMethod="PUT"
 			>
-				<a slot="form-actions" href={`${base}/sensor/${data.id}`} class="btn btn-link">Abbrechen</a>
+				<a slot="form-actions" href={`/sensor/${data.id}`} class="btn btn-link">Abbrechen</a>
 			</SensorSettingsForm>
 		{/if}
 	</div>

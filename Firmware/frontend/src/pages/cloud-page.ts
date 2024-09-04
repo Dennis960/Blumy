@@ -192,9 +192,21 @@ export class CloudPage extends BasePage {
         this.updateConfigured();
     }
 
+    async handleExternalSetup() {
+        location.href = "https://blumy.cloud/selector";
+    }
+
     render() {
         return html`
-            <title-element>Schnittstellen-Konfiguration</title-element>
+            <title-element>Automatische Schnittstellen-Konfiguration</title-element>
+            <button-element
+                name="Verbindung mit Blumy Cloud herstellen"
+                @click="${() => this.handleExternalSetup()}"
+                ?disabled="${loadingState.state > 0}"
+                ?secondary="${true}"
+            ></button-element>
+            <br />
+            <title-element>Manuelle Schnittstellen-Konfiguration</title-element>
             <collapsible-element
                 summary="Blumy Cloud"
                 ?open=${this.configurationState["cloud"].open}
