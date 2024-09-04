@@ -25,16 +25,7 @@ export class CollapsibleElement extends LitElement {
             }
 
             details[open] summary {
-                background-color: var(--secondary-base);
-                color: var(--text-light);
-            }
-
-            details[open] summary::-webkit-details-marker {
-                color: var(--text-light);
-            }
-
-            details[open] summary::marker {
-                color: var(--text-light);
+                background-color: var(--primary-light);
             }
 
             summary:before {

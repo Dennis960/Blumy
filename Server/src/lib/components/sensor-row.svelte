@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import { base } from '$app/paths';
 	import Time from '$lib/components/time.svelte';
 	import {
 		IconAlertTriangle,
@@ -28,7 +27,7 @@
 			new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString();
 </script>
 
-<tr on:click={() => goto(`${base}/sensor/${sensor.id}`)}>
+<tr on:click={() => goto(`/sensor/${sensor.id}`)}>
 	<th class="w-1">
 		<Base64Image class="avatar avatar-xs" imageBase64={sensor.config.imageBase64} />
 	</th>
@@ -91,7 +90,7 @@
 	</td>
 
 	<td class="text-end">
-		<a href="{base}/sensor/{sensor.id}">Details</a>
+		<a href="/sensor/{sensor.id}">Details</a>
 	</td>
 </tr>
 

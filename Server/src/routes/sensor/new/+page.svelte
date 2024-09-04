@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { base } from '$app/paths';
 	import CopyText from '$lib/components/copy-text.svelte';
 	import SensorSettingsForm from '$lib/components/sensor-settings-form.svelte';
 	import type { SensorCreatedDTO } from '$lib/types/api';
@@ -32,7 +31,7 @@
 						</div>
 						<div class="card-footer text-end">
 							<div class="d-flex justify-content-end column-gap-2">
-								<a href={`${base}/sensor/${createdSensor.id}`} class="btn btn-primary">Fertig</a>
+								<a href={`/sensor/${createdSensor.id}`} class="btn btn-primary">Fertig</a>
 							</div>
 						</div>
 					</div>

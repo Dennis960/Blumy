@@ -450,7 +450,13 @@ bool plantfi_test_blumy_connection(char *token, char *url)
         return false;
     }
     ESP_ERROR_CHECK(esp_http_client_set_header(client, "Authorization", bearer));
-    ESP_ERROR_CHECK(esp_http_client_perform(client));
+    esp_err_t err = esp_http_client_perform(client);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE("HTTP", "Failed to perform HTTP request (%s)", esp_err_to_name(err));
+        ESP_ERROR_CHECK_WITHOUT_ABORT(esp_http_client_cleanup(client));
+        return false;
+    }
 
     int status_code = esp_http_client_get_status_code(client);
     ESP_LOGI("HTTP", "Status Code: %d", status_code);

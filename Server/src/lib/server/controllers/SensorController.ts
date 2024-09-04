@@ -90,6 +90,7 @@ export default class SensorController {
     return {
       id,
       readToken: sensorEntity.readToken,
+      writeToken: sensorEntity.writeToken,
       config,
       lastUpdate:
         lastReading != undefined

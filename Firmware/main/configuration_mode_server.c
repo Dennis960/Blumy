@@ -213,6 +213,7 @@ esp_err_t post_api_cloudSetup_blumy_handler(httpd_req_t *req)
     plantstore_setCloudConfigurationBlumy(token, url);
 
     const char resp[] = "OK";
+    httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
@@ -290,6 +291,7 @@ esp_err_t get_api_cloudSetup_blumy_handler(httpd_req_t *req)
     char *resp = cJSON_Print(root);
     cJSON_Delete(root);
 
+    httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     free(resp);
     return ESP_OK;
@@ -323,6 +325,7 @@ esp_err_t post_api_cloudTest_blumy_handler(httpd_req_t *req)
     const bool connectionOk = plantfi_test_blumy_connection(token, url);
     char resp[6];
     sprintf(resp, "%s", connectionOk ? "true" : "false");
+    httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
