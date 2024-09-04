@@ -25,7 +25,7 @@ export class ResetPage extends BasePage {
                 später erneut zu konfigurieren, drücke den Reset-Knopf auf dem
                 Gerät.
             </description-element>
-            <error-text-element text="${this.errorText}"></error-text-element>
+            <text-element text="${this.errorText}"></text-element>
             <button-nav-element>
                 <button-element
                     name="Zurück"
@@ -34,7 +34,7 @@ export class ResetPage extends BasePage {
                 ></button-element>
                 <button-element
                     name="Sensor-Modus"
-                    @click="${this.next}"
+                    @click="${() => this.next()}"
                     ?secondary="${false}"
                 ></button-element>
                 <button-element

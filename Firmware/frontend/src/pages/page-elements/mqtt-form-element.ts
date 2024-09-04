@@ -1,17 +1,17 @@
-import { InputElement } from "./input-element";
 import { LitElement, html } from "lit";
 import { customElement, query } from "lit/decorators.js";
 import { MqttCloudConfiguration } from "../../api";
+import { InputElement } from "./input-element";
 
 @customElement("mqtt-form-element")
 export class MqttFormElement extends LitElement {
-    @query("#sensorId") sensorInput: InputElement;
-    @query("#server") serverInput: InputElement;
-    @query("#port") portInput: InputElement;
-    @query("#user") userInput: InputElement;
-    @query("#password") passwordInput: InputElement;
-    @query("#topic") topicInput: InputElement;
-    @query("#client-id") clientIdInput: InputElement;
+    @query("#sensorId") sensorInput!: InputElement;
+    @query("#server") serverInput!: InputElement;
+    @query("#port") portInput!: InputElement;
+    @query("#user") userInput!: InputElement;
+    @query("#password") passwordInput!: InputElement;
+    @query("#topic") topicInput!: InputElement;
+    @query("#client-id") clientIdInput!: InputElement;
 
     public getConfig(): MqttCloudConfiguration {
         return {

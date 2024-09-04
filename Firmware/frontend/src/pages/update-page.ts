@@ -1,11 +1,12 @@
 import { css, html } from "lit";
-import { customElement, property, query, state } from "lit/decorators.js";
+import { customElement, query, state } from "lit/decorators.js";
 import {
     checkUpdateAvailable,
     getUpdateFirmwareUrl,
     getUpdatePercentage,
     updateFirmware,
 } from "../api";
+import { enableDotNavigation } from "../states";
 import { BasePage } from "./base-page";
 import { InputElement } from "./page-elements/input-element";
 
@@ -18,33 +19,39 @@ export class UpdatePage extends BasePage {
             }
         `,
     ];
-    @property({ type: String }) onlineStatus: string;
     @state() errorText: string = "";
     @state() successText: string = "";
+    @state() infoText: string = "";
 
-    @query("#url") urlElement: InputElement;
+    @query("#url") urlElement!: InputElement;
 
-    @state() firmwareUpdateProgress: number = 0;
+    @state() firmwareUpdateProgress: number | null = null;
     @state() updateAvailable: boolean = false;
 
-    updateProgressTimeout: number;
-
     async updateProgress() {
-        this.firmwareUpdateProgress = await getUpdatePercentage();
-        if (this.firmwareUpdateProgress < 100) {
-            this.updateProgressTimeout = window.setTimeout(
-                () => this.updateProgress(),
-                200
-            );
+        this.firmwareUpdateProgress = 0;
+        while (this.firmwareUpdateProgress !== null) {
+            this.firmwareUpdateProgress = await getUpdatePercentage();
+            if (
+                this.firmwareUpdateProgress === 100 ||
+                this.firmwareUpdateProgress === -1
+            ) {
+                this.infoText = "Der Sensor wurde erfolgreich aktualisiert";
+                this.firmwareUpdateProgress = null;
+                return;
+            }
+            if (this.firmwareUpdateProgress < 100) {
+                await new Promise((resolve) => setTimeout(resolve, 200));
+            }
+            if (this.firmwareUpdateProgress > 80) {
+                this.infoText = "Der Sensor wird jetzt neu gestartet";
+            }
         }
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
-
-        if (this.updateProgressTimeout) {
-            window.clearTimeout(this.updateProgressTimeout);
-        }
+        this.firmwareUpdateProgress = null;
     }
 
     async firstUpdated() {
@@ -78,14 +85,17 @@ export class UpdatePage extends BasePage {
 
     async updateFirmware() {
         this.errorText = "";
+        this.successText = "";
         const url = this.urlElement.input.value;
         if (!url) {
             this.errorText = "Bitte gib eine URL ein";
             return;
         }
 
+        enableDotNavigation.state = false;
         await updateFirmware(url);
-        this.updateProgress();
+        await this.updateProgress();
+        enableDotNavigation.state = true;
     }
 
     render() {
@@ -98,23 +108,29 @@ export class UpdatePage extends BasePage {
                     type="text"
                 ></input-element>
                 <progress-bar-element
-                    progress="${this.firmwareUpdateProgress}"
+                    progress="${this.firmwareUpdateProgress ?? 0}"
                 ></progress-bar-element>
             </input-element-grid>
-            <error-text-element text="${this.errorText}"></error-text-element>
-            <success-text-element
-                text="${this.successText}"
-            ></success-text-element>
+            <text-element
+                text="${this.errorText || this.successText || this.infoText}"
+                color="${this.errorText
+                    ? "error"
+                    : this.successText
+                    ? "success"
+                    : "warning"}"
+            ></text-element>
             <button-nav-element>
                 <button-element
                     name="Zurück"
                     @click="${this.back}"
                     ?secondary="${false}"
+                    ?disabled="${this.firmwareUpdateProgress !== null}"
                 ></button-element>
                 <button-element
                     name="Überspringen"
-                    @click="${this.next}"
+                    @click="${() => this.next()}"
                     ?secondary="${true}"
+                    ?disabled="${this.firmwareUpdateProgress !== null}"
                 ></button-element>
                 ${this.updateAvailable
                     ? html`
@@ -122,6 +138,8 @@ export class UpdatePage extends BasePage {
                               name="Firmware aktualisieren"
                               @click="${this.updateFirmware}"
                               ?secondary="${true}"
+                              ?disabled="${this.firmwareUpdateProgress !==
+                              null}"
                           ></button-element>
                       `
                     : html`
@@ -129,6 +147,8 @@ export class UpdatePage extends BasePage {
                               name="Nach Updates suchen"
                               @click="${this.searchForUpdates}"
                               ?secondary="${true}"
+                              ?disabled="${this.firmwareUpdateProgress !==
+                              null}"
                           ></button-element>
                       `}
             </button-nav-element>

@@ -1,3 +1,4 @@
+import { StateController } from "@lit-app/state";
 import { html } from "lit";
 import { customElement, query, state } from "lit/decorators.js";
 import {
@@ -13,10 +14,18 @@ import { InputElement } from "./page-elements/input-element";
 
 @customElement("wifi-setup-page")
 export class WifiSetupPage extends BasePage {
-    @query("#ssid") ssidElement: InputElement;
-    @query("#password") passwordElement: InputElement;
+    @query("#ssid") ssidElement!: InputElement;
+    @query("#password") passwordElement!: InputElement;
 
     @state() errorText: string = "";
+
+    loadingStateController = new StateController(this, loadingState);
+
+    async connectLoading() {
+        loadingState.state++;
+        await this.connect();
+        loadingState.state--;
+    }
 
     async connect() {
         this.errorText = "";
@@ -84,7 +93,11 @@ export class WifiSetupPage extends BasePage {
             return;
         }
 
-        networkState.state.network.ssid = network.ssid;
+        networkState.state.network = {
+            ssid: network.ssid,
+            rssi: network.rssi,
+            secure: -1,
+        };
         this.ssidElement.input.value = network.ssid;
         this.passwordElement.input.focus();
     }
@@ -105,7 +118,7 @@ export class WifiSetupPage extends BasePage {
                     label="Passwort"
                 ></input-element>
             </input-element-grid>
-            <error-text-element text="${this.errorText}"></error-text-element>
+            <text-element text="${this.errorText}"></text-element>
             <button-nav-element>
                 <button-element
                     name="Zurück"
@@ -114,8 +127,9 @@ export class WifiSetupPage extends BasePage {
                 ></button-element>
                 <button-element
                     name="Verbinden"
-                    @click="${this.connect}"
+                    @click="${this.connectLoading}"
                     ?secondary="${true}"
+                    ?disabled="${loadingState.state > 0}"
                 ></button-element>
             </button-nav-element>
         `;

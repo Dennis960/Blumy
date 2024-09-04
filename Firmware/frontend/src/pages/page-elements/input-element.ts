@@ -23,7 +23,7 @@ export class InputElement extends LitElement {
             }
         `,
     ];
-    @property({ type: String }) label: string;
+    @property({ type: String }) label!: string;
     @property({ type: String }) type?:
         | "button"
         | "checkbox"
@@ -48,10 +48,10 @@ export class InputElement extends LitElement {
         | "url"
         | "week" = "text";
     @property() initialValue: any;
-    @property() readonly: boolean;
+    @property() readonly!: boolean;
 
     @query("#input")
-    input: HTMLInputElement;
+    input!: HTMLInputElement;
 
     firstUpdated() {
         if (this.initialValue !== undefined) {

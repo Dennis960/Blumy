@@ -5,6 +5,8 @@ export default defineMock(
         url: "/api/connectedNetwork",
         body: {
             ssid: "Best WiFi",
+            rssi: -50,
+            status: 0,
         }
     }
 );

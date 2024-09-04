@@ -1,13 +1,11 @@
-import { networkState } from "../states";
-import { getNetworks, Network } from "../api";
 import { html } from "lit";
-import { property, customElement, state } from "lit/decorators.js";
+import { customElement, state } from "lit/decorators.js";
+import { getNetworks, Network } from "../api";
+import { networkState } from "../states";
 import { BasePage } from "./base-page";
 
 @customElement("wifi-scanner-page")
 export class WifiScannerPage extends BasePage {
-    @property({ type: String }) onlineStatus: string;
-
     @state() errorText: string = "";
     @state() networks: Network[] = [];
 
@@ -48,7 +46,7 @@ export class WifiScannerPage extends BasePage {
         return html`
             <title-element>Wähle WLAN aus</title-element>
             <description-element>Verfügbare WLANs</description-element>
-            <error-text-element text="${this.errorText}"></error-text-element>
+            <text-element text="${this.errorText}"></text-element>
             <wifi-list-element
                 .wifis="${this.networks}"
                 @networkClick="${this.onNetworkClick}"
@@ -61,7 +59,7 @@ export class WifiScannerPage extends BasePage {
                 ></button-element>
                 <button-element
                     name="Manuelle Eingabe"
-                    @click="${this.next}"
+                    @click="${() => this.next()}"
                     ?secondary="${true}"
                 ></button-element>
             </button-nav-element>

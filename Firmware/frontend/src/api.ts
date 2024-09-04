@@ -55,7 +55,7 @@ export type CloudConfiguration =
 
 /* fetch loading state indicator */
 const fetch = new Proxy(window.fetch, {
-    apply: async (target, thisArgs, args) => {
+    apply: async (target, thisArgs, args: [RequestInfo, RequestInit?]) => {
         loadingState.state++;
         try {
             const res = await target.apply(thisArgs, args);
@@ -83,13 +83,20 @@ async function postDataToEsp(
     });
 }
 
-async function getDataFromEsp(url: string) {
-    return await fetch("/api" + url)
+async function getDataFromEsp(
+    url: string,
+    _fetch: typeof window.fetch = fetch
+) {
+    return await _fetch("/api" + url)
         .then((response) => response.json())
         .catch((error) => {
             console.error(error);
             return null;
         });
+}
+
+async function getDataFromEspWithoutLoadingState(url: string) {
+    return await getDataFromEsp(url, window.fetch);
 }
 
 export async function connectToNetwork(ssid: string, password: string) {
@@ -104,19 +111,26 @@ export async function getNetworks(): Promise<Network[]> {
     return await getDataFromEsp("/networks");
 }
 
-export async function isConnected(): Promise<WifiStatus> {
-    const res = await getDataFromEsp("/isConnected");
+export async function isConnected(
+    enableLoadingState = true
+): Promise<WifiStatus> {
+    const res = await (enableLoadingState
+        ? getDataFromEsp
+        : getDataFromEspWithoutLoadingState)("/isConnected");
     if (res == null) {
         return WifiStatus.ERROR;
     }
     return Number(res);
 }
 
-export async function getConnectedNetwork(): Promise<{
+export async function getConnectedNetwork(enableLoadingState = true): Promise<{
     ssid: string;
     status: WifiStatus;
+    rssi: number;
 }> {
-    return await getDataFromEsp("/connectedNetwork");
+    return await (enableLoadingState
+        ? getDataFromEsp
+        : getDataFromEspWithoutLoadingState)("/connectedNetwork");
 }
 
 export async function setCloudCredentials(config: CloudConfiguration) {
@@ -124,7 +138,7 @@ export async function setCloudCredentials(config: CloudConfiguration) {
         return await postDataToEsp("/cloudSetup/http", config);
     } else if (config.type === "mqtt") {
         return await postDataToEsp("/cloudSetup/mqtt", config);
-    } else if (config.type === "cloud") {
+    } else {
         return await postDataToEsp("/cloudSetup/blumy", config);
     }
 }
@@ -142,7 +156,7 @@ export async function getCloudCredentials<T extends CloudConfiguration["type"]>(
         return await getDataFromEsp("/cloudSetup/http");
     } else if (type === "mqtt") {
         return await getDataFromEsp("/cloudSetup/mqtt");
-    } else if (type === "cloud") {
+    } else {
         return await getDataFromEsp("/cloudSetup/blumy");
     }
 }
@@ -158,7 +172,7 @@ export async function testCloudConnection(
         return await postDataToEsp("/cloudTest/mqtt", config).then((res) =>
             res.json()
         );
-    } else if (config.type === "cloud") {
+    } else {
         return await postDataToEsp("/cloudTest/blumy", config).then((res) =>
             res.json()
         );
@@ -187,15 +201,17 @@ export async function getConfigurationModeTimeout() {
 }
 
 export async function getUpdatePercentage() {
-    return Number(await getDataFromEsp("/update/percentage"));
+    return Number(
+        await getDataFromEspWithoutLoadingState("/update/percentage")
+    );
 }
 
 export async function getSensorData(): Promise<SensorData> {
     return await getDataFromEsp("/sensor/data");
 }
 
-export async function hardResetEsp() {
-    return await postDataToEsp("/hardReset");
+export async function factoryResetEsp() {
+    return await postDataToEsp("/factoryReset");
 }
 
 export async function updateFirmware(url: string) {

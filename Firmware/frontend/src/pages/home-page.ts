@@ -22,32 +22,36 @@ export class HomePage extends BasePage {
         }
     `;
 
-    @query("#temperature") temperatureElement: InputElement;
-    @query("#humidity") humidityElement: InputElement;
-    @query("#light") lightElement: InputElement;
-    @query("#moisture") moistureElement: InputElement;
-    @query("#voltage") voltageElement: InputElement;
-    @query("#usb") usbElement: InputElement;
+    @query("#temperature") temperatureElement!: InputElement;
+    @query("#humidity") humidityElement!: InputElement;
+    @query("#light") lightElement!: InputElement;
+    @query("#moisture") moistureElement!: InputElement;
+    @query("#voltage") voltageElement!: InputElement;
+    @query("#usb") usbElement!: InputElement;
 
     @state()
     loading = false;
 
-    timeout: number;
+    shouldFetchData = true;
 
     async updateSensorData() {
-        const sensorData = await getSensorData();
-        if (!sensorData) {
-            return;
+        while (this.shouldFetchData) {
+            const sensorData = await getSensorData();
+            if (!sensorData) {
+                return;
+            }
+            this.temperatureElement.input.value = String(
+                sensorData.temperature
+            );
+            this.humidityElement.input.value = String(sensorData.humidity);
+            this.lightElement.input.value = String(sensorData.light);
+            this.moistureElement.input.value = String(sensorData.moisture);
+            this.voltageElement.input.value = String(sensorData.voltage);
+            this.usbElement.input.value = sensorData.usb
+                ? "angeschlossen"
+                : "nicht angeschlossen";
+            await new Promise((resolve) => setTimeout(resolve, 2000));
         }
-        this.temperatureElement.input.value = String(sensorData.temperature);
-        this.humidityElement.input.value = String(sensorData.humidity);
-        this.lightElement.input.value = String(sensorData.light);
-        this.moistureElement.input.value = String(sensorData.moisture);
-        this.voltageElement.input.value = String(sensorData.voltage);
-        this.usbElement.input.value = sensorData.usb
-            ? "angeschlossen"
-            : "nicht angeschlossen";
-        this.timeout = window.setTimeout(() => this.updateSensorData(), 2000);
     }
 
     constructor() {
@@ -57,9 +61,7 @@ export class HomePage extends BasePage {
 
     disconnectedCallback() {
         super.disconnectedCallback();
-        if (this.timeout) {
-            window.clearTimeout(this.timeout);
-        }
+        this.shouldFetchData = false;
     }
 
     render() {

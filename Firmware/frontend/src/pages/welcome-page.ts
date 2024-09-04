@@ -1,7 +1,7 @@
 import { StateController } from "@lit-app/state";
 import { css, html } from "lit";
 import { customElement } from "lit/decorators.js";
-import { WifiStatus, getConnectedNetwork, isConnected } from "../api";
+import { WifiStatus, getConnectedNetwork, isConnected, resetEsp } from "../api";
 import { networkState } from "../states";
 import { BasePage } from "./base-page";
 
@@ -24,23 +24,25 @@ export class WelcomePage extends BasePage {
 
     constructor() {
         super();
-        (async () => {
-            while (this.shouldReadWifiStatus) {
-                const wifiStatus = await isConnected();
-                if (wifiStatus == WifiStatus.CONNECTED) {
-                    const network = await getConnectedNetwork();
-                    networkState.state = {
-                        isConnected: network.status == WifiStatus.CONNECTED,
-                        network: {
-                            rssi: 0, // TODO
-                            ssid: network.ssid,
-                            secure: 0, // TODO
-                        },
-                    };
-                }
-                await new Promise((resolve) => setTimeout(resolve, 1000));
+        this.checkWifiStatus();
+    }
+
+    async checkWifiStatus() {
+        while (this.shouldReadWifiStatus) {
+            const wifiStatus = await isConnected(false);
+            if (wifiStatus == WifiStatus.CONNECTED) {
+                const network = await getConnectedNetwork(false);
+                networkState.state = {
+                    isConnected: network.status == WifiStatus.CONNECTED,
+                    network: {
+                        rssi: network.rssi,
+                        ssid: network.ssid,
+                        secure: -1,
+                    },
+                };
             }
-        })();
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
     }
 
     disconnectedCallback() {
@@ -48,39 +50,54 @@ export class WelcomePage extends BasePage {
         this.shouldReadWifiStatus = false;
     }
 
+    async exitConfiguration() {
+        await resetEsp();
+    }
+
     render() {
         return html`
             <title-element>Willkommen</title-element>
             <description-element>
-                Blumy ist aktuell
-                ${networkState.state.isConnected
-                    ? "mit dem Internet"
-                    : "vom Internet"}
-                <span
-                    class="${networkState.state.isConnected ? "green" : "red"}"
-                    >${networkState.state.isConnected
-                        ? "verbunden"
-                        : "getrennt"}</span
-                >.
-                ${networkState.state.isConnected &&
-                networkState.state.network?.ssid
+                ${networkState.state.network
                     ? html`
-                          <br />
-                          Verbunden mit
-                          <b>${networkState.state.network?.ssid}</b>.
+                          Blumy ist aktuell
+                          ${networkState.state.isConnected
+                              ? "mit dem Internet"
+                              : "vom Internet"}
+                          <span
+                              class="${networkState.state.isConnected
+                                  ? "green"
+                                  : "red"}"
+                              >${networkState.state.isConnected
+                                  ? "verbunden"
+                                  : "getrennt"}</span
+                          >.
+                          ${networkState.state.isConnected &&
+                          networkState.state.network?.ssid
+                              ? html`
+                                    <br />
+                                    Verbunden mit
+                                    <b>${networkState.state.network.ssid}</b>.
+                                `
+                              : html``}
                       `
-                    : html``}
+                    : html`<span>Verbindung wird überprüft</span>`}
             </description-element>
             <button-nav-element>
                 <button-element
-                    name="Setup überspringen"
-                    @click="${() =>
-                        this.dispatchEvent(new CustomEvent("skip"))}"
+                    name="Konfiguration beenden"
+                    @click="${this.exitConfiguration}"
                     ?secondary="${false}"
                 ></button-element>
                 <button-element
                     name="Setup beginnen"
-                    @click="${this.next}"
+                    @click="${() => {
+                        if (networkState.state.isConnected) {
+                            this.next(3);
+                        } else {
+                            this.next();
+                        }
+                    }}"
                     ?secondary="${true}"
                 ></button-element>
             </button-nav-element>

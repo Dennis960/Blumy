@@ -47,4 +47,4 @@ bool plantstore_getResetReasonOta(bool *ota);
  * The plantstore is marked as configured, if the wifi credentials are set and at least one of the cloud configurations is set.
  */
 bool plantstore_isConfigured();
-void plantstore_hardReset();
+void plantstore_factoryReset();

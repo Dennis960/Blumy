@@ -12,7 +12,7 @@ import "./pages/update-page";
 import "./pages/welcome-page";
 import "./pages/wifi-scanner-page";
 import "./pages/wifi-setup-page";
-import { loadingState } from "./states";
+import { enableDotNavigation, loadingState } from "./states";
 
 @customElement("first-setup-screen")
 export class FirstSetupScreen extends LitElement {
@@ -38,47 +38,30 @@ export class FirstSetupScreen extends LitElement {
     @state()
     currentDot = 0;
 
-    @state()
-    pageElements = [];
+    pageElements = [
+        html`<welcome-page @next="${this.next}" />`,
+        html`<wifi-scanner-page @next="${this.next}" @back="${this.back}" />`,
+        html`<wifi-setup-page @next="${this.next}" @back="${this.back}" />`,
+        html`<update-page @next="${this.next}" @back="${this.back}" />`,
+        html`<cloud-page @next="${this.next}" @back="${this.back}" />`,
+        html`<timeout-page @next="${this.next}" @back="${this.back}" />`,
+        html`<reset-page @next="${this.next}" @back="${this.back}" />`,
+        html`<home-page @back="${this.back}"></home-page>`,
+    ];
 
-    next() {
-        this.currentDot++;
-        if (this.currentDot >= this.pageElements.length) {
-            this.nextScreen();
-        }
+    next(event: CustomEvent<number>) {
+        this.currentDot += event.detail;
     }
     back() {
         this.currentDot = Math.max(this.currentDot - 1, 0);
     }
 
-    nextScreen() {
-        // redirect to /home
-        window.location.href = "/home";
-    }
-
     onDotClick = (e: CustomEvent) => {
-        const dotNumber = e.detail;
-        this.currentDot = dotNumber;
+        if (enableDotNavigation.state) {
+            const dotNumber = e.detail;
+            this.currentDot = dotNumber;
+        }
     };
-
-    updatePageElements() {
-        this.pageElements = [
-            html`<welcome-page
-                @next="${this.next}"
-                @skip="${this.nextScreen}"
-            />`,
-            html`<wifi-scanner-page
-                @next="${this.next}"
-                @back="${this.back}"
-            />`,
-            html`<wifi-setup-page @next="${this.next}" @back="${this.back}" />`,
-            html`<update-page @next="${this.next}" @back="${this.back}" />`,
-            html`<timeout-page @next="${this.next}" @back="${this.back}" />`,
-            html`<cloud-page @next="${this.next}" @back="${this.back}" />`,
-            html`<reset-page @next="${this.next}" @back="${this.back}" />`,
-            html`<home-page @back="${this.back}"></home-page>`,
-        ];
-    }
 
     loadingStateController = new StateController(this, loadingState);
 
@@ -101,7 +84,6 @@ export class FirstSetupScreen extends LitElement {
         if (page) {
             this.currentDot = parseInt(page);
         }
-        this.updatePageElements();
     }
 
     render() {

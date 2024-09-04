@@ -4,9 +4,9 @@ import { classMap } from "lit/directives/class-map.js";
 
 @customElement("button-element")
 export class ButtonElement extends LitElement {
-    @property({ type: Boolean }) secondary: boolean;
-    @property({ type: String }) name: string;
-    @property({ type: Boolean }) disabled: boolean;
+    @property({ type: Boolean }) secondary!: boolean;
+    @property({ type: String }) name!: string;
+    @property({ type: Boolean }) disabled!: boolean;
 
     static styles = [
         css`
@@ -37,7 +37,7 @@ export class ButtonElement extends LitElement {
             disabled: this.disabled,
         };
         return html`
-            <button class=${classMap(classes)}>
+            <button class=${classMap(classes)} ?disabled=${this.disabled}>
                 <slot></slot>${this.name}
             </button>
         `;
