@@ -12,11 +12,13 @@
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
+#include "lwip/lwip_napt.h"
 
 #include "plantstore.h"
 #include "defaults.h"
 #include <esp_http_client.h>
 #include "esp_timer.h"
+#include <dhcpserver/dhcpserver.h>
 
 EventGroupHandle_t plantfi_sta_event_group;
 
@@ -32,7 +34,15 @@ char plantfi_ssid[DEFAULT_SSID_MAX_LENGTH];
 char plantfi_password[DEFAULT_PASSWORD_MAX_LENGTH];
 
 bool _credentialsChanged = false;
+bool _enableNatAndDnsOnConnect = false;
 bool *_userConnectedToAp = NULL;
+
+esp_netif_t *ap_netif;
+esp_netif_t *sta_netif;
+
+void plantfi_start_nat();
+void plantfi_configure_dns_sta();
+void plantfi_configure_dns_ap();
 
 void plantfi_wifi_event_handler(int32_t event_id)
 {
@@ -83,6 +93,11 @@ void plantfi_ip_event_handler(int32_t event_id, void *event_data)
         ESP_LOGI(PLANTFI_TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         plantfi_retry_num = 0;
         xEventGroupSetBits(plantfi_sta_event_group, PLANTFI_CONNECTED_BIT);
+        if (_enableNatAndDnsOnConnect)
+        {
+            plantfi_configure_dns_sta();
+            plantfi_start_nat();
+        }
     }
     else
     {
@@ -113,10 +128,10 @@ void plantfi_initWifi(bool staOnly)
     ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &plantfi_event_handler, &instance_any_wifi_event)); // TODO unregister event handlers on deinit
     ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &plantfi_event_handler, &instance_any_ip_event));
 
-    esp_netif_create_default_wifi_sta();
+    sta_netif = esp_netif_create_default_wifi_sta();
     if (!staOnly)
     {
-        esp_netif_create_default_wifi_ap();
+        ap_netif = esp_netif_create_default_wifi_ap();
     }
 
     // esp_wifi_set_max_tx_power(84); :D
@@ -130,6 +145,10 @@ void plantfi_initWifi(bool staOnly)
     else
     {
         ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
+    }
+    if (_enableNatAndDnsOnConnect)
+    {
+        plantfi_configure_dns_ap();
     }
     ESP_ERROR_CHECK(esp_wifi_start());
 
@@ -240,6 +259,46 @@ esp_err_t plantfi_waitForStaConnection(EventBits_t *bits)
         *bits = _bits;
     }
     return ESP_OK;
+}
+
+void plantfi_setEnableNatAndDnsOnConnect(bool enableNatAndDnsOnConnect)
+{
+    _enableNatAndDnsOnConnect = enableNatAndDnsOnConnect;
+}
+
+void plantfi_configure_dns_sta()
+{
+    esp_netif_dns_info_t dns;
+    if (esp_netif_get_dns_info(sta_netif, ESP_NETIF_DNS_MAIN, &dns) == ESP_OK)
+    {
+        esp_netif_set_dns_info(ap_netif, ESP_NETIF_DNS_MAIN, &dns);
+        ESP_LOGI(PLANTFI_TAG, "set dns to:" IPSTR, IP2STR(&(dns.ip.u_addr.ip4)));
+    }
+}
+
+void plantfi_configure_dns_ap()
+{
+    // Enable DNS (offer) for dhcp server
+    dhcps_offer_t dhcps_dns_value = OFFER_DNS;
+    esp_netif_dhcps_option(ap_netif, ESP_NETIF_OP_SET, ESP_NETIF_DOMAIN_NAME_SERVER, &dhcps_dns_value, sizeof(dhcps_dns_value));
+
+    esp_netif_dns_info_t dns;
+    if (esp_netif_get_dns_info(sta_netif, ESP_NETIF_DNS_MAIN, &dns) == ESP_OK)
+    {
+        esp_netif_set_dns_info(ap_netif, ESP_NETIF_DNS_MAIN, &dns);
+        ESP_LOGI(PLANTFI_TAG, "set dns to:" IPSTR, IP2STR(&(dns.ip.u_addr.ip4)));
+    }
+
+    esp_netif_dns_info_t dnsserver;
+    dnsserver.ip.u_addr.ip4.addr = ipaddr_addr("8.8.8.8");
+    dnsserver.ip.type = ESP_IPADDR_TYPE_V4;
+    esp_netif_set_dns_info(sta_netif, ESP_NETIF_DNS_MAIN, &dnsserver);
+}
+
+void plantfi_start_nat()
+{
+    ESP_LOGI(PLANTFI_TAG, "Starting NAT");
+    ESP_ERROR_CHECK_WITHOUT_ABORT(esp_netif_napt_enable(ap_netif));
 }
 
 int8_t plantfi_getRssi()

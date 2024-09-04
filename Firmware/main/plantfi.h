@@ -32,6 +32,7 @@ void plantfi_initWifiApSta();
 void plantfi_initWifiStaOnly();
 void plantfi_configureAp(const char *ssid, const char *password, int max_connection, bool *userConnectedToAp);
 void plantfi_configureSta(const char *ssid, const char *password, int max_retry, bool credentialsChanged);
+void plantfi_setEnableNatAndDnsOnConnect(bool isConfigurationMode);
 /**
  * @return true if wifi credentials were found
  */

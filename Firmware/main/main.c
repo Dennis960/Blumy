@@ -28,6 +28,7 @@ void start_deep_sleep()
 void configuration_mode(bool isConfigured)
 {
     sensors_playStartupSound();
+    plantfi_setEnableNatAndDnsOnConnect(true);
     plantfi_initWifiApSta();
     uint64_t start_time = esp_timer_get_time();
     uint64_t current_time = start_time;
