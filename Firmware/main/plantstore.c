@@ -233,7 +233,7 @@ bool plantstore_isConfigured()
             plantstore_getCloudConfigurationBlumy(NULL, NULL, 0, 0));
 }
 
-void plantstore_hardReset()
+void plantstore_factoryReset()
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
     ESP_ERROR_CHECK(nvs_erase_all(nvs_handle));

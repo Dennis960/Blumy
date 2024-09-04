@@ -1,3 +1,4 @@
+import { StateController } from "@lit-app/state";
 import { html } from "lit";
 import { customElement, query, state } from "lit/decorators.js";
 import {
@@ -9,6 +10,7 @@ import {
     setCloudCredentials,
     testCloudConnection,
 } from "../api";
+import { loadingState } from "../states";
 import { BasePage } from "./base-page";
 import "./page-elements/cloud-form-element";
 import { CloudFormElement } from "./page-elements/cloud-form-element";
@@ -40,17 +42,20 @@ export class CloudPage extends BasePage {
         mqtt: { open: false },
     };
     @state() configured: boolean = false;
-    @state() configurationMessages: {
-        error: Record<CloudConfiguration["type"], string>;
-        success: Record<CloudConfiguration["type"], string>;
-    } = {
-        error: { cloud: "", http: "", mqtt: "" },
-        success: { cloud: "", http: "", mqtt: "" },
+    @state() configurationMessages: Record<
+        CloudConfiguration["type"],
+        { message: string; type: "error" | "success" }
+    > = {
+        cloud: { message: "", type: "error" },
+        http: { message: "", type: "error" },
+        mqtt: { message: "", type: "error" },
     };
 
-    @query("cloud-form-element") cloudFormElement: CloudFormElement;
-    @query("http-form-element") httpFormElement: HttpFormElement;
-    @query("mqtt-form-element") mqttFormElement: MqttFormElement;
+    @query("cloud-form-element") cloudFormElement!: CloudFormElement;
+    @query("http-form-element") httpFormElement!: HttpFormElement;
+    @query("mqtt-form-element") mqttFormElement!: MqttFormElement;
+
+    loadingStateController = new StateController(this, loadingState);
 
     private async submit() {
         const configuredStates = Object.entries(this.configurationState).filter(
@@ -115,19 +120,21 @@ export class CloudPage extends BasePage {
         this.updateConfigured();
     }
 
-    private async test() {
+    private async testConnections() {
         if (this.configurationState.cloud.open) {
             const res = await testCloudConnection(
                 this.cloudFormElement.getConfig()
             );
             if (res) {
-                this.configurationMessages.success.cloud =
-                    "Blumy Cloud verbunden";
-                this.configurationMessages.error.cloud = "";
+                this.configurationMessages.cloud = {
+                    message: "Blumy Cloud verbunden",
+                    type: "success",
+                };
             } else {
-                this.configurationMessages.error.cloud =
-                    "Verbindung fehlgeschlagen";
-                this.configurationMessages.success.cloud = "";
+                this.configurationMessages.cloud = {
+                    message: "Verbindung fehlgeschlagen",
+                    type: "error",
+                };
             }
         }
         if (this.configurationState.http.open) {
@@ -135,11 +142,15 @@ export class CloudPage extends BasePage {
                 this.httpFormElement.getConfig()
             );
             if (res) {
-                this.configurationMessages.success.http = "HTTP verbunden";
-                this.configurationMessages.error.http = "";
+                this.configurationMessages.http = {
+                    message: "HTTP verbunden",
+                    type: "success",
+                };
             } else {
-                this.configurationMessages.error.http = "Verbindung fehlgeschlagen";
-                this.configurationMessages.success.http = "";
+                this.configurationMessages.http = {
+                    message: "Verbindung fehlgeschlagen",
+                    type: "error",
+                };
             }
         }
         if (this.configurationState.mqtt.open) {
@@ -147,11 +158,15 @@ export class CloudPage extends BasePage {
                 this.mqttFormElement.getConfig()
             );
             if (res) {
-                this.configurationMessages.success.mqtt = "MQTT verbunden";
-                this.configurationMessages.error.mqtt = "";
+                this.configurationMessages.mqtt = {
+                    message: "MQTT verbunden",
+                    type: "success",
+                };
             } else {
-                this.configurationMessages.error.mqtt = "Verbindung fehlgeschlagen";
-                this.configurationMessages.success.mqtt = "";
+                this.configurationMessages.mqtt = {
+                    message: "Verbindung fehlgeschlagen",
+                    type: "error",
+                };
             }
         }
         this.configurationState = { ...this.configurationState };
@@ -189,13 +204,10 @@ export class CloudPage extends BasePage {
                 <cloud-form-element
                     @input-config=${this.handleChange}
                 ></cloud-form-element>
-                ${this.configurationMessages.error.cloud
-                    ? html`<error-text-element
-                          text="${this.configurationMessages.error.cloud}"
-                      />`
-                    : html` <success-text-element
-                          text="${this.configurationMessages.success.cloud}"
-                      />`}
+                <text-element
+                    text="${this.configurationMessages.cloud.message}"
+                    color="${this.configurationMessages.cloud.type}"
+                />
             </collapsible-element>
             <collapsible-element
                 summary="HTTP"
@@ -206,13 +218,10 @@ export class CloudPage extends BasePage {
                 <http-form-element
                     @input-config=${this.handleChange}
                 ></http-form-element>
-                ${this.configurationMessages.error.http
-                    ? html`<error-text-element
-                          text="${this.configurationMessages.error.http}"
-                      />`
-                    : html` <success-text-element
-                          text="${this.configurationMessages.success.http}"
-                      />`}
+                <text-element
+                    text="${this.configurationMessages.http.message}"
+                    color="${this.configurationMessages.http.type}"
+                />
             </collapsible-element>
             <collapsible-element
                 summary="MQTT"
@@ -223,37 +232,36 @@ export class CloudPage extends BasePage {
                 <mqtt-form-element
                     @input-config=${this.handleChange}
                 ></mqtt-form-element>
-                ${this.configurationMessages.error.mqtt
-                    ? html`<error-text-element
-                          text="${this.configurationMessages.error.mqtt}"
-                      />`
-                    : html` <success-text-element
-                          text="${this.configurationMessages.success.mqtt}"
-                      />`}
+                <text-element
+                    text="${this.configurationMessages.mqtt.message}"
+                    color="${this.configurationMessages.mqtt.type}"
+                />
             </collapsible-element>
-            <error-text-element text="${this.errorText}"></error-text-element>
+            <text-element text="${this.errorText}"></text-element>
             <button-nav-element>
                 <button-element
                     name="Zurück"
                     @click="${this.back}"
                     ?secondary="${false}"
+                    ?disabled="${loadingState.state > 0}"
                 ></button-element>
                 <button-element
                     name="Überspringen"
-                    @click="${this.next}"
+                    @click="${() => this.next()}"
                     ?secondary="${true}"
+                    ?disabled="${loadingState.state > 0}"
                 ></button-element>
                 <button-element
                     name="Speichern"
                     @click="${this.submit}"
                     ?secondary="${true}"
-                    ?disabled="${!this.configured}"
+                    ?disabled="${!this.configured || loadingState.state > 0}"
                 ></button-element>
                 <button-element
                     name="Testen"
-                    @click="${this.test}"
+                    @click="${this.testConnections}"
                     ?secondary="${true}"
-                    ?disabled="${!this.configured}"
+                    ?disabled="${!this.configured || loadingState.state > 0}"
                 ></button-element>
             </button-nav-element>
         `;

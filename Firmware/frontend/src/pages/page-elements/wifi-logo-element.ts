@@ -4,8 +4,8 @@ import { classMap } from "lit/directives/class-map.js";
 
 @customElement("wifi-logo-element")
 export class WifiLogoElement extends LitElement {
-    @property({ type: Number }) rssi: number;
-    @property({ type: Boolean }) isSecure: boolean;
+    @property({ type: Number }) rssi!: number;
+    @property({ type: Boolean }) isSecure!: boolean;
 
     get strength() {
         const rssiClamped = Math.max(-100, Math.min(this.rssi, -30));

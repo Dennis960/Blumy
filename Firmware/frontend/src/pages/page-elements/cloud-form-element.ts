@@ -1,12 +1,12 @@
 import { BlumyCloudConfiguration } from "api";
-import { InputElement } from "./input-element";
 import { LitElement, html } from "lit";
 import { customElement, query } from "lit/decorators.js";
+import { InputElement } from "./input-element";
 
 @customElement("cloud-form-element")
 export class CloudFormElement extends LitElement {
-    @query("#token") tokenInput: InputElement;
-    @query("#url") urlInput: InputElement;
+    @query("#token") tokenInput!: InputElement;
+    @query("#url") urlInput!: InputElement;
 
     public getConfig(): BlumyCloudConfiguration {
         return {

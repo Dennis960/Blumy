@@ -13,7 +13,7 @@
 
 #include "index_html.c"
 
-float ota_update_percentage = 0;
+float ota_update_percentage = -1;
 
 // Returns the index_html from index_html.c
 esp_err_t get_handler(httpd_req_t *req)
@@ -433,11 +433,13 @@ esp_err_t get_api_connectedNetwork_handler(httpd_req_t *req)
         return ESP_FAIL;
     }
     plantfi_sta_status_t status = plantfi_get_sta_status();
+    int8_t rssi = plantfi_getRssi();
 
     cJSON *root = cJSON_CreateObject();
     cJSON_AddStringToObject(root, "ssid", ssid);
     // cJSON_AddStringToObject(root, "password", password);
     cJSON_AddNumberToObject(root, "status", status);
+    cJSON_AddNumberToObject(root, "rssi", rssi);
 
     char *resp = cJSON_Print(root);
     cJSON_Delete(root);
@@ -470,9 +472,9 @@ esp_err_t get_api_sensor_data_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
-esp_err_t post_api_hardReset_handler(httpd_req_t *req)
+esp_err_t post_api_factoryReset_handler(httpd_req_t *req)
 {
-    plantstore_hardReset();
+    plantstore_factoryReset();
 
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
@@ -733,10 +735,10 @@ httpd_uri_t get_api_sensorData = {
     .handler = get_api_sensor_data_handler,
     .user_ctx = NULL};
 
-httpd_uri_t post_api_hardReset = {
-    .uri = "/api/hardReset",
+httpd_uri_t post_api_factoryReset = {
+    .uri = "/api/factoryReset",
     .method = HTTP_POST,
-    .handler = post_api_hardReset_handler,
+    .handler = post_api_factoryReset_handler,
     .user_ctx = NULL};
 
 httpd_uri_t get_api_timeouts_configurationMode = {
@@ -823,7 +825,7 @@ httpd_handle_t start_webserver(void)
         httpd_register_uri_handler(server, &get_api_update_percentage);
         httpd_register_uri_handler(server, &get_api_connectedNetwork);
         httpd_register_uri_handler(server, &get_api_sensorData);
-        httpd_register_uri_handler(server, &post_api_hardReset);
+        httpd_register_uri_handler(server, &post_api_factoryReset);
         httpd_register_uri_handler(server, &post_api_update_firmware);
         httpd_register_uri_handler(server, &get_api_update_firmware);
         httpd_register_uri_handler(server, &post_api_update_check);

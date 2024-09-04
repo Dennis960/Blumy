@@ -1,15 +1,18 @@
-import { getSleepTimeout, setSleepTimeout } from "../api";
+import { StateController } from "@lit-app/state";
 import { html } from "lit";
-import { property, query, customElement, state } from "lit/decorators.js";
+import { customElement, query, state } from "lit/decorators.js";
+import timestring from "timestring";
+import { getSleepTimeout, setSleepTimeout } from "../api";
+import { loadingState } from "../states";
 import { BasePage } from "./base-page";
 import { InputElement } from "./page-elements/input-element";
-import timestring from "timestring";
 
 @customElement("timeout-page")
 export class NamePage extends BasePage {
-    @property({ type: String }) onlineStatus: string;
-    @query("#sleepTimeout") sleepTimeoutElement: InputElement;
+    @query("#sleepTimeout") sleepTimeoutElement!: InputElement;
     @state() errorText: string = "";
+
+    loadingStateController = new StateController(this, loadingState);
 
     humanizeDuration(durationMs: number): string {
         let durationString = "";
@@ -17,11 +20,15 @@ export class NamePage extends BasePage {
         if (durationDays > 0) {
             durationString += durationDays + " d ";
         }
-        const durationHours = Math.floor((durationMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const durationHours = Math.floor(
+            (durationMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
         if (durationHours > 0) {
             durationString += durationHours + " h ";
         }
-        const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+        const durationMinutes = Math.floor(
+            (durationMs % (1000 * 60 * 60)) / (1000 * 60)
+        );
         if (durationMinutes > 0) {
             durationString += durationMinutes + " min ";
         }
@@ -56,7 +63,8 @@ export class NamePage extends BasePage {
     async firstUpdated() {
         const sleepTimeout: number = await getSleepTimeout();
         if (sleepTimeout != null) {
-            this.sleepTimeoutElement.input.value = this.humanizeDuration(sleepTimeout);
+            this.sleepTimeoutElement.input.value =
+                this.humanizeDuration(sleepTimeout);
         }
     }
 
@@ -71,22 +79,25 @@ export class NamePage extends BasePage {
                 >
                 </input-element>
             </input-element-grid>
-            <error-text-element text="${this.errorText}"></error-text-element>
+            <text-element text="${this.errorText}"></text-element>
             <button-nav-element>
                 <button-element
                     name="Zurück"
                     @click="${this.back}"
                     ?secondary="${false}"
+                    ?disabled="${loadingState.state > 0}"
                 ></button-element>
                 <button-element
                     name="Überspringen"
-                    @click="${this.next}"
+                    @click="${() => this.next()}"
                     ?secondary="${true}"
+                    ?disabled="${loadingState.state > 0}"
                 ></button-element>
                 <button-element
                     name="Speichern"
                     @click="${this.submit}"
                     ?secondary="${true}"
+                    ?disabled="${loadingState.state > 0}"
                 ></button-element>
             </button-nav-element>
         `;

@@ -1,13 +1,13 @@
 import { HttpCloudConfiguration } from "api";
-import { InputElement } from "./input-element";
 import { LitElement, html } from "lit";
 import { customElement, query } from "lit/decorators.js";
+import { InputElement } from "./input-element";
 
 @customElement("http-form-element")
 export class HttpFormElement extends LitElement {
-    @query("#sensorId") sensorInput: InputElement;
-    @query("#url") urlInput: InputElement;
-    @query("#auth") authInput: InputElement;
+    @query("#sensorId") sensorInput!: InputElement;
+    @query("#url") urlInput!: InputElement;
+    @query("#auth") authInput!: InputElement;
 
     public getConfig(): HttpCloudConfiguration {
         return {
