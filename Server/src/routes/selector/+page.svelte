@@ -6,7 +6,7 @@
 
 	async function sensorClick(sensor: SensorDTO) {
 		// TODO extract this constant value to an environment variable
-		await fetch('http://192.168.4.1/api/cloudSetup/blumy', {
+		await fetch('https://192.168.4.1/api/cloudSetup/blumy', {
 			method: 'POST',
 			body: `token=${sensor.writeToken}\nurl=${window.location.origin}/api/v2/data\n`
 		});

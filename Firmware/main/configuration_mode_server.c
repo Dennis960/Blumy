@@ -1,7 +1,7 @@
 #include "configuration_mode_server.h"
 
 #include "esp_log.h"
-#include "esp_http_server.h"
+#include "esp_https_server.h"
 #include "cJSON.h"
 
 #include "plantfi.h"
@@ -792,52 +792,94 @@ httpd_uri_t get = {
     .handler = get_handler,
     .user_ctx = NULL};
 
+void register_uri_handlers(httpd_handle_t server)
+{
+    httpd_register_uri_handler(server, &post_api_connect);
+    httpd_register_uri_handler(server, &post_api_reset);
+    httpd_register_uri_handler(server, &get_api_networks);
+    httpd_register_uri_handler(server, &get_api_isConnected);
+    httpd_register_uri_handler(server, &post_api_cloudSetup_mqtt);
+    httpd_register_uri_handler(server, &post_api_cloudSetup_http);
+    httpd_register_uri_handler(server, &post_api_cloudSetup_blumy);
+    httpd_register_uri_handler(server, &get_api_cloudSetup_mqtt);
+    httpd_register_uri_handler(server, &get_api_cloudSetup_http);
+    httpd_register_uri_handler(server, &get_api_cloudSetup_blumy);
+    httpd_register_uri_handler(server, &post_api_cloudTest_mqtt);
+    httpd_register_uri_handler(server, &post_api_cloudTest_http);
+    httpd_register_uri_handler(server, &post_api_cloudTest_blumy);
+    httpd_register_uri_handler(server, &post_api_timeouts_sleep);
+    httpd_register_uri_handler(server, &get_api_timeouts_sleep);
+    httpd_register_uri_handler(server, &get_api_timeouts_configurationMode);
+    httpd_register_uri_handler(server, &post_api_timeouts_configurationMode);
+    httpd_register_uri_handler(server, &get_api_timeouts_wdt);
+    httpd_register_uri_handler(server, &post_api_timeouts_wdt);
+    httpd_register_uri_handler(server, &get_api_update_percentage);
+    httpd_register_uri_handler(server, &get_api_connectedNetwork);
+    httpd_register_uri_handler(server, &get_api_sensorData);
+    httpd_register_uri_handler(server, &post_api_factoryReset);
+    httpd_register_uri_handler(server, &post_api_update_firmware);
+    httpd_register_uri_handler(server, &get_api_update_firmware);
+    httpd_register_uri_handler(server, &post_api_update_check);
+
+    // Every other get request returns index.html
+    httpd_register_uri_handler(server, &get);
+}
+
 /* Function for starting the webserver */
+httpd_handle_t start_https_webserver(void)
+{
+    ESP_LOGI("HTTP", "Starting HTTPS server");
+    /* Empty handle to esp_http_server */
+    httpd_handle_t server = NULL;
+
+    /* Generate default configuration */
+    httpd_ssl_config_t config = HTTPD_SSL_CONFIG_DEFAULT();
+    config.httpd.uri_match_fn = httpd_uri_match_wildcard;
+    config.httpd.max_uri_handlers = 50;
+
+    extern const unsigned char servercert_start[] asm("_binary_servercert_pem_start");
+    extern const unsigned char servercert_end[] asm("_binary_servercert_pem_end");
+    config.servercert = servercert_start;
+    config.servercert_len = servercert_end - servercert_start;
+
+    extern const unsigned char prvtkey_pem_start[] asm("_binary_prvtkey_pem_start");
+    extern const unsigned char prvtkey_pem_end[] asm("_binary_prvtkey_pem_end");
+    config.prvtkey_pem = prvtkey_pem_start;
+    config.prvtkey_len = prvtkey_pem_end - prvtkey_pem_start;
+
+    /* Start the httpd server */
+    ESP_ERROR_CHECK(httpd_ssl_start(&server, &config));
+    register_uri_handlers(server);
+    /* If server failed to start, handle will be NULL */
+    return server;
+}
+
 httpd_handle_t start_webserver(void)
 {
+    ESP_LOGI("HTTP", "Starting HTTP server");
+    /* Empty handle to esp_http_server */
+    httpd_handle_t server = NULL;
+
     /* Generate default configuration */
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.uri_match_fn = httpd_uri_match_wildcard;
     config.max_uri_handlers = 50;
 
-    /* Empty handle to esp_http_server */
-    httpd_handle_t server = NULL;
-
     /* Start the httpd server */
-    if (httpd_start(&server, &config) == ESP_OK)
-    {
-        httpd_register_uri_handler(server, &post_api_connect);
-        httpd_register_uri_handler(server, &post_api_reset);
-        httpd_register_uri_handler(server, &get_api_networks);
-        httpd_register_uri_handler(server, &get_api_isConnected);
-        httpd_register_uri_handler(server, &post_api_cloudSetup_mqtt);
-        httpd_register_uri_handler(server, &post_api_cloudSetup_http);
-        httpd_register_uri_handler(server, &post_api_cloudSetup_blumy);
-        httpd_register_uri_handler(server, &get_api_cloudSetup_mqtt);
-        httpd_register_uri_handler(server, &get_api_cloudSetup_http);
-        httpd_register_uri_handler(server, &get_api_cloudSetup_blumy);
-        httpd_register_uri_handler(server, &post_api_cloudTest_mqtt);
-        httpd_register_uri_handler(server, &post_api_cloudTest_http);
-        httpd_register_uri_handler(server, &post_api_cloudTest_blumy);
-        httpd_register_uri_handler(server, &post_api_timeouts_sleep);
-        httpd_register_uri_handler(server, &get_api_timeouts_sleep);
-        httpd_register_uri_handler(server, &get_api_timeouts_configurationMode);
-        httpd_register_uri_handler(server, &post_api_timeouts_configurationMode);
-        httpd_register_uri_handler(server, &get_api_timeouts_wdt);
-        httpd_register_uri_handler(server, &post_api_timeouts_wdt);
-        httpd_register_uri_handler(server, &get_api_update_percentage);
-        httpd_register_uri_handler(server, &get_api_connectedNetwork);
-        httpd_register_uri_handler(server, &get_api_sensorData);
-        httpd_register_uri_handler(server, &post_api_factoryReset);
-        httpd_register_uri_handler(server, &post_api_update_firmware);
-        httpd_register_uri_handler(server, &get_api_update_firmware);
-        httpd_register_uri_handler(server, &post_api_update_check);
-
-        // Every other get request returns index.html
-        httpd_register_uri_handler(server, &get);
-    }
+    ESP_ERROR_CHECK(httpd_start(&server, &config));
+    register_uri_handlers(server);
     /* If server failed to start, handle will be NULL */
     return server;
+}
+
+/* Function for stopping the webserver */
+void stop_https_webserver(httpd_handle_t server)
+{
+    if (server)
+    {
+        /* Stop the httpd server */
+        httpd_ssl_stop(server);
+    }
 }
 
 /* Function for stopping the webserver */
