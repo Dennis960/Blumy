@@ -1,7 +1,6 @@
 #include "configuration_mode_server.h"
 
 #include "esp_log.h"
-#include "esp_https_server.h"
 #include "cJSON.h"
 
 #include "plantfi.h"
@@ -213,7 +212,6 @@ esp_err_t post_api_cloudSetup_blumy_handler(httpd_req_t *req)
     plantstore_setCloudConfigurationBlumy(token, url);
 
     const char resp[] = "OK";
-    httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
@@ -291,7 +289,6 @@ esp_err_t get_api_cloudSetup_blumy_handler(httpd_req_t *req)
     char *resp = cJSON_Print(root);
     cJSON_Delete(root);
 
-    httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     free(resp);
     return ESP_OK;
@@ -355,14 +352,13 @@ esp_err_t post_api_cloudTest_blumy_handler(httpd_req_t *req)
     const bool connectionOk = plantfi_test_blumy_connection(token, url);
     char resp[6];
     sprintf(resp, "%s", connectionOk ? "true" : "false");
-    httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
 esp_err_t post_api_cloudDisable_mqtt_handler(httpd_req_t *req)
 {
-    plantstore_setCloudConfigurationMqtt("", "", 0, "", "", "", "");
+    plantstore_resetCloudConfigurationMqtt();
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
@@ -370,7 +366,7 @@ esp_err_t post_api_cloudDisable_mqtt_handler(httpd_req_t *req)
 
 esp_err_t post_api_cloudDisable_http_handler(httpd_req_t *req)
 {
-    plantstore_setCloudConfigurationHttp("", "", "");
+    plantstore_resetCloudConfigurationHttp();
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
@@ -378,9 +374,8 @@ esp_err_t post_api_cloudDisable_http_handler(httpd_req_t *req)
 
 esp_err_t post_api_cloudDisable_blumy_handler(httpd_req_t *req)
 {
-    plantstore_setCloudConfigurationBlumy("", "");
+    plantstore_resetCloudConfigurationBlumy();
     const char resp[] = "OK";
-    httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
@@ -532,11 +527,10 @@ esp_err_t get_api_sensor_data_handler(httpd_req_t *req)
 
 esp_err_t post_api_factoryReset_handler(httpd_req_t *req)
 {
-    plantstore_factoryReset();
-
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
 
+    plantstore_factoryReset();
     esp_restart();
     return ESP_OK;
 }
@@ -899,35 +893,6 @@ void register_uri_handlers(httpd_handle_t server)
     httpd_register_uri_handler(server, &get);
 }
 
-/* Function for starting the webserver */
-httpd_handle_t start_https_webserver(void)
-{
-    ESP_LOGI("HTTP", "Starting HTTPS server");
-    /* Empty handle to esp_http_server */
-    httpd_handle_t server = NULL;
-
-    /* Generate default configuration */
-    httpd_ssl_config_t config = HTTPD_SSL_CONFIG_DEFAULT();
-    config.httpd.uri_match_fn = httpd_uri_match_wildcard;
-    config.httpd.max_uri_handlers = 50;
-
-    extern const unsigned char servercert_start[] asm("_binary_servercert_pem_start");
-    extern const unsigned char servercert_end[] asm("_binary_servercert_pem_end");
-    config.servercert = servercert_start;
-    config.servercert_len = servercert_end - servercert_start;
-
-    extern const unsigned char prvtkey_pem_start[] asm("_binary_prvtkey_pem_start");
-    extern const unsigned char prvtkey_pem_end[] asm("_binary_prvtkey_pem_end");
-    config.prvtkey_pem = prvtkey_pem_start;
-    config.prvtkey_len = prvtkey_pem_end - prvtkey_pem_start;
-
-    /* Start the httpd server */
-    ESP_ERROR_CHECK(httpd_ssl_start(&server, &config));
-    register_uri_handlers(server);
-    /* If server failed to start, handle will be NULL */
-    return server;
-}
-
 httpd_handle_t start_webserver(void)
 {
     ESP_LOGI("HTTP", "Starting HTTP server");
@@ -944,16 +909,6 @@ httpd_handle_t start_webserver(void)
     register_uri_handlers(server);
     /* If server failed to start, handle will be NULL */
     return server;
-}
-
-/* Function for stopping the webserver */
-void stop_https_webserver(httpd_handle_t server)
-{
-    if (server)
-    {
-        /* Stop the httpd server */
-        httpd_ssl_stop(server);
-    }
 }
 
 /* Function for stopping the webserver */

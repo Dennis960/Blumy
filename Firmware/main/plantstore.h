@@ -28,10 +28,13 @@ bool plantstore_getWifiCredentials(char *ssid, char *password, size_t ssid_size,
 void plantstore_setWifiCredentials(char *ssid, char *password);
 bool plantstore_getCloudConfigurationHttp(char *sensorId, char *url, char *auth, size_t sensorId_size, size_t url_size, size_t auth_size);
 void plantstore_setCloudConfigurationHttp(char *sensorId, char *url, char *auth);
+void plantstore_resetCloudConfigurationHttp();
 bool plantstore_getCloudConfigurationMqtt(char *sensorId, char *server, int16_t *port, char *username, char *password, char *topic, char *clientId, size_t sensorId_size, size_t server_size, size_t username_size, size_t password_size, size_t topic_size, size_t clientId_size);
 void plantstore_setCloudConfigurationMqtt(char *sensorId, char *server, int16_t port, char *username, char *password, char *topic, char *clientId);
+void plantstore_resetCloudConfigurationMqtt();
 bool plantstore_getCloudConfigurationBlumy(char *token, char *url, size_t token_size, size_t url_size);
 void plantstore_setCloudConfigurationBlumy(char *token, char *url);
+void plantstore_resetCloudConfigurationBlumy();
 bool plantstore_getSensorTimeoutSleepMs(uint64_t *timeoutMs);
 void plantstore_setSensorTimeoutSleepMs(uint64_t timeoutMs);
 bool plantstore_getConfigurationModeTimeoutMs(int32_t *timeoutMs);

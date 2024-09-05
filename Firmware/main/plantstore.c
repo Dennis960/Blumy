@@ -84,6 +84,16 @@ void plantstore_setCloudConfigurationHttp(char *sensorId, char *url, char *auth)
     nvs_close(nvs_handle);
 }
 
+void plantstore_resetCloudConfigurationHttp()
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
+    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, HTTP_SENSORID_KEY));
+    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, HTTP_URL_KEY));
+    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, HTTP_AUTH_KEY));
+    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    nvs_close(nvs_handle);
+}
+
 bool plantstore_getCloudConfigurationMqtt(char *sensorId, char *server, int16_t *port, char *username, char *password, char *topic, char *clientId, size_t sensorId_size, size_t server_size, size_t username_size, size_t password_size, size_t topic_size, size_t clientId_size)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
@@ -115,6 +125,20 @@ void plantstore_setCloudConfigurationMqtt(char *sensorId, char *server, int16_t 
     nvs_close(nvs_handle);
 }
 
+void plantstore_resetCloudConfigurationMqtt()
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
+    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, MQTT_SENSORID_KEY));
+    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, MQTT_SERVER_KEY));
+    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, MQTT_PORT_KEY));
+    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, MQTT_USERNAME_KEY));
+    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, MQTT_PASSWORD_KEY));
+    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, MQTT_TOPIC_KEY));
+    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, MQTT_CLIENTID_KEY));
+    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    nvs_close(nvs_handle);
+}
+
 bool plantstore_getCloudConfigurationBlumy(char *token, char *url, size_t token_size, size_t url_size)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
@@ -132,6 +156,15 @@ void plantstore_setCloudConfigurationBlumy(char *token, char *url)
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
     ESP_ERROR_CHECK(nvs_set_str(nvs_handle, BLUMY_TOKEN_KEY, token));
     ESP_ERROR_CHECK(nvs_set_str(nvs_handle, BLUMY_URL_KEY, url));
+    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    nvs_close(nvs_handle);
+}
+
+void plantstore_resetCloudConfigurationBlumy()
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
+    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, BLUMY_TOKEN_KEY));
+    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, BLUMY_URL_KEY));
     ESP_ERROR_CHECK(nvs_commit(nvs_handle));
     nvs_close(nvs_handle);
 }

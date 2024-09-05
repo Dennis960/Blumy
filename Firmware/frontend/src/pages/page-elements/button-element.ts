@@ -11,6 +11,7 @@ export class ButtonElement extends LitElement {
     static styles = [
         css`
             button {
+                width: 100%;
                 border: 1px solid var(--grey);
                 border-radius: 0.25rem;
                 padding: 0.5rem 0.75rem;

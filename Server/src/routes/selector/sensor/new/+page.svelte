@@ -9,13 +9,12 @@
 
 	async function onSensorCreate() {
 		const redirectUrl = $page.url.searchParams.get('redirect');
-		const apiUrl = $page.url.searchParams.get('apiUrl');
-		if (!redirectUrl || !apiUrl) {
+		if (!redirectUrl) {
 			error =
 				'Ein Fehler ist aufgetreten. Bitte verbinde dich mit dem Sensor und versuche es erneut.';
 			return;
 		}
-		error = await setupSensorOnLocalEsp(createdSensor.tokens.write, redirectUrl, apiUrl);
+		setupSensorOnLocalEsp(createdSensor.tokens.write, redirectUrl);
 	}
 
 	$: if (createdSensor) {

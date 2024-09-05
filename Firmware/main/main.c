@@ -40,7 +40,6 @@ void configuration_mode(bool isConfigured)
 
     ESP_LOGI("MODE", "Starting webserver");
     httpd_handle_t webserver = start_webserver();
-    httpd_handle_t https_webserver = start_https_webserver();
     plantfi_configureStaFromPlantstore();
 
     bool wasBootButtonPressed = false;
@@ -64,7 +63,6 @@ void configuration_mode(bool isConfigured)
         vTaskDelay(10 / portTICK_PERIOD_MS); // Reset watchdog
     }
     stop_webserver(webserver);
-    stop_https_webserver(https_webserver);
     sensors_detach_boot_button_interrupt();
     sensors_playShutdownSound();
     start_deep_sleep();
