@@ -66,6 +66,10 @@ export class CloudPage extends BasePage {
                 "Bitte konfiguriere mindestens eine Schnittstelle.";
             return;
         }
+        if (!(await this.testConnections())) {
+            this.errorText = "Verbindungstest fehlgeschlagen";
+            return;
+        }
         configuredStates.forEach(async ([key]) => {
             if (key == "cloud") {
                 const apiConfig = this.cloudFormElement.getConfig();
@@ -120,7 +124,8 @@ export class CloudPage extends BasePage {
         this.updateConfigured();
     }
 
-    private async testConnections() {
+    private async testConnections(): Promise<boolean> {
+        let success = true;
         if (this.configurationState.cloud.open) {
             const res = await testCloudConnection(
                 this.cloudFormElement.getConfig()
@@ -135,6 +140,7 @@ export class CloudPage extends BasePage {
                     message: "Verbindung fehlgeschlagen",
                     type: "error",
                 };
+                success = false;
             }
         }
         if (this.configurationState.http.open) {
@@ -151,6 +157,7 @@ export class CloudPage extends BasePage {
                     message: "Verbindung fehlgeschlagen",
                     type: "error",
                 };
+                success = false;
             }
         }
         if (this.configurationState.mqtt.open) {
@@ -167,9 +174,11 @@ export class CloudPage extends BasePage {
                     message: "Verbindung fehlgeschlagen",
                     type: "error",
                 };
+                success = false;
             }
         }
         this.configurationState = { ...this.configurationState };
+        return success;
     }
 
     async firstUpdated() {
@@ -198,9 +207,11 @@ export class CloudPage extends BasePage {
 
     render() {
         return html`
-            <title-element>Automatische Schnittstellen-Konfiguration</title-element>
+            <title-element
+                >Automatische Schnittstellen-Konfiguration</title-element
+            >
             <button-element
-                name="Verbindung mit Blumy Cloud herstellen"
+                name="Über die Blumy Cloud einrichten"
                 @click="${() => this.handleExternalSetup()}"
                 ?disabled="${loadingState.state > 0}"
                 ?secondary="${true}"
