@@ -18,13 +18,6 @@ export class ResetPage extends BasePage {
     render() {
         return html`
             <title-element>Reset</title-element>
-            <description-element>
-                Das Drücken des Neustart-Buttons versetzt das Gerät in den
-                Sensor-Modus. Es wird sich zu dem konfigurierten WLAN verbinden
-                und Daten entsprechend der Einstellungen versenden. Um das Gerät
-                später erneut zu konfigurieren, drücke den Reset-Knopf auf dem
-                Gerät.
-            </description-element>
             <text-element text="${this.errorText}"></text-element>
             <button-nav-element>
                 <button-element
@@ -38,7 +31,7 @@ export class ResetPage extends BasePage {
                     ?secondary="${false}"
                 ></button-element>
                 <button-element
-                    name="Neustart"
+                    name="Konfiguration abschließen"
                     @click="${this.reset}"
                     ?secondary="${true}"
                 ></button-element>
