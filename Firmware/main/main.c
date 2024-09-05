@@ -107,7 +107,9 @@ void sensor_mode()
     if (bits & PLANTFI_CONNECTED_BIT)
     {
         int8_t rssi = plantfi_getRssi();
-        plantfi_send_sensor_data(&sensors_data, rssi);
+        plantfi_send_sensor_data_blumy(&sensors_data, rssi);
+        plantfi_send_sensor_data_http(&sensors_data, rssi);
+        plantfi_send_sensor_data_mqtt(&sensors_data, rssi);
     }
     else
     {

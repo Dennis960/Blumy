@@ -24,15 +24,19 @@ export interface SensorData {
     usb: boolean;
 }
 
+export const cloudConfigurationTypes = ["http", "mqtt", "blumy"] as const;
+
+export type CloudConfigurationType = (typeof cloudConfigurationTypes)[number];
+
 export interface HttpCloudConfiguration extends Record<string, string> {
-    type: "http";
+    type: (typeof cloudConfigurationTypes)[0];
     sensorId: string;
     url: string;
     auth: string;
 }
 
 export interface MqttCloudConfiguration extends Record<string, string> {
-    type: "mqtt";
+    type: (typeof cloudConfigurationTypes)[1];
     sensorId: string;
     server: string;
     port: string;
@@ -43,7 +47,7 @@ export interface MqttCloudConfiguration extends Record<string, string> {
 }
 
 export interface BlumyCloudConfiguration extends Record<string, string> {
-    type: "cloud";
+    type: (typeof cloudConfigurationTypes)[2];
     token: string;
     url: string;
 }
@@ -89,10 +93,7 @@ async function getDataFromEsp(
 ) {
     return await _fetch("/api" + url)
         .then((response) => response.json())
-        .catch((error) => {
-            console.error(error);
-            return null;
-        });
+        .catch(() => null);
 }
 
 async function getDataFromEspWithoutLoadingState(url: string) {
@@ -134,16 +135,10 @@ export async function getConnectedNetwork(enableLoadingState = true): Promise<{
 }
 
 export async function setCloudCredentials(config: CloudConfiguration) {
-    if (config.type === "http") {
-        return await postDataToEsp("/cloudSetup/http", config);
-    } else if (config.type === "mqtt") {
-        return await postDataToEsp("/cloudSetup/mqtt", config);
-    } else {
-        return await postDataToEsp("/cloudSetup/blumy", config);
-    }
+    return await postDataToEsp(`/cloudSetup/${config.type}`, config);
 }
 
-export async function getCloudCredentials<T extends CloudConfiguration["type"]>(
+export async function getCloudCredentials<T extends CloudConfigurationType>(
     type: T
 ): Promise<
     T extends "http"
@@ -152,31 +147,19 @@ export async function getCloudCredentials<T extends CloudConfiguration["type"]>(
         ? MqttCloudConfiguration
         : BlumyCloudConfiguration
 > {
-    if (type === "http") {
-        return await getDataFromEsp("/cloudSetup/http");
-    } else if (type === "mqtt") {
-        return await getDataFromEsp("/cloudSetup/mqtt");
-    } else {
-        return await getDataFromEsp("/cloudSetup/blumy");
-    }
+    return await getDataFromEsp(`/cloudSetup/${type}`);
 }
 
 export async function testCloudConnection(
     config: CloudConfiguration
 ): Promise<boolean> {
-    if (config.type === "http") {
-        return await postDataToEsp("/cloudTest/http", config).then((res) =>
-            res.json()
-        );
-    } else if (config.type === "mqtt") {
-        return await postDataToEsp("/cloudTest/mqtt", config).then((res) =>
-            res.json()
-        );
-    } else {
-        return await postDataToEsp("/cloudTest/blumy", config).then((res) =>
-            res.json()
-        );
-    }
+    return await postDataToEsp(`/cloudTest/${config.type}`, config).then(
+        (res) => res.json()
+    );
+}
+
+export async function disableCloudConnection(key: CloudConfigurationType) {
+    return await postDataToEsp(`/cloudDisable/${key}`);
 }
 
 export async function setSleepTimeout(timeout: number) {
