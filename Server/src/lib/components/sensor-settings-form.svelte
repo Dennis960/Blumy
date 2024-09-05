@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { applyAction, deserialize } from '$app/forms';
+	import WaterCapacityDistribution from '$lib/components/graphs/water-capacity-distribution.svelte';
 	import Slider, { type SliderOptions } from '$lib/components/slider.svelte';
-	import WaterCapacityDistribution from '$lib/components/water-capacity-distribution.svelte';
 	import { funnyPlantNames } from '$lib/funny-plant-names';
 	import type {
 		SensorConfigurationDTO,

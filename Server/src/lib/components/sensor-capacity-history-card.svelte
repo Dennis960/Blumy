@@ -3,11 +3,12 @@
 	import Litepicker from '$lib/components/litepicker.svelte';
 	import { IconCalendar, IconChevronLeftRaw, IconChevronRightRaw } from '$lib/icons';
 	import type { SensorDTO, SensorHistoryDTO } from '$lib/types/api';
-	import LightGraph from './light-graph.svelte';
-	import RssiGraph from './rssi-graph.svelte';
-	import VoltageGraph from './voltage-graph.svelte';
-	import WaterCapacityGraph from './water-capacity-graph.svelte';
-	import WeatherGraph from './weather-graph.svelte';
+	import type { ILPConfiguration } from 'litepicker/dist/types/interfaces';
+	import LightGraph from './graphs/light-graph.svelte';
+	import RssiGraph from './graphs/rssi-graph.svelte';
+	import VoltageGraph from './graphs/voltage-graph.svelte';
+	import WaterCapacityGraph from './graphs/water-capacity-graph.svelte';
+	import WeatherGraph from './graphs/weather-graph.svelte';
 
 	export let sensor: SensorDTO;
 	export let history: SensorHistoryDTO;
@@ -22,7 +23,7 @@
 		maxDate: new Date(),
 		startDate: dateRange.startDate,
 		endDate: dateRange.endDate
-	};
+	} as ILPConfiguration;
 
 	function handleDateChange(e: CustomEvent) {
 		const newStartDate = e.detail.startDate;

@@ -11,7 +11,7 @@
 	} from '$lib/icons';
 	import type { SensorDTO, SensorHistoryDTO } from '$lib/types/api';
 	import Base64Image from './base64-image.svelte';
-	import SensorSparkline from './sensor-sparkline.svelte';
+	import SensorSparkline from './graphs/sensor-sparkline.svelte';
 	import WaterCapacityBar from './water-capacity-bar.svelte';
 
 	export let sensor: SensorDTO;
