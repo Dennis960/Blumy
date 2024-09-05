@@ -166,7 +166,7 @@ esp_err_t post_api_cloudSetup_mqtt_handler(httpd_req_t *req)
     char clientId[100];
     char *keys[] = {"sensorId", "server", "port", "username", "password", "topic", "clientId"};
     char *values[] = {sensorId, server, portString, username, password, topic, clientId};
-    if (!get_values(req, keys, values, 6) || !is_number(portString))
+    if (!get_values(req, keys, values, 7) || !is_number(portString))
     {
         return ESP_FAIL;
     }
@@ -187,7 +187,7 @@ esp_err_t post_api_cloudSetup_http_handler(httpd_req_t *req)
     char auth[100];
     char *keys[] = {"sensorId", "url", "auth"};
     char *values[] = {sensorId, url, auth};
-    if (!get_values(req, keys, values, 2))
+    if (!get_values(req, keys, values, 3))
     {
         return ESP_FAIL;
     }
@@ -299,15 +299,45 @@ esp_err_t get_api_cloudSetup_blumy_handler(httpd_req_t *req)
 
 esp_err_t post_api_cloudTest_mqtt_handler(httpd_req_t *req)
 {
-    // TODO implement this check
-    const char resp[] = "false";
+    char sensorId[100];
+    char server[100];
+    char portString[10];
+    char username[100];
+    char password[100];
+    char topic[100];
+    char clientId[100];
+
+    char *keys[] = {"sensorId", "server", "port", "username", "password", "topic", "clientId"};
+    char *values[] = {sensorId, server, portString, username, password, topic, clientId};
+    if (!get_values(req, keys, values, 7) || !is_number(portString))
+    {
+        return ESP_FAIL;
+    }
+
+    int16_t port = atoi(portString);
+
+    const bool connectionOk = plantfi_test_mqtt_connection(sensorId, server, port, username, password, topic, clientId);
+    char resp[6];
+    sprintf(resp, "%s", connectionOk ? "true" : "false");
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 esp_err_t post_api_cloudTest_http_handler(httpd_req_t *req)
 {
-    // TODO implement this check
-    const char resp[] = "false";
+    char sensorId[100];
+    char url[100];
+    char auth[100];
+
+    char *keys[] = {"sensorId", "url", "auth"};
+    char *values[] = {sensorId, url, auth};
+    if (!get_values(req, keys, values, 3))
+    {
+        return ESP_FAIL;
+    }
+
+    const bool connectionOk = plantfi_test_http_connection(sensorId, url, auth);
+    char resp[6];
+    sprintf(resp, "%s", connectionOk ? "true" : "false");
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
@@ -325,6 +355,31 @@ esp_err_t post_api_cloudTest_blumy_handler(httpd_req_t *req)
     const bool connectionOk = plantfi_test_blumy_connection(token, url);
     char resp[6];
     sprintf(resp, "%s", connectionOk ? "true" : "false");
+    httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+esp_err_t post_api_cloudDisable_mqtt_handler(httpd_req_t *req)
+{
+    plantstore_setCloudConfigurationMqtt("", "", 0, "", "", "", "");
+    const char resp[] = "OK";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+esp_err_t post_api_cloudDisable_http_handler(httpd_req_t *req)
+{
+    plantstore_setCloudConfigurationHttp("", "", "");
+    const char resp[] = "OK";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+esp_err_t post_api_cloudDisable_blumy_handler(httpd_req_t *req)
+{
+    plantstore_setCloudConfigurationBlumy("", "");
+    const char resp[] = "OK";
     httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
@@ -708,6 +763,22 @@ httpd_uri_t post_api_cloudTest_blumy = {
     .handler = post_api_cloudTest_blumy_handler,
     .user_ctx = NULL};
 
+httpd_uri_t post_api_cloudDisable_mqtt = {
+    .uri = "/api/cloudDisable/mqtt",
+    .method = HTTP_POST,
+    .handler = post_api_cloudDisable_mqtt_handler,
+    .user_ctx = NULL};
+httpd_uri_t post_api_cloudDisable_http = {
+    .uri = "/api/cloudDisable/http",
+    .method = HTTP_POST,
+    .handler = post_api_cloudDisable_http_handler,
+    .user_ctx = NULL};
+httpd_uri_t post_api_cloudDisable_blumy = {
+    .uri = "/api/cloudDisable/blumy",
+    .method = HTTP_POST,
+    .handler = post_api_cloudDisable_blumy_handler,
+    .user_ctx = NULL};
+
 httpd_uri_t post_api_timeouts_sleep = {
     .uri = "/api/timeouts/sleep",
     .method = HTTP_POST,
@@ -807,6 +878,9 @@ void register_uri_handlers(httpd_handle_t server)
     httpd_register_uri_handler(server, &post_api_cloudTest_mqtt);
     httpd_register_uri_handler(server, &post_api_cloudTest_http);
     httpd_register_uri_handler(server, &post_api_cloudTest_blumy);
+    httpd_register_uri_handler(server, &post_api_cloudDisable_mqtt);
+    httpd_register_uri_handler(server, &post_api_cloudDisable_http);
+    httpd_register_uri_handler(server, &post_api_cloudDisable_blumy);
     httpd_register_uri_handler(server, &post_api_timeouts_sleep);
     httpd_register_uri_handler(server, &get_api_timeouts_sleep);
     httpd_register_uri_handler(server, &get_api_timeouts_configurationMode);

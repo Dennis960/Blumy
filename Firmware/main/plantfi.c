@@ -19,6 +19,7 @@
 #include <esp_http_client.h>
 #include "esp_timer.h"
 #include <dhcpserver/dhcpserver.h>
+#include <mqtt_client.h>
 
 EventGroupHandle_t plantfi_sta_event_group;
 
@@ -385,30 +386,48 @@ plantfi_sta_status_t plantfi_get_sta_status()
     return plantfi_sta_status;
 }
 
-// TODO use udp or mqtt
-void plantfi_send_sensor_data(sensors_full_data_t *sensors_data, int8_t rssi)
+/**
+ * Optionally pass a sensorId or NULL
+ */
+void plantfi_create_sensor_data_json(char *data, sensors_full_data_t *sensors_data, int8_t rssi, const char *sensorId)
 {
-    char token[50];
-    char url[100];
-    plantstore_getCloudConfigurationBlumy(token, url, sizeof(token), sizeof(url));
-    char data[400];
-    char bearer[60];
-    sprintf(bearer, "Bearer %s", token);
+    if (sensorId != NULL)
+    {
+        sprintf(data, "{\"sensorId\":\"%s\",\"light\":%2.2f,\"voltage\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f,\"isUsbConnected\":%s,\"moisture\":%d,\"moistureStabilizationTime\":%lu,\"isMoistureMeasurementSuccessful\":%s,\"humidityRaw\":%lu,\"temperatureRaw\":%lu,\"rssi\":%d,\"duration\":%lld}",
+                sensorId,
+                sensors_data->light,
+                sensors_data->voltage,
+                sensors_data->temperature,
+                sensors_data->humidity,
+                sensors_data->is_usb_connected ? "true" : "false",
+                sensors_data->moisture_measurement,
+                sensors_data->moisture_stabilization_time,
+                sensors_data->moisture_measurement_successful ? "true" : "false",
+                sensors_data->humidity_raw,
+                sensors_data->temperature_raw,
+                rssi,
+                esp_timer_get_time());
+    }
+    else
+    {
+        sprintf(data, "{\"light\":%2.2f,\"voltage\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f,\"isUsbConnected\":%s,\"moisture\":%d,\"moistureStabilizationTime\":%lu,\"isMoistureMeasurementSuccessful\":%s,\"humidityRaw\":%lu,\"temperatureRaw\":%lu,\"rssi\":%d,\"duration\":%lld}",
+                sensors_data->light,
+                sensors_data->voltage,
+                sensors_data->temperature,
+                sensors_data->humidity,
+                sensors_data->is_usb_connected ? "true" : "false",
+                sensors_data->moisture_measurement,
+                sensors_data->moisture_stabilization_time,
+                sensors_data->moisture_measurement_successful ? "true" : "false",
+                sensors_data->humidity_raw,
+                sensors_data->temperature_raw,
+                rssi,
+                esp_timer_get_time());
+    }
+}
 
-    sprintf(data, "{\"light\":%2.2f,\"voltage\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f,\"isUsbConnected\":%s,\"moisture\":%d,\"moistureStabilizationTime\":%lu,\"isMoistureMeasurementSuccessful\":%s,\"humidityRaw\":%lu,\"temperatureRaw\":%lu,\"rssi\":%d,\"duration\":%lld}",
-            sensors_data->light,
-            sensors_data->voltage,
-            sensors_data->temperature,
-            sensors_data->humidity,
-            sensors_data->is_usb_connected ? "true" : "false",
-            sensors_data->moisture_measurement,
-            sensors_data->moisture_stabilization_time,
-            sensors_data->moisture_measurement_successful ? "true" : "false",
-            sensors_data->humidity_raw,
-            sensors_data->temperature_raw,
-            rssi,
-            esp_timer_get_time());
-
+void plantfi_post_http(const char *url, const char *data, const char *authHeader)
+{
     esp_http_client_config_t config = {
         .url = url,
         .method = HTTP_METHOD_POST,
@@ -422,7 +441,7 @@ void plantfi_send_sensor_data(sensors_full_data_t *sensors_data, int8_t rssi)
     }
     ESP_ERROR_CHECK(esp_http_client_set_post_field(client, data, strlen(data)));
     ESP_ERROR_CHECK(esp_http_client_set_header(client, "Content-Type", "application/json"));
-    ESP_ERROR_CHECK(esp_http_client_set_header(client, "Authorization", bearer));
+    ESP_ERROR_CHECK(esp_http_client_set_header(client, "Authorization", authHeader));
     ESP_ERROR_CHECK(esp_http_client_perform(client));
 
     ESP_LOGI("Data", "%s", data);
@@ -433,11 +452,8 @@ void plantfi_send_sensor_data(sensors_full_data_t *sensors_data, int8_t rssi)
     ESP_ERROR_CHECK(esp_http_client_cleanup(client));
 }
 
-bool plantfi_test_blumy_connection(char *token, char *url)
+int plantfi_get_http(char *url, char *authHeader)
 {
-    char bearer[60];
-    sprintf(bearer, "Bearer %s", token);
-
     esp_http_client_config_t config = {
         .url = url,
         .method = HTTP_METHOD_GET,
@@ -447,19 +463,143 @@ bool plantfi_test_blumy_connection(char *token, char *url)
     if (client == NULL)
     {
         ESP_LOGE("HTTP", "Failed to initialize HTTP client");
-        return false;
+        return 500;
     }
-    ESP_ERROR_CHECK(esp_http_client_set_header(client, "Authorization", bearer));
+    ESP_ERROR_CHECK(esp_http_client_set_header(client, "Authorization", authHeader));
     esp_err_t err = esp_http_client_perform(client);
     if (err != ESP_OK)
     {
         ESP_LOGE("HTTP", "Failed to perform HTTP request (%s)", esp_err_to_name(err));
         ESP_ERROR_CHECK_WITHOUT_ABORT(esp_http_client_cleanup(client));
-        return false;
+        return 500;
     }
 
     int status_code = esp_http_client_get_status_code(client);
     ESP_LOGI("HTTP", "Status Code: %d", status_code);
     ESP_ERROR_CHECK(esp_http_client_cleanup(client));
+    return status_code;
+}
+
+esp_mqtt_client_handle_t plantfi_init_mqtt_client()
+{
+    char server[100];
+    int16_t port;
+    char username[100];
+    char password[100];
+    char clientId[100];
+    if (!plantstore_getCloudConfigurationMqtt(NULL, server, &port, username, password, NULL, clientId, 0, sizeof(server), sizeof(username), sizeof(password), 0, sizeof(clientId)))
+    {
+        ESP_LOGE(PLANTFI_TAG, "No MQTT configuration found");
+        return NULL;
+    }
+
+    const esp_mqtt_client_config_t mqtt_cfg = {
+        .broker.address.uri = server,
+        .broker.address.port = port,
+        .credentials.username = username,
+        .credentials.authentication.password = password,
+        .credentials.client_id = clientId,
+    };
+
+    esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
+    return client;
+}
+
+void plantfi_send_sensor_data_blumy(sensors_full_data_t *sensors_data, int8_t rssi)
+{
+    char token[50];
+    char url[100];
+    if (!plantstore_getCloudConfigurationBlumy(token, url, sizeof(token), sizeof(url)))
+    {
+        ESP_LOGE(PLANTFI_TAG, "No Blumy configuration found");
+        return;
+    }
+    char authHeader[60];
+    sprintf(authHeader, "Bearer %s", token);
+
+    char data[400];
+    plantfi_create_sensor_data_json(data, sensors_data, rssi, NULL);
+
+    plantfi_post_http(url, data, authHeader);
+}
+
+bool plantfi_test_blumy_connection(char *token, char *url)
+{
+    char bearer[60];
+    sprintf(bearer, "Bearer %s", token);
+    int status_code = plantfi_get_http(url, bearer);
     return status_code == 200;
+}
+
+void plantfi_send_sensor_data_http(sensors_full_data_t *sensors_data, int8_t rssi)
+{
+    char sensorId[100];
+    char url[100];
+    char auth[60];
+    if (!plantstore_getCloudConfigurationHttp(sensorId, url, auth, sizeof(sensorId), sizeof(url), sizeof(auth)))
+    {
+        ESP_LOGE(PLANTFI_TAG, "No HTTP configuration found");
+        return;
+    }
+
+    char data[400];
+    plantfi_create_sensor_data_json(data, sensors_data, rssi, sensorId);
+
+    plantfi_post_http(url, data, auth);
+}
+
+bool plantfi_test_http_connection(char *sensorId, char *url, char *auth)
+{
+    int status_code = plantfi_get_http(url, auth);
+    return status_code == 200;
+}
+
+void plantfi_send_sensor_data_mqtt(sensors_full_data_t *sensors_data, int8_t rssi)
+{
+    char sensorId[100];
+    char topic[100];
+
+    if (!plantstore_getCloudConfigurationMqtt(sensorId, NULL, 0, NULL, NULL, topic, NULL, sizeof(sensorId), 0, 0, 0, sizeof(topic), 0))
+    {
+        ESP_LOGE(PLANTFI_TAG, "No MQTT configuration found");
+        return;
+    }
+
+    char data[400];
+    plantfi_create_sensor_data_json(data, sensors_data, rssi, sensorId);
+
+    esp_mqtt_client_handle_t client = plantfi_init_mqtt_client();
+    if (client == NULL)
+    {
+        ESP_LOGE(PLANTFI_TAG, "Failed to initialize MQTT client");
+        return;
+    }
+    esp_mqtt_client_start(client);
+    esp_mqtt_client_publish(client, topic, data, strlen(data), 0, 0);
+    esp_mqtt_client_destroy(client);
+}
+
+bool plantfi_test_mqtt_connection(char *sensorId, char *server, int16_t port, char *username, char *password, char *topic, char *clientId)
+{
+    esp_mqtt_client_config_t mqtt_cfg = {
+        .broker.address.uri = server,
+        .broker.address.port = port,
+        .credentials.username = username,
+        .credentials.authentication.password = password,
+        .credentials.client_id = clientId,
+    };
+
+    esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
+    if (client == NULL)
+    {
+        ESP_LOGE(PLANTFI_TAG, "Failed to initialize MQTT client");
+        return false;
+    }
+    if (esp_mqtt_client_start(client) != ESP_OK)
+    {
+        ESP_LOGE(PLANTFI_TAG, "Failed to start MQTT client");
+        return false;
+    }
+    esp_mqtt_client_destroy(client);
+    return true;
 }

@@ -10,7 +10,7 @@ export class CloudFormElement extends LitElement {
 
     public getConfig(): BlumyCloudConfiguration {
         return {
-            type: "cloud",
+            type: "blumy",
             token: this.tokenInput.input.value,
             url: this.urlInput.input.value,
         };
@@ -25,7 +25,7 @@ export class CloudFormElement extends LitElement {
         this.dispatchEvent(
             new CustomEvent<BlumyCloudConfiguration>("input-config", {
                 detail: {
-                    type: "cloud",
+                    type: "blumy",
                     token: this.tokenInput.input.value,
                     url: this.urlInput.input.value,
                 },
