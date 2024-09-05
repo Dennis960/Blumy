@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { setupSensorOnLocalEsp } from '$lib/api.js';
 	import SensorSelectionCard from '$lib/components/sensor-selection-card.svelte';
 	import { IconPlus } from '$lib/icons.js';
@@ -11,7 +12,18 @@
 
 	async function sensorClick(sensor: SensorDTO) {
 		sensorClicked = true;
-		error = await setupSensorOnLocalEsp(sensor.writeToken);
+		const redirectUrl = $page.url.searchParams.get('redirect');
+		const apiUrl = $page.url.searchParams.get('apiUrl');
+		if (!redirectUrl || !apiUrl) {
+			error =
+				'Ein Fehler ist aufgetreten. Bitte verbinde dich mit dem Sensor und versuche es erneut.';
+			return;
+		}
+		error = await setupSensorOnLocalEsp(sensor.writeToken, redirectUrl, apiUrl);
+	}
+
+	async function createNewSensor() {
+		await goto('/selector/sensor/new?' + $page.url.searchParams.toString());
 	}
 </script>
 
@@ -24,7 +36,7 @@
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
 					<section
-						on:click={() => goto('/selector/sensor/new')}
+						on:click={createNewSensor}
 						class="card cursor-pointer bg-secondary text-white text-center"
 					>
 						<div

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { setupSensorOnLocalEsp } from '$lib/api';
 	import SensorSettingsForm from '$lib/components/sensor-settings-form.svelte';
 	import type { SensorCreatedDTO } from '$lib/types/api';
@@ -7,7 +8,14 @@
 	let error: string | undefined;
 
 	async function onSensorCreate() {
-		error = await setupSensorOnLocalEsp(createdSensor.tokens.write);
+		const redirectUrl = $page.url.searchParams.get('redirect');
+		const apiUrl = $page.url.searchParams.get('apiUrl');
+		if (!redirectUrl || !apiUrl) {
+			error =
+				'Ein Fehler ist aufgetreten. Bitte verbinde dich mit dem Sensor und versuche es erneut.';
+			return;
+		}
+		error = await setupSensorOnLocalEsp(createdSensor.tokens.write, redirectUrl, apiUrl);
 	}
 
 	$: if (createdSensor) {
