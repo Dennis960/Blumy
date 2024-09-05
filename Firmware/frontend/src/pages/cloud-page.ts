@@ -202,7 +202,7 @@ export class CloudPage extends BasePage {
     }
 
     async handleExternalSetup() {
-        location.href = "https://blumy.cloud/selector";
+        location.href = `https://blumy.cloud/selector?redirect=${location.origin}/?page=5&apiUrl=${location.origin}/api/cloudSetup/blumy`;
     }
 
     render() {
