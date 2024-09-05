@@ -84,10 +84,11 @@ export async function setupSensorOnLocalEsp(
 	redirectUrl: string,
 	apiUrl: string
 ) {
+	const originHttp = window.location.origin.replace('https', 'http');
 	try {
 		const res = await fetch(apiUrl, {
 			method: 'POST',
-			body: `token=${writeToken}\nurl=${window.location.origin}/api/v2/data\n`
+			body: `token=${writeToken}\nurl=${originHttp}/api/v2/data\n`
 		});
 		if (res.ok) {
 			location.href = redirectUrl;
