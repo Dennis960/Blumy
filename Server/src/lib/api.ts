@@ -1,14 +1,11 @@
 import SuperJSON from 'superjson';
-import type {
-	SensorConfigurationDTO,
-	SensorCreatedDTO
-} from './types/api';
+import type { SensorConfigurationDTO, SensorCreatedDTO } from './types/api';
 
-const BASE_URL = '/api'
+const BASE_URL = '/api';
+// TODO this constant should be passed as url parameter from the Blumy Sensor
+const BLUMY_BASE_URL = 'https://192.168.4.1';
 
-export async function createSensor(
-	config: SensorConfigurationDTO
-): Promise<SensorCreatedDTO> {
+export async function createSensor(config: SensorConfigurationDTO): Promise<SensorCreatedDTO> {
 	return await fetch(`${BASE_URL}/sensors`, {
 		method: 'POST',
 		headers: {
@@ -82,4 +79,21 @@ export async function submitUnsubscription(
 	})
 		.then((response) => response.text())
 		.then((text) => SuperJSON.parse(text));
+}
+
+export async function setupSensorOnLocalEsp(writeToken: string) {
+	try {
+		const res = await fetch(`${BLUMY_BASE_URL}/api/cloudSetup/blumy`, {
+			method: 'POST',
+			body: `token=${writeToken}\nurl=${window.location.origin}/api/v2/data\n`
+		});
+		if (res.ok) {
+			location.href = 'http://192.168.4.1/?page=5';
+		} else {
+			return 'Unbekannter Fehler beim Einrichten des Sensors. Starte den Blumy Sensor neu und versuche es erneut.';
+		}
+	} catch (err) {
+		console.log(err);
+		return 'Der Sensor konnte nicht synchronisiert werden. Bitte überprüfe die Verbindung zum Blumy Sensor.';
+	}
 }

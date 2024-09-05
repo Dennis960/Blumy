@@ -1,42 +1,56 @@
 <script lang="ts">
-	import SensorCard from '$lib/components/sensor-card.svelte';
+	import { goto } from '$app/navigation';
+	import { setupSensorOnLocalEsp } from '$lib/api.js';
+	import SensorSelectionCard from '$lib/components/sensor-selection-card.svelte';
+	import { IconPlus } from '$lib/icons.js';
 	import type { SensorDTO } from '$lib/types/api.js';
 
 	export let data;
+	let error: string | undefined;
+	let sensorClicked = false;
 
 	async function sensorClick(sensor: SensorDTO) {
-		// TODO extract this constant value to an environment variable
-		const res = await fetch('https://192.168.4.1/api/cloudSetup/blumy', {
-			method: 'POST',
-			body: `token=${sensor.writeToken}\nurl=${window.location.origin}/api/v2/data\n`
-		});
-		if (res.ok) {
-			location.href = 'http://192.168.4.1/?page=5';
-		} else {
-			alert('Fehler beim Einrichten des Sensors');
-		}
+		sensorClicked = true;
+		error = await setupSensorOnLocalEsp(sensor.writeToken);
 	}
 </script>
 
 <div class="page-body">
 	<div class="container-xl">
-		<div class="row row-deck row-cards">
-			{#each data.sensors as sensor (sensor.id)}
-				<div class="col-12 col-md-6 col-lg-4">
-					<SensorCard
-						on:click={() => {
-							sensorClick(sensor);
-						}}
-						{sensor}
-					/>
+		{#if !error}
+			{#if !sensorClicked}
+				<h2>Wähle einen Sensor aus</h2>
+				<div class="datagrid">
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
+					<!-- svelte-ignore a11y-no-static-element-interactions -->
+					<section
+						on:click={() => goto('/selector/sensor/new')}
+						class="card cursor-pointer bg-secondary text-white text-center"
+					>
+						<div
+							class="card-body d-flex flex-column gap-4 align-items-center justify-content-center"
+						>
+							<IconPlus size={60}></IconPlus>
+							<div class="card-title">
+								<strong> Neuen Sensor einrichten</strong>
+							</div>
+						</div>
+					</section>
+					{#each data.sensors as sensor (sensor.id)}
+						<SensorSelectionCard
+							on:click={() => {
+								sensorClick(sensor);
+							}}
+							{sensor}
+						/>
+					{/each}
 				</div>
-			{/each}
-			<!-- TODO implement this -->
-			<!-- <div class="col-12">
-				<div class="w-full d-flex justify-content-end column-gap-2">
-					<a href="sensor/new" class="btn btn-primary">Neuen Sensor einrichten</a>
-				</div>
-			</div> -->
-		</div>
+			{:else}
+				<h2>Der Sensor wird nun eingerichtet, bitte warten...</h2>
+			{/if}
+		{:else}
+			<h2>Ein Fehler ist aufgetreten</h2>
+			<p>{error}</p>
+		{/if}
 	</div>
 </div>
