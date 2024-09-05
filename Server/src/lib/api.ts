@@ -79,24 +79,12 @@ export async function submitUnsubscription(
 		.then((text) => SuperJSON.parse(text));
 }
 
-export async function setupSensorOnLocalEsp(
-	writeToken: string,
-	redirectUrl: string,
-	apiUrl: string
-) {
+export function setupSensorOnLocalEsp(writeToken: string, redirectUrl: string) {
 	const originHttp = window.location.origin.replace('https', 'http');
-	try {
-		const res = await fetch(apiUrl, {
-			method: 'POST',
-			body: `token=${writeToken}\nurl=${originHttp}/api/v2/data\n`
-		});
-		if (res.ok) {
-			location.href = redirectUrl;
-		} else {
-			return 'Unbekannter Fehler beim Einrichten des Sensors. Starte den Blumy Sensor neu und versuche es erneut.';
-		}
-	} catch (err) {
-		console.log(err);
-		return 'Der Sensor konnte nicht synchronisiert werden. Bitte überprüfe die Verbindung zum Blumy Sensor.';
-	}
+	const url = new URL(redirectUrl);
+	const query = new URLSearchParams(url.search);
+	query.set('token', writeToken);
+	query.set('blumyUrl', `${originHttp}/api/v2/data`);
+	url.search = query.toString();
+	location.href = url.toString();
 }

@@ -2,6 +2,7 @@ import { StateController } from "@lit-app/state";
 import { html } from "lit";
 import { customElement, query, state } from "lit/decorators.js";
 import {
+    BlumyCloudConfiguration,
     CloudConfiguration,
     CloudConfigurationType,
     cloudConfigurationTypes,
@@ -181,6 +182,48 @@ export class CloudPage extends BasePage {
         return success;
     }
 
+    async loadConfigFromQuery(queryParameters: URLSearchParams) {
+        const token = queryParameters.get("token")!;
+        const url = queryParameters.get("blumyUrl")!;
+        queryParameters.delete("token");
+        queryParameters.delete("blumyUrl");
+        window.history.replaceState(
+            null,
+            "",
+            `${location.pathname}?${queryParameters.toString()}`
+        );
+        const blumyConfiguration: BlumyCloudConfiguration = {
+            type: "blumy",
+            token: token,
+            url: url,
+        };
+        this.configurationStates.blumy.formElement!.setConfig(
+            blumyConfiguration as never
+        );
+
+        const connectionSuccess = await testCloudConnection(blumyConfiguration);
+
+        if (connectionSuccess) {
+            const res = await setCloudCredentials(blumyConfiguration);
+            if (!res.ok) {
+                this.errorText = "Fehler, Gerät antwortet nicht";
+            } else {
+                this.configurationStates.blumy.configuration =
+                    blumyConfiguration;
+                this.configurationStates.blumy.open = true;
+                this.configurationStates.blumy.message = {
+                    content: this.configurationStates.blumy.testMessage.success,
+                    type: "success",
+                };
+            }
+        } else {
+            this.configurationStates.blumy.message = {
+                content: this.configurationStates.blumy.testMessage.error,
+                type: "error",
+            };
+        }
+    }
+
     async firstUpdated() {
         this.configurationStates.blumy.formElement = this.cloudFormElement;
         this.configurationStates.http.formElement = this.httpFormElement;
@@ -194,13 +237,16 @@ export class CloudPage extends BasePage {
                 configurationState.open = true;
             }
         }
+        const queryParameters = new URLSearchParams(location.search);
+        if (queryParameters.has("token") && queryParameters.has("blumyUrl")) {
+            await this.loadConfigFromQuery(queryParameters);
+        }
         this.configurationStates = { ...this.configurationStates };
         this.updateConfigured();
     }
 
     async handleExternalSetup() {
-        const originHttps = location.origin.replace("http", "https");
-        location.href = `https://blumy.cloud/selector?redirect=${location.origin}/?page=5&apiUrl=${originHttps}/api/cloudSetup/blumy`;
+        location.href = `https://blumy.cloud/selector?redirect=${location.href}`;
     }
 
     render() {
@@ -208,12 +254,14 @@ export class CloudPage extends BasePage {
             <title-element
                 >Automatische Schnittstellen-Konfiguration</title-element
             >
-            <button-element
-                name="Über die Blumy Cloud einrichten"
-                @click="${() => this.handleExternalSetup()}"
-                ?disabled="${loadingState.state > 0}"
-                ?secondary="${true}"
-            ></button-element>
+            <div style="width: fit-content;">
+                <button-element
+                    name="Über die Blumy Cloud einrichten"
+                    @click="${() => this.handleExternalSetup()}"
+                    ?disabled="${loadingState.state > 0}"
+                    ?secondary="${true}"
+                ></button-element>
+            </div>
             <br />
             <title-element>Manuelle Schnittstellen-Konfiguration</title-element>
             <collapsible-element

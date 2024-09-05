@@ -9,20 +9,21 @@ export class WifiScannerPage extends BasePage {
     @state() errorText: string = "";
     @state() networks: Network[] = [];
 
+    shouldUpdateNetworks = true;
+
     async updateNetworks() {
-        const networks = await getNetworks();
-        if (networks === undefined || networks === null) {
-            this.errorText = "Fehler beim Scannen der Netzwerke";
-            return;
-        } else {
-            this.errorText = "";
-            this.networks = networks;
+        while (this.shouldUpdateNetworks) {
+            const networks = await getNetworks();
+            if (networks === undefined || networks === null) {
+                this.errorText = "Fehler beim Scannen der Netzwerke";
+                return;
+            } else {
+                this.errorText = "";
+                this.networks = networks;
+            }
+            await new Promise((res) => setTimeout(res, 5000));
         }
     }
-
-    interval = setInterval(() => {
-        this.updateNetworks();
-    }, 5000);
 
     constructor() {
         super();
@@ -33,7 +34,7 @@ export class WifiScannerPage extends BasePage {
     disconnectedCallback() {
         super.disconnectedCallback();
 
-        clearInterval(this.interval);
+        this.shouldUpdateNetworks = false;
     }
 
     onNetworkClick(e: CustomEvent) {
