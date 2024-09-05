@@ -34,19 +34,48 @@ export class HomePage extends BasePage {
 
     shouldFetchData = true;
 
+    getMoistureHumandReadable(moisture: number): string {
+        const MIN_MOISTURE = 10;
+        const MAX_MOISTURE = 2500;
+        const moistureTranslationMap: { [key: string]: string } = {
+            "50": "Unter Wasser",
+            "500": "Feucht",
+            "1000": "Mittel feucht",
+            "1500": "Leicht feucht",
+            "2000": "Trocken",
+            "2500": "Lufttrocken",
+        };
+
+        moisture = Math.min(Math.max(moisture, MIN_MOISTURE), MAX_MOISTURE);
+        const invertedMoisture = MAX_MOISTURE - moisture;
+        const percentage = (invertedMoisture / MAX_MOISTURE) * 100;
+        let moistureTranslation = "";
+        for (const key in moistureTranslationMap) {
+            if (moisture <= parseInt(key)) {
+                moistureTranslation = moistureTranslationMap[key];
+                break;
+            }
+        }
+        return `${Math.round(percentage)}% (${moistureTranslation})`;
+    }
+
     async updateSensorData() {
         while (this.shouldFetchData) {
             const sensorData = await getSensorData();
             if (!sensorData) {
                 return;
             }
-            this.temperatureElement.input.value = String(
-                sensorData.temperature
+            this.temperatureElement.input.value =
+                sensorData.temperature.toFixed(2) + " °C";
+            this.humidityElement.input.value =
+                String(Math.round(sensorData.humidity)) + "%";
+            this.lightElement.input.value =
+                String(Math.round(sensorData.light * 100)) + "%";
+            this.moistureElement.input.value = this.getMoistureHumandReadable(
+                sensorData.moisture
             );
-            this.humidityElement.input.value = String(sensorData.humidity);
-            this.lightElement.input.value = String(sensorData.light);
-            this.moistureElement.input.value = String(sensorData.moisture);
-            this.voltageElement.input.value = String(sensorData.voltage);
+            this.voltageElement.input.value =
+                sensorData.voltage.toFixed(2) + " V";
             this.usbElement.input.value = sensorData.usb
                 ? "angeschlossen"
                 : "nicht angeschlossen";
@@ -73,35 +102,35 @@ export class HomePage extends BasePage {
                 <input-element
                     id="temperature"
                     name="Temperatur"
-                    type="number"
+                    type="text"
                     label="Temperatur"
                     readonly="true"
                 ></input-element>
                 <input-element
                     id="humidity"
                     name="Luftfeuchtigkeit"
-                    type="number"
+                    type="text"
                     label="Luftfeuchtigkeit"
                     readonly="true"
                 ></input-element>
                 <input-element
                     id="light"
                     name="Licht"
-                    type="number"
+                    type="text"
                     label="Licht"
                     readonly="true"
                 ></input-element>
                 <input-element
                     id="moisture"
-                    name="Feuchtigkeit"
-                    type="number"
-                    label="Feuchtigkeit"
+                    name="Bodenfeuchtigkeit"
+                    type="text"
+                    label="Bodenfeuchtigkeit"
                     readonly="true"
                 ></input-element>
                 <input-element
                     id="voltage"
                     name="Spannung"
-                    type="number"
+                    type="text"
                     label="Spannung"
                     readonly="true"
                 ></input-element>

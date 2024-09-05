@@ -6,11 +6,15 @@
 
 	async function sensorClick(sensor: SensorDTO) {
 		// TODO extract this constant value to an environment variable
-		await fetch('https://192.168.4.1/api/cloudSetup/blumy', {
+		const res = await fetch('https://192.168.4.1/api/cloudSetup/blumy', {
 			method: 'POST',
 			body: `token=${sensor.writeToken}\nurl=${window.location.origin}/api/v2/data\n`
 		});
-		location.href = 'http://192.168.4.1/?page=4';
+		if (res.ok) {
+			location.href = 'http://192.168.4.1/?page=5';
+		} else {
+			alert('Fehler beim Einrichten des Sensors');
+		}
 	}
 </script>
 
