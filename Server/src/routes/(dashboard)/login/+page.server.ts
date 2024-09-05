@@ -1,16 +1,30 @@
-import type { Actions } from "./$types";
+import type { Actions } from './$types';
 
-import { google } from "$lib/server/auth";
-import { redirect } from "@sveltejs/kit";
-import { generateState } from "arctic";
-import crypto from "crypto";
+import { google } from '$lib/server/auth';
+import { redirect } from '@sveltejs/kit';
+import { generateState } from 'arctic';
+import crypto from 'crypto';
 
-import { dev } from "$app/environment";
+import { dev } from '$app/environment';
 
+import type { PageServerLoad } from './$types';
+
+export const load = (({ cookies, url }) => {
+	const redirectUrl = url.searchParams.get('redirectUrl') ?? '/';
+	cookies.set('redirectUrl', redirectUrl, {
+		path: '/',
+		secure: !dev,
+		httpOnly: true,
+		maxAge: 60 * 10,
+		sameSite: 'lax'
+	});
+}) satisfies PageServerLoad;
 
 function generateCodeVerifier() {
-	return crypto.randomBytes(32).toString("base64")
-		.replace(/[^a-zA-Z0-9]/g, "")
+	return crypto
+		.randomBytes(32)
+		.toString('base64')
+		.replace(/[^a-zA-Z0-9]/g, '')
 		.slice(0, 128);
 }
 
@@ -18,24 +32,23 @@ export const actions = {
 	loginGoogle: async (event) => {
 		const state = generateState();
 		const codeVerifier = generateCodeVerifier();
-		event.cookies.set("google_oauth_code_verifier", codeVerifier, {
+		event.cookies.set('google_oauth_code_verifier', codeVerifier, {
 			secure: !dev,
-			path: "/",
+			path: '/',
 			httpOnly: true,
 			maxAge: 60 * 10,
-			sameSite: "lax"
+			sameSite: 'lax'
 		});
 		const url = await google.createAuthorizationURL(state, codeVerifier);
 
-		event.cookies.set("google_oauth_state", state, {
-			path: "/",
+		event.cookies.set('google_oauth_state', state, {
+			path: '/',
 			secure: !dev,
 			httpOnly: true,
 			maxAge: 60 * 10,
-			sameSite: "lax"
+			sameSite: 'lax'
 		});
 
 		redirect(302, url.toString());
 	}
 } satisfies Actions;
-
