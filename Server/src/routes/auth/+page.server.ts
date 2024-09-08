@@ -26,6 +26,7 @@ export const actions = {
             sameSite: "lax"
         });
         const url = await google.createAuthorizationURL(state, codeVerifier);
+        url.searchParams.set("prompt", "select_account");
 
         event.cookies.set("google_oauth_state", state, {
             path: "/",
