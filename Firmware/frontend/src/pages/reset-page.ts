@@ -1,41 +1,42 @@
-import { html } from "lit";
-import { customElement, state } from "lit/decorators.js";
-import { resetEsp } from "../api";
+import { css, html } from "lit";
+import { customElement } from "lit/decorators.js";
 import { BasePage } from "./base-page";
+import { factoryResetEsp } from "../api";
 
 @customElement("reset-page")
-export class ResetPage extends BasePage {
-    @state() errorText: string = "";
-
-    async reset() {
-        const res = await resetEsp();
-        if (!res.ok) {
-            this.errorText = "Fehler, Gerät antwortet nicht";
-            return;
-        }
+export class HomePage extends BasePage {
+    async factoryReset() {
+        await factoryResetEsp();
     }
+
+    static styles = css`
+        :host {
+            display: flex;
+            flex-direction: column;
+            row-gap: 1rem;
+        }
+    `;
 
     render() {
         return html`
-            <title-element>Reset</title-element>
-            <text-element text="${this.errorText}"></text-element>
-            <button-nav-element>
-                <button-element
-                    name="Zurück"
-                    @click="${this.back}"
-                    ?secondary="${false}"
-                ></button-element>
-                <button-element
-                    name="Sensor-Modus"
-                    @click="${() => this.next()}"
-                    ?secondary="${false}"
-                ></button-element>
-                <button-element
-                    name="Konfiguration abschließen"
-                    @click="${this.reset}"
-                    ?secondary="${true}"
-                ></button-element>
-            </button-nav-element>
+            <button-element
+                name="Sensor neustarten"
+                @click="${this.factoryReset}"
+                ?secondary="${false}"
+            ></button-element>
+            <span>
+                Dadurch wird der Sensor neu gestartet. Die aktuelle Verbindung
+                wird getrennt. Du kannst die Seite danach schließen.
+            </span>
+            <div></div>
+            <button-element
+                name="Alle Einstellungen zurücksetzen"
+                @click="${this.factoryReset}"
+                ?secondary="${false}"
+            ></button-element>
+            <text-element
+                text="Nach dem Zurücksetzen werden alle Einstellungen auf die Werkseinstellungen zurückgesetzt. Das Gerät wird neu gestartet. Und muss neu konfiguriert werden."
+            ></text-element>
         `;
     }
 }

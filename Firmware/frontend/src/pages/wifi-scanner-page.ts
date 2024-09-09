@@ -39,7 +39,10 @@ export class WifiScannerPage extends BasePage {
 
     onNetworkClick(e: CustomEvent) {
         const network: Network = e.detail;
-        networkState.state.network = network;
+        networkState.state = {
+            isConnected: false,
+            network: network,
+        };
         this.next();
     }
 

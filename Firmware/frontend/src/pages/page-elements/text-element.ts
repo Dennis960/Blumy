@@ -8,20 +8,11 @@ export class ColoredTextElement extends LitElement {
     @property({ type: String }) color: "success" | "error" | "warning" =
         "error";
 
-    static styles = [
-        css`
-            .success-text {
-                margin-bottom: 0.75rem;
-            }
-        `,
-    ];
-
     render() {
         return html`
             <div
-                class="success-text"
                 style="${styleMap({
-                    display: this.text ? "" : "none",
+                    display: this.text ? "block" : "none",
                     color: `var(--${this.color})`,
                 })}"
             >
