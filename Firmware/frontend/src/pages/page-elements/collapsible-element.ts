@@ -44,6 +44,9 @@ export class CollapsibleElement extends LitElement {
 
             .content {
                 padding: 0.5rem 1rem;
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
             }
         `,
     ];
@@ -59,7 +62,10 @@ export class CollapsibleElement extends LitElement {
     render() {
         return html`
             <details ?open=${this.open} @toggle=${this.handleToggle}>
-                <summary>${this.summary}</summary>
+                <summary>
+                    ${this.summary}
+                    <slot name="summary"></slot>
+                </summary>
                 <div class="content">
                     <slot></slot>
                 </div>

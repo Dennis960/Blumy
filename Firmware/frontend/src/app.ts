@@ -1,11 +1,13 @@
 import { StateController } from "@lit-app/state";
-import { css, html, LitElement } from "lit";
+import { css, html, LitElement, TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import "./elements/dots-stepper-element";
 import "./elements/header-element";
 import "./elements/loader-bar-element";
 import "./pages/cloud-page";
 import "./pages/home-page";
+import "./pages/before-setup-finish-page";
+import "./pages/setup-finish-page";
 import "./pages/reset-page";
 import "./pages/timeout-page";
 import "./pages/update-page";
@@ -14,7 +16,7 @@ import "./pages/wifi-scanner-page";
 import "./pages/wifi-setup-page";
 import { enableDotNavigation, loadingState } from "./states";
 
-@customElement("first-setup-screen")
+@customElement("app-element")
 export class FirstSetupScreen extends LitElement {
     static styles = css`
         :host {
@@ -36,24 +38,41 @@ export class FirstSetupScreen extends LitElement {
     `;
 
     @state()
-    currentDot = 0;
+    currentDot = "0";
 
-    pageElements = [
-        html`<welcome-page @next="${this.next}" />`,
-        html`<wifi-scanner-page @next="${this.next}" @back="${this.back}" />`,
-        html`<wifi-setup-page @next="${this.next}" @back="${this.back}" />`,
-        html`<update-page @next="${this.next}" @back="${this.back}" />`,
-        html`<cloud-page @next="${this.next}" @back="${this.back}" />`,
-        html`<timeout-page @next="${this.next}" @back="${this.back}" />`,
-        html`<reset-page @next="${this.next}" @back="${this.back}" />`,
-        html`<home-page @back="${this.back}"></home-page>`,
-    ];
+    pageElements: Record<string, TemplateResult> = {
+        "0": html`<welcome-page @next="${this.next}" />`,
+        "1": html`<wifi-scanner-page
+            @next="${this.next}"
+            @back="${this.back}"
+        />`,
+        "2": html`<wifi-setup-page
+            @next="${this.next}"
+            @back="${this.back}"
+        />`,
+        "3": html`<cloud-page @next="${this.next}" @back="${this.back}" />`,
+        "4": html`<before-setup-finish-page
+            @next="${this.next}"
+            @back="${this.back}"
+        />`,
+        "5": html`<setup-finish-page
+            @next="${this.next}"
+            @back="${this.back}"
+        />`,
+        update: html`<update-page @next="${this.next}" @back="${this.back}" />`,
+        settings: html`<timeout-page
+            @next="${this.next}"
+            @back="${this.back}"
+        />`,
+        sensor: html`<home-page @back="${this.back}"></home-page>`,
+        reset: html`<reset-page @next="${this.next}" @back="${this.back}" />`,
+    };
 
     next(event: CustomEvent<number>) {
-        this.currentDot += event.detail;
+        this.currentDot = (parseInt(this.currentDot) + event.detail).toString();
     }
     back() {
-        this.currentDot = Math.max(this.currentDot - 1, 0);
+        this.currentDot = (parseInt(this.currentDot) - 1).toString();
     }
 
     onDotClick = (e: CustomEvent) => {
@@ -82,7 +101,7 @@ export class FirstSetupScreen extends LitElement {
         const urlParams = new URLSearchParams(window.location.search);
         const page = urlParams.get("page");
         if (page) {
-            this.currentDot = parseInt(page);
+            this.currentDot = page;
         }
     }
 
@@ -95,11 +114,13 @@ export class FirstSetupScreen extends LitElement {
                 ></loader-bar-element>
             </header>
             <dots-stepper-element
-                numberOfDots="${this.pageElements.length}"
+                numberOfDots="5"
                 currentDot="${this.currentDot}"
                 @dotClicked="${this.onDotClick}"
             ></dots-stepper-element>
-            <div class="page">${this.pageElements[this.currentDot]}</div>
+            <div class="page">
+                ${this.pageElements[this.currentDot.toString()]}
+            </div>
         `;
     }
 }

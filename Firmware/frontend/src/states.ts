@@ -9,10 +9,13 @@ class CustomState<T> extends State {
     }
 }
 
-export const networkState = new CustomState<{
-    network: Network;
-    isConnected: boolean;
-}>({} as any);
+export const networkState = new CustomState<
+    | {
+          network: Network | undefined;
+          isConnected: boolean;
+      }
+    | undefined
+>(undefined);
 
 /**
  * state specifies the number of things that are currently loading.

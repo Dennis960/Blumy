@@ -45,15 +45,14 @@ export class WifiSetupPage extends BasePage {
             if (wifiStatus == WifiStatus.ERROR) {
                 this.errorText = "Fehler, Sensor antwortet nicht";
             } else if (wifiStatus == WifiStatus.CONNECTED) {
-                networkState.state.isConnected = true;
-                if (
-                    networkState.state.network?.ssid !=
-                    this.ssidElement.input.value
-                ) {
-                    networkState.state.network = {
+                networkState.state = {
+                    isConnected: true,
+                    network: {
+                        rssi: -1,
+                        secure: -1,
                         ssid: this.ssidElement.input.value,
-                    } as Network;
-                }
+                    },
+                };
                 this.next();
                 return;
             } else if (wifiStatus == WifiStatus.FAIL) {
@@ -77,7 +76,7 @@ export class WifiSetupPage extends BasePage {
     }
 
     async painted() {
-        if (networkState.state.network?.secure != 7) {
+        if (networkState.state?.network?.secure != 7) {
             this.passwordElement.input.focus();
         } else if (!networkState.state.isConnected) {
             this.connect();
@@ -85,7 +84,7 @@ export class WifiSetupPage extends BasePage {
     }
 
     async firstUpdated() {
-        if (networkState.state.network) {
+        if (networkState.state?.network) {
             return;
         }
         const network = await getConnectedNetwork();
@@ -93,10 +92,13 @@ export class WifiSetupPage extends BasePage {
             return;
         }
 
-        networkState.state.network = {
-            ssid: network.ssid,
-            rssi: network.rssi,
-            secure: -1,
+        networkState.state = {
+            isConnected: true,
+            network: {
+                ssid: network.ssid,
+                rssi: network.rssi,
+                secure: -1,
+            },
         };
         this.ssidElement.input.value = network.ssid;
         this.passwordElement.input.focus();
@@ -110,7 +112,7 @@ export class WifiSetupPage extends BasePage {
                     id="ssid"
                     type="text"
                     label="SSID"
-                    initialValue="${networkState.state.network?.ssid}"
+                    initialValue="${networkState.state?.network?.ssid}"
                 ></input-element>
                 <input-element
                     id="password"

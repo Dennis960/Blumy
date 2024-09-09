@@ -1,6 +1,6 @@
 import { StateController } from "@lit-app/state";
 import { css, html } from "lit";
-import { customElement } from "lit/decorators.js";
+import { customElement, state } from "lit/decorators.js";
 import { WifiStatus, getConnectedNetwork, isConnected, resetEsp } from "../api";
 import { networkState } from "../states";
 import { BasePage } from "./base-page";
@@ -17,6 +17,7 @@ export class WelcomePage extends BasePage {
             }
         `,
     ];
+    @state() errorText: string = "";
 
     networkStateController = new StateController(this, networkState);
 
@@ -33,12 +34,17 @@ export class WelcomePage extends BasePage {
             if (wifiStatus == WifiStatus.CONNECTED) {
                 const network = await getConnectedNetwork(false);
                 networkState.state = {
-                    isConnected: network.status == WifiStatus.CONNECTED,
+                    isConnected: true,
                     network: {
                         rssi: network.rssi,
                         ssid: network.ssid,
                         secure: -1,
                     },
+                };
+            } else {
+                networkState.state = {
+                    isConnected: false,
+                    network: undefined,
                 };
             }
             await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -51,27 +57,26 @@ export class WelcomePage extends BasePage {
     }
 
     async exitConfiguration() {
-        await resetEsp();
+        const res = await resetEsp();
+        if (!res.ok) {
+            this.errorText = "Fehler, Gerät antwortet nicht";
+            return;
+        } else {
+            this.next(5);
+        }
     }
 
     render() {
         return html`
             <title-element>Willkommen</title-element>
             <description-element>
-                ${networkState.state.network
+                ${networkState.state
                     ? html`
-                          Blumy ist aktuell
                           ${networkState.state.isConnected
-                              ? "mit dem Internet"
-                              : "vom Internet"}
-                          <span
-                              class="${networkState.state.isConnected
-                                  ? "green"
-                                  : "red"}"
-                              >${networkState.state.isConnected
-                                  ? "verbunden"
-                                  : "getrennt"}</span
-                          >.
+                              ? html` Blumy ist aktuell mit dem Internet
+                                    <span class="green">verbunden</span>.`
+                              : html`Blumy ist aktuell vom Internet
+                                    <span class="red">getrennt</span>.`}
                           ${networkState.state.isConnected &&
                           networkState.state.network?.ssid
                               ? html`
@@ -83,6 +88,7 @@ export class WelcomePage extends BasePage {
                       `
                     : html`<span>Verbindung wird überprüft</span>`}
             </description-element>
+            <text-element text="${this.errorText}"></text-element>
             <button-nav-element>
                 <button-element
                     name="Konfiguration beenden"
@@ -92,7 +98,7 @@ export class WelcomePage extends BasePage {
                 <button-element
                     name="Setup beginnen"
                     @click="${() => {
-                        if (networkState.state.isConnected) {
+                        if (networkState.state?.isConnected) {
                             this.next(3);
                         } else {
                             this.next();

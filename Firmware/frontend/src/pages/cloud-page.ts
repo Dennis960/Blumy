@@ -1,5 +1,5 @@
 import { StateController } from "@lit-app/state";
-import { html } from "lit";
+import { css, html } from "lit";
 import { customElement, query, state } from "lit/decorators.js";
 import {
     BlumyCloudConfiguration,
@@ -93,6 +93,8 @@ export class CloudPage extends BasePage {
                         content: configurationState.testMessage.error,
                         type: "error",
                     };
+                    this.configurationStates = { ...this.configurationStates };
+                    await new Promise((resolve) => setTimeout(resolve, 10));
                     if (
                         window.confirm(
                             `Verbindungstest für ${key} fehlgeschlagen. Trotzdem speichern?`
@@ -137,6 +139,7 @@ export class CloudPage extends BasePage {
         if (this.configured) {
             this.errorText = "";
         }
+        this.configurationStates = { ...this.configurationStates };
     }
 
     private handleOpen(target: CloudConfigurationType) {
@@ -155,27 +158,27 @@ export class CloudPage extends BasePage {
         this.updateConfigured();
     }
 
-    private async testConnections(): Promise<boolean> {
+    private async testConnection(
+        key: CloudConfigurationType
+    ): Promise<boolean> {
         this.errorText = "";
         let success = true;
-        for (const key of cloudConfigurationTypes) {
-            const configurationState = this.configurationStates[key];
-            if (configurationState.open) {
-                const res = await testCloudConnection(
-                    configurationState.formElement!.getConfig()
-                );
-                if (res) {
-                    configurationState.message = {
-                        content: configurationState.testMessage.success,
-                        type: "success",
-                    };
-                } else {
-                    configurationState.message = {
-                        content: configurationState.testMessage.error,
-                        type: "error",
-                    };
-                    success = false;
-                }
+        const configurationState = this.configurationStates[key];
+        if (configurationState.open) {
+            const res = await testCloudConnection(
+                configurationState.formElement!.getConfig()
+            );
+            if (res) {
+                configurationState.message = {
+                    content: configurationState.testMessage.success,
+                    type: "success",
+                };
+            } else {
+                configurationState.message = {
+                    content: configurationState.testMessage.error,
+                    type: "error",
+                };
+                success = false;
             }
         }
         this.configurationStates = { ...this.configurationStates };
@@ -248,13 +251,20 @@ export class CloudPage extends BasePage {
     async handleExternalSetup() {
         location.href = `https://blumy.cloud/selector?redirect=${location.href}`;
     }
+    static styles = [
+        css`
+            collapsible-element button-element {
+                margin-left: auto;
+            }
+        `,
+    ];
 
     render() {
         return html`
             <title-element
                 >Automatische Schnittstellen-Konfiguration</title-element
             >
-            <div style="width: fit-content;">
+            <div style="width: fit-content; margin-bottom: 1.5rem;">
                 <button-element
                     name="Über die Blumy Cloud einrichten"
                     @click="${() => this.handleExternalSetup()}"
@@ -262,7 +272,6 @@ export class CloudPage extends BasePage {
                     ?secondary="${true}"
                 ></button-element>
             </div>
-            <br />
             <title-element>Manuelle Schnittstellen-Konfiguration</title-element>
             <collapsible-element
                 summary="Blumy Cloud"
@@ -273,6 +282,18 @@ export class CloudPage extends BasePage {
                 <cloud-form-element
                     @input-config=${this.handleChange}
                 ></cloud-form-element>
+                ${this.configurationStates["blumy"].open
+                    ? html`
+                          <button-element
+                              slot="summary"
+                              name="Testen"
+                              @click="${() => this.testConnection("blumy")}"
+                              ?secondary="${true}"
+                              ?disabled="${!this.configured ||
+                              loadingState.state > 0}"
+                          ></button-element>
+                      `
+                    : html``}
                 <text-element
                     text="${this.configurationStates.blumy.message.content}"
                     color="${this.configurationStates.blumy.message.type}"
@@ -287,6 +308,18 @@ export class CloudPage extends BasePage {
                 <http-form-element
                     @input-config=${this.handleChange}
                 ></http-form-element>
+                ${this.configurationStates["http"].open
+                    ? html`
+                          <button-element
+                              slot="summary"
+                              name="Testen"
+                              @click="${() => this.testConnection("http")}"
+                              ?secondary="${true}"
+                              ?disabled="${!this.configured ||
+                              loadingState.state > 0}"
+                          ></button-element>
+                      `
+                    : html``}
                 <text-element
                     text="${this.configurationStates.http.message.content}"
                     color="${this.configurationStates.http.message.type}"
@@ -301,6 +334,18 @@ export class CloudPage extends BasePage {
                 <mqtt-form-element
                     @input-config=${this.handleChange}
                 ></mqtt-form-element>
+                ${this.configurationStates["mqtt"].open
+                    ? html`
+                          <button-element
+                              slot="summary"
+                              name="Testen"
+                              @click="${() => this.testConnection("mqtt")}"
+                              ?secondary="${true}"
+                              ?disabled="${!this.configured ||
+                              loadingState.state > 0}"
+                          ></button-element>
+                      `
+                    : html``}
                 <text-element
                     text="${this.configurationStates.mqtt.message.content}"
                     color="${this.configurationStates.mqtt.message.type}"
@@ -315,20 +360,8 @@ export class CloudPage extends BasePage {
                     ?disabled="${loadingState.state > 0}"
                 ></button-element>
                 <button-element
-                    name="Überspringen"
-                    @click="${() => this.next()}"
-                    ?secondary="${true}"
-                    ?disabled="${loadingState.state > 0}"
-                ></button-element>
-                <button-element
                     name="Speichern"
                     @click="${this.submit}"
-                    ?secondary="${true}"
-                    ?disabled="${!this.configured || loadingState.state > 0}"
-                ></button-element>
-                <button-element
-                    name="Testen"
-                    @click="${this.testConnections}"
                     ?secondary="${true}"
                     ?disabled="${!this.configured || loadingState.state > 0}"
                 ></button-element>
