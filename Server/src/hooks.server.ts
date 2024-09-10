@@ -11,12 +11,16 @@ import cron from 'node-cron';
 import webpush from 'web-push';
 
 await migrate(db, { migrationsFolder: 'migrations' });
+let privateVapidKey = privateEnv.PRIVATE_VAPID_KEY;
+let publicVapidKey = publicEnv.PUBLIC_VAPID_KEY;
 
-webpush.setVapidDetails(
-	'mailto:' + privateEnv.VAPID_EMAIL,
-	publicEnv.PUBLIC_VAPID_KEY,
-	privateEnv.PRIVATE_VAPID_KEY
-);
+if (publicEnv.PUBLIC_MODE === 'test-ci') {
+	const newKey = webpush.generateVAPIDKeys();
+	privateVapidKey = newKey.privateKey;
+	publicVapidKey = newKey.publicKey;
+}
+
+webpush.setVapidDetails('mailto:' + privateEnv.VAPID_EMAIL, publicVapidKey, privateVapidKey);
 
 // send notifications every day at 8, 12, 16 and 20
 cron.schedule('0 8,12,16,20 * * *', async () => {
