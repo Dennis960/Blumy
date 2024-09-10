@@ -91,21 +91,3 @@ test('/data inserts data if authenticated', async () => {
 
     expect(afterCount).toBe(beforeCount + 1)
 })
-
-test.skip('inserts data received over legacy MQTT API', async () => {
-    // const beforeCount = await countData()
-
-    // const sensorController = new SensorController()
-    // await sensorController.addLegacySensorData({
-    //     plantName: testSensor.name,
-    //     sensorAddress: testSensor.sensorAddress,
-    //     water: 879,
-    //     rssi: -36,
-    //     duration: 3083,
-    //     measurementDuration: 2034,
-    // })
-
-    // const afterCount = await countData()
-
-    // expect(afterCount).toBe(beforeCount + 1)
-})

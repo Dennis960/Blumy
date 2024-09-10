@@ -1,13 +1,14 @@
 import SensorController from '$lib/server/controllers/SensorController';
-import SubscriptionController from '$lib/server/controllers/SubscriptionController';
 import { error } from '@sveltejs/kit';
-import type { PushSubscription } from 'web-push';
-import type { Actions, PageServerLoad } from './$types';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async function ({ params, url, depends, locals }) {
-	await locals.middleware.security.isOwnerOrThisSensorRead(params.id, url.searchParams.get('token'));
-	depends("sensor-history");
-	depends("sensor");
+	await locals.middleware.security.isOwnerOrThisSensorRead(
+		params.id,
+		url.searchParams.get('token')
+	);
+	depends('sensor-history');
+	depends('sensor');
 	const id = parseInt(params.id);
 
 	let startDate = new Date();
@@ -43,7 +44,12 @@ export const load: PageServerLoad = async function ({ params, url, depends, loca
 		throw error(404, 'Sensor nicht gefunden');
 	}
 
-	const sensorData = await new SensorController().getSensorHistory(id, startDate, endDate, maxDataPoints);
+	const sensorData = await new SensorController().getSensorHistory(
+		id,
+		startDate,
+		endDate,
+		maxDataPoints
+	);
 
 	return {
 		id,
@@ -53,27 +59,3 @@ export const load: PageServerLoad = async function ({ params, url, depends, loca
 		sensorData
 	};
 };
-
-export const actions = {
-	subscribe: async ({ request, params, locals, url }) => {
-		await locals.middleware.security.isOwnerOrThisSensorRead(params.id, url.searchParams.get('token'));
-		const data = await request.formData();
-		const subscription: PushSubscription = JSON.parse(data.get('subscription') as string);
-		await SubscriptionController.subscribe(parseInt(params.id), subscription);
-		return {};
-	},
-	unsubscribe: async ({ request, params, locals, url }) => {
-		await locals.middleware.security.isOwnerOrThisSensorRead(params.id, url.searchParams.get('token'));
-		const data = await request.formData();
-		const subscription: PushSubscription = JSON.parse(data.get('subscription') as string);
-		await SubscriptionController.unsubscribe(parseInt(params.id), subscription);
-		return {};
-	},
-	checkSubscription: async ({ request, params, locals, url }) => {
-		await locals.middleware.security.isOwnerOrThisSensorRead(params.id, url.searchParams.get('token'));
-		const data = await request.formData();
-		const subscription: PushSubscription = JSON.parse(data.get('subscription') as string);
-		const subscribed = await SubscriptionController.getIsSubscribed(parseInt(params.id), subscription);
-		return subscribed;
-	}
-} satisfies Actions;
