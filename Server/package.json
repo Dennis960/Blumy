@@ -13,7 +13,7 @@
 		"test:ui": "POSTGRES_DB=blumy_test playwright test --ui",
 		"test:unit": "vitest",
 		"lint": "eslint .",
-		"format": "prettier --plugin-search-dir . --write .",
+		"format": "prettier --write src",
 		"drizzle": "drizzle-kit generate"
 	},
 	"devDependencies": {
@@ -47,6 +47,7 @@
 		"litepicker": "^2.0.12",
 		"lodash-es": "^4.17.21",
 		"lucia": "^3.2.0",
+		"node-cron": "^3.0.3",
 		"nouislider": "^15.8.1",
 		"pg": "^8.12.0",
 		"playwright-ctrf-json-reporter": "^0.0.15",
