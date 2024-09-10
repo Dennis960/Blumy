@@ -218,6 +218,7 @@ export class CloudPage extends BasePage {
                     content: this.configurationStates.blumy.testMessage.success,
                     type: "success",
                 };
+                this.next();
             }
         } else {
             this.configurationStates.blumy.message = {
