@@ -19,15 +19,6 @@ export const espSensorReadingSchema = z.object({
 
 export type ESPSensorReadingDTO = z.infer<typeof espSensorReadingSchema>;
 
-export interface LegacyESPSensorReadingDTO {
-	sensorAddress: number;
-	plantName: string;
-	water: number;
-	duration: number;
-	measurementDuration: number;
-	rssi: number;
-}
-
 export default class SensorReadingEntity {
 	constructor(
 		public id: number,
