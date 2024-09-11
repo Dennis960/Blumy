@@ -7,11 +7,6 @@ on:
         required: true
         default: "latest"
         type: string
-      branch:
-        description: "Branch to deploy"
-        required: true
-        default: "main"
-        type: string
       environment:
         description: "Environment to deploy to"
         required: true
@@ -25,6 +20,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Extract branch name
+        shell: bash
+        run: |
+          branch_name="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+          branch_name=$(echo "$branch_name" | sed 's/\//_/g')
+          echo "branch=${branch_name}" >> $GITHUB_OUTPUT
+        id: extract_branch
       - uses: actions/checkout@v4
       - name: Deploy to server
         uses: easingthemes/ssh-deploy@main
@@ -40,8 +42,8 @@ jobs:
           SCRIPT_AFTER: |
             echo "Deploying with Docker Compose"
             cd ${{ github.event.inputs.environment == 'production' && secrets.BLUMY_HOST_PATH || secrets.BLUMY_TEST_HOST_PATH }}
-            echo "setting IMAGE_BRANCH to ${{ github.event.inputs.branch }}"
-            export IMAGE_BRANCH=${{ github.event.inputs.branch }}
+            echo "setting IMAGE_BRANCH to ${{ steps.extract_branch.outputs.branch }}"
+            export IMAGE_BRANCH=${{ steps.extract_branch.outputs.branch }}
             echo "setting IMAGE_NUMBER to ${{ github.event.inputs.version }}"
             export IMAGE_NUMBER=${{ github.event.inputs.version }}
             echo "Running Docker Compose"
