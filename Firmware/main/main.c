@@ -25,7 +25,7 @@ void start_deep_sleep()
     esp_deep_sleep(sleepTime);
 }
 
-void configuration_mode(bool isConfigured)
+void configuration_mode(bool isConfigured, bool resetReasonOta)
 {
     sensors_playStartupSound();
     plantfi_setEnableNatAndDnsOnConnect(true);
@@ -39,7 +39,7 @@ void configuration_mode(bool isConfigured)
     plantfi_configureAp("Blumy", "", 4, &userConnectedToAp);
 
     ESP_LOGI("MODE", "Starting webserver");
-    httpd_handle_t webserver = start_webserver();
+    httpd_handle_t webserver = start_webserver(resetReasonOta);
     plantfi_configureStaFromPlantstore();
 
     bool wasBootButtonPressed = false;
@@ -135,7 +135,7 @@ void app_main()
 
     if (isManualReset || !isConfigured)
     {
-        configuration_mode(isConfigured);
+        configuration_mode(isConfigured, resetReasonOta);
     }
     else
     {
