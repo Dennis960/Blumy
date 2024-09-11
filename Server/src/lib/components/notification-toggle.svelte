@@ -28,11 +28,13 @@
 			return;
 		}
 		if (subscribed) {
-			await submitUnsubscription(sensor.id, subscription);
-			subscribed = false;
+			if (await submitUnsubscription(sensor.id, subscription)) {
+				subscribed = false;
+			}
 		} else {
-			await submitSubscription(sensor.id, subscription);
-			subscribed = true;
+			if (await submitSubscription(sensor.id, subscription)) {
+				subscribed = true;
+			}
 		}
 	}
 </script>
