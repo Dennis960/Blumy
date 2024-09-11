@@ -1,5 +1,3 @@
-import SuperJSON from 'superjson';
-
 const BASE_URL = '/api';
 
 export async function checkSubscription(
@@ -11,40 +9,40 @@ export async function checkSubscription(
 		headers: {
 			'Content-Type': 'application/json'
 		},
-		body: SuperJSON.stringify(subscription)
+		body: JSON.stringify(subscription)
 	})
-		.then((response) => response.text())
-		.then((text) => SuperJSON.parse(text));
+		.then((response) => response.json())
+		.catch(() => false);
 }
 
 export async function submitSubscription(
 	sensorId: number,
 	subscription: PushSubscription
-): Promise<void> {
+): Promise<boolean> {
 	return await fetch(`${BASE_URL}/sensors/${sensorId}/subscribe`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
 		},
-		body: SuperJSON.stringify(subscription)
+		body: JSON.stringify(subscription)
 	})
-		.then((response) => response.text())
-		.then((text) => SuperJSON.parse(text));
+		.then((response) => response.json())
+		.catch(() => false);
 }
 
 export async function submitUnsubscription(
 	sensorId: number,
 	subscription: PushSubscription
-): Promise<void> {
+): Promise<boolean> {
 	return await fetch(`${BASE_URL}/sensors/${sensorId}/unsubscribe`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
 		},
-		body: SuperJSON.stringify(subscription)
+		body: JSON.stringify(subscription)
 	})
-		.then((response) => response.text())
-		.then((text) => SuperJSON.parse(text));
+		.then((response) => response.json())
+		.catch(() => false);
 }
 
 export function setupSensorOnLocalEsp(writeToken: string, redirectUrl: string) {
