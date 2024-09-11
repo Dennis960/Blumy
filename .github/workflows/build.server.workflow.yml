@@ -11,6 +11,7 @@ on:
       - main
     paths:
       - "Server/**"
+  workflow_dispatch:
 
 jobs:
   test-playwright:
