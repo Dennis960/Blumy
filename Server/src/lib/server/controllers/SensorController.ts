@@ -277,4 +277,8 @@ export default class SensorController {
 			config: SensorEntity.toDTO(sensorEntity)
 		};
 	}
+
+	public async deleteSensor(sensorId: number) {
+		await SensorRepository.delete(sensorId);
+	}
 }

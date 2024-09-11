@@ -60,9 +60,7 @@ export const sensors = pgTable('sensor', {
 	lowerThreshold: real('lower_threshold').notNull().default(0.2),
 	upperThreshold: real('upper_threshold').notNull().default(0.8),
 	imageBase64: text('image_base64'),
-	owner: text('owner')
-		.references(() => users.id)
-		.notNull(),
+	owner: text('owner').references(() => users.id),
 	writeToken: text('write_token').notNull(),
 	readToken: text('read_token').notNull()
 });

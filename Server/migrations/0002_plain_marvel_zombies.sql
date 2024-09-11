@@ -1,0 +1,1 @@
+ALTER TABLE "sensor" ALTER COLUMN "owner" DROP NOT NULL;

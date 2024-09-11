@@ -13,7 +13,9 @@
 	import { onMount } from 'svelte';
 	import Base64Image from './base64-image.svelte';
 	import CopyText from './copy-text.svelte';
+	import { goto } from '$app/navigation';
 
+	export let sensorId: number | undefined = undefined;
 	export let config: SensorConfigurationDTO | undefined = undefined;
 	export let sensorValueDistribution: SensorValueDistributionDTO | undefined = undefined;
 	export let error: string | undefined = undefined;
@@ -120,6 +122,15 @@
 		}
 
 		applyAction(result);
+	}
+
+	async function deleteSensor() {
+		if (window.confirm('Soll der Sensor wirklich gelöscht werden?')) {
+			await fetch(`/api/sensors/${sensorId}`, {
+				method: 'DELETE'
+			});
+			goto('/');
+		}
 	}
 </script>
 
@@ -236,6 +247,20 @@
 									hint="Jeder mit diesem Link hat Zugriff auf die Sensorwerte."
 									value={shareLink}
 								/>
+							</div>
+						</div>
+					{/if}
+
+					{#if sensorId}
+						<!-- Delete button -->
+						<div class="row mb-3">
+							<div
+								class="col-12 col
+								-md-6 col-lg-4"
+							>
+								<button type="button" class="btn btn-danger" on:click={deleteSensor}>
+									Sensor löschen
+								</button>
 							</div>
 						</div>
 					{/if}

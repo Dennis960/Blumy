@@ -5,9 +5,6 @@
 
 	export let data;
 
-	let shareLink: string | undefined;
-	let writeToken: string | undefined;
-
 	let error: string;
 
 	onMount(() => {
@@ -25,10 +22,11 @@
 	<div class="container">
 		{#if data.sensor.config != undefined}
 			<SensorSettingsForm
+				sensorId={data.sensor.id}
 				config={data.sensor.config}
 				{error}
-				{writeToken}
-				{shareLink}
+				writeToken={data.writeToken ?? undefined}
+				shareLink={data.shareLink}
 				sensorValueDistribution={data.sensorValueDistribution}
 				formAction="/api/sensors/{data.id}/settings"
 				formMethod="PUT"
