@@ -32,19 +32,17 @@ export class UpdatePage extends BasePage {
         this.firmwareUpdateProgress = 0;
         while (this.firmwareUpdateProgress !== null) {
             this.firmwareUpdateProgress = await getUpdatePercentage();
-            if (
-                this.firmwareUpdateProgress === 100 ||
-                this.firmwareUpdateProgress === -1
-            ) {
+            if (this.firmwareUpdateProgress === -1) {
+                this.infoText = "Es wurde noch kein Update gestartet";
+            } else if (this.firmwareUpdateProgress === 100) {
                 this.infoText = "Der Sensor wurde erfolgreich aktualisiert";
                 this.firmwareUpdateProgress = null;
                 return;
-            }
-            if (this.firmwareUpdateProgress < 100) {
+            } else if (this.firmwareUpdateProgress < 100) {
                 await new Promise((resolve) => setTimeout(resolve, 200));
-            }
-            if (this.firmwareUpdateProgress > 80) {
-                this.infoText = "Der Sensor wird jetzt neu gestartet";
+                if (this.firmwareUpdateProgress > 80) {
+                    this.infoText = "Der Sensor wird jetzt neu gestartet";
+                }
             }
         }
     }

@@ -617,6 +617,7 @@ esp_err_t post_api_update_firmware_handler(httpd_req_t *req)
     }
 
     plantstore_setFirmwareUpdateUrl(url);
+    ota_update_percentage = 0;
 
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
@@ -893,7 +894,7 @@ void register_uri_handlers(httpd_handle_t server)
     httpd_register_uri_handler(server, &get);
 }
 
-httpd_handle_t start_webserver(void)
+httpd_handle_t start_webserver(bool resetReasonOta)
 {
     ESP_LOGI("HTTP", "Starting HTTP server");
     /* Empty handle to esp_http_server */
@@ -903,6 +904,12 @@ httpd_handle_t start_webserver(void)
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.uri_match_fn = httpd_uri_match_wildcard;
     config.max_uri_handlers = 50;
+
+    if (resetReasonOta)
+    {
+        ESP_LOGI("OTA", "Reset reason is OTA, so OTA finished successfully");
+        ota_update_percentage = 100;
+    }
 
     /* Start the httpd server */
     ESP_ERROR_CHECK(httpd_start(&server, &config));
