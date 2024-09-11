@@ -15,6 +15,13 @@
       "when": 1725972477544,
       "tag": "0001_little_frog_thor",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1726055881099,
+      "tag": "0002_plain_marvel_zombies",
+      "breakpoints": true
     }
   ]
 }

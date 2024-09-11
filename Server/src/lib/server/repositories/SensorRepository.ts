@@ -98,4 +98,8 @@ export default class SensorRepository {
 			.limit(1)
 			.then((results) => results.pop()?.owner);
 	}
+
+	static async delete(sensorId: number) {
+		await db.update(sensors).set({ owner: null }).where(eq(sensors.sensorAddress, sensorId));
+	}
 }
