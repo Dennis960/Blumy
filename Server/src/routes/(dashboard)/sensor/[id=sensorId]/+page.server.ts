@@ -1,14 +1,10 @@
+import { DATA_DEPENDENCY } from '$lib/api';
 import SensorController from '$lib/server/controllers/SensorController';
-import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async function ({ params, url, depends, locals }) {
-	await locals.middleware.security.isOwnerOrThisSensorRead(
-		params.id,
-		url.searchParams.get('token')
-	);
-	depends('sensor-history');
-	depends('sensor');
+	await locals.security.allowOwnerOrSensorRead(params.id, url.searchParams.get('token'));
+	depends(DATA_DEPENDENCY.SENSOR);
 	const id = parseInt(params.id);
 
 	let startDate = new Date();
@@ -39,11 +35,6 @@ export const load: PageServerLoad = async function ({ params, url, depends, loca
 		}
 	}
 
-	const sensor = await new SensorController().getSensor(id);
-	if (sensor == undefined) {
-		throw error(404, 'Sensor nicht gefunden');
-	}
-
 	const sensorData = await new SensorController().getSensorHistory(
 		id,
 		startDate,
@@ -55,7 +46,6 @@ export const load: PageServerLoad = async function ({ params, url, depends, loca
 		id,
 		startDate,
 		endDate,
-		sensor,
 		sensorData
 	};
 };

@@ -9,7 +9,8 @@ import { dev } from '$app/environment';
 
 import type { PageServerLoad } from './$types';
 
-export const load = (({ cookies, url }) => {
+export const load = (({ cookies, url, locals }) => {
+	locals.security.allowAll();
 	const redirectUrl = url.searchParams.get('redirectUrl') ?? '/';
 	cookies.set('redirectUrl', redirectUrl, {
 		path: '/',
@@ -30,6 +31,7 @@ function generateCodeVerifier() {
 
 export const actions = {
 	loginGoogle: async (event) => {
+		event.locals.security.allowAll();
 		const state = generateState();
 		const codeVerifier = generateCodeVerifier();
 		event.cookies.set('google_oauth_code_verifier', codeVerifier, {

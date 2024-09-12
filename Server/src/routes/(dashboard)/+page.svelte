@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation';
+	import { DATA_DEPENDENCY } from '$lib/api.js';
 	import SensorCard from '$lib/components/sensor-card.svelte';
 	import { onMount } from 'svelte';
 
@@ -8,7 +9,7 @@
 	onMount(() => {
 		const interval = setInterval(
 			() => {
-				invalidate('sensor-overview');
+				invalidate(DATA_DEPENDENCY.SENSOR_VALUE_DISTRIBUTION);
 			},
 			60 * 60 * 1000
 		);

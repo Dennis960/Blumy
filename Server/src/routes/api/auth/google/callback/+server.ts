@@ -9,6 +9,7 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { and, eq } from 'drizzle-orm';
 
 export async function GET(event: RequestEvent): Promise<Response> {
+	event.locals.security.allowAll();
 	const code = event.url.searchParams.get('code');
 	const state = event.url.searchParams.get('state');
 	const storedState = event.cookies.get('google_oauth_state') ?? null;

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
+	import { DATA_DEPENDENCY } from '$lib/api.js';
 	import SensorSettingsForm from '$lib/components/sensor-settings-form.svelte';
 	import { onMount } from 'svelte';
 
@@ -10,7 +11,7 @@
 	onMount(() => {
 		const interval = setInterval(
 			() => {
-				invalidate('sensor-value-distribution');
+				invalidate(DATA_DEPENDENCY.SENSOR_VALUE_DISTRIBUTION);
 			},
 			15 * 60 * 1000
 		);

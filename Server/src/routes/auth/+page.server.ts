@@ -17,6 +17,7 @@ function generateCodeVerifier() {
 
 export const actions = {
 	loginGoogle: async (event) => {
+		event.locals.security.allowAll();
 		const state = generateState();
 		const codeVerifier = generateCodeVerifier();
 		event.cookies.set('google_oauth_code_verifier', codeVerifier, {
@@ -40,6 +41,7 @@ export const actions = {
 		redirect(302, url.toString());
 	},
 	logout: async (event) => {
+		event.locals.security.allowAll();
 		if (!event.locals.session) {
 			return new Response(null, {
 				status: 401

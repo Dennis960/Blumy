@@ -3,7 +3,7 @@ import { error, redirect } from '@sveltejs/kit';
 import type { Session, User } from 'lucia';
 
 export const authenticated = (user: User | null, session: Session | null) => ({
-	isAuthenticated: function () {
+	allowAuthenticated: function () {
 		if (!user) {
 			throw error(401, 'not authenticated');
 		}
@@ -13,7 +13,7 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 		}
 		return user;
 	},
-	isAuthenticatedElseRedirect: function (redirectUrl = '/') {
+	allowAuthenticatedElseRedirect: function (redirectUrl = '/') {
 		if (!user || (session && session.fresh)) {
 			throw redirect(302, `/login?redirectUrl=${encodeURIComponent(redirectUrl)}`);
 		}
@@ -21,16 +21,16 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 	},
 
 	// @enforce-await
-	isSensorWrite: async function (sensorId: number, writeToken: string) {
-		user = this.isAuthenticated();
+	allowHasWritePermission: async function (sensorId: number, writeToken: string) {
+		user = this.allowAuthenticated();
 		if (sensorId !== (await SensorRepository.getIdByWriteToken(writeToken))) {
 			throw error(403, 'missing write token');
 		}
 	},
 
 	// @enforce-await
-	isOwner: async function (sensorId: number) {
-		user = this.isAuthenticated();
+	allowOwnerOf: async function (sensorId: number) {
+		user = this.allowAuthenticated();
 
 		if (!user) {
 			throw error(403, 'not authenticated');
@@ -47,8 +47,8 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 	},
 
 	// @enforce-await
-	isOwnerOrThisSensorRead: async function (sensorId: number | string, readToken?: string | null) {
-		user = this.isAuthenticated();
+	allowOwnerOrSensorRead: async function (sensorId: number | string, readToken?: string | null) {
+		user = this.allowAuthenticated();
 		sensorId = parseInt(sensorId.toString());
 
 		if (readToken) {
@@ -65,5 +65,10 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 				throw error(403, 'not an owner of this sensor');
 			}
 		}
+	},
+
+	allowAll: function () {},
+	allowNone: function () {
+		throw error(405, 'not allowed');
 	}
 });

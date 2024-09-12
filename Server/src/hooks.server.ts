@@ -2,7 +2,7 @@ import { env as privateEnv } from '$env/dynamic/private';
 import { env as publicEnv } from '$env/dynamic/public';
 import { lucia } from '$lib/server/auth';
 import { db } from '$lib/server/db/worker';
-import { authenticated } from '$lib/server/middlewares/authenticated';
+import { authenticated } from '$lib/server/security/authenticated';
 import NotificationService from '$lib/server/services/NotificationService';
 import type { Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
@@ -58,9 +58,7 @@ export const handle: Handle = sequence(
 		return resolve(event);
 	},
 	async ({ event, resolve }) => {
-		event.locals.middleware = {
-			security: authenticated(event.locals.user, event.locals.session)
-		};
+		event.locals.security = authenticated(event.locals.user, event.locals.session);
 		return resolve(event);
 	}
 );
