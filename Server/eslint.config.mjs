@@ -6,7 +6,7 @@ import globals from 'globals';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import parser from 'svelte-eslint-parser';
-import enforceAwaitPlugin from './x-plugins-eslint/enforce-await.js';
+import customSecurityLinterPlugin from './x-plugins-eslint/custom-security-linter.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,10 +41,11 @@ export default [
 	),
 	{
 		plugins: {
-			'enforce-await': enforceAwaitPlugin
+			'custom-security-linter': customSecurityLinterPlugin
 		},
 		rules: {
-			'enforce-await/enforce-await': 'error'
+			'custom-security-linter/enforce-security-await': 'error',
+			'custom-security-linter/enforce-security-specification': 'error'
 		},
 		files: ['**/*.svelte', '**/*.ts'],
 		ignores: ['**/*.config.ts'],

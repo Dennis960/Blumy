@@ -4,7 +4,7 @@ import type { Actions } from './$types';
 
 export const actions = {
 	default: async (event) => {
-		event.locals.user = event.locals.middleware.security.isAuthenticatedElseRedirect();
+		event.locals.user = event.locals.security.allowAuthenticatedElseRedirect();
 		const data = await event.request.formData();
 
 		const imageFile = data.get('image') as File;

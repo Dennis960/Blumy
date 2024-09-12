@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { DATA_DEPENDENCY } from '$lib/api.js';
 	import SensorCapacityHistoryCard from '$lib/components/sensor-capacity-history-card.svelte';
 	import SensorDetailCard from '$lib/components/sensor-detail-card.svelte';
 	import { onMount } from 'svelte';
@@ -16,7 +17,7 @@
 		$page.url.searchParams.set('from', dateRange.startDate.getTime().toString());
 		$page.url.searchParams.set('to', dateRange.endDate.getTime().toString());
 		await goto($page.url);
-		invalidate('sensor-history');
+		invalidate(DATA_DEPENDENCY.SENSOR);
 	}
 
 	$: if (
@@ -29,8 +30,7 @@
 	onMount(() => {
 		const interval = setInterval(
 			() => {
-				invalidate('sensor-history');
-				invalidate('sensor');
+				invalidate(DATA_DEPENDENCY.SENSOR);
 			},
 			15 * 60 * 1000
 		);

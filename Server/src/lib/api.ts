@@ -54,3 +54,9 @@ export function setupSensorOnLocalEsp(writeToken: string, redirectUrl: string) {
 	url.search = query.toString();
 	location.href = url.toString();
 }
+
+export enum DATA_DEPENDENCY {
+	SENSOR = 'SENSOR',
+	SENSOR_OVERVIEW = 'SENSOR_OVERVIEW',
+	SENSOR_VALUE_DISTRIBUTION = 'SENSOR_VALUE_DISTRIBUTION'
+}

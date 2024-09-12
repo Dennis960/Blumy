@@ -1,9 +1,10 @@
+import { DATA_DEPENDENCY } from '$lib/api';
 import SensorController from '$lib/server/controllers/SensorController';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
-	event.depends('sensor-overview');
-	event.locals.middleware.security.isAuthenticatedElseRedirect();
+	event.locals.security.allowAuthenticatedElseRedirect();
+	event.depends(DATA_DEPENDENCY.SENSOR_OVERVIEW);
 	const sensorOverview = await new SensorController().getSensorOverview(event.locals.user!.id);
 	// const sensorHistory = await new SensorController().getSensorHistory(event.locals.user!.id);
 	const now = new Date();

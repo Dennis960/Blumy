@@ -6,6 +6,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 const dataController = new SensorController();
 
 export const POST = (async (event) => {
+	await event.locals.security.allowAll();
 	const authorizationHeader = event.request.headers.get('Authorization');
 	if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
@@ -22,6 +23,7 @@ export const POST = (async (event) => {
 }) satisfies RequestHandler;
 
 export const GET = (async (event) => {
+	event.locals.security.allowAll();
 	const authorizationHeader = event.request.headers.get('Authorization');
 	if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
 		return json({ error: 'Unauthorized' }, { status: 401 });

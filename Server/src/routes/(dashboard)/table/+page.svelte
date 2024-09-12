@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
+	import { DATA_DEPENDENCY } from '$lib/api.js';
 	import SensorRow from '$lib/components/sensor-row.svelte';
 	import SensorStatusCard from '$lib/components/sensor-status-card.svelte';
 	import TableSorter, { type SortDirection } from '$lib/components/table-sorter.svelte';
@@ -13,7 +14,7 @@
 	onMount(() => {
 		const interval = setInterval(
 			() => {
-				invalidate('sensor-overview');
+				invalidate(DATA_DEPENDENCY.SENSOR_OVERVIEW);
 			},
 			60 * 60 * 1000
 		);

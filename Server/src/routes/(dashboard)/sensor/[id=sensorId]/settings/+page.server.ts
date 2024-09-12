@@ -1,25 +1,22 @@
+import { DATA_DEPENDENCY } from '$lib/api';
 import SensorController from '$lib/server/controllers/SensorController';
-import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async function ({ depends, params }) {
-	depends('sensor-value-distribution');
+export const load: PageServerLoad = async function ({ depends, params, parent, locals, url }) {
+	await locals.security.allowOwnerOrSensorRead(params.id, url.searchParams.get('token'));
+	depends(DATA_DEPENDENCY.SENSOR_VALUE_DISTRIBUTION);
 	const id = parseInt(params.id);
 
 	const sensorValueDistribution = await new SensorController().getSensorValueDistribution(id);
 
-	const sensor = await new SensorController().getSensor(id);
-	if (sensor == undefined) {
-		throw error(404, 'Sensor not found');
-	}
-	const writeToken = await new SensorController().getSensorWriteToken(id);
+	const sensor = (await parent()).sensor;
 	const shareLink =
 		sensor.readToken != undefined ? `/sensor/${id}?token=${sensor.readToken}` : undefined;
 
 	return {
 		sensor,
 		sensorValueDistribution,
-		writeToken,
-		shareLink
+		writeToken: sensor.writeToken,
+		shareLink: shareLink
 	};
 };
