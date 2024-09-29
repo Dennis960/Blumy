@@ -121,7 +121,7 @@ void sensor_mode()
 void app_main()
 {
     bool isConfigured = plantstore_isConfigured();
-    // bool resetReasonOta = false;
+    bool resetReasonOta = false;
     // plantstore_getResetReasonOta(&resetReasonOta);
     // if (resetReasonOta)
     // {
