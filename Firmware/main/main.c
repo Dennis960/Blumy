@@ -121,12 +121,12 @@ void sensor_mode()
 void app_main()
 {
     bool isConfigured = plantstore_isConfigured();
-    bool resetReasonOta = false;
-    plantstore_getResetReasonOta(&resetReasonOta);
-    if (resetReasonOta)
-    {
-        plantstore_setResetReasonOta(false);
-    }
+    // bool resetReasonOta = false;
+    // plantstore_getResetReasonOta(&resetReasonOta);
+    // if (resetReasonOta)
+    // {
+    //     plantstore_setResetReasonOta(false);
+    // }
     bool isManualReset = (esp_reset_reason() == ESP_RST_POWERON ||
                           esp_reset_reason() == ESP_RST_JTAG ||
                           esp_reset_reason() == ESP_RST_SDIO ||
