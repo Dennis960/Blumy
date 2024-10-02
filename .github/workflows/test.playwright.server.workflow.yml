@@ -20,7 +20,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:alpine
+        image: postgres:16-alpine
         env:
           POSTGRES_USER: blumy
           POSTGRES_PASSWORD: blumy
