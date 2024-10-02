@@ -125,7 +125,11 @@
 	}
 
 	async function deleteSensor() {
-		if (window.confirm('Soll der Sensor wirklich gelöscht werden?')) {
+		if (
+			window.confirm(
+				'Soll der Sensor wirklich gelöscht werden? Dieser Prozess kann nicht rückgängig gemacht werden.'
+			)
+		) {
 			await fetch(`/api/sensors/${sensorId}`, {
 				method: 'DELETE'
 			});
