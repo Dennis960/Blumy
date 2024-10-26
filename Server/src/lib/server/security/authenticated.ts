@@ -48,7 +48,6 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 
 	// @enforce-await
 	allowOwnerOrSensorRead: async function (sensorId: number | string, readToken?: string | null) {
-		user = this.allowAuthenticated();
 		sensorId = parseInt(sensorId.toString());
 
 		if (readToken) {
@@ -56,6 +55,7 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 				throw error(403, 'wrong sensor for read token');
 			}
 		} else {
+			user = this.allowAuthenticated();
 			const ownerId = await SensorRepository.getOwner(sensorId);
 			if (ownerId === undefined) {
 				throw error(404, 'sensor not found');
