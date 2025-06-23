@@ -10956,7 +10956,7 @@
 				(hide yes)
 			)
 		)
-		(property "JLCPCB Position Offset" "0,0,-0.5"
+		(property "JLCPCB Position Offset" ""
 			(at 118.745 128.27 0)
 			(effects
 				(font
@@ -11616,6 +11616,15 @@
 			)
 		)
 		(property "MPN" "C2997435"
+			(at 163.195 180.975 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "JLCPCB Position Offset" "0,0.83,0"
 			(at 163.195 180.975 0)
 			(effects
 				(font
@@ -12747,6 +12756,15 @@
 			)
 		)
 		(property "MPN" "C2757850"
+			(at 33.02 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "JLCPCB Rotation Offset" "180"
 			(at 33.02 91.44 0)
 			(effects
 				(font

@@ -220,7 +220,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -244,7 +244,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -292,7 +292,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/7a21b79e-06fc-4ddd-81ff-3d4ac5e04cc0")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -465,7 +467,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:MouseBites5mm"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -538,8 +540,9 @@
 			)
 		)
 		(path "/85969bde-8cdc-402b-9446-f021d9a48f66")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
-		(attr smd exclude_from_bom)
+		(attr smd exclude_from_bom dnp)
 		(fp_line
 			(start -0.254 2.46)
 			(end -0.254 -2.54)
@@ -633,7 +636,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -657,7 +660,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -705,7 +708,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/5d06a35b-9da1-4da2-bd48-0f6c6b5e3dbf")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -878,7 +883,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -902,7 +907,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -938,7 +943,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/c255548a-5676-48b0-b800-a35c1a0a4551")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -1111,7 +1118,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:DSBGA-8_L1.8-W1.1-R2-C4-P0.40-BR"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -1123,7 +1130,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://item.szlcsc.com/269672.html"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -1172,6 +1179,7 @@
 			)
 		)
 		(path "/856eddec-1fbb-4c32-a8b2-29203677c275")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(clearance 0.05)
 		(zone_connect 2)
@@ -1393,7 +1401,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:SW-SMD_L3.9-W3.0-P4.45"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -1405,7 +1413,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://item.szlcsc.com/457636.html"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -1454,6 +1462,7 @@
 			)
 		)
 		(path "/38876186-b03b-46c2-9870-726d06241c1a")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -1601,7 +1610,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -1625,7 +1634,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -1661,7 +1670,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/d21d35c6-6fd3-4864-a9ec-2bb3ac92b833")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -1834,7 +1845,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -1858,7 +1869,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -1906,7 +1917,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/64626f49-2a38-47ce-9a5b-c609b8ad493f")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -2078,7 +2091,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:Flower"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -2151,8 +2164,9 @@
 			)
 		)
 		(path "/67333fd1-4b08-41fc-b326-563ed1a49e30")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
-		(attr board_only exclude_from_pos_files exclude_from_bom)
+		(attr board_only exclude_from_pos_files exclude_from_bom dnp)
 		(fp_poly
 			(pts
 				(xy 0.360619 -2.940567) (xy 0.629111 -2.839279) (xy 0.85278 -2.659853) (xy 0.994647 -2.479225) (xy 1.077558 -2.350476)
@@ -2229,7 +2243,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:MouseBites5mm"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -2302,8 +2316,9 @@
 			)
 		)
 		(path "/0609f83d-514c-4a16-bc35-5da6d1ad35c3")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
-		(attr smd exclude_from_bom)
+		(attr smd exclude_from_bom dnp)
 		(fp_line
 			(start -0.254 2.46)
 			(end -0.254 -2.54)
@@ -2397,7 +2412,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -2421,7 +2436,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -2469,7 +2484,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/9fb2708d-3425-4ebe-9c96-8d15a95e8aa3")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -2642,7 +2659,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:BUZ-SMD_4P-L8.5-W8.5-P8.50-BR"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -2654,7 +2671,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://item.szlcsc.com/96500.html"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -2727,6 +2744,7 @@
 			)
 		)
 		(path "/e2bccb4d-9a90-4c95-b136-6ae7fb697c99")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -2923,7 +2941,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -2947,7 +2965,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -3007,7 +3025,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/8fca70ec-1b02-4297-8e1e-6c39c3ce9024")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -3180,7 +3200,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -3204,7 +3224,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -3240,7 +3260,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/55f3fadc-224f-4b35-928f-fbd7a0657b4a")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -3413,7 +3435,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -3437,7 +3459,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -3473,7 +3495,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/7c8c284c-1577-46c7-a1f2-e1d19f303ef8")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -3646,7 +3670,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -3670,7 +3694,7 @@
 				)
 			)
 		)
-		(property "Description" "Mounting Hole without connection"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -3706,33 +3730,11 @@
 				)
 			)
 		)
-		(property "dnp" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "21626f75-9df2-4878-8b15-44b611b98f9f")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "exclude_from_bom" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "77b0a0e7-80a7-47fe-b869-d0b86e78a5b3")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
+		(property ki_fp_filters "MountingHole*")
 		(path "/2194f879-9640-49c7-8d7f-07e03383e8b2")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
-		(attr exclude_from_pos_files exclude_from_bom)
+		(attr exclude_from_pos_files exclude_from_bom dnp)
 		(fp_circle
 			(center 0 0)
 			(end 3.2 0)
@@ -3770,7 +3772,12 @@
 			(at 0 0)
 			(size 3.2 3.2)
 			(drill 3.2)
-			(layers "*.Cu" "*.Mask")
+			(layers "*.Cu" "*.Mask" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu" "In7.Cu" "In8.Cu"
+				"In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu" "In15.Cu"
+				"In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu" "In22.Cu"
+				"In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu" "In29.Cu"
+				"In30.Cu"
+			)
 			(uuid "203468c4-740a-46aa-a1f0-d28990dd066d")
 		)
 	)
@@ -3803,7 +3810,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -3827,7 +3834,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -3875,7 +3882,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/032298ba-4d0d-41bb-b322-7acec882654f")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -4029,7 +4038,7 @@
 			(at 0 2.25 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "8ed61eb8-13f4-4867-b0ac-347949621512")
+			(uuid "7206d1c1-5f3a-4e1e-b15c-b7a9a610d489")
 			(effects
 				(font
 					(size 1 1)
@@ -4040,7 +4049,7 @@
 		(property "Value" "AHT20"
 			(at 0 3.5 0)
 			(layer "F.Fab")
-			(uuid "9863f088-1db7-4cac-bddc-6bd28bd64791")
+			(uuid "eafd4ebe-4fe8-450d-a7a3-f6203d1ebacf")
 			(effects
 				(font
 					(size 1 1)
@@ -4048,11 +4057,11 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:SENSOR-SMD-6_AHT20"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "903378b6-8c76-4188-98b3-13620a71b334")
+			(uuid "e916281d-403b-414d-bfdf-8d97b10d8953")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4060,11 +4069,11 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://img.jlc.com/image//data/smt-stock-produce/componentSizePhoto/2022-04-19/f11dc062e7c449078b2a02061eb03bb9/BG2204181018_D22041300494_font.png"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "739e9bdc-8427-4737-a45e-df797fc99505")
+			(uuid "339a7ae0-2c2e-4171-a197-626072894481")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4076,7 +4085,7 @@
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "e05e7387-5dc5-427f-bc94-f433ab6d540c")
+			(uuid "2c2dca1a-2ac3-44d8-b17e-88986bcf5c23")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4108,7 +4117,21 @@
 				)
 			)
 		)
+		(property "JLCPCB Rotation Offset" "180"
+			(at 0 0 180)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "4d2fee9d-cd47-4968-abe7-add945e36edf")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(path "/ca58b189-8ee4-420d-943a-c981e1e753a8")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -4119,7 +4142,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "2d48e374-2a55-4b10-b7e7-32f6406993b9")
+			(uuid "c053ae69-17d6-46a6-90ca-3b21879eeb00")
 		)
 		(fp_line
 			(start 1.5 1.454128)
@@ -4129,7 +4152,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "3d9c4586-4bce-447b-b0e7-534b42d004b4")
+			(uuid "e8a20da1-c010-4637-a0ad-791a49545c41")
 		)
 		(fp_line
 			(start 1.5 0.454153)
@@ -4139,7 +4162,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "e174f882-586e-46d4-8516-b831972de9f4")
+			(uuid "9e88cfbf-a6a4-4625-b011-e77001041d00")
 		)
 		(fp_line
 			(start 1.5 -0.545847)
@@ -4149,7 +4172,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "a1d4181d-c9cc-4f08-8f2a-c2e9d2337911")
+			(uuid "8559ee08-a84e-4f83-a8f2-e333ccee4bcf")
 		)
 		(fp_line
 			(start 1.5 -1.5)
@@ -4159,7 +4182,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "253a04b5-1711-4bae-be1d-8e6845fd18df")
+			(uuid "db52ee12-3051-4360-b922-12b6eca27cbe")
 		)
 		(fp_line
 			(start -0.275006 -0.549987)
@@ -4169,7 +4192,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "d305ce8d-bb6c-431f-bc4f-bf09e5ee720f")
+			(uuid "9a9a41ee-ecaa-4444-9689-e64fedc1abeb")
 		)
 		(fp_line
 			(start -0.275006 -1.049987)
@@ -4179,7 +4202,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "ffb5b724-6a19-4bb7-979c-75c0ed889ac3")
+			(uuid "63d28e3f-66ba-4e2d-a3d0-c611dc1df59f")
 		)
 		(fp_line
 			(start -1.5 1.5)
@@ -4189,7 +4212,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "4b7c11f0-e5b6-4ff5-b0af-5b6df1bf1daf")
+			(uuid "d8af4737-4d16-4b9c-adc0-d954cf348a9d")
 		)
 		(fp_line
 			(start -1.5 0.545872)
@@ -4199,7 +4222,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "0f3ad6c4-289b-4ba6-9467-1cae55ac34ed")
+			(uuid "bf5e6a4a-ba6e-40cb-b0ff-2ece7697e415")
 		)
 		(fp_line
 			(start -1.5 -0.454128)
@@ -4209,7 +4232,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "4974fd2a-3276-4e6a-92bf-30a47b930d85")
+			(uuid "016ec719-f990-4327-b5e5-f431c969549e")
 		)
 		(fp_line
 			(start -1.5 -1.454128)
@@ -4219,7 +4242,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "14a45ce5-ca4a-4592-b5b1-ce07f28af2a7")
+			(uuid "e1c5874d-4f69-4b42-9400-7f51c2c8a0e0")
 		)
 		(fp_line
 			(start -1.5 -1.5)
@@ -4229,7 +4252,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "60c7859f-80cc-473f-9a7d-a019a48e5b2d")
+			(uuid "91debdc5-34d5-4001-a7b0-f0884d46e2dc")
 		)
 		(fp_arc
 			(start 0.298908 -1.050775)
@@ -4240,7 +4263,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "7347af35-fcc6-42a7-962c-bcbf79659da5")
+			(uuid "0ab24b24-cdff-4080-950c-7a3a74861936")
 		)
 		(fp_arc
 			(start -0.275006 -0.549987)
@@ -4251,18 +4274,18 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "a6deeed5-15be-41b8-bebd-7c018c2c4e15")
+			(uuid "e7a7c3c2-6099-4dd4-842b-4110a5fdd7b5")
 		)
 		(fp_circle
-			(center -1.499873 -1.499873)
-			(end -1.469901 -1.499873)
+			(center -1.8 -1.5)
+			(end -1.770028 -1.5)
 			(stroke
 				(width 0.059995)
 				(type solid)
 			)
 			(fill none)
 			(layer "F.SilkS")
-			(uuid "e92100f1-2fda-45ac-9fbd-b964f957e92d")
+			(uuid "ae2b289f-9a65-4523-b23a-4f47efd562c2")
 		)
 		(fp_rect
 			(start -2 -1.9)
@@ -4273,12 +4296,12 @@
 			)
 			(fill none)
 			(layer "F.CrtYd")
-			(uuid "f8c88078-d99c-499c-8f78-989bede27c77")
+			(uuid "25b189c3-cad5-4db5-a8b7-13c29e9149a9")
 		)
 		(fp_text user "REF**"
 			(at 0 5.5 0)
 			(layer "F.Fab")
-			(uuid "ff4bad63-b760-4ca0-b63c-6cd822112cd2")
+			(uuid "16d44b8e-390d-40c8-90b8-3d15043e7fca")
 			(effects
 				(font
 					(size 1 1)
@@ -4293,7 +4316,7 @@
 			(net 20 "unconnected-(U3-NC-Pad1)")
 			(pinfunction "NC")
 			(pintype "no_connect")
-			(uuid "88749074-afac-4ef2-902e-e6fca940bdb6")
+			(uuid "52c61a30-48c5-4af0-94e5-b8c51738e93f")
 		)
 		(pad "2" smd rect
 			(at -1.199898 0 180)
@@ -4302,7 +4325,7 @@
 			(net 1 "+3V3")
 			(pinfunction "VDD")
 			(pintype "power_in")
-			(uuid "f7dfa1bf-464c-4747-a985-f87a1ca4f235")
+			(uuid "d4ffe20a-6fb6-4fed-a212-0c6a919c140d")
 		)
 		(pad "3" smd rect
 			(at -1.199898 1 180)
@@ -4311,7 +4334,7 @@
 			(net 34 "TH_SCL")
 			(pinfunction "SCL")
 			(pintype "bidirectional")
-			(uuid "f40c326b-ff5b-42bf-8f72-325583c227ed")
+			(uuid "0e8f26ca-69eb-4ad5-8975-5a1b81d45f83")
 		)
 		(pad "4" smd rect
 			(at 1.199898 1 180)
@@ -4320,7 +4343,7 @@
 			(net 41 "TH_SDA")
 			(pinfunction "SDA")
 			(pintype "bidirectional")
-			(uuid "2c9395e3-a10a-482a-88b0-da0edc571de8")
+			(uuid "37644689-84e8-45cd-9611-9b0f895be329")
 		)
 		(pad "5" smd rect
 			(at 1.199898 0 180)
@@ -4329,7 +4352,7 @@
 			(net 2 "GND")
 			(pinfunction "GND")
 			(pintype "power_in")
-			(uuid "da0b97d9-002d-42a2-983e-7efa0e3bb0c1")
+			(uuid "dcea4c94-89a1-4203-8b9b-3ac91b1287d1")
 		)
 		(pad "6" smd rect
 			(at 1.199898 -1 180)
@@ -4338,7 +4361,7 @@
 			(net 21 "unconnected-(U3-NC-Pad6)")
 			(pinfunction "NC")
 			(pintype "no_connect")
-			(uuid "0ba4e41b-cdac-4a13-9174-5fc0bca4d2ee")
+			(uuid "be03118b-b95e-4cff-8138-15bad20985d1")
 		)
 		(model "lib/CustomFootprints.pretty/packages3d/SENSOR-SMD-6_AHT20.step"
 			(offset
@@ -4381,7 +4404,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:USB-C-SMD_G-SWITCH_GT-USB-7010EN"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -4393,7 +4416,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://atta.szlcsc.com/upload/public/pdf/source/20220429/DBF6CF34305C712BCF88AF8C50C2E7F9.pdf"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -4441,7 +4464,21 @@
 				)
 			)
 		)
+		(property "JLCPCB Position Offset" "0,0.83,0"
+			(at 0 0 -90)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "212ce003-8387-476d-86bc-87d62af3947f")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(path "/ae152440-d04e-43a0-80b0-d59ea0a0b50f")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -4543,21 +4580,36 @@
 			(at -2.890018 -1.302388 270)
 			(size 0.700025 0.700025)
 			(drill 0.700025)
-			(layers "*.Cu" "*.Mask")
+			(layers "*.Cu" "*.Mask" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu" "In7.Cu" "In8.Cu"
+				"In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu" "In15.Cu"
+				"In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu" "In22.Cu"
+				"In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu" "In29.Cu"
+				"In30.Cu"
+			)
 			(uuid "b447eb91-5b15-4964-90a7-337edd013b08")
 		)
 		(pad "" np_thru_hole circle
 			(at 2.890018 -1.302134 270)
 			(size 0.700025 0.700025)
 			(drill 0.700025)
-			(layers "*.Cu" "*.Mask")
+			(layers "*.Cu" "*.Mask" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu" "In7.Cu" "In8.Cu"
+				"In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu" "In15.Cu"
+				"In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu" "In22.Cu"
+				"In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu" "In29.Cu"
+				"In30.Cu"
+			)
 			(uuid "40ab648a-2c96-4c81-beaf-0158be309a3d")
 		)
 		(pad "1" thru_hole oval
 			(at -4.320041 -1.802515 270)
 			(size 1 2.1)
 			(drill oval 0.6 1.7)
-			(layers "*.Cu" "*.Mask")
+			(layers "*.Cu" "*.Mask" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu" "In7.Cu" "In8.Cu"
+				"In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu" "In15.Cu"
+				"In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu" "In22.Cu"
+				"In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu" "In29.Cu"
+				"In30.Cu"
+			)
 			(remove_unused_layers no)
 			(net 16 "unconnected-(U1-SHELL-Pad1)")
 			(pinfunction "SHELL")
@@ -4568,7 +4620,12 @@
 			(at 4.320041 -1.802515 270)
 			(size 1 2.1)
 			(drill oval 0.6 1.7)
-			(layers "*.Cu" "*.Mask")
+			(layers "*.Cu" "*.Mask" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu" "In7.Cu" "In8.Cu"
+				"In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu" "In15.Cu"
+				"In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu" "In22.Cu"
+				"In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu" "In29.Cu"
+				"In30.Cu"
+			)
 			(remove_unused_layers no)
 			(net 17 "unconnected-(U1-SHELL-Pad2)")
 			(pinfunction "SHELL")
@@ -4579,7 +4636,12 @@
 			(at 4.320041 2.377572 270)
 			(size 1 1.6)
 			(drill oval 0.6 1.300025)
-			(layers "*.Cu" "*.Mask")
+			(layers "*.Cu" "*.Mask" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu" "In7.Cu" "In8.Cu"
+				"In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu" "In15.Cu"
+				"In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu" "In22.Cu"
+				"In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu" "In29.Cu"
+				"In30.Cu"
+			)
 			(remove_unused_layers no)
 			(net 18 "unconnected-(U1-SHELL-Pad3)")
 			(pinfunction "SHELL")
@@ -4590,7 +4652,12 @@
 			(at -4.320041 2.377572 270)
 			(size 1 1.6)
 			(drill oval 0.6 1.300025)
-			(layers "*.Cu" "*.Mask")
+			(layers "*.Cu" "*.Mask" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu" "In7.Cu" "In8.Cu"
+				"In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu" "In15.Cu"
+				"In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu" "In22.Cu"
+				"In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu" "In29.Cu"
+				"In30.Cu"
+			)
 			(remove_unused_layers no)
 			(net 19 "unconnected-(U1-SHELL-Pad4)")
 			(pinfunction "SHELL")
@@ -4746,7 +4813,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:SENSORS-SMD_ALS-PT19"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -4758,7 +4825,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://item.szlcsc.com/157565.html"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -4819,6 +4886,7 @@
 			)
 		)
 		(path "/673c85ea-3be2-4225-b534-50875f94bb82")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -4943,7 +5011,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:MouseBites5mm"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -5016,8 +5084,9 @@
 			)
 		)
 		(path "/d293b82d-bd37-461b-a1fd-55ab87a17582")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
-		(attr smd exclude_from_bom)
+		(attr smd exclude_from_bom dnp)
 		(fp_line
 			(start -0.254 -0.04)
 			(end -3.254 -0.04)
@@ -5111,7 +5180,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -5135,7 +5204,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -5171,7 +5240,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/a09ccc26-44ac-472f-bbba-72b4b3c78df5")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -5344,7 +5415,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:LED0805-R-RD"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -5356,7 +5427,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://item.szlcsc.com/88042.html"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -5417,6 +5488,7 @@
 			)
 		)
 		(path "/dbd67d15-889f-4c1f-93d5-66600f9ce4a1")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -5621,7 +5693,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:WIFIM-SMD_61P-L16.6-W13.2-P0.80-ESP32-C6-MINI-1-N4"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -5633,7 +5705,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://eu.mouser.com/datasheet/2/891/esp32_c6_mini_1_datasheet_en-3105735.pdf"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -5682,6 +5754,7 @@
 			)
 		)
 		(path "/b36d4962-55f4-4336-b5de-2db28d0dc733")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -6337,7 +6410,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -6361,7 +6434,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -6397,7 +6470,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/6f1b5874-d9d4-4abb-8744-4769064d4dca")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -6570,7 +6645,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -6594,7 +6669,7 @@
 				)
 			)
 		)
-		(property "Description" "Mounting Hole without connection"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -6630,33 +6705,11 @@
 				)
 			)
 		)
-		(property "dnp" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "bf753b05-2ae1-49f1-9896-ec2a887c78cc")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "exclude_from_bom" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "c02d9af0-87bb-40a1-8fe8-fe854a5a2c8f")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
+		(property ki_fp_filters "MountingHole*")
 		(path "/5d09e64e-158f-4cb2-859b-9ddaf918ae0c")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
-		(attr exclude_from_pos_files exclude_from_bom)
+		(attr exclude_from_pos_files exclude_from_bom dnp)
 		(fp_circle
 			(center 0 0)
 			(end 3.2 0)
@@ -6694,7 +6747,12 @@
 			(at 0 0)
 			(size 3.2 3.2)
 			(drill 3.2)
-			(layers "*.Cu" "*.Mask")
+			(layers "*.Cu" "*.Mask" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu" "In7.Cu" "In8.Cu"
+				"In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu" "In15.Cu"
+				"In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu" "In22.Cu"
+				"In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu" "In29.Cu"
+				"In30.Cu"
+			)
 			(uuid "36727f50-471b-47c2-9e28-42231b0fc925")
 		)
 	)
@@ -6727,7 +6785,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:MouseBites5mm"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -6800,8 +6858,9 @@
 			)
 		)
 		(path "/2fca7383-803e-4723-bc49-79ac60c4e7d0")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
-		(attr smd exclude_from_bom)
+		(attr smd exclude_from_bom dnp)
 		(fp_line
 			(start -0.254 -0.04)
 			(end -3.254 -0.04)
@@ -6895,7 +6954,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:SW-SMD_L3.9-W3.0-P4.45"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -6907,7 +6966,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://item.szlcsc.com/457636.html"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -6956,6 +7015,7 @@
 			)
 		)
 		(path "/04dc1b85-2324-4329-b4e2-0710790b7ac2")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -7103,7 +7163,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -7127,7 +7187,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -7163,7 +7223,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/931c1a95-e04e-443b-9bfb-1d58a0a99913")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -7336,7 +7398,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:SW-SMD_MK-12C02-G025"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -7348,7 +7410,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://item.szlcsc.com/826787.html"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -7372,7 +7434,7 @@
 				)
 			)
 		)
-		(property "JLCPCB Position Offset" "0,0,-0.5"
+		(property "JLCPCB Position Offset" ""
 			(at 333.949996 -23.150002 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -7409,6 +7471,7 @@
 			)
 		)
 		(path "/8d6b055e-c7aa-451c-9d9c-c4b6fdf0c316")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -7522,14 +7585,24 @@
 			(at -1.5 0.448311 90)
 			(size 0.849987 0.849987)
 			(drill 0.849987)
-			(layers "*.Cu" "*.Mask")
+			(layers "*.Cu" "*.Mask" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu" "In7.Cu" "In8.Cu"
+				"In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu" "In15.Cu"
+				"In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu" "In22.Cu"
+				"In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu" "In29.Cu"
+				"In30.Cu"
+			)
 			(uuid "5605302f-54f1-4d89-a6e8-885ec06ba34b")
 		)
 		(pad "" np_thru_hole circle
 			(at 1.5 0.448311 90)
 			(size 0.849987 0.849987)
 			(drill 0.849987)
-			(layers "*.Cu" "*.Mask")
+			(layers "*.Cu" "*.Mask" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu" "In7.Cu" "In8.Cu"
+				"In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu" "In15.Cu"
+				"In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu" "In22.Cu"
+				"In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu" "In29.Cu"
+				"In30.Cu"
+			)
 			(uuid "23da197c-37e9-42e5-999a-964819a81c47")
 		)
 		(pad "1" smd rect
@@ -7636,7 +7709,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -7660,7 +7733,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -7696,7 +7769,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/3a93f275-5e5b-4b3b-bcfc-2c4d8b365b14")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -7869,7 +7944,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:L0806"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -7893,7 +7968,7 @@
 				)
 			)
 		)
-		(property "Description" "Inductor"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -7929,7 +8004,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Choke_* *Coil* Inductor_* L_*")
 		(path "/be3b0ad7-e3bb-4513-8fa0-afdb020fbb04")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -8164,7 +8241,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -8188,7 +8265,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -8236,7 +8313,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/457b2b95-b0e7-4316-8e2e-9c17a7dd847c")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -8409,7 +8488,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -8433,7 +8512,7 @@
 				)
 			)
 		)
-		(property "Description" "Mounting Hole without connection"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -8469,33 +8548,11 @@
 				)
 			)
 		)
-		(property "dnp" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "431bdc79-2bf2-4b48-bf48-e7a6ed5d197a")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "exclude_from_bom" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "5c686cc6-030c-451a-bfd5-b6ed07a1eb74")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
+		(property ki_fp_filters "MountingHole*")
 		(path "/5e1d6b53-7be6-4ad8-989f-6dbf16c3dc49")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
-		(attr exclude_from_pos_files exclude_from_bom)
+		(attr exclude_from_pos_files exclude_from_bom dnp)
 		(fp_circle
 			(center 0 0)
 			(end 3.2 0)
@@ -8533,7 +8590,12 @@
 			(at 0 0)
 			(size 3.2 3.2)
 			(drill 3.2)
-			(layers "*.Cu" "*.Mask")
+			(layers "*.Cu" "*.Mask" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu" "In7.Cu" "In8.Cu"
+				"In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu" "In15.Cu"
+				"In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu" "In22.Cu"
+				"In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu" "In29.Cu"
+				"In30.Cu"
+			)
 			(uuid "44012f15-8a4b-48bb-8137-7f508f1f0eea")
 		)
 	)
@@ -8566,7 +8628,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -8590,7 +8652,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -8638,7 +8700,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/c0f8bd9e-beb3-4e18-80a5-bddc0b9e2163")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -8811,7 +8875,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:LED0805-R-RD"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -8823,7 +8887,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://item.szlcsc.com/88042.html"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -8884,6 +8948,7 @@
 			)
 		)
 		(path "/329126f3-4313-4fcb-8daa-a8cb2401c179")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -9088,7 +9153,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -9112,7 +9177,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -9160,7 +9225,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/8d1e9d08-58cf-4e85-a599-6e6ad1fcfd93")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -9333,7 +9400,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -9357,7 +9424,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -9405,7 +9472,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/0ca7faca-cd43-4388-9e51-a5a82aa53624")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -9578,7 +9647,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -9602,7 +9671,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -9650,7 +9719,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/65a3bd26-c88f-4326-b458-876d550659d3")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -9823,7 +9894,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -9847,7 +9918,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -9883,7 +9954,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/a7aadbac-dbc0-42ec-9593-d5d14686465d")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -10056,7 +10129,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -10080,7 +10153,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -10116,7 +10189,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/cfa0877e-e053-4203-bf4a-f114951ed2d0")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -10289,7 +10364,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -10313,7 +10388,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -10373,7 +10448,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/ff75518a-5191-43bf-891e-847b3272b3eb")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -10546,7 +10623,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -10570,7 +10647,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -10618,7 +10695,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/dec32147-c639-4211-98cf-4194a8fd336f")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -10791,7 +10870,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -10815,7 +10894,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -10863,7 +10942,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/59dad15d-129d-4b9f-ac64-6f5bedb42492")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -11036,7 +11117,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:PinHeader_1x03_P2.54mm_Vertical_SMD"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -11060,7 +11141,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -11096,20 +11177,11 @@
 				)
 			)
 		)
-		(property "dnp" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "2efe3a23-d43d-4cc3-9096-c92a3bef0921")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/c89096d8-093f-4e67-b4eb-045510a4db22")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
+		(attr dnp)
 		(fp_line
 			(start -1.524 -1.778)
 			(end -1.524 -0.762)
@@ -11241,7 +11313,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -11265,7 +11337,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -11313,7 +11385,9 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/c75745eb-0df3-488a-b5ab-3a8fabf9d660")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -11486,7 +11560,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:SOD-123F_L2.7-W1.6-LS3.8-RD"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -11498,7 +11572,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.jinghenggroup.com/DATABOOK2010/10ZENER/MM1Z2V0THRUMM1Z120SOD123.pdf"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -11559,6 +11633,7 @@
 			)
 		)
 		(path "/8f02233f-f47f-4ef3-a056-781256bd6ec0")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd)
 		(fp_line
@@ -11705,7 +11780,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:Sensor-Tip"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -11729,7 +11804,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -11793,20 +11868,9 @@
 				(justify mirror)
 			)
 		)
-		(property "exclude_from_bom" ""
-			(at 340.099998 377.599994 0)
-			(layer "B.Fab")
-			(hide yes)
-			(uuid "3fff6929-7955-4304-bfd0-ac96dae167e4")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify mirror)
-			)
-		)
+		(property ki_fp_filters "C_*")
 		(path "/c62dd1ba-6e2e-4d2a-8afd-d36db7a5eef2")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr exclude_from_bom)
 		(fp_line
@@ -11996,7 +12060,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "CustomFootprints:AAA Battery-spring"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -12085,6 +12149,7 @@
 			)
 		)
 		(path "/f1f58b1e-d0e8-40e6-af70-45ec8ff536e0")
+		(sheetname "Root")
 		(sheetfile "Board.kicad_sch")
 		(attr smd exclude_from_bom)
 		(fp_line
@@ -12358,7 +12423,12 @@
 			(at -5.5 0 180)
 			(size 4.3 1.5)
 			(drill oval 3.3 0.5)
-			(layers "*.Cu" "*.Mask")
+			(layers "*.Cu" "*.Mask" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu" "In7.Cu" "In8.Cu"
+				"In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu" "In15.Cu"
+				"In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu" "In22.Cu"
+				"In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu" "In29.Cu"
+				"In30.Cu"
+			)
 			(remove_unused_layers no)
 			(roundrect_rratio 0.3333333333)
 			(net 50 "PWR_BAT_VIN")
@@ -12371,7 +12441,12 @@
 			(at 5.5 0 180)
 			(size 4.3 1.5)
 			(drill oval 3.3 0.5)
-			(layers "*.Cu" "*.Mask")
+			(layers "*.Cu" "*.Mask" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu" "In7.Cu" "In8.Cu"
+				"In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu" "In15.Cu"
+				"In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu" "In22.Cu"
+				"In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu" "In29.Cu"
+				"In30.Cu"
+			)
 			(remove_unused_layers no)
 			(roundrect_rratio 0.3333333333)
 			(net 2 "GND")

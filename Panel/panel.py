@@ -7,7 +7,7 @@ from itertools import chain
 
 # Custom config
 input = "Board/Board.kicad_pcb"
-output = "Board-Panel/panel.kicad_pcb"
+output = "Panel/panel.kicad_pcb"
 
 # KiKit Panel Config (Only deviations from default)
 
