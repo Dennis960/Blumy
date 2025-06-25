@@ -237,24 +237,20 @@ bool plantstore_getFirmwareUpdateUrl(char *url, size_t url_size)
     return url_err == ESP_OK;
 }
 
-void plantstore_setResetReasonOta(bool ota)
+bool plantstore_getLedBrightness(uint8_t *brightness)
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
+    esp_err_t brightness_err = nvs_get_u8(nvs_handle, LED_BRIGHTNESS_KEY, brightness);
+    nvs_close(nvs_handle);
+
+    return brightness_err == ESP_OK;
+}
+void plantstore_setLedBrightness(uint8_t brightness)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
-    ESP_ERROR_CHECK(nvs_set_u8(nvs_handle, RESET_REASON_OTA_KEY, ota));
+    ESP_ERROR_CHECK(nvs_set_u8(nvs_handle, LED_BRIGHTNESS_KEY, brightness));
     ESP_ERROR_CHECK(nvs_commit(nvs_handle));
     nvs_close(nvs_handle);
-}
-
-bool plantstore_getResetReasonOta(bool *ota)
-{
-    uint8_t _ota;
-    nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
-    esp_err_t ota_err = nvs_get_u8(nvs_handle, RESET_REASON_OTA_KEY, &_ota);
-    nvs_close(nvs_handle);
-
-    *ota = _ota != 0;
-
-    return ota_err == ESP_OK;
 }
 
 bool plantstore_isConfigured()

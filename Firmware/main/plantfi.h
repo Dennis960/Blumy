@@ -30,7 +30,7 @@ void plantfi_event_handler(void *arg, esp_event_base_t event_base,
                            int32_t event_id, void *event_data);
 void plantfi_initWifiApSta();
 void plantfi_initWifiStaOnly();
-void plantfi_configureAp(const char *ssid, const char *password, int max_connection, bool *userConnectedToAp);
+void plantfi_configureAp(const char *ssid, const char *password, int max_connection);
 void plantfi_configureSta(const char *ssid, const char *password, int max_retry, bool credentialsChanged);
 void plantfi_setEnableNatAndDnsOnConnect(bool isConfigurationMode);
 /**
@@ -52,6 +52,9 @@ int8_t plantfi_getRssi();
  */
 void plantfi_scan_networks(plantfi_ap_record_t *ap_records, int *num_ap_records);
 plantfi_sta_status_t plantfi_get_sta_status();
+bool plantfi_is_sta_connected();
+bool plantfi_is_user_connected_to_ap();
+bool plantfi_is_sta_connecting();
 void plantfi_send_sensor_data_blumy(sensors_full_data_t *sensors_data, int8_t rssi);
 bool plantfi_test_blumy_connection(char *token, char *url);
 void plantfi_send_sensor_data_http(sensors_full_data_t *sensors_data, int8_t rssi);

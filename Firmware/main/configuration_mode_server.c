@@ -467,6 +467,35 @@ esp_err_t post_api_timeouts_wdt_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
+esp_err_t get_api_led_brightness_handler(httpd_req_t *req)
+{
+    uint8_t brightness = DEFAULT_LED_BRIGHTNESS;
+    plantstore_getLedBrightness(&brightness);
+
+    char resp[4];
+    sprintf(resp, "%d", brightness);
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+esp_err_t post_api_led_brightness_handler(httpd_req_t *req)
+{
+    char brightnessString[4];
+    if (!get_single_value(req, brightnessString) || !is_number(brightnessString))
+    {
+        return ESP_FAIL;
+    }
+
+    uint8_t brightness;
+    sscanf(brightnessString, "%hhu", &brightness);
+
+    plantstore_setLedBrightness(brightness);
+
+    const char resp[] = "OK";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
 esp_err_t get_api_update_percentage_handler(httpd_req_t *req)
 {
     char resp[10];
@@ -601,7 +630,6 @@ void ota_update_task(void *pvParameter)
     }
 
     ESP_LOGI("OTA", "OTA finished, restarting");
-    plantstore_setResetReasonOta(true);
     esp_restart();
     vTaskDelete(NULL);
 }
@@ -786,30 +814,6 @@ httpd_uri_t get_api_timeouts_sleep = {
     .handler = get_api_timeouts_sleep_handler,
     .user_ctx = NULL};
 
-httpd_uri_t get_api_update_percentage = {
-    .uri = "/api/update/percentage",
-    .method = HTTP_GET,
-    .handler = get_api_update_percentage_handler,
-    .user_ctx = NULL};
-
-httpd_uri_t get_api_connectedNetwork = {
-    .uri = "/api/connectedNetwork",
-    .method = HTTP_GET,
-    .handler = get_api_connectedNetwork_handler,
-    .user_ctx = NULL};
-
-httpd_uri_t get_api_sensorData = {
-    .uri = "/api/sensor/data",
-    .method = HTTP_GET,
-    .handler = get_api_sensor_data_handler,
-    .user_ctx = NULL};
-
-httpd_uri_t post_api_factoryReset = {
-    .uri = "/api/factoryReset",
-    .method = HTTP_POST,
-    .handler = post_api_factoryReset_handler,
-    .user_ctx = NULL};
-
 httpd_uri_t get_api_timeouts_configurationMode = {
     .uri = "/api/timeouts/configurationMode",
     .method = HTTP_GET,
@@ -832,6 +836,42 @@ httpd_uri_t post_api_timeouts_wdt = {
     .uri = "/api/timeouts/wdt",
     .method = HTTP_POST,
     .handler = post_api_timeouts_wdt_handler,
+    .user_ctx = NULL};
+
+httpd_uri_t post_api_led_brightness = {
+    .uri = "/api/led/brightness",
+    .method = HTTP_POST,
+    .handler = post_api_led_brightness_handler,
+    .user_ctx = NULL};
+
+httpd_uri_t get_api_led_brightness = {
+    .uri = "/api/led/brightness",
+    .method = HTTP_GET,
+    .handler = get_api_led_brightness_handler,
+    .user_ctx = NULL};
+
+httpd_uri_t get_api_update_percentage = {
+    .uri = "/api/update/percentage",
+    .method = HTTP_GET,
+    .handler = get_api_update_percentage_handler,
+    .user_ctx = NULL};
+
+httpd_uri_t get_api_connectedNetwork = {
+    .uri = "/api/connectedNetwork",
+    .method = HTTP_GET,
+    .handler = get_api_connectedNetwork_handler,
+    .user_ctx = NULL};
+
+httpd_uri_t get_api_sensorData = {
+    .uri = "/api/sensor/data",
+    .method = HTTP_GET,
+    .handler = get_api_sensor_data_handler,
+    .user_ctx = NULL};
+
+httpd_uri_t post_api_factoryReset = {
+    .uri = "/api/factoryReset",
+    .method = HTTP_POST,
+    .handler = post_api_factoryReset_handler,
     .user_ctx = NULL};
 
 httpd_uri_t post_api_update_firmware = {
@@ -882,6 +922,8 @@ void register_uri_handlers(httpd_handle_t server)
     httpd_register_uri_handler(server, &post_api_timeouts_configurationMode);
     httpd_register_uri_handler(server, &get_api_timeouts_wdt);
     httpd_register_uri_handler(server, &post_api_timeouts_wdt);
+    httpd_register_uri_handler(server, &post_api_led_brightness);
+    httpd_register_uri_handler(server, &get_api_led_brightness);
     httpd_register_uri_handler(server, &get_api_update_percentage);
     httpd_register_uri_handler(server, &get_api_connectedNetwork);
     httpd_register_uri_handler(server, &get_api_sensorData);
@@ -894,7 +936,7 @@ void register_uri_handlers(httpd_handle_t server)
     httpd_register_uri_handler(server, &get);
 }
 
-httpd_handle_t start_webserver(bool resetReasonOta)
+httpd_handle_t start_webserver()
 {
     ESP_LOGI("HTTP", "Starting HTTP server");
     /* Empty handle to esp_http_server */
@@ -904,12 +946,6 @@ httpd_handle_t start_webserver(bool resetReasonOta)
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.uri_match_fn = httpd_uri_match_wildcard;
     config.max_uri_handlers = 50;
-
-    if (resetReasonOta)
-    {
-        ESP_LOGI("OTA", "Reset reason is OTA, so OTA finished successfully");
-        ota_update_percentage = 100;
-    }
 
     /* Start the httpd server */
     ESP_ERROR_CHECK(httpd_start(&server, &config));
