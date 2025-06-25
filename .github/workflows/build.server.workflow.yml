@@ -18,7 +18,7 @@ jobs:
     uses: ./.github/workflows/test.playwright.server.workflow.yml
 
   docker_publish:
-    runs-on: "ubuntu-20.04"
+    runs-on: ubuntu-latest
     needs: ["test-playwright"]
 
     steps:
