@@ -44,7 +44,7 @@ bool get_value(char *content, char *key, char *value)
 bool get_values(httpd_req_t *req, char *keys[], char *values[], int num_keys)
 {
     char content[1000];
-    size_t recv_size = MIN(req->content_len, sizeof(content));
+    size_t recv_size = MIN(req->content_len, sizeof(content) - 1);
     int ret = httpd_req_recv(req, content, recv_size);
     if (ret <= 0)
     {
@@ -54,6 +54,7 @@ bool get_values(httpd_req_t *req, char *keys[], char *values[], int num_keys)
         }
         return false;
     }
+    content[ret] = '\0'; // Ensure null terminator
     for (int i = 0; i < num_keys; i++)
     {
         if (!get_value(content, keys[i], values[i]))
@@ -64,10 +65,10 @@ bool get_values(httpd_req_t *req, char *keys[], char *values[], int num_keys)
     return true;
 }
 
-bool get_single_value(httpd_req_t *req, char *value)
+bool get_single_value(httpd_req_t *req, char *value, size_t buffer_len)
 {
     // The entire request body is the value, there is no key and no newline
-    size_t recv_size = MIN(req->content_len, 1000);
+    size_t recv_size = MIN(req->content_len, buffer_len - 1);
     int ret = httpd_req_recv(req, value, recv_size);
     if (ret <= 0)
     {
@@ -77,6 +78,7 @@ bool get_single_value(httpd_req_t *req, char *value)
         }
         return false;
     }
+    value[ret] = '\0'; // Ensure null terminator
     return true;
 }
 
@@ -383,7 +385,7 @@ esp_err_t post_api_cloudDisable_blumy_handler(httpd_req_t *req)
 esp_err_t post_api_timeouts_sleep_handler(httpd_req_t *req)
 {
     char timoutString[10];
-    if (!get_single_value(req, timoutString) || !is_number(timoutString))
+    if (!get_single_value(req, timoutString, 10) || !is_number(timoutString))
     {
         return ESP_FAIL;
     }
@@ -423,7 +425,7 @@ esp_err_t get_api_timeouts_configurationMode_handler(httpd_req_t *req)
 esp_err_t post_api_timeouts_configurationMode_handler(httpd_req_t *req)
 {
     char timoutString[10];
-    if (!get_single_value(req, timoutString) || !is_number(timoutString))
+    if (!get_single_value(req, timoutString, 10) || !is_number(timoutString))
     {
         return ESP_FAIL;
     }
@@ -452,7 +454,7 @@ esp_err_t get_api_timeouts_wdt_handler(httpd_req_t *req)
 esp_err_t post_api_timeouts_wdt_handler(httpd_req_t *req)
 {
     char timoutString[10];
-    if (!get_single_value(req, timoutString) || !is_number(timoutString))
+    if (!get_single_value(req, timoutString, 10) || !is_number(timoutString))
     {
         return ESP_FAIL;
     }
@@ -480,9 +482,16 @@ esp_err_t get_api_led_brightness_handler(httpd_req_t *req)
 
 esp_err_t post_api_led_brightness_handler(httpd_req_t *req)
 {
-    char brightnessString[4];
-    if (!get_single_value(req, brightnessString) || !is_number(brightnessString))
+    char brightnessString[10];
+    if (!get_single_value(req, brightnessString, 10))
     {
+        ESP_LOGI("DEBUG", "1");
+        return ESP_FAIL;
+    }
+    ESP_LOGI("DEBUG", "%s", brightnessString);
+    if (!is_number(brightnessString))
+    {
+        ESP_LOGI("DEBUG", "2");
         return ESP_FAIL;
     }
 
@@ -714,6 +723,15 @@ esp_err_t post_api_update_check_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
+esp_err_t get_api_firmware_version_handler(httpd_req_t *req)
+{
+    uint64_t version = FIRMWARE_VERSION;
+    char resp[20];
+    sprintf(resp, "%llu", version);
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
 httpd_uri_t post_api_connect = {
     .uri = "/api/connect",
     .method = HTTP_POST,
@@ -892,6 +910,12 @@ httpd_uri_t post_api_update_check = {
     .handler = post_api_update_check_handler,
     .user_ctx = NULL};
 
+httpd_uri_t get_api_firmware_version = {
+    .uri = "/api/firmware/version",
+    .method = HTTP_GET,
+    .handler = get_api_firmware_version_handler,
+    .user_ctx = NULL};
+
 httpd_uri_t get = {
     .uri = "*",
     .method = HTTP_GET,
@@ -931,6 +955,7 @@ void register_uri_handlers(httpd_handle_t server)
     httpd_register_uri_handler(server, &post_api_update_firmware);
     httpd_register_uri_handler(server, &get_api_update_firmware);
     httpd_register_uri_handler(server, &post_api_update_check);
+    httpd_register_uri_handler(server, &get_api_firmware_version);
 
     // Every other get request returns index.html
     httpd_register_uri_handler(server, &get);
