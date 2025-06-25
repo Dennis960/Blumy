@@ -112,9 +112,7 @@ void configuration_mode(bool isConfigured)
     }
     stop_webserver(webserver);
     sensors_playShutdownSound();
-    sensors_blinkLedGreenAsync(0, 0, ledBrightness);
-    sensors_blinkLedYellowAsync(0, 0, ledBrightness);
-    sensors_setLedGreenBrightness(0.0);
+    sensors_setLedGreenBrightness(0);
     sensors_blinkLedRed(3, 100, ledBrightness);
     start_deep_sleep();
 }
