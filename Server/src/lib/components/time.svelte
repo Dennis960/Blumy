@@ -7,26 +7,39 @@
 	dayjs.extend(relativeTime);
 	dayjs.locale('de');
 
-	export let timestamp: Date = new Date();
+	export let timestamp: Date | string = new Date();
 	export let relative = false;
 
-	// eslint-disable-next-line no-undef
+	let parsed = dayjs(timestamp);
+	let isValid = parsed.isValid();
+	let formatted = '';
+	let title: string | undefined;
 	let interval: NodeJS.Timeout;
 
 	onMount(() => {
+		if (!isValid) return;
+
 		if (relative) {
 			interval = setInterval(() => {
-				formatted = dayjs(timestamp).from(undefined);
+				formatted = parsed.from(undefined);
 			}, 60 * 1000);
 		}
 
 		return () => clearInterval(interval);
 	});
 
-	$: formatted = relative ? dayjs(timestamp).from(undefined) : dayjs(timestamp).format();
-	$: title = relative ? dayjs(timestamp).format() : undefined;
+	$: if (isValid) {
+		formatted = relative ? parsed.from(undefined) : parsed.format();
+		title = relative ? parsed.format() : undefined;
+	}
 </script>
 
-<time {...$$restProps} {title} datetime={timestamp.toISOString()}>
-	{formatted}
-</time>
+{#if isValid}
+	<time {...$$restProps} {title} datetime={parsed.toISOString()}>
+		{formatted}
+	</time>
+{:else}
+	<span style="color: red; font-weight: bold;">
+		⚠️ Invalid timestamp: "{timestamp}"
+	</span>
+{/if}
