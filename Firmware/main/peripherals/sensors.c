@@ -34,6 +34,7 @@ void analogWrite(int gpio, int frequency, float duty_cycle, ledc_channel_t chann
         if (ledc_initialized[channel])
         {
             ledc_stop(LEDC_LOW_SPEED_MODE, channel, 0);
+            ledc_initialized[channel] = false;
         }
         return;
     }
@@ -78,6 +79,7 @@ void analogWrite(int gpio, int frequency, float duty_cycle, ledc_channel_t chann
         .duty = (1 << duty_resolution) * duty_cycle,
         .hpoint = 0};
     ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
+    vTaskDelay(10 / portTICK_PERIOD_MS); // TODO find a way to call ledc settings less often because calling it back to back hangs up the esp
 }
 
 TimerHandle_t toneTimer;
