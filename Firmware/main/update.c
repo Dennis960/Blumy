@@ -13,12 +13,7 @@ void ota_update_task(void *pvParameter)
 {
     ESP_LOGI("OTA", "Starting OTA update task");
     char url[100] = DEFAULT_FIRMWARE_UPDATE_URL;
-    if (!plantstore_getFirmwareUpdateUrl(url, 100))
-    {
-        ESP_LOGE("OTA", "No firmware update URL set");
-        vTaskDelete(NULL);
-        return;
-    }
+    plantstore_getFirmwareUpdateUrl(url, 100);
 
     esp_http_client_config_t config = {
         .url = url,
