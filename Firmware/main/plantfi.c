@@ -498,7 +498,7 @@ int plantfi_post_http(const char *url, const char *data, const char *authHeader)
     if (client == NULL)
     {
         ESP_LOGE("HTTP", "Failed to initialize HTTP client");
-        return NULL;
+        return 0;
     }
     ESP_ERROR_CHECK(esp_http_client_set_post_field(client, data, strlen(data)));
     ESP_ERROR_CHECK(esp_http_client_set_header(client, "Content-Type", "application/json"));
@@ -572,7 +572,7 @@ int plantfi_send_sensor_data_blumy(sensors_full_data_t *sensors_data, int8_t rss
     if (!plantstore_getCloudConfigurationBlumy(token, url, sizeof(token), sizeof(url)))
     {
         ESP_LOGE(PLANTFI_TAG, "No Blumy configuration found");
-        return NULL;
+        return 0;
     }
     char authHeader[60];
     sprintf(authHeader, "Bearer %s", token);

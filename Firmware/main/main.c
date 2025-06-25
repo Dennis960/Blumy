@@ -153,7 +153,7 @@ void sensor_mode()
     sensors_full_read(&sensors_data);
     EventBits_t bits;
     ESP_ERROR_CHECK(plantfi_waitForStaConnection(&bits));
-    int statusCode = NULL;
+    int statusCode = 0;
     if (bits & PLANTFI_CONNECTED_BIT)
     {
         int8_t rssi = plantfi_getRssi();
@@ -169,7 +169,7 @@ void sensor_mode()
     if (statusCode == 426)
     {
         ESP_ERROR_CHECK(esp_timer_stop(watchdog_timer));
-        esp_timer_handle_t watchdog_timer = init_watchdog(DEFAULT_OTA_TIMEOUT_MS);
+        watchdog_timer = init_watchdog(DEFAULT_OTA_TIMEOUT_MS);
         update_updateFirmware(NULL);
         // wait indefinitely for the update to complete
         while (1)
