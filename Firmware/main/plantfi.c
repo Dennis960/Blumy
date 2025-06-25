@@ -16,6 +16,7 @@
 
 #include "plantstore.h"
 #include "defaults.h"
+#include "update.h"
 #include <esp_http_client.h>
 #include "esp_timer.h"
 #include <dhcpserver/dhcpserver.h>
@@ -483,7 +484,10 @@ void plantfi_create_sensor_data_json(char *data, sensors_full_data_t *sensors_da
     }
 }
 
-void plantfi_post_http(const char *url, const char *data, const char *authHeader)
+/**
+ * Returns the status code
+ */
+int plantfi_post_http(const char *url, const char *data, const char *authHeader)
 {
     esp_http_client_config_t config = {
         .url = url,
@@ -494,7 +498,7 @@ void plantfi_post_http(const char *url, const char *data, const char *authHeader
     if (client == NULL)
     {
         ESP_LOGE("HTTP", "Failed to initialize HTTP client");
-        return;
+        return NULL;
     }
     ESP_ERROR_CHECK(esp_http_client_set_post_field(client, data, strlen(data)));
     ESP_ERROR_CHECK(esp_http_client_set_header(client, "Content-Type", "application/json"));
@@ -504,9 +508,8 @@ void plantfi_post_http(const char *url, const char *data, const char *authHeader
     ESP_LOGI("Data", "%s", data);
     int status_code = esp_http_client_get_status_code(client);
     ESP_LOGI("HTTP", "Status Code: %d", status_code);
-    // TODO also send firmware version. Status code can show if updates are available
-    // TODO also update plantstore settings if available in response
     ESP_ERROR_CHECK(esp_http_client_cleanup(client));
+    return status_code;
 }
 
 int plantfi_get_http(char *url, char *authHeader)
@@ -562,14 +565,14 @@ esp_mqtt_client_handle_t plantfi_init_mqtt_client()
     return client;
 }
 
-void plantfi_send_sensor_data_blumy(sensors_full_data_t *sensors_data, int8_t rssi)
+int plantfi_send_sensor_data_blumy(sensors_full_data_t *sensors_data, int8_t rssi)
 {
     char token[50];
     char url[100];
     if (!plantstore_getCloudConfigurationBlumy(token, url, sizeof(token), sizeof(url)))
     {
         ESP_LOGE(PLANTFI_TAG, "No Blumy configuration found");
-        return;
+        return NULL;
     }
     char authHeader[60];
     sprintf(authHeader, "Bearer %s", token);
@@ -577,7 +580,7 @@ void plantfi_send_sensor_data_blumy(sensors_full_data_t *sensors_data, int8_t rs
     char data[400];
     plantfi_create_sensor_data_json(data, sensors_data, rssi, NULL);
 
-    plantfi_post_http(url, data, authHeader);
+    return plantfi_post_http(url, data, authHeader);
 }
 
 bool plantfi_test_blumy_connection(char *token, char *url)

@@ -55,7 +55,10 @@ plantfi_sta_status_t plantfi_get_sta_status();
 bool plantfi_is_sta_connected();
 bool plantfi_is_user_connected_to_ap();
 bool plantfi_is_sta_connecting();
-void plantfi_send_sensor_data_blumy(sensors_full_data_t *sensors_data, int8_t rssi);
+/**
+ * Returns the status code of the http request
+ */
+int plantfi_send_sensor_data_blumy(sensors_full_data_t *sensors_data, int8_t rssi);
 bool plantfi_test_blumy_connection(char *token, char *url);
 void plantfi_send_sensor_data_http(sensors_full_data_t *sensors_data, int8_t rssi);
 bool plantfi_test_http_connection(char *sensorId, char *url, char *auth);

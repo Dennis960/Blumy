@@ -268,4 +268,5 @@ void plantstore_factoryReset()
     ESP_ERROR_CHECK(nvs_erase_all(nvs_handle));
     ESP_ERROR_CHECK(nvs_commit(nvs_handle));
     nvs_close(nvs_handle);
+    nvs_flash_erase();
 }

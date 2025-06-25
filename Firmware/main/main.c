@@ -15,6 +15,7 @@
 #include "configuration_mode_server.h"
 #include "plantstore.h"
 #include "defaults.h"
+#include "update.h"
 
 void wait_until_boot_button_released()
 {
@@ -70,9 +71,8 @@ void handleLedsForWifiEvents()
     }
 }
 
-void configuration_mode()
+void configuration_mode(bool isConfigured)
 {
-    bool isConfigured = plantstore_isConfigured();
     ESP_LOGI("MODE", "Starting configuration mode%s", isConfigured ? " (sensor is configured)" : " (no config)");
     sensors_initSensors();
     plantstore_getLedBrightness(&ledBrightness);
@@ -125,7 +125,7 @@ void watchdog_callback(void *arg)
     start_deep_sleep();
 }
 
-esp_timer_handle_t init_watchdog()
+esp_timer_handle_t init_watchdog(uint64_t timeoutMs)
 {
     esp_timer_create_args_t watchdog_args = {
         .callback = &watchdog_callback,
@@ -133,7 +133,7 @@ esp_timer_handle_t init_watchdog()
     };
     esp_timer_handle_t watchdog_timer;
     ESP_ERROR_CHECK(esp_timer_create(&watchdog_args, &watchdog_timer));
-    uint64_t watchdog_timeout = DEFAULT_WATCHDOG_TIMEOUT_MS;
+    uint64_t watchdog_timeout = timeoutMs;
     plantstore_getWatchdogTimeoutMs(&watchdog_timeout);
 
     ESP_LOGI("Watchdog", "Starting watchdog with timeout %llu ms", watchdog_timeout);
@@ -145,7 +145,7 @@ esp_timer_handle_t init_watchdog()
 void sensor_mode()
 {
     ESP_LOGI("MODE", "Starting sensor mode");
-    esp_timer_handle_t watchdog_timer = init_watchdog();
+    esp_timer_handle_t watchdog_timer = init_watchdog(DEFAULT_WATCHDOG_TIMEOUT_MS);
     plantfi_initWifiStaOnly();
     plantfi_configureStaFromPlantstore();
     sensors_initSensors();
@@ -153,10 +153,11 @@ void sensor_mode()
     sensors_full_read(&sensors_data);
     EventBits_t bits;
     ESP_ERROR_CHECK(plantfi_waitForStaConnection(&bits));
+    int statusCode = NULL;
     if (bits & PLANTFI_CONNECTED_BIT)
     {
         int8_t rssi = plantfi_getRssi();
-        plantfi_send_sensor_data_blumy(&sensors_data, rssi);
+        statusCode = plantfi_send_sensor_data_blumy(&sensors_data, rssi);
         plantfi_send_sensor_data_http(&sensors_data, rssi);
         plantfi_send_sensor_data_mqtt(&sensors_data, rssi);
     }
@@ -165,6 +166,17 @@ void sensor_mode()
         ESP_LOGE("WIFI", "Failed to connect to wifi");
     }
     sensors_deinitSensors(); // optional
+    if (statusCode == 426)
+    {
+        ESP_ERROR_CHECK(esp_timer_stop(watchdog_timer));
+        esp_timer_handle_t watchdog_timer = init_watchdog(DEFAULT_OTA_TIMEOUT_MS);
+        update_updateFirmware(NULL);
+        // wait indefinitely for the update to complete
+        while (1)
+        {
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+    }
     ESP_ERROR_CHECK(esp_timer_stop(watchdog_timer));
     start_deep_sleep();
 }
@@ -177,9 +189,11 @@ void app_main()
                           esp_reset_reason() == ESP_RST_SDIO ||
                           esp_reset_reason() == ESP_RST_USB);
 
-    if (isManualReset)
+    bool isConfigured = plantstore_isConfigured();
+
+    if (isManualReset || !isConfigured)
     {
-        configuration_mode();
+        configuration_mode(isConfigured);
     }
     else
     {
