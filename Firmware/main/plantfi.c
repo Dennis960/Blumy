@@ -36,7 +36,10 @@ char plantfi_password[DEFAULT_PASSWORD_MAX_LENGTH];
 
 bool _credentialsChanged = false;
 bool _enableNatAndDnsOnConnect = false;
-bool *_userConnectedToAp = NULL;
+bool _isUserConnectedToAp = NULL;
+bool _isStaConnected = false;
+bool _isStaConnecting = false;
+bool _is_manual_disconnect = false;
 
 esp_netif_t *ap_netif;
 esp_netif_t *sta_netif;
@@ -49,21 +52,32 @@ void plantfi_wifi_event_handler(int32_t event_id)
 {
     if (event_id == WIFI_EVENT_STA_DISCONNECTED)
     {
-        if (plantfi_retry_num < plantfi_max_retry)
+        _isStaConnected = false;
+        if (_is_manual_disconnect)
         {
-            esp_wifi_connect();
-            plantfi_retry_num++;
-            ESP_LOGI(PLANTFI_TAG, "retry to connect to the AP");
+            _is_manual_disconnect = false;
         }
         else
         {
-            xEventGroupSetBits(plantfi_sta_event_group, PLANTFI_FAIL_BIT);
-            plantfi_sta_status = PLANTFI_STA_STATUS_DISCONNECTED;
+            if (plantfi_retry_num < plantfi_max_retry)
+            {
+                esp_wifi_connect();
+                plantfi_retry_num++;
+                ESP_LOGI(PLANTFI_TAG, "retry to connect to the AP");
+            }
+            else
+            {
+                xEventGroupSetBits(plantfi_sta_event_group, PLANTFI_FAIL_BIT);
+                plantfi_sta_status = PLANTFI_STA_STATUS_DISCONNECTED;
+                _isStaConnecting = false;
+            }
+            ESP_LOGI(PLANTFI_TAG, "connect to the AP fail");
         }
-        ESP_LOGI(PLANTFI_TAG, "connect to the AP fail");
     }
     else if (event_id == WIFI_EVENT_STA_CONNECTED)
     {
+        _isStaConnected = true;
+        _isStaConnecting = false;
         ESP_LOGI(PLANTFI_TAG, "connect to the AP success");
         if (_credentialsChanged)
         {
@@ -74,11 +88,13 @@ void plantfi_wifi_event_handler(int32_t event_id)
     }
     else if (event_id == WIFI_EVENT_AP_STACONNECTED)
     {
-        if (_userConnectedToAp != NULL)
-        {
-            *_userConnectedToAp = true;
-        }
+        _isUserConnectedToAp = true;
         ESP_LOGI(PLANTFI_TAG, "User connected to AP");
+    }
+    else if (event_id == WIFI_EVENT_AP_STADISCONNECTED)
+    {
+        _isUserConnectedToAp = false;
+        ESP_LOGI(PLANTFI_TAG, "User disconnected from AP");
     }
     else
     {
@@ -167,7 +183,7 @@ void plantfi_initWifiStaOnly()
     plantfi_initWifi(true);
 }
 
-void plantfi_configureAp(const char *ssid, const char *password, int max_connection, bool *userConnectedToAp)
+void plantfi_configureAp(const char *ssid, const char *password, int max_connection)
 {
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
     wifi_config_t wifi_ap_config = {
@@ -180,16 +196,16 @@ void plantfi_configureAp(const char *ssid, const char *password, int max_connect
     strcpy((char *)wifi_ap_config.ap.ssid, ssid);
     strcpy((char *)wifi_ap_config.ap.password, password);
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_ap_config));
-
-    _userConnectedToAp = userConnectedToAp;
 }
 
 void plantfi_configureSta(const char *ssid, const char *password, int max_retry, bool credentialsChanged)
 {
+    _isStaConnecting = true;
     _credentialsChanged = credentialsChanged;
     if (plantfi_sta_status == PLANTFI_STA_STATUS_CONNECTED)
     {
         ESP_LOGI(PLANTFI_TAG, "STA already enabled, disconnecting");
+        _is_manual_disconnect = true;
         esp_wifi_disconnect();
     }
     plantfi_sta_status = PLANTFI_STA_STATUS_PENDING;
@@ -247,7 +263,6 @@ esp_err_t plantfi_waitForStaConnection(EventBits_t *bits)
         ESP_LOGE(PLANTFI_TAG, "STA not initialized");
         return ESP_FAIL;
     }
-    // TODO
     /* Waiting until either the connection is established (PLANTFI_CONNECTED_BIT) or connection failed for the maximum
      * number of re-tries (PLANTFI_FAIL_BIT). The bits are set by plantfi_event_handler() (see above) */
     EventBits_t _bits = xEventGroupWaitBits(plantfi_sta_event_group,
@@ -350,12 +365,36 @@ void plantfi_scan_networks(plantfi_ap_record_t *ap_records, int *num_ap_records)
     ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&ap_num, ap_list));
     qsort(ap_list, ap_num, sizeof(wifi_ap_record_t), plantfi_compareWifiApRecords);
 
-    if (ap_num > *num_ap_records)
+    // Remove duplicate SSIDs, keep the one with the strongest RSSI
+    int unique_count = 0;
+    for (int i = 0; i < ap_num; i++)
     {
-        ap_num = *num_ap_records;
+        bool duplicate = false;
+        for (int j = 0; j < unique_count; j++)
+        {
+            if (strcmp((char *)ap_list[i].ssid, (char *)ap_list[j].ssid) == 0)
+            {
+                duplicate = true;
+                break;
+            }
+        }
+        if (!duplicate)
+        {
+            // Move unique record to the front
+            if (unique_count != i)
+            {
+                ap_list[unique_count] = ap_list[i];
+            }
+            unique_count++;
+        }
     }
 
-    for (int i = 0; i < ap_num; i++)
+    if (unique_count > *num_ap_records)
+    {
+        unique_count = *num_ap_records;
+    }
+
+    for (int i = 0; i < unique_count; i++)
     {
         ap_records[i].rssi = ap_list[i].rssi;
         strcpy(ap_records[i].ssid, (char *)ap_list[i].ssid);
@@ -363,7 +402,7 @@ void plantfi_scan_networks(plantfi_ap_record_t *ap_records, int *num_ap_records)
     }
 
     free(ap_list);
-    *num_ap_records = ap_num;
+    *num_ap_records = unique_count;
 }
 
 plantfi_sta_status_t plantfi_get_sta_status()
@@ -384,6 +423,21 @@ plantfi_sta_status_t plantfi_get_sta_status()
         }
     }
     return plantfi_sta_status;
+}
+
+bool plantfi_is_sta_connected()
+{
+    return _isStaConnected;
+}
+
+bool plantfi_is_user_connected_to_ap()
+{
+    return _isUserConnectedToAp;
+}
+
+bool plantfi_is_sta_connecting()
+{
+    return _isStaConnecting;
 }
 
 /**

@@ -106,14 +106,160 @@ void sensors_playToneSync(int frequency, int duration_ms)
     analogWrite(BUZZER, 0, 0, BUZZER_CHANNEL);
 }
 
-void sensors_setRedLedBrightness(float brightness)
+void setLedBrightness(int led_pin, uint8_t brightness)
 {
-    analogWrite(LED_RED, 5000, brightness * brightness, LED_RED_CHANNEL);
+    float duty_cycle = (brightness / 255.0f) * (brightness / 255.0f); // Square the brightness for a more linear perception
+    if (led_pin == LED_RED)
+    {
+        analogWrite(LED_RED, 5000, duty_cycle, LED_RED_CHANNEL);
+    }
+    else if (led_pin == LED_GREEN)
+    {
+        analogWrite(LED_GREEN, 5000, duty_cycle, LED_GREEN_CHANNEL);
+    }
+    else
+    {
+        ESP_LOGE("SENSORS", "Invalid LED pin: %d", led_pin);
+    }
 }
 
-void sensors_setGreenLedBrightness(float brightness)
+typedef struct
 {
-    analogWrite(LED_GREEN, 5000, brightness * brightness, LED_GREEN_CHANNEL);
+    bool led_red;
+    bool led_green;
+    int times;
+    int duration_ms;
+    uint8_t brightness;
+} led_blink_params_t;
+led_blink_params_t led_blink_params = {
+    .led_red = false,
+    .led_green = false,
+    .times = 0,
+    .duration_ms = 0,
+    .brightness = 0.0f};
+TaskHandle_t led_blink_task_handle = NULL;
+
+void stop_led_blink_task()
+{
+    if (led_blink_task_handle != NULL)
+    {
+        vTaskDelete(led_blink_task_handle);
+        led_blink_task_handle = NULL; // Reset the handle
+        led_blink_params.led_red = false;
+        led_blink_params.led_green = false;
+        led_blink_params.times = 0;
+        led_blink_params.duration_ms = 0;
+    }
+    setLedBrightness(LED_RED, 0.0);   // Turn off the red LED
+    setLedBrightness(LED_GREEN, 0.0); // Turn off the green LED
+}
+
+void sensors_setLedRedBrightness(uint8_t brightness)
+{
+    stop_led_blink_task();
+    setLedBrightness(LED_RED, brightness);
+}
+
+void sensors_setLedGreenBrightness(uint8_t brightness)
+{
+    stop_led_blink_task();
+    setLedBrightness(LED_GREEN, brightness);
+}
+
+void sensors_setLedYellowBrightness(uint8_t brightness)
+{
+    stop_led_blink_task();
+    setLedBrightness(LED_RED, brightness);
+    setLedBrightness(LED_GREEN, brightness);
+}
+
+void blinkLed(bool led_red, bool led_green, int times, int duration_ms, uint8_t brightness)
+{
+    int count = 0;
+    while (times <= 0 || count < times)
+    {
+        if (led_red)
+        {
+            setLedBrightness(LED_RED, brightness);
+        }
+        if (led_green)
+        {
+            setLedBrightness(LED_GREEN, brightness);
+        }
+        vTaskDelay(duration_ms / portTICK_PERIOD_MS);
+
+        if (led_red)
+        {
+            setLedBrightness(LED_RED, 0.0);
+        }
+        if (led_green)
+        {
+            setLedBrightness(LED_GREEN, 0.0);
+        }
+        vTaskDelay(duration_ms / portTICK_PERIOD_MS);
+
+        if (times > 0)
+        {
+            count++;
+        }
+    }
+}
+
+void sensors_blinkLedRed(int times, int duration_ms, uint8_t brightness)
+{
+    blinkLed(true, false, times, duration_ms, brightness);
+}
+
+void sensors_blinkLedGreen(int times, int duration_ms, uint8_t brightness)
+{
+    blinkLed(false, true, times, duration_ms, brightness);
+}
+
+void sensors_blinkLedYellow(int times, int duration_ms, uint8_t brightness)
+{
+    blinkLed(true, true, times, duration_ms, brightness);
+}
+
+void led_blink_task(void *params)
+{
+    led_blink_params_t *blink_params = (led_blink_params_t *)params;
+
+    blinkLed(blink_params->led_red, blink_params->led_green, blink_params->times, blink_params->duration_ms, blink_params->brightness);
+
+    vTaskDelete(NULL); // Delete this task when done
+}
+
+void sensors_blinkLedRedAsync(int times, int duration_ms, uint8_t brightness)
+{
+    stop_led_blink_task();
+    led_blink_params.led_red = true;
+    led_blink_params.led_green = false;
+    led_blink_params.times = times;
+    led_blink_params.duration_ms = duration_ms;
+    led_blink_params.brightness = brightness;
+    xTaskCreate(led_blink_task, "LED_Blink_Task", 2048, &led_blink_params, tskIDLE_PRIORITY + 1, &led_blink_task_handle);
+}
+
+void sensors_blinkLedGreenAsync(int times, int duration_ms, uint8_t brightness)
+{
+    stop_led_blink_task();
+    led_blink_params.led_red = false;
+    led_blink_params.led_green = true;
+    led_blink_params.times = times;
+    led_blink_params.duration_ms = duration_ms;
+    led_blink_params.brightness = brightness;
+    xTaskCreate(led_blink_task, "LED_Blink_Task", 2048, &led_blink_params, tskIDLE_PRIORITY + 1, &led_blink_task_handle);
+}
+
+void sensors_blinkLedYellowAsync(int times, int duration_ms, uint8_t brightness)
+{
+    stop_led_blink_task();
+    led_blink_params.led_red = true;
+    led_blink_params.led_green = true;
+    led_blink_params.times = times;
+    led_blink_params.duration_ms = duration_ms;
+    led_blink_params.brightness = brightness;
+    xTaskCreate(led_blink_task, "LED_Blink_Task", 2048, &led_blink_params, tskIDLE_PRIORITY + 1, &led_blink_task_handle);
 }
 
 void enableLightSensor()
@@ -333,6 +479,9 @@ void sensors_initSensors()
     io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
     io_conf.pin_bit_mask = (1ULL << POWER_USB_VIN);
     ESP_ERROR_CHECK(gpio_config(&io_conf));
+    io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
+    io_conf.pin_bit_mask |= (1ULL << BOOT_BUTTON);
+    ESP_ERROR_CHECK(gpio_config(&io_conf));
 
     adc_initAdc();
     initAht(TEMPERATURE_SENSOR_SDA, TEMPERATURE_SENSOR_SCL);
@@ -401,31 +550,7 @@ void sensors_playShutdownSound()
     sensors_playToneSync(587, tick);
 }
 
-void boot_button_isr(void *arg)
+bool sensors_isBootButtonPressed()
 {
-    bool *wasBootButtonPressed = (bool *)arg;
-    *wasBootButtonPressed = true;
-}
-
-void sensors_attach_boot_button_interrupt(bool *wasBootButtonPressed)
-{
-#ifdef ENABLE_BOOT_BUTTON_INTERRUPT
-    gpio_config_t io_conf;
-    io_conf.intr_type = GPIO_INTR_NEGEDGE;
-    io_conf.pin_bit_mask = 1ULL << BOOT_BUTTON;
-    io_conf.mode = GPIO_MODE_INPUT;
-    io_conf.pull_up_en = 1;
-    io_conf.pull_down_en = 0;
-    gpio_config(&io_conf);
-    gpio_install_isr_service(0);
-    gpio_isr_handler_add(BOOT_BUTTON, boot_button_isr, wasBootButtonPressed);
-#endif
-}
-
-void sensors_detach_boot_button_interrupt()
-{
-#ifdef ENABLE_BOOT_BUTTON_INTERRUPT
-    gpio_isr_handler_remove(BOOT_BUTTON);
-    gpio_uninstall_isr_service();
-#endif
+    return gpio_get_level(BOOT_BUTTON) == 0; // Assuming active low button
 }

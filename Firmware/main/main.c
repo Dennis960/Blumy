@@ -16,17 +16,67 @@
 #include "plantstore.h"
 #include "defaults.h"
 
+void wait_until_boot_button_released()
+{
+    ESP_LOGI("BOOT", "Waiting for boot button to be released");
+    while (sensors_isBootButtonPressed())
+    {
+        vTaskDelay(10 / portTICK_PERIOD_MS); // Reset watchdog
+    }
+    ESP_LOGI("BOOT", "Boot button released");
+}
+
 void start_deep_sleep()
 {
     uint64_t sleepTime = DEFAULT_SENSOR_TIMEOUT_SLEEP_MS;
     plantstore_getSensorTimeoutSleepMs(&sleepTime);
     sleepTime *= 1000;
     ESP_LOGI("DeepSleep", "Going to sleep for %llu us", sleepTime);
+    wait_until_boot_button_released(); // Having the button pressed during deep sleep can cause issues on wakeup
     esp_deep_sleep(sleepTime);
 }
 
-void configuration_mode(bool isConfigured, bool resetReasonOta)
+bool isStaConnectionFresh = true;
+bool isStaConnectingFresh = true;
+uint8_t ledBrightness = DEFAULT_LED_BRIGHTNESS;
+void handleLedsForWifiEvents()
 {
+    bool staConnected = plantfi_is_sta_connected() && isStaConnectionFresh;
+    bool staDisconnected = !plantfi_is_sta_connected() && !isStaConnectionFresh;
+    bool staStartedConnecting = plantfi_is_sta_connecting() && isStaConnectingFresh;
+    bool staStoppedConnecting = !plantfi_is_sta_connecting() && !isStaConnectingFresh;
+
+    if (staStartedConnecting)
+    {
+        isStaConnectingFresh = false;
+        sensors_blinkLedYellowAsync(0, 500, ledBrightness);
+    }
+    if (staStoppedConnecting)
+    {
+        isStaConnectingFresh = true;
+        if (!plantfi_is_sta_connected())
+        {
+            sensors_setLedRedBrightness(ledBrightness);
+        }
+    }
+    if (staConnected)
+    {
+        isStaConnectionFresh = false;
+        sensors_setLedGreenBrightness(ledBrightness);
+    }
+    if (staDisconnected)
+    {
+        isStaConnectionFresh = true;
+    }
+}
+
+void configuration_mode()
+{
+    bool isConfigured = plantstore_isConfigured();
+    ESP_LOGI("MODE", "Starting configuration mode%s", isConfigured ? " (sensor is configured)" : " (no config)");
+    sensors_initSensors();
+    plantstore_getLedBrightness(&ledBrightness);
+    sensors_setLedRedBrightness(ledBrightness);
     sensors_playStartupSound();
     plantfi_setEnableNatAndDnsOnConnect(true);
     plantfi_initWifiApSta();
@@ -34,19 +84,16 @@ void configuration_mode(bool isConfigured, bool resetReasonOta)
     uint64_t current_time = start_time;
     int32_t timeoutMs = DEFAULT_CONFIGURATION_MODE_TIMEOUT_MS;
     plantstore_getConfigurationModeTimeoutMs(&timeoutMs);
-    ESP_LOGI("MODE", "Starting configuration mode%s", isConfigured ? " (sensor is configured)" : " (no config)");
-    bool userConnectedToAp = false;
-    plantfi_configureAp("Blumy", "", 4, &userConnectedToAp);
+    plantfi_configureAp("Blumy", "", 4);
 
     ESP_LOGI("MODE", "Starting webserver");
-    httpd_handle_t webserver = start_webserver(resetReasonOta);
+    httpd_handle_t webserver = start_webserver();
     plantfi_configureStaFromPlantstore();
+    sensors_blinkLedGreenAsync(0, 500, ledBrightness);
 
-    bool wasBootButtonPressed = false;
-    sensors_attach_boot_button_interrupt(&wasBootButtonPressed);
     while (1)
     {
-        if (isConfigured && !userConnectedToAp)
+        if (isConfigured && !plantfi_is_user_connected_to_ap())
         {
             current_time = esp_timer_get_time();
             if (current_time - start_time > timeoutMs * 1000)
@@ -55,16 +102,20 @@ void configuration_mode(bool isConfigured, bool resetReasonOta)
                 break;
             }
         }
-        if (wasBootButtonPressed)
+        if (sensors_isBootButtonPressed())
         {
             ESP_LOGI("MODE", "Boot button pressed, going to sleep");
             break;
         }
+        handleLedsForWifiEvents();
         vTaskDelay(10 / portTICK_PERIOD_MS); // Reset watchdog
     }
     stop_webserver(webserver);
-    sensors_detach_boot_button_interrupt();
     sensors_playShutdownSound();
+    sensors_blinkLedGreenAsync(0, 0, ledBrightness);
+    sensors_blinkLedYellowAsync(0, 0, ledBrightness);
+    sensors_setLedGreenBrightness(0.0);
+    sensors_blinkLedRed(3, 100, ledBrightness);
     start_deep_sleep();
 }
 
@@ -120,22 +171,15 @@ void sensor_mode()
 
 void app_main()
 {
-    bool isConfigured = plantstore_isConfigured();
-    bool resetReasonOta = false;
-    // plantstore_getResetReasonOta(&resetReasonOta);
-    // if (resetReasonOta)
-    // {
-    //     plantstore_setResetReasonOta(false);
-    // }
+    // Reset button and inserting batteries is both ESP_RST_POWERON
     bool isManualReset = (esp_reset_reason() == ESP_RST_POWERON ||
                           esp_reset_reason() == ESP_RST_JTAG ||
                           esp_reset_reason() == ESP_RST_SDIO ||
-                          esp_reset_reason() == ESP_RST_USB ||
-                          resetReasonOta);
+                          esp_reset_reason() == ESP_RST_USB);
 
-    if (isManualReset || !isConfigured)
+    if (isManualReset)
     {
-        configuration_mode(isConfigured, resetReasonOta);
+        configuration_mode();
     }
     else
     {

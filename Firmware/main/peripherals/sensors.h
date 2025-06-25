@@ -32,8 +32,43 @@ typedef struct
 
 void sensors_playToneAsync(int frequency, int duration_ms);
 void sensors_playToneSync(int frequency, int duration_ms);
-void sensors_setRedLedBrightness(float brightness);
-void sensors_setGreenLedBrightness(float brightness);
+void sensors_setLedRedBrightness(uint8_t brightness);
+void sensors_setLedGreenBrightness(uint8_t brightness);
+void sensors_setLedYellowBrightness(uint8_t brightness);
+/**
+ * Blink the red LED synchronously
+ * @param times Number of times to blink. If times is 0, it will blink indefinitely.
+ * @param duration_ms Duration of each blink in milliseconds and duration between blinks.
+ * @param brightness Brightness of the LED (0.0 to 1.0)
+ */
+void sensors_blinkLedRed(int times, int duration_ms, uint8_t brightness);
+/** * Blink the green LED synchronously
+ * @param times Number of times to blink. If times is 0, it will blink indefinitely.
+ * @param duration_ms Duration of each blink in milliseconds and duration between blinks.
+ * @param brightness Brightness of the LED (0.0 to 1.0)
+ */
+void sensors_blinkLedGreen(int times, int duration_ms, uint8_t brightness);
+/**
+ * Blink the red LED asynchronously
+ * @param times Number of times to blink. If times is 0, it will blink indefinitely until stopped.
+ * @param duration_ms Duration of each blink in milliseconds and duration between blinks. If 0, blinking will stop and the LED will be turned off.
+ * @param brightness Brightness of the LED (0.0 to 1.0)
+ */
+void sensors_blinkLedRedAsync(int times, int duration_ms, uint8_t brightness);
+/**
+ * Blink the green LED asynchronously
+ * @param times Number of times to blink. If times is 0, it will blink indefinitely until stopped.
+ * @param duration_ms Duration of each blink in milliseconds and duration between blinks. If 0, blinking will stop and the LED will be turned off.
+ * @param brightness Brightness of the LED (0.0 to 1.0)
+ */
+void sensors_blinkLedGreenAsync(int times, int duration_ms, uint8_t brightness);
+/**
+ * Blink the red and green LEDs asynchronously
+ * @param times Number of times to blink. If times is 0, it will blink indefinitely until stopped.
+ * @param duration_ms Duration of each blink in milliseconds and duration between blinks. If 0, blinking will stop and the LEDs will be turned off.
+ * @param brightness Brightness of the LED (0.0 to 1.0)
+ */
+void sensors_blinkLedYellowAsync(int times, int duration_ms, uint8_t brightness);
 /**
  * @return Light percentage (0.0 to 1.0)
  */
@@ -47,5 +82,4 @@ void sensors_deinitSensors();
 void sensors_full_read(sensors_full_data_t *data);
 void sensors_playStartupSound();
 void sensors_playShutdownSound();
-void sensors_attach_boot_button_interrupt(bool *wasBootButtonPressed);
-void sensors_detach_boot_button_interrupt();
+bool sensors_isBootButtonPressed();

@@ -22,7 +22,7 @@
 #define SENSOR_TIMEOUT_CONFIG_KEY "timeout_config"
 #define WATCHDOG_TIMEOUT_KEY "timeout_wdt"
 #define FIRMWARE_UPDATE_URL_KEY "update_url"
-#define RESET_REASON_OTA_KEY "reset_ota"
+#define LED_BRIGHTNESS_KEY "led_brightness"
 
 bool plantstore_getWifiCredentials(char *ssid, char *password, size_t ssid_size, size_t password_size);
 void plantstore_setWifiCredentials(char *ssid, char *password);
@@ -43,8 +43,8 @@ bool plantstore_getWatchdogTimeoutMs(uint64_t *timeoutMs);
 void plantstore_setWatchdogTimeoutMs(uint64_t timeoutMs);
 void plantstore_setFirmwareUpdateUrl(char *url);
 bool plantstore_getFirmwareUpdateUrl(char *url, size_t url_size);
-void plantstore_setResetReasonOta(bool ota);
-bool plantstore_getResetReasonOta(bool *ota);
+bool plantstore_getLedBrightness(uint8_t *brightness);
+void plantstore_setLedBrightness(uint8_t brightness);
 /**
  * @brief Check if the plantstore is configured
  * The plantstore is marked as configured, if the wifi credentials are set and at least one of the cloud configurations is set.

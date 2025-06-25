@@ -7,3 +7,5 @@
 #define DEFAULT_SSID_MAX_LENGTH 33
 #define DEFAULT_PASSWORD_MAX_LENGTH 65
 #define DEFAULT_API_URL "http://blumy.cloud/api/v2/data"
+
+#define DEFAULT_LED_BRIGHTNESS 128 // Default brightness for LEDs between 0 and 255
