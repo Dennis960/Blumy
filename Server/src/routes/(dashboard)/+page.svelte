@@ -6,6 +6,8 @@
 
 	let { data } = $props();
 
+	let sensorLink = $state('');
+
 	onMount(() => {
 		const interval = setInterval(
 			() => {
@@ -17,9 +19,9 @@
 	});
 </script>
 
-{#if data.authenticated}
-	<div class="page-body">
-		<div class="container-xl">
+<div class="page-body">
+	<div class="container-xl">
+		{#if data.authenticated}
 			<div class="row row-deck row-cards">
 				{#each data.sensors as sensor (sensor.id)}
 					<div class="col-md-6 col-lg-4 col-12">
@@ -32,6 +34,33 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		{:else}
+			<div class="d-flex flex-column align-items-center mt-5">
+				<label for="sensor-link" class="mb-2">Sensor Share-Link eingeben:</label>
+				<div class="input-group mb-3" style="max-width: 400px;">
+					<input
+						id="sensor-link"
+						type="text"
+						class="form-control"
+						bind:value={sensorLink}
+						placeholder="z.B. https://blumy.cloud/sensor/1234?token=1234567890abcdef"
+						autocomplete="off"
+					/>
+					<button
+						class="btn btn-primary"
+						type="button"
+						onclick={() => {
+							if (sensorLink.trim()) goto(sensorLink.trim());
+						}}
+					>
+						Gehe zu Sensor
+					</button>
+				</div>
+			</div>
+
+			<script lang="ts">
+				let sensorLink = '';
+			</script>
+		{/if}
 	</div>
-{/if}
+</div>
