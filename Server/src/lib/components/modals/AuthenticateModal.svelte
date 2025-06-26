@@ -1,17 +1,16 @@
 <script module lang="ts">
 	import { writable } from 'svelte/store';
 	export const authenticationModalStore = writable({
-		open: false,
 		authenticationType: 'login' as 'login' | 'register'
 	});
 </script>
 
 <script lang="ts">
 	import { goto, invalidateAll } from '$app/navigation';
+	import { page } from '$app/state';
 	import { clientApi } from '$lib/client/api';
 	import Modal from '$lib/components/Modal.svelte';
 	import LoginButtonGoogle from '../LoginButtonGoogle.svelte';
-	import { page } from '$app/state';
 
 	let email = $state('');
 	let password = $state('');
@@ -25,7 +24,7 @@
 		return clientApi(fetch).auth().default().register(email, password).response();
 	}
 
-	async function authenticate(event) {
+	async function authenticate(event: Event) {
 		event.preventDefault();
 
 		let res;
@@ -41,7 +40,6 @@
 
 		if (res.ok) {
 			await invalidateAll();
-			$authenticationModalStore.open = false;
 			email = '';
 			password = '';
 			errorText = '';
@@ -57,53 +55,54 @@
 
 <Modal
 	title={$authenticationModalStore.authenticationType === 'login' ? 'Login' : 'Register'}
-	bind:open={$authenticationModalStore.open}
 	dataTestId="authentication-modal"
+	modalId="authentication-modal"
 >
-	<form onsubmit={authenticate} class="flex w-full flex-col items-start gap-4">
-		<label for="email" class="text-sm font-medium">Email</label>
+	<form onsubmit={authenticate} class="d-flex flex-column w-100 align-items-start gap-3">
+		<label for="email" class="form-label fw-medium">Email</label>
 		<input
 			id="email"
 			type="email"
-			class="w-full rounded border px-3 py-2 text-sm"
+			class="form-control"
 			bind:value={email}
 			data-testid="authentication-modal-email"
 		/>
 		{#if errorText.toLowerCase().includes('email') && !errorText.toLowerCase().includes('password')}
-			<p class="text-sm text-red-500" data-testid="authentication-modal-error">{errorText}</p>
+			<p class="form-text text-danger" data-testid="authentication-modal-error">{errorText}</p>
 		{/if}
 
-		<label for="password" class="text-sm font-medium">Password</label>
+		<label for="password" class="form-label fw-medium">Password</label>
 		<input
 			id="password"
 			type="password"
-			class="w-full rounded border px-3 py-2 text-sm"
+			class="form-control"
 			bind:value={password}
 			data-testid="authentication-modal-password"
 		/>
 
 		{#if $authenticationModalStore.authenticationType === 'register'}
-			<label for="repeat-password" class="text-sm font-medium">Repeat Password</label>
+			<label for="repeat-password" class="form-label fw-medium">Repeat Password</label>
 			<input
 				id="repeat-password"
 				type="password"
-				class="w-full rounded border px-3 py-2 text-sm"
+				class="form-control"
 				bind:value={repeatPassword}
 				data-testid="authentication-modal-repeat-password"
 			/>
 		{/if}
 
 		{#if errorText.toLowerCase().includes('password')}
-			<p class="text-sm text-red-500" data-testid="authentication-modal-error">{errorText}</p>
+			<p class="form-text text-danger" data-testid="authentication-modal-error">{errorText}</p>
 		{/if}
 
-		<input type="submit" class="hidden" />
+		<input type="submit" class="d-none" />
 
 		<button
 			type="submit"
 			onclick={authenticate}
-			class="mt-2 w-full rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+			class="w-100 btn btn-primary mt-2"
 			data-testid="authentication-modal-submit"
+			data-bs-dismiss="modal"
 		>
 			{$authenticationModalStore.authenticationType === 'login' ? 'Login' : 'Register'}
 		</button>
@@ -111,28 +110,32 @@
 		{#if errorText && !errorText.toLowerCase().includes('email') && !errorText
 				.toLowerCase()
 				.includes('password')}
-			<p class="text-sm text-red-500" data-testid="authentication-modal-error">{errorText}</p>
+			<p class="form-text text-danger" data-testid="authentication-modal-error">{errorText}</p>
 		{/if}
 
-		<div class="text-sm">
+		<div class="form-text">
 			{#if $authenticationModalStore.authenticationType === 'login'}
 				Don't have an account?
-				<a
+				<button
+					type="button"
 					onclick={() => ($authenticationModalStore.authenticationType = 'register')}
-					class="cursor-pointer text-blue-600 hover:underline"
+					class="link-primary text-decoration-underline btn btn-link cursor-pointer p-0"
 					data-testid="authentication-modal-register"
+					style="cursor:pointer"
 				>
 					Register
-				</a>
+				</button>
 			{:else}
 				Already have an account?
-				<a
+				<button
+					type="button"
 					onclick={() => ($authenticationModalStore.authenticationType = 'login')}
-					class="cursor-pointer text-blue-600 hover:underline"
+					class="link-primary text-decoration-underline btn btn-link cursor-pointer p-0"
 					data-testid="authentication-modal-login"
+					style="cursor:pointer"
 				>
 					Login
-				</a>
+				</button>
 			{/if}
 		</div>
 

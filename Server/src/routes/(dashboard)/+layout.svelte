@@ -7,7 +7,6 @@
 	import LoginButtonGoogle from '$lib/components/LoginButtonGoogle.svelte';
 	import { authenticationModalStore } from '$lib/components/modals/AuthenticateModal.svelte';
 	import ToastContainer from '$lib/components/ToastContainer.svelte';
-	import ChevronDown from '@tabler/icons-svelte/icons/chevron-down';
 	// @ts-expect-error no declaration file
 	import { pwaInfo } from 'virtual:pwa-info';
 
@@ -22,14 +21,12 @@
 
 	function login() {
 		authenticationModalStore.set({
-			open: true,
 			authenticationType: 'login'
 		});
 	}
 
 	function register() {
 		authenticationModalStore.set({
-			open: true,
 			authenticationType: 'register'
 		});
 	}
@@ -69,47 +66,61 @@
 					</li>
 					{#if !data.authenticated}
 						<li class="nav-item">
-							<a class="nav-link cursor-pointer" onclick={login} data-testid="nav-bar-login"
-								>Login</a
+							<button
+								type="button"
+								class="nav-link btn btn-link p-0"
+								onclick={login}
+								data-testid="nav-bar-login"
+								data-bs-toggle="modal"
+								data-bs-target="#authentication-modal"
 							>
+								Login
+							</button>
 						</li>
-						<li class="nav-item">
-							<a class="nav-link cursor-pointer" onclick={register} data-testid="nav-bar-register"
-								>Register</a
+						<li class="nav-item ms-2">
+							<button
+								type="button"
+								class="nav-link btn btn-link p-0"
+								onclick={register}
+								data-testid="nav-bar-register"
+								data-bs-toggle="modal"
+								data-bs-target="#authentication-modal"
 							>
+								Register
+							</button>
 						</li>
-						<li class="nav-item">
+						<li class="nav-item ms-2">
 							<LoginButtonGoogle />
 						</li>
 					{:else}
-						<li class="nav-item dropdown">
-							<a
-								class="nav-link dropdown-toggle cursor-pointer"
-								id="navbarAccountDropdown"
-								role="button"
-								data-bs-toggle="dropdown"
-								aria-expanded="false"
-								data-testid="nav-bar-account"
-							>
-								<div>
-									Account
-									<ChevronDown
-										class="text-primary-800 ms-2 dark:text-white"
-										style="width: 1.5em; height: 1.5em; vertical-align: middle;"
-									/>
-								</div>
-							</a>
-							<ul class="dropdown-menu" aria-labelledby="navbarAccountDropdown">
-								<li>
-									<a class="dropdown-item" href="/account" data-testid="nav-bar-account-settings"
-										>Account settings</a
+						<li class="nav-item">
+							<div class="dropdown">
+								<a
+									href="#"
+									class="nav-link dropdown-toggle cursor-pointer"
+									id="navbarAccountDropdown"
+									role="button"
+									data-bs-toggle="dropdown"
+									aria-expanded="false"
+									data-testid="nav-bar-account"
+								>
+									<div>Account</div>
+								</a>
+								<div class="dropdown-menu" aria-labelledby="navbarAccountDropdown">
+									<a class="dropdown-item" href="/account" data-testid="nav-bar-account-settings">
+										Account settings
+									</a>
+									<div class="dropdown-divider"></div>
+									<button
+										type="button"
+										class="dropdown-item"
+										onclick={logout}
+										data-testid="nav-bar-logout"
 									>
-								</li>
-								<li><hr class="dropdown-divider" /></li>
-								<li>
-									<a class="dropdown-item" onclick={logout} data-testid="nav-bar-logout">Logout</a>
-								</li>
-							</ul>
+										Logout
+									</button>
+								</div>
+							</div>
 						</li>
 					{/if}
 				</ul>

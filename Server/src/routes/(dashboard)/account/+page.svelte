@@ -40,11 +40,7 @@
 	}
 
 	async function deleteAccount() {
-		if (
-			confirm(
-				'Are you sure you want to delete your account? This action cannot be undone.'
-			)
-		) {
+		if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
 			const deleteApiCall = clientApi(fetch).currentAccount().delete();
 			const deleteResponse = await deleteApiCall.response();
 			if (deleteResponse.ok) {
@@ -63,92 +59,116 @@
 	}
 </script>
 
-<div class="mx-auto grid grid-cols-[2fr,2fr,1fr] gap-4 lg:w-1/2">
-	<h4 class="col-span-full my-4 text-lg font-semibold">Account Settings</h4>
-
-	<label for="email" class="col-span-full -mb-2 text-sm font-medium">Email</label>
-	<div class="col-span-2">
-		<input
-			type="text"
-			id="email"
-			placeholder="Email"
-			bind:value={email}
-			data-testid="account-settings-email"
-			class="w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
-			disabled={!data.user.isDefaultLogin}
-		/>
-		<div class="absolute right-2 top-1/2 -translate-y-1/2">
-			{#if emailUpdateStatus === 'updating'}
-				<IconLoader2 class="animate-spin text-gray-500" size={20} />
-			{:else if emailUpdateStatus === 'success'}
-				<IconCheck class="text-green-500" size={20} data-testid="account-settings-email-success" />
-			{:else if emailUpdateStatus === 'error'}
-				<IconX class="text-red-500" size={20} />
-			{/if}
+<div class="container mt-4" style="max-width: 600px;">
+	<div class="row mb-4">
+		<div class="col">
+			<h4>Account Settings</h4>
 		</div>
 	</div>
 
-	{#if data.user.isDefaultLogin}
-		<button
-			class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
-			on:click={changeEmail}
-			disabled={email === data.user.email}
-			data-testid="account-settings-change-email"
-		>
-			Change Email
-		</button>
-
-		<label for="current-password" class="-mb-2 text-sm font-medium">Current Password</label>
-		<label for="new-password" class="-mb-2 text-sm font-medium">New Password</label>
-		<div></div>
-
-		<input
-			type="password"
-			id="current-password"
-			placeholder="Current Password"
-			bind:value={currentPassword}
-			data-testid="account-settings-current-password"
-			class="col-span-1 rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
-		/>
-
-		<input
-			type="password"
-			id="new-password"
-			placeholder="New Password"
-			bind:value={newPassword}
-			data-testid="account-settings-new-password"
-			class="col-span-1 rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
-		/>
-		<div class="absolute right-2 top-1/2 -translate-y-1/2">
-			{#if passwordUpdateStatus === 'updating'}
-				<IconLoader2 class="animate-spin text-gray-500" size={20} />
-			{:else if passwordUpdateStatus === 'success'}
-				<IconCheck class="text-green-500" size={20} />
-			{:else if passwordUpdateStatus === 'error'}
-				<IconX class="text-red-500" size={20} />
-			{/if}
+	<div class="row align-items-center mb-3">
+		<label for="email" class="col-12 col-form-label">Email</label>
+		<div class="col-8 position-relative">
+			<input
+				type="text"
+				id="email"
+				placeholder="Email"
+				bind:value={email}
+				data-testid="account-settings-email"
+				class="form-control"
+				disabled={!data.user.isDefaultLogin}
+			/>
+			<span class="position-absolute top-50 translate-middle-y end-0 me-2">
+				{#if emailUpdateStatus === 'updating'}
+					<IconLoader2 class="text-muted" size={20} />
+				{:else if emailUpdateStatus === 'success'}
+					<IconCheck class="text-success" size={20} data-testid="account-settings-email-success" />
+				{:else if emailUpdateStatus === 'error'}
+					<IconX class="text-danger" size={20} />
+				{/if}
+			</span>
 		</div>
+		{#if data.user.isDefaultLogin}
+			<div class="col-4">
+				<button
+					class="btn btn-primary w-100"
+					onclick={changeEmail}
+					disabled={email === data.user.email}
+					data-testid="account-settings-change-email"
+				>
+					Change Email
+				</button>
+			</div>
+		{/if}
+	</div>
 
-		<button
-			class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
-			on:click={changePassword}
-			disabled={currentPassword === '' || newPassword === ''}
-			data-testid="account-settings-change-password"
-		>
-			Change Password
-		</button>
+	{#if data.user.isDefaultLogin}
+		<div class="row mb-3">
+			<div class="col-6">
+				<label for="current-password" class="form-label">Current Password</label>
+				<input
+					type="password"
+					id="current-password"
+					placeholder="Current Password"
+					bind:value={currentPassword}
+					data-testid="account-settings-current-password"
+					class="form-control"
+				/>
+			</div>
+			<div class="col-6">
+				<label for="new-password" class="form-label">New Password</label>
+				<input
+					type="password"
+					id="new-password"
+					placeholder="New Password"
+					bind:value={newPassword}
+					data-testid="account-settings-new-password"
+					class="form-control"
+				/>
+			</div>
+		</div>
+		<div class="row align-items-center mb-3">
+			<div class="col-8 position-relative">
+				<span class="position-absolute top-50 translate-middle-y end-0 me-2">
+					{#if passwordUpdateStatus === 'updating'}
+						<IconLoader2 class="text-muted" size={20} />
+					{:else if passwordUpdateStatus === 'success'}
+						<IconCheck class="text-success" size={20} />
+					{:else if passwordUpdateStatus === 'error'}
+						<IconX class="text-danger" size={20} />
+					{/if}
+				</span>
+			</div>
+			<div class="col-4">
+				<button
+					class="btn btn-primary w-100"
+					onclick={changePassword}
+					disabled={currentPassword === '' || newPassword === ''}
+					data-testid="account-settings-change-password"
+				>
+					Change Password
+				</button>
+			</div>
+		</div>
 	{:else}
-		<div class="col-span-2">
-			<p class="text-sm text-gray-500">
-				You are logged in with a third-party provider. You cannot change your email or password.
-			</p>
+		<div class="row mb-3">
+			<div class="col">
+				<p class="text-muted">
+					You are logged in with a third-party provider. You cannot change your email or password.
+				</p>
+			</div>
 		</div>
 	{/if}
 
-	<hr class="col-span-full my-4 border-t border-gray-300" />
-	<h4 class="col-span-full my-4 text-lg font-semibold">Danger Zone</h4>
-
-	<button class="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700" on:click={deleteAccount}>
-		Delete Account
-	</button>
+	<hr class="my-4" />
+	<div class="row mb-3">
+		<div class="col">
+			<h4>Danger Zone</h4>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col">
+			<button class="btn btn-danger w-100" onclick={deleteAccount}> Delete Account </button>
+		</div>
+	</div>
 </div>

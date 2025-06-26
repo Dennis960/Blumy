@@ -1,55 +1,26 @@
-<!-- TODO: Use tabler modal -->
-<script>
-	export let open = false;
-	export let title = '';
-	export let dataTestId = '';
-	export let modalId = 'exampleModal';
-
-	// Dispatch close event for parent handling if needed
-	import { createEventDispatcher } from 'svelte';
-	const dispatch = createEventDispatcher();
-
-	function closeModal() {
-		open = false;
-		dispatch('close');
-	}
+<script lang="ts">
+	let {
+		title = '',
+		dataTestId = '',
+		modalId = 'modal',
+		children
+	}: {
+		title?: string;
+		dataTestId?: string;
+		modalId?: string;
+		children?: import('svelte').Snippet;
+	} = $props();
 </script>
 
-<div
-	class="modal fade {open ? 'show d-block' : ''}"
-	id={modalId}
-	tabindex="-1"
-	aria-hidden={!open}
-	style="display: {open ? 'block' : 'none'};"
-	data-testid={dataTestId}
->
+<div class="modal" id={modalId} tabindex="-1" data-testid={dataTestId}>
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title">{title}</h5>
-				<button
-					type="button"
-					class="btn-close"
-					data-bs-dismiss="modal"
-					aria-label="Close"
-					on:click={closeModal}
-				></button>
+				<button type="button" class="btn-close" aria-label="Close" data-bs-dismiss="modal"></button>
 			</div>
 			<div class="modal-body">
-				<slot />
-			</div>
-			<div class="modal-footer">
-				<slot name="footer">
-					<button type="button" class="btn me-auto" data-bs-dismiss="modal" on:click={closeModal}
-						>Close</button
-					>
-					<button
-						type="button"
-						class="btn btn-primary"
-						data-bs-dismiss="modal"
-						on:click={closeModal}>Save changes</button
-					>
-				</slot>
+				{@render children?.()}
 			</div>
 		</div>
 	</div>
