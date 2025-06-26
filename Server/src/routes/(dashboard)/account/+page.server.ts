@@ -18,7 +18,6 @@ export const load = async (event: PageServerLoadEvent) => {
 		user: {
 			createdAt: user.createdAt,
 			email: user.email,
-			credits: user.credits,
 			isDefaultLogin
 		}
 	};

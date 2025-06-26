@@ -42,7 +42,7 @@
 	async function deleteAccount() {
 		if (
 			confirm(
-				'Are you sure you want to delete your account? This action cannot be undone. All projects and data will be lost. All of your purchases will be deleted immediately. Your credits will not be refunded.'
+				'Are you sure you want to delete your account? This action cannot be undone.'
 			)
 		) {
 			const deleteApiCall = clientApi(fetch).currentAccount().delete();
