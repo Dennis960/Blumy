@@ -12,7 +12,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Add KiCad PPA and install KiCad
         run: |
           sudo add-apt-repository --yes ppa:kicad/kicad-dev-nightly
@@ -29,7 +29,7 @@ jobs:
           kicad-cli-nightly pcb export vrml Board/Board.kicad_pcb -o Board/dist/Board.wrl
           kicad-cli-nightly pcb export step Board/Board.kicad_pcb --drill-origin --no-dnp --subst-models -o Board/dist/Board.step
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Board
           path: Board/dist
@@ -38,7 +38,7 @@ jobs:
     needs: export
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: Board
           path: Board
