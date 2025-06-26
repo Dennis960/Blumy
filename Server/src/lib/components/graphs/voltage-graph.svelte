@@ -15,7 +15,7 @@
 					name: 'Volt',
 					data: history.debugHistory.map((entry) => ({
 						x: entry.timestamp,
-						y: entry.voltage
+						y: Math.round(entry.voltage * 100) / 100
 					})),
 					color: 'var(--tblr-black)'
 				}

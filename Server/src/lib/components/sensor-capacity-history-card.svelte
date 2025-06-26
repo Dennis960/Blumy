@@ -91,7 +91,7 @@
 	.charts {
 		height: calc(100vh - 200px);
 		display: grid;
-		grid-template-rows: minmax(0, 6fr) minmax(0, 1fr) minmax(0, 1fr);
+		grid-template-rows: minmax(0, 4fr) minmax(0, 3fr) minmax(0, 1fr);
 	}
 
 	.charts__graph {

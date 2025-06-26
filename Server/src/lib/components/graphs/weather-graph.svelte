@@ -15,7 +15,7 @@
 					name: 'Temperatur',
 					data: history.weatherHistory.map((entry) => ({
 						x: entry.timestamp,
-						y: entry.temperature
+						y: Math.round(entry.temperature * 10) / 10
 					})),
 					color: 'var(--tblr-primary)'
 				},
@@ -23,7 +23,7 @@
 					name: 'Luftfeuchtigkeit',
 					data: history.weatherHistory.map((entry) => ({
 						x: entry.timestamp,
-						y: entry.humidity
+						y: Math.round(entry.humidity)
 					})),
 					color: 'var(--tblr-secondary)'
 				}

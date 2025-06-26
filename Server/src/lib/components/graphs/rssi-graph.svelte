@@ -15,7 +15,7 @@
 					name: 'RSSI',
 					data: history.debugHistory.map((entry) => ({
 						x: entry.timestamp,
-						y: entry.rssi
+						y: Math.round(entry.rssi)
 					})),
 					color: 'var(--tblr-black)'
 				}
