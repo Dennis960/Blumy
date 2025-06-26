@@ -1,6 +1,6 @@
-<svelte:options accessors />
+<svelte:options />
 
-<script context="module" lang="ts">
+<script module lang="ts">
 	export type SortDirection = 'asc' | 'desc' | undefined;
 </script>
 
@@ -9,11 +9,16 @@
 
 	import { createEventDispatcher } from 'svelte';
 
-	export let sortKey: SortKey;
-	export let sortDirection: SortDirection = undefined;
+	interface Props {
+		sortKey: SortKey;
+		sortDirection?: SortDirection;
+		children?: import('svelte').Snippet;
+	}
 
-	$: asc = sortDirection === 'asc';
-	$: desc = sortDirection === 'desc';
+	let { sortKey, sortDirection = $bindable(undefined), children }: Props = $props();
+
+	let asc = $derived(sortDirection === 'asc');
+	let desc = $derived(sortDirection === 'desc');
 
 	const dispatch = createEventDispatcher();
 
@@ -30,15 +35,17 @@
 		}
 		handleSortClick();
 	}
+
+	export { sortKey, sortDirection };
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="sort-container" on:click={click}>
-	<slot />
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div class="sort-container" onclick={click}>
+	{@render children?.()}
 	<div class="sort-icons">
-		<span class="sort-icon asc" class:active={asc} />
-		<span class="sort-icon desc" class:active={desc} />
+		<span class="sort-icon asc" class:active={asc}></span>
+		<span class="sort-icon desc" class:active={desc}></span>
 	</div>
 </div>
 

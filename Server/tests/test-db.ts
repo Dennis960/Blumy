@@ -1,5 +1,5 @@
 import * as schema from '$lib/server/db/schema';
-import { oauthAccounts, sensorReadings, sensors, sessions, subscriptions, users } from '$lib/server/db/schema';
+import { accounts, sensorReadings, sensors, sessions, subscriptions, users } from '$lib/server/db/schema';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import pg from "pg";
@@ -20,7 +20,7 @@ await migrate(_testDb, { migrationsFolder: "migrations" });
 export const testDb = _testDb;
 
 export async function resetDatabase() {
-    for (const table of [sessions, oauthAccounts, sensorReadings, subscriptions, sensors, users]) {
+    for (const table of [sessions, accounts, sensorReadings, subscriptions, sensors, users]) {
         await testDb.delete(table);
     }
 }

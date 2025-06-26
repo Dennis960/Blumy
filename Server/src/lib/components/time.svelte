@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import dayjs from 'dayjs';
 	import 'dayjs/locale/de';
 	import relativeTime from 'dayjs/plugin/relativeTime.js';
@@ -7,13 +9,18 @@
 	dayjs.extend(relativeTime);
 	dayjs.locale('de');
 
-	export let timestamp: Date | string = new Date();
-	export let relative = false;
+	interface Props {
+		timestamp?: Date | string;
+		relative?: boolean;
+		[key: string]: any;
+	}
+
+	let { timestamp = new Date(), relative = false, ...rest }: Props = $props();
 
 	let parsed = dayjs(timestamp);
 	let isValid = parsed.isValid();
-	let formatted = '';
-	let title: string | undefined;
+	let formatted = $state('');
+	let title: string | undefined = $state();
 	let interval: NodeJS.Timeout;
 
 	onMount(() => {
@@ -28,14 +35,16 @@
 		return () => clearInterval(interval);
 	});
 
-	$: if (isValid) {
-		formatted = relative ? parsed.from(undefined) : parsed.format();
-		title = relative ? parsed.format() : undefined;
-	}
+	run(() => {
+		if (isValid) {
+			formatted = relative ? parsed.from(undefined) : parsed.format();
+			title = relative ? parsed.format() : undefined;
+		}
+	});
 </script>
 
 {#if isValid}
-	<time {...$$restProps} {title} datetime={parsed.toISOString()}>
+	<time {...rest} {title} datetime={parsed.toISOString()}>
 		{formatted}
 	</time>
 {:else}

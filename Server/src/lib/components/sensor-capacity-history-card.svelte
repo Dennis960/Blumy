@@ -10,9 +10,13 @@
 	import WaterCapacityGraph from './graphs/water-capacity-graph.svelte';
 	import WeatherGraph from './graphs/weather-graph.svelte';
 
-	export let sensor: SensorDTO;
-	export let history: SensorHistoryDTO;
-	export let dateRange: { startDate: Date; endDate: Date };
+	interface Props {
+		sensor: SensorDTO;
+		history: SensorHistoryDTO;
+		dateRange: { startDate: Date; endDate: Date };
+	}
+
+	let { sensor, history, dateRange = $bindable() }: Props = $props();
 
 	const litepickerOptions = {
 		singleMode: false,

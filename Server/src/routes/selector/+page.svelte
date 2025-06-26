@@ -2,13 +2,15 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { setupSensorOnLocalEsp } from '$lib/api.js';
+	import { authenticationModalStore } from '$lib/components/modals/AuthenticateModal.svelte';
 	import SensorSelectionCard from '$lib/components/sensor-selection-card.svelte';
 	import { IconPlus } from '$lib/icons.js';
 	import type { SensorDTO } from '$lib/types/api.js';
+	import { onMount } from 'svelte';
 
-	export let data;
-	let error: string | undefined;
-	let sensorClicked = false;
+	let { data } = $props();
+	let error: string | undefined = $state();
+	let sensorClicked = $state(false);
 
 	async function sensorClick(sensor: SensorDTO) {
 		sensorClicked = true;
@@ -24,44 +26,64 @@
 	async function createNewSensor() {
 		await goto('/selector/sensor/new?' + $page.url.searchParams.toString());
 	}
+
+	onMount(() => {
+		console.log(data);
+
+		if (!data.authenticated) {
+			authenticationModalStore.set({
+				open: true,
+				authenticationType: 'login'
+			});
+		}
+	});
 </script>
 
-<div class="page-body">
-	<div class="container-xl">
-		{#if !error}
-			{#if !sensorClicked}
-				<h2>Wähle einen Sensor aus</h2>
-				<div class="datagrid">
-					<!-- svelte-ignore a11y-click-events-have-key-events -->
-					<!-- svelte-ignore a11y-no-static-element-interactions -->
-					<section
-						on:click={createNewSensor}
-						class="card cursor-pointer bg-secondary text-white text-center"
-					>
-						<div
-							class="card-body d-flex flex-column gap-4 align-items-center justify-content-center"
+{#if data.authenticated}
+	<div class="page-body">
+		<div class="container-xl">
+			{#if !error}
+				{#if !sensorClicked}
+					<h2>Wähle einen Sensor aus</h2>
+					<div class="datagrid">
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
+						<section
+							onclick={createNewSensor}
+							class="card bg-secondary cursor-pointer text-center text-white"
 						>
-							<IconPlus size={60}></IconPlus>
-							<div class="card-title">
-								<strong> Neuen Sensor einrichten</strong>
+							<div
+								class="card-body d-flex flex-column align-items-center justify-content-center gap-4"
+							>
+								<IconPlus size={60}></IconPlus>
+								<div class="card-title">
+									<strong> Neuen Sensor einrichten</strong>
+								</div>
 							</div>
-						</div>
-					</section>
-					{#each data.sensors as sensor (sensor.id)}
-						<SensorSelectionCard
-							on:click={() => {
-								sensorClick(sensor);
-							}}
-							{sensor}
-						/>
-					{/each}
-				</div>
+						</section>
+						{#each data.sensors as sensor (sensor.id)}
+							<SensorSelectionCard
+								on:click={() => {
+									sensorClick(sensor);
+								}}
+								{sensor}
+							/>
+						{/each}
+					</div>
+				{:else}
+					<h2>Der Sensor wird nun eingerichtet, bitte warten...</h2>
+				{/if}
 			{:else}
-				<h2>Der Sensor wird nun eingerichtet, bitte warten...</h2>
+				<h2>Ein Fehler ist aufgetreten</h2>
+				<p>{error}</p>
 			{/if}
-		{:else}
-			<h2>Ein Fehler ist aufgetreten</h2>
-			<p>{error}</p>
-		{/if}
+		</div>
 	</div>
-</div>
+{:else if !$authenticationModalStore.open}
+	<button
+		onclick={() => authenticationModalStore.set({ open: true, authenticationType: 'login' })}
+		class="btn btn-primary"
+	>
+		Login
+	</button>
+{/if}

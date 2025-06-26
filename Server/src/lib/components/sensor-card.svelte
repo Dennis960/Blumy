@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { createBubbler } from 'svelte/legacy';
+
+	const bubble = createBubbler();
 	import Time from '$lib/components/time.svelte';
 	import {
 		IconAlertTriangle,
@@ -14,33 +17,39 @@
 	import Base64Image from './base64-image.svelte';
 	import WaterCapacityBar from './water-capacity-bar.svelte';
 
-	export let sensor: SensorDTO;
+	interface Props {
+		sensor: SensorDTO;
+	}
 
-	$: waterToday =
+	let { sensor }: Props = $props();
+
+	let waterToday = $derived(
 		sensor.prediction != undefined &&
-		(sensor.prediction.nextWatering <= new Date() ||
-			sensor.prediction.nextWatering.toLocaleDateString() == new Date().toLocaleDateString());
-	$: waterTomorrow =
+			(sensor.prediction.nextWatering <= new Date() ||
+				sensor.prediction.nextWatering.toLocaleDateString() == new Date().toLocaleDateString())
+	);
+	let waterTomorrow = $derived(
 		sensor.prediction != undefined &&
-		sensor.prediction.nextWatering.toLocaleDateString() ==
-			new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString();
+			sensor.prediction.nextWatering.toLocaleDateString() ==
+				new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString()
+	);
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<section on:click class="card d-flex flex-column cursor-pointer">
-	<div class="h-100 row row-0">
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<section onclick={bubble('click')} class="card d-flex flex-column cursor-pointer">
+	<div class="row row-0 h-100">
 		<div class="col-4">
 			<Base64Image
-				class="w-100 h-100 ratio ratio-1x1 d-block bg-cover rounded-start-1"
+				class="ratio ratio-1x1 d-block rounded-start-1 h-100 w-100 bg-cover"
 				imageBase64={sensor.config.imageBase64}
 			/>
 		</div>
 		<div class="col-8">
-			<div class="card-body h-100 d-flex flex-column">
+			<div class="card-body d-flex flex-column h-100">
 				<div class="row">
 					<div class="col me-auto">
-						<h1 class="card-title mb-2 text-nowrap text-truncate">
+						<h1 class="card-title text-truncate mb-2 text-nowrap">
 							<span>{sensor.config.name}</span>
 						</h1>
 					</div>

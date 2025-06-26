@@ -1,10 +1,14 @@
 <script lang="ts">
-	export let label: string;
-	export let value: string;
-	export let hint: string;
+	interface Props {
+		label: string;
+		value: string;
+		hint: string;
+	}
 
-	let tokenInput: HTMLInputElement;
-	let copied = false;
+	let { label, value, hint }: Props = $props();
+
+	let tokenInput: HTMLInputElement = $state();
+	let copied = $state(false);
 
 	async function handleCopy() {
 		tokenInput.select();
@@ -23,10 +27,10 @@
 <label for="token" class="form-label">{label}</label>
 <div class="d-flex column-gap-1">
 	<input bind:this={tokenInput} id="token" type="text" class="form-control" {value} readonly />
-	<button class="btn btn-outline-secondary" type="button" on:click={handleCopy}>Kopieren</button>
+	<button class="btn btn-outline-secondary" type="button" onclick={handleCopy}>Kopieren</button>
 </div>
 {#if copied}
-	<small class="form-hint mt-2 text-success">In Zwischenablage kopiert!</small>
+	<small class="form-hint text-success mt-2">In Zwischenablage kopiert!</small>
 {:else}
 	<small class="form-hint mt-2">{hint}</small>
 {/if}

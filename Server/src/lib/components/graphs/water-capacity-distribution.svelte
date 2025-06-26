@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import {
 		IconDropletFilled2Svg,
 		IconDropletFilledSvg,
@@ -10,8 +12,12 @@
 	import { debounce } from 'lodash-es';
 	import Apexchart, { type ChartOptions } from './apexchart.svelte';
 
-	export let sensorValueDistribution: SensorValueDistributionDTO;
-	export let sensorConfig: SensorConfigurationDTO;
+	interface Props {
+		sensorValueDistribution: SensorValueDistributionDTO;
+		sensorConfig: SensorConfigurationDTO;
+	}
+
+	let { sensorValueDistribution, sensorConfig }: Props = $props();
 
 	function getOptions(
 		sensorValueDistribution: SensorValueDistributionDTO,
@@ -186,7 +192,7 @@
 		};
 	}
 
-	let chartOptions: ChartOptions;
+	let chartOptions: ChartOptions | undefined = $state();
 	function updateChartOptions(
 		sensorValueDistribution: SensorValueDistributionDTO,
 		sensorConfig: SensorConfigurationDTO
@@ -197,7 +203,11 @@
 	const updateChartOptionsDebounced = debounce(updateChartOptions, 100);
 
 	updateChartOptions(sensorValueDistribution, sensorConfig);
-	$: updateChartOptionsDebounced(sensorValueDistribution, sensorConfig);
+	run(() => {
+		updateChartOptionsDebounced(sensorValueDistribution, sensorConfig);
+	});
 </script>
 
-<Apexchart options={chartOptions} />
+{#if chartOptions}
+	<Apexchart options={chartOptions} />
+{/if}

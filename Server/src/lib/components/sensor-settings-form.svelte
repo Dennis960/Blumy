@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot (form-actions to form_actions) making the component unusable -->
 <script lang="ts">
 	import { applyAction, deserialize } from '$app/forms';
 	import WaterCapacityDistribution from '$lib/components/graphs/water-capacity-distribution.svelte';
@@ -34,10 +35,10 @@
 			: {
 					name: funnyPlantNames[Math.floor(Math.random() * funnyPlantNames.length)],
 					imageBase64: undefined,
-					fieldCapacity: MAX_FIELD_CAPACITY,
-					permanentWiltingPoint: MAX_FIELD_CAPACITY * 0.3,
-					upperThreshold: 0.8,
-					lowerThreshold: 0.2
+					fieldCapacity: MAX_FIELD_CAPACITY * 0.85,
+					permanentWiltingPoint: MAX_FIELD_CAPACITY * 0.15,
+					upperThreshold: 0.75,
+					lowerThreshold: 0.4
 				};
 
 	let sliderOptions: SliderOptions;
@@ -65,8 +66,8 @@
 		sliderOptions = {
 			start: [
 				initialConfig.permanentWiltingPoint,
-				initialConfig.lowerThreshold * initialConfig.fieldCapacity,
-				initialConfig.upperThreshold * initialConfig.fieldCapacity,
+				initialConfig.lowerThreshold * MAX_FIELD_CAPACITY,
+				initialConfig.upperThreshold * MAX_FIELD_CAPACITY,
 				initialConfig.fieldCapacity
 			],
 			connect: true,
@@ -147,7 +148,7 @@
 				</div>
 				<div class="card-body">
 					<div class="row mb-3">
-						<div class="col-12 col-md-6 col-lg-4">
+						<div class="col-md-6 col-lg-4 col-12">
 							<label for="name" class="form-label">Name</label>
 							<input
 								name="name"
@@ -160,7 +161,7 @@
 					</div>
 
 					<div class="row mb-3">
-						<div class="col-12 col-md-6 col-lg-4">
+						<div class="col-md-6 col-lg-4 col-12">
 							<label for="image" class="form-label">Foto</label>
 							{#if image}
 								<span
@@ -187,10 +188,10 @@
 					</div>
 
 					<div class="row mb-3">
-						<div class="col-12 col-md-6 col-lg-4">
+						<div class="col-md-6 col-lg-4 col-12">
 							<label for="slider" class="form-label">Schwellwerte</label>
 							{#if sliderOptions != undefined}
-								<div class="my-2 slider">
+								<div class="slider my-2">
 									{#if sensorValueDistribution != undefined}
 										<WaterCapacityDistribution
 											{sensorValueDistribution}
@@ -208,12 +209,12 @@
 										<input
 											type="hidden"
 											name="lowerThreshold"
-											value={lowerThreshold / fieldCapacity}
+											value={lowerThreshold / MAX_FIELD_CAPACITY}
 										/>
 										<input
 											type="hidden"
 											name="upperThreshold"
-											value={upperThreshold / fieldCapacity}
+											value={upperThreshold / MAX_FIELD_CAPACITY}
 										/>
 										<input type="hidden" name="fieldCapacity" value={fieldCapacity} />
 									</div>
@@ -225,7 +226,7 @@
 							</small>
 						</div>
 						{#if error != undefined}
-							<div class="mt-3 alert alert-danger" role="alert">
+							<div class="alert alert-danger mt-3" role="alert">
 								{error}
 							</div>
 						{/if}
@@ -233,7 +234,7 @@
 
 					{#if writeToken}
 						<div class="row mb-3">
-							<div class="col-12 col-md-6 col-lg-4">
+							<div class="col-md-6 col-lg-4 col-12">
 								<CopyText
 									label="Zugangsschlüssel"
 									hint="Kopiere den Zugangsschlüssel zur Einrichtung des Sensors."
@@ -245,7 +246,7 @@
 
 					{#if shareLink}
 						<div class="row mb-3">
-							<div class="col-12 col-md-6 col-lg-4">
+							<div class="col-md-6 col-lg-4 col-12">
 								<CopyText
 									label="Share-Link"
 									hint="Jeder mit diesem Link hat Zugriff auf die Sensorwerte."
@@ -259,8 +260,8 @@
 						<!-- Delete button -->
 						<div class="row mb-3">
 							<div
-								class="col-12 col
-								-md-6 col-lg-4"
+								class="col -md-6
+								col-lg-4 col-12"
 							>
 								<button type="button" class="btn btn-danger" on:click={deleteSensor}>
 									Sensor löschen

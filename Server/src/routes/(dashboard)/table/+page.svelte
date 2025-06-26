@@ -9,7 +9,7 @@
 	import { SortKey, sortQueryDataBy } from '$lib/sort-query-data';
 	import { onMount } from 'svelte';
 
-	export let data;
+	let { data } = $props();
 
 	onMount(() => {
 		const interval = setInterval(
@@ -21,23 +21,31 @@
 		return () => clearInterval(interval);
 	});
 
-	$: totalSensors = data.sensors.length;
-	$: poorPlantHealth = data.sensors.filter((sensor) => sensor.plantHealth.critical).length;
-	$: poorSensorHealth = data.sensors.filter((sensor) => sensor.sensorHealth.critical).length;
-	$: minNextWatering = data.sensors
-		.filter((sensor) => sensor.prediction)
-		.map((sensor) => sensor.prediction!.nextWatering)
-		.filter((nextWatering) => nextWatering != undefined)
-		.map((nw) => new Date(nw)) // TODO use superjson for API responses
-		.sort((a, b) => a.getTime() - b.getTime())[0];
-	$: anyWateringToday =
-		minNextWatering && minNextWatering.getTime() < new Date().getTime() + 24 * 60 * 60 * 1000; // TODO use end of day
-	$: anyWateringTomorrow =
-		minNextWatering && minNextWatering.getTime() < new Date().getTime() + 2 * 24 * 60 * 60 * 1000;
+	let totalSensors = $derived(data.sensors.length);
+	let poorPlantHealth = $derived(
+		data.sensors.filter((sensor) => sensor.plantHealth.critical).length
+	);
+	let poorSensorHealth = $derived(
+		data.sensors.filter((sensor) => sensor.sensorHealth.critical).length
+	);
+	let minNextWatering = $derived(
+		data.sensors
+			.filter((sensor) => sensor.prediction)
+			.map((sensor) => sensor.prediction!.nextWatering)
+			.filter((nextWatering) => nextWatering != undefined)
+			.map((nw) => new Date(nw)) // TODO use superjson for API responses
+			.sort((a, b) => a.getTime() - b.getTime())[0]
+	);
+	let anyWateringToday = $derived(
+		minNextWatering && minNextWatering.getTime() < new Date().getTime() + 24 * 60 * 60 * 1000
+	); // TODO use end of day
+	let anyWateringTomorrow = $derived(
+		minNextWatering && minNextWatering.getTime() < new Date().getTime() + 2 * 24 * 60 * 60 * 1000
+	);
 
-	let tableSorters: TableSorter[] = [];
-	let sortKey = SortKey.NEXT_WATERING;
-	let sortAsc = true;
+	let tableSorters: TableSorter[] = $state([]);
+	let sortKey = $state(SortKey.NEXT_WATERING);
+	let sortAsc = $state(true);
 
 	function sort(event: CustomEvent<{ key: SortKey; direction: SortDirection }>) {
 		const { key, direction } = event.detail;
@@ -56,32 +64,38 @@
 		sortKey = key;
 		sortAsc = asc;
 	}
-	$: queryDataSorted = sortQueryDataBy(data, sortKey, sortAsc);
+	let queryDataSorted = $derived(sortQueryDataBy(data, sortKey, sortAsc));
 </script>
 
 <div class="page-body">
 	<div class="container-xl">
 		<div class="row row-deck row-cards">
-			<div class="col-12 col-md-4 col-lg-3">
+			<div class="col-md-4 col-lg-3 col-12">
 				<SensorStatusCard title="Pflanzen" value={totalSensors.toString()}>
-					<IconPlant slot="icon" size={24} />
+					{#snippet icon()}
+						<IconPlant size={24} />
+					{/snippet}
 				</SensorStatusCard>
 			</div>
 
 			{#if minNextWatering}
-				<div class="col-12 col-md-4 col-lg-3">
+				<div class="col-md-4 col-lg-3 col-12">
 					<SensorStatusCard
 						title="Nächste Bewässerung"
 						critical={anyWateringToday}
 						warning={anyWateringTomorrow}
 					>
-						<IconBucketDroplet slot="icon" size={24} />
-						<Time slot="value" relative timestamp={minNextWatering} />
+						{#snippet icon()}
+							<IconBucketDroplet size={24} />
+						{/snippet}
+						{#snippet value()}
+							<Time relative timestamp={minNextWatering} />
+						{/snippet}
 					</SensorStatusCard>
 				</div>
 			{/if}
 
-			<div class="col-12 col-md-4 col-lg-3">
+			<div class="col-md-4 col-lg-3 col-12">
 				<SensorStatusCard
 					title="Planzen-Status"
 					value={`${poorPlantHealth} ${poorPlantHealth == 1 ? 'Problem' : 'Probleme'}`}
@@ -90,7 +104,7 @@
 				/>
 			</div>
 
-			<div class="col-12 col-md-4 col-lg-3">
+			<div class="col-md-4 col-lg-3 col-12">
 				<SensorStatusCard
 					title="Sensor-Status"
 					value={`${poorSensorHealth} ${poorSensorHealth == 1 ? 'Problem' : 'Probleme'}`}
@@ -102,7 +116,7 @@
 			<div class="col-12">
 				<div class="card">
 					<div class="table-responsive">
-						<table class="table table-vcenter table-striped">
+						<table class="table-vcenter table-striped table">
 							<thead>
 								<tr>
 									<th></th>
@@ -140,7 +154,7 @@
 										</TableSorter>
 									</th>
 									<th>Letzte 3 Tage</th>
-									<th />
+									<th></th>
 								</tr>
 							</thead>
 							<tbody>

@@ -14,20 +14,26 @@
 	import SensorSparkline from './graphs/sensor-sparkline.svelte';
 	import WaterCapacityBar from './water-capacity-bar.svelte';
 
-	export let sensor: SensorDTO;
-	export let sensorHistory: SensorHistoryDTO;
+	interface Props {
+		sensor: SensorDTO;
+		sensorHistory: SensorHistoryDTO;
+	}
 
-	$: waterToday =
+	let { sensor, sensorHistory }: Props = $props();
+
+	let waterToday = $derived(
 		sensor.prediction != undefined &&
-		(sensor.prediction.nextWatering <= new Date() ||
-			sensor.prediction.nextWatering.toLocaleDateString() == new Date().toLocaleDateString());
-	$: waterTomorrow =
+			(sensor.prediction.nextWatering <= new Date() ||
+				sensor.prediction.nextWatering.toLocaleDateString() == new Date().toLocaleDateString())
+	);
+	let waterTomorrow = $derived(
 		sensor.prediction != undefined &&
-		sensor.prediction.nextWatering.toLocaleDateString() ==
-			new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString();
+			sensor.prediction.nextWatering.toLocaleDateString() ==
+				new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString()
+	);
 </script>
 
-<tr on:click={() => goto(`/sensor/${sensor.id}`)}>
+<tr onclick={() => goto(`/sensor/${sensor.id}`)}>
 	<th class="w-1">
 		<Base64Image class="avatar avatar-xs" imageBase64={sensor.config.imageBase64} />
 	</th>
@@ -83,7 +89,7 @@
 		</div>
 	</td>
 
-	<td class="w-1 graph">
+	<td class="graph w-1">
 		{#if browser && sensorHistory.waterCapacityHistory.length > 0}
 			<SensorSparkline {sensor} history={sensorHistory} />
 		{/if}

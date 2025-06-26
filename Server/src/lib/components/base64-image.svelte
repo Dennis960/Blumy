@@ -1,20 +1,31 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { browser } from '$app/environment';
 
-	export let imageBase64: string | undefined = undefined;
-	export let style: string | undefined = undefined;
+	interface Props {
+		imageBase64?: string | undefined;
+		style?: string | undefined;
+		[key: string]: any;
+	}
+
+	let { imageBase64 = undefined, style = undefined, ...rest }: Props = $props();
 	const emptyImage =
 		'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAOElEQVR42mNkAAIAAAoAAv/lxKUAAAAASUVORK5CYII=';
-	let image: HTMLImageElement | undefined;
-	$: imageUrl = `data:image/png;base64,${imageBase64 ?? emptyImage}`;
+	let image: HTMLImageElement | undefined = $state();
+	let imageUrl = $derived(`data:image/png;base64,${imageBase64 ?? emptyImage}`);
 
-	$: if (browser && !image) {
-		image = new Image();
-	}
+	run(() => {
+		if (browser && !image) {
+			image = new Image();
+		}
+	});
 
-	$: if (browser && image) {
-		image.src = imageUrl;
-	}
+	run(() => {
+		if (browser && image) {
+			image.src = imageUrl;
+		}
+	});
 </script>
 
-<span {...$$restProps} style="background-image: url({imageUrl}); {style ?? ''}" />
+<span {...rest} style="background-image: url({imageUrl}); {style ?? ''}"></span>

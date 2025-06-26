@@ -19,11 +19,11 @@ export { default as IconBatteryOff } from '@tabler/icons-svelte/icons/battery-of
 export { default as IconBatteryCharging2 } from '@tabler/icons-svelte/icons/battery-charging-2';
 export { default as IconPlus } from '@tabler/icons-svelte/icons/plus';
 
-export { default as IconChevronLeftRaw } from '@tabler/icons/chevron-left.svg?raw';
-export { default as IconChevronRightRaw } from '@tabler/icons/chevron-right.svg?raw';
-export { default as IconBucketDropletSvg } from '@tabler/icons/bucket-droplet.svg';
-export { default as IconDropletSvg } from '@tabler/icons/droplet.svg';
-export { default as IconDropletFilled2Svg } from '@tabler/icons/droplet-half-2-filled.svg';
-export { default as IconDropletFilledSvg } from '@tabler/icons/droplet-filled.svg';
-export { default as IconScubeMaskSvg } from '@tabler/icons/scuba-mask.svg';
-export { default as IconGraveSvg } from '@tabler/icons/grave.svg';
+export { default as IconChevronLeftRaw } from '@tabler/icons/outline/chevron-left.svg';
+export { default as IconChevronRightRaw } from '@tabler/icons/outline/chevron-right.svg';
+export { default as IconBucketDropletSvg } from '@tabler/icons/outline/bucket-droplet.svg';
+export { default as IconDropletSvg } from '@tabler/icons/outline/droplet.svg';
+export { default as IconDropletFilled2Svg } from '@tabler/icons/filled/droplet-half-2.svg';
+export { default as IconDropletFilledSvg } from '@tabler/icons/filled/droplet.svg';
+export { default as IconScubeMaskSvg } from '@tabler/icons/outline/scuba-mask.svg';
+export { default as IconGraveSvg } from '@tabler/icons/outline/grave.svg';

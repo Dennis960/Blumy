@@ -4,7 +4,7 @@
 	import SensorSettingsForm from '$lib/components/sensor-settings-form.svelte';
 	import { onMount } from 'svelte';
 
-	export let data;
+	let { data } = $props();
 
 	let error: string;
 
@@ -32,6 +32,7 @@
 				formAction="/api/sensors/{data.id}/settings"
 				formMethod="PUT"
 			>
+				<!-- @migration-task: migrate this slot by hand, `form-actions` is an invalid identifier -->
 				<a slot="form-actions" href={`/sensor/${data.id}`} class="btn btn-link">Abbrechen</a>
 			</SensorSettingsForm>
 		{/if}
