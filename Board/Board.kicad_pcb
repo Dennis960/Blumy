@@ -191,6 +191,152 @@
 	(net 55 "unconnected-(U13-IO20-Pad26)")
 	(net 56 "unconnected-(U13-IO14-Pad19)")
 	(net 57 "unconnected-(U13-IO15-Pad20)")
+	(footprint "CustomFootprints:MouseBites5mm"
+		(layer "F.Cu")
+		(uuid "00a4b511-c568-451e-aef6-b276f24cfeae")
+		(at 164.049999 227.299997)
+		(property "Reference" "U14"
+			(at 0 -0.5 0)
+			(unlocked yes)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "459e27d1-2fdd-4509-af01-c80ca4f27af8")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.1)
+				)
+			)
+		)
+		(property "Value" "~"
+			(at 0 1 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(uuid "a00df72f-c42f-46d6-853d-2957e13dd94e")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Footprint" "CustomFootprints:MouseBites5mm"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "ea5ef91f-7e86-493c-ae2b-007d63315c5e")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "77a9736c-fcaa-4fbf-a03f-8424088344f1")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f40d13e9-6be6-4821-a844-8fa6e0a237cf")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "MPN" "/"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "9bcb6974-e93b-41d1-aaf9-aa85f5fb59c3")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(path "/f4b5e51f-a8b8-40f6-bf60-91049ad16ed8")
+		(sheetname "Root")
+		(sheetfile "Board.kicad_sch")
+		(attr smd exclude_from_bom dnp)
+		(fp_line
+			(start -0.254 -0.04)
+			(end -3.254 -0.04)
+			(stroke
+				(width 0.3)
+				(type solid)
+			)
+			(layer "Dwgs.User")
+			(uuid "c41fbf49-491d-400a-9dcb-d920c9ca6c99")
+		)
+		(fp_line
+			(start -0.254 -0.04)
+			(end -1.254 -1.04)
+			(stroke
+				(width 0.3)
+				(type solid)
+			)
+			(layer "Dwgs.User")
+			(uuid "3143c5ee-c731-47f1-a239-2c594fd78df6")
+		)
+		(fp_line
+			(start -0.254 -0.04)
+			(end -1.254 0.96)
+			(stroke
+				(width 0.3)
+				(type solid)
+			)
+			(layer "Dwgs.User")
+			(uuid "e3f888dc-a334-4fd2-b5b0-e33059c0562e")
+		)
+		(fp_line
+			(start -0.254 2.46)
+			(end -0.254 -2.54)
+			(stroke
+				(width 0.3)
+				(type solid)
+			)
+			(layer "Dwgs.User")
+			(uuid "596101de-cff8-4bbe-a45a-0e54f4eaf425")
+		)
+		(fp_text user "KIKIT: width: 5mm"
+			(at -6.004 -0.04 90)
+			(layer "Dwgs.User")
+			(uuid "e2f20a96-b358-4b04-967e-df64fe0279b5")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 2.5 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(uuid "7490dd47-55bf-4dbe-a9e6-909cd0655dfd")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+	)
 	(footprint "Resistor_SMD:R_0402_1005Metric"
 		(layer "F.Cu")
 		(uuid "05f5431b-4396-468a-9b39-0c6aa21aa13d")
@@ -4979,6 +5125,152 @@
 			)
 			(rotate
 				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "CustomFootprints:MouseBites5mm"
+		(layer "F.Cu")
+		(uuid "7c52f604-6b9c-4385-a5a3-4bc8ceb6a5b4")
+		(at 177.049999 227.299997 180)
+		(property "Reference" "U5"
+			(at 0 -0.5 180)
+			(unlocked yes)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "4368e065-ce40-47db-af00-0bcef407b125")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.1)
+				)
+			)
+		)
+		(property "Value" "~"
+			(at 0 1 180)
+			(unlocked yes)
+			(layer "F.Fab")
+			(uuid "fc4413f0-432e-4f7c-af91-bf26a2017a7e")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Footprint" "CustomFootprints:MouseBites5mm"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "201651f9-e4dd-4d45-ae07-1c2ef7367d01")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "0421818a-a30c-44d9-8dc6-6ddb64ef2a73")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "1c98514b-f2e5-4ccf-9c92-8f1c7e784205")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "MPN" "/"
+			(at 0 0 180)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "efb47b7e-c7a5-44ea-9540-63c3a6e98c19")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(path "/c9121b5f-bc29-454f-995c-3dbe457482ed")
+		(sheetname "Root")
+		(sheetfile "Board.kicad_sch")
+		(attr smd exclude_from_bom dnp)
+		(fp_line
+			(start -0.254 2.46)
+			(end -0.254 -2.54)
+			(stroke
+				(width 0.3)
+				(type solid)
+			)
+			(layer "Dwgs.User")
+			(uuid "2c11cea0-b720-4401-b5f7-22494f92ef96")
+		)
+		(fp_line
+			(start -0.254 -0.04)
+			(end -1.254 0.96)
+			(stroke
+				(width 0.3)
+				(type solid)
+			)
+			(layer "Dwgs.User")
+			(uuid "e839f1c4-0616-4b0d-87e8-9f57de5ca02b")
+		)
+		(fp_line
+			(start -0.254 -0.04)
+			(end -1.254 -1.04)
+			(stroke
+				(width 0.3)
+				(type solid)
+			)
+			(layer "Dwgs.User")
+			(uuid "264f1eb8-6ca3-4a33-bc50-533f5c2fd0b2")
+		)
+		(fp_line
+			(start -0.254 -0.04)
+			(end -3.254 -0.04)
+			(stroke
+				(width 0.3)
+				(type solid)
+			)
+			(layer "Dwgs.User")
+			(uuid "8e7f680f-e94c-41dd-9142-0cc6fb320119")
+		)
+		(fp_text user "KIKIT: width: 5mm"
+			(at -6.004 -0.04 90)
+			(layer "Dwgs.User")
+			(uuid "dcbca726-45e5-4aee-860d-d952448c4ca9")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 2.5 180)
+			(unlocked yes)
+			(layer "F.Fab")
+			(uuid "6fbf6fbc-e627-48d3-9c85-3fcca4c22fe6")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
 			)
 		)
 	)
