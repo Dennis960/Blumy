@@ -32,7 +32,6 @@
 
 		if (!data.authenticated) {
 			authenticationModalStore.set({
-				open: true,
 				authenticationType: 'login'
 			});
 		}
@@ -79,10 +78,12 @@
 			{/if}
 		</div>
 	</div>
-{:else if !$authenticationModalStore.open}
+{:else}
 	<button
-		onclick={() => authenticationModalStore.set({ open: true, authenticationType: 'login' })}
+		onclick={() => authenticationModalStore.set({ authenticationType: 'login' })}
 		class="btn btn-primary"
+		data-bs-toggle="modal"
+		data-bs-target="#authentication-modal"
 	>
 		Login
 	</button>
