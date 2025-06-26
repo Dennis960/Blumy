@@ -5,7 +5,7 @@ execute_process(
 )
 
 idf_component_register(
-    SRCS "index_html.c" "plantstore.c" "plantfi.c" "configuration_mode_server.c" "peripherals/sensors.c" "peripherals/adc.c" "update.c" "main.c"
+    SRCS "index_html.c" "plantstore.c" "plantfi.c" "configuration_mode_server.c" "peripherals/sensors.c" "peripherals/adc.c" "update.c" "captive_plant_dns.c" "main.c"
     INCLUDE_DIRS "."
 )
 

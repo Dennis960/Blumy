@@ -16,6 +16,7 @@
 #include "plantstore.h"
 #include "defaults.h"
 #include "update.h"
+#include "captive_plant_dns.h"
 
 void wait_until_boot_button_released()
 {
@@ -80,6 +81,7 @@ void configuration_mode(bool isConfigured)
     sensors_playStartupSound();
     plantfi_setEnableNatAndDnsOnConnect(true);
     plantfi_initWifiApSta();
+    captive_plant_dns_init();
     uint64_t start_time = esp_timer_get_time();
     uint64_t current_time = start_time;
     int32_t timeoutMs = DEFAULT_CONFIGURATION_MODE_TIMEOUT_MS;

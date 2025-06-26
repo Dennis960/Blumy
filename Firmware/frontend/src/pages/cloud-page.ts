@@ -272,6 +272,13 @@ export class CloudPage extends BasePage {
                     ?disabled="${loadingState.state > 0}"
                     ?secondary="${true}"
                 ></button-element>
+                <div style="margin-top: 0.5rem; font-size: 0.95em;">
+                    Falls der Button nicht funktioniert, kopiere diese URL und
+                    öffne sie im Browser:<br />
+                    <code style="user-select: all; word-break: break-all;">
+                        https://blumy.cloud/selector?redirect=${location.href}
+                    </code>
+                </div>
             </div>
             <title-element>Manuelle Schnittstellen-Konfiguration</title-element>
             <collapsible-element

@@ -4,6 +4,7 @@
 #include "freertos/task.h"
 #include "esp_event.h"
 #include "peripherals/sensors.h"
+#include "esp_netif.h"
 
 #define PLANTFI_CONNECTED_BIT BIT0
 #define PLANTFI_FAIL_BIT BIT1
@@ -32,7 +33,7 @@ void plantfi_initWifiApSta();
 void plantfi_initWifiStaOnly();
 void plantfi_configureAp(const char *ssid, const char *password, int max_connection);
 void plantfi_configureSta(const char *ssid, const char *password, int max_retry, bool credentialsChanged);
-void plantfi_setEnableNatAndDnsOnConnect(bool isConfigurationMode);
+void plantfi_setEnableNatAndDnsOnConnect(bool enableNatAndDnsOnConnect);
 /**
  * @return true if wifi credentials were found
  */
@@ -64,3 +65,5 @@ void plantfi_send_sensor_data_http(sensors_full_data_t *sensors_data, int8_t rss
 bool plantfi_test_http_connection(char *sensorId, char *url, char *auth);
 void plantfi_send_sensor_data_mqtt(sensors_full_data_t *sensors_data, int8_t rssi);
 bool plantfi_test_mqtt_connection(char *sensorId, char *server, int16_t port, char *username, char *password, char *topic, char *clientId);
+esp_netif_t *plantfi_get_ap_netif();
+esp_netif_t *plantfi_get_sta_netif();

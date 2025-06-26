@@ -15,9 +15,42 @@
 
 float ota_update_percentage = -1;
 
-// Returns the index_html from index_html.c
+static const char *blumy_hosts[] = {
+    "connectivitycheck.gstatic.com",
+    "clients3.google.com",
+    "captive.apple.com",
+    "www.apple.com",
+    "www.msftconnecttest.com",
+    "www.msftncsi.com",
+    "detectportal.firefox.com",
+    NULL};
+
+static bool is_blumy_host(const char *host)
+{
+    for (int i = 0; blumy_hosts[i] != NULL; i++)
+    {
+        if (strcmp(host, blumy_hosts[i]) == 0)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Returns the index_html from index_html.c or redirects to a captive portal if the host matches a known captive portal host
 esp_err_t get_handler(httpd_req_t *req)
 {
+    char host[128];
+    if (httpd_req_get_hdr_value_str(req, "Host", host, sizeof(host)) == ESP_OK)
+    {
+        if (is_blumy_host(host))
+        {
+            httpd_resp_set_status(req, "302 Found");
+            httpd_resp_set_hdr(req, "Location", "http://12.34.56.78"); // Has to be the same as the IP address in plantfi_configure_ap()
+            httpd_resp_sendstr(req, "302 Found");
+            return ESP_OK;
+        }
+    }
     httpd_resp_set_type(req, "text/html");
     httpd_resp_send(req, index_html, sizeof(index_html));
     return ESP_OK;
