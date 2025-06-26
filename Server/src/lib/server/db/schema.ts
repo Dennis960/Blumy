@@ -20,7 +20,6 @@ export const users = pgTable('user', {
 		withTimezone: true,
 		mode: 'date'
 	}).defaultNow(),
-	credits: integer('credits').notNull().default(0)
 });
 
 // Used by lucia

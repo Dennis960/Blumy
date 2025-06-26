@@ -22,8 +22,7 @@ export const lucia = new Lucia(adapter, {
 	getUserAttributes: (attributes) => {
 		return {
 			// we don't need to expose the hashed password!
-			email: attributes.email,
-			credits: attributes.credits
+			email: attributes.email
 		};
 	}
 });
@@ -68,7 +67,6 @@ declare module 'lucia' {
 		Lucia: typeof lucia;
 		DatabaseUserAttributes: {
 			email: string;
-			credits: number;
 		};
 	}
 }
