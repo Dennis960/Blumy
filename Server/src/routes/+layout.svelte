@@ -1,9 +1,10 @@
 <script lang="ts">
 	// TODO remove all vendors except litepicker
 	import AuthenticateModal from '$lib/components/modals/AuthenticateModal.svelte';
+	import 'nouislider/dist/nouislider.css';
+	// nouislider Needs to be imported first
 	import '@tabler/core/dist/css/tabler-vendors.css';
 	import '@tabler/core/dist/css/tabler.css';
-	import 'nouislider/dist/nouislider.css';
 	import { onMount } from 'svelte';
 
 	interface Props {
