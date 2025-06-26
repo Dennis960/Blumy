@@ -79,7 +79,7 @@ void analogWrite(int gpio, int frequency, float duty_cycle, ledc_channel_t chann
         .duty = (1 << duty_resolution) * duty_cycle,
         .hpoint = 0};
     ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
-    vTaskDelay(10 / portTICK_PERIOD_MS); // TODO find a way to call ledc settings less often because calling it back to back hangs up the esp
+    vTaskDelay(10 / portTICK_PERIOD_MS); // Calling ledc back to back hangs up the esp
 }
 
 TimerHandle_t toneTimer;
@@ -152,19 +152,19 @@ void stop_led_blink_task()
         led_blink_params.times = 0;
         led_blink_params.duration_ms = 0;
     }
-    setLedBrightness(LED_RED, 0.0);   // Turn off the red LED
-    setLedBrightness(LED_GREEN, 0.0); // Turn off the green LED
 }
 
 void sensors_setLedRedBrightness(uint8_t brightness)
 {
     stop_led_blink_task();
+    setLedBrightness(LED_GREEN, 0.0);
     setLedBrightness(LED_RED, brightness);
 }
 
 void sensors_setLedGreenBrightness(uint8_t brightness)
 {
     stop_led_blink_task();
+    setLedBrightness(LED_RED, 0.0);
     setLedBrightness(LED_GREEN, brightness);
 }
 
@@ -209,11 +209,13 @@ void blinkLed(bool led_red, bool led_green, int times, int duration_ms, uint8_t 
 
 void sensors_blinkLedRed(int times, int duration_ms, uint8_t brightness)
 {
+    setLedBrightness(LED_GREEN, 0.0);
     blinkLed(true, false, times, duration_ms, brightness);
 }
 
 void sensors_blinkLedGreen(int times, int duration_ms, uint8_t brightness)
 {
+    setLedBrightness(LED_RED, 0.0);
     blinkLed(false, true, times, duration_ms, brightness);
 }
 
