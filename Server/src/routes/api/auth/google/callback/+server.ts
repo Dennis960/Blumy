@@ -1,11 +1,12 @@
-import { google, lucia } from '$lib/server/auth';
-import { oauthAccounts, users } from '$lib/server/db/schema';
+import { getGoogle, lucia } from '$lib/server/auth';
+import { accounts, users } from '$lib/server/db/schema';
 import { db } from '$lib/server/db/worker';
-import { OAuth2RequestError } from 'arctic';
 import jwt from 'jsonwebtoken';
-import { generateIdFromEntropySize } from 'lucia';
+import { generateId } from 'lucia';
 
-import type { RequestEvent } from '@sveltejs/kit';
+import { dev } from '$app/environment';
+import dbHelper from '$lib/server/db/dbHelper';
+import { type RequestEvent } from '@sveltejs/kit';
 import { and, eq } from 'drizzle-orm';
 
 export async function GET(event: RequestEvent): Promise<Response> {
@@ -14,55 +15,80 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	const state = event.url.searchParams.get('state');
 	const storedState = event.cookies.get('google_oauth_state') ?? null;
 	const codeVerifier = event.cookies.get('google_oauth_code_verifier') ?? null;
-	const redirectUrl = event.cookies.get('redirectUrl') ?? '/';
+	const redirectUrl = decodeURIComponent(
+		event.cookies.get('redirectUrl') ?? encodeURIComponent('/')
+	);
+	event.cookies.delete('redirectUrl', { path: '/' });
 
 	if (!code || !state || !storedState || state !== storedState || !codeVerifier) {
+		console.log('Invalid state or code');
 		return new Response(null, {
-			status: 400
+			status: 302,
+			headers: {
+				Location: redirectUrl
+			}
 		});
 	}
 
 	try {
-		const tokens = await google.validateAuthorizationCode(code, codeVerifier);
+		const tokens = await getGoogle(event.url.origin).validateAuthorizationCode(code, codeVerifier);
 
-		const googleUser: GoogleIdToken = jwt.decode(tokens.idToken) as GoogleIdToken;
+		const googleUser: GoogleIdToken = jwt.decode(tokens.idToken()) as GoogleIdToken;
 		const userGoogleId = googleUser.sub;
 
 		const existingOauthAccount = (
 			await db
 				.select()
-				.from(oauthAccounts)
-				.where(
-					and(eq(oauthAccounts.provider, 'google'), eq(oauthAccounts.providerUserId, userGoogleId))
-				)
+				.from(accounts)
+				.where(and(eq(accounts.provider, 'google'), eq(accounts.providerUserId, userGoogleId)))
 		).pop();
 
+		let userId: string;
 		if (existingOauthAccount) {
-			const session = await lucia.createSession(existingOauthAccount.userId, {});
-			const sessionCookie = lucia.createSessionCookie(session.id);
-			event.cookies.set(sessionCookie.name, sessionCookie.value, {
-				path: '.',
-				...sessionCookie.attributes
-			});
+			userId = existingOauthAccount.userId;
 		} else {
-			const userId = generateIdFromEntropySize(10); // 16 characters long
+			userId = generateId(15);
 
-			await db.insert(users).values({
-				id: userId
-			});
-			await db.insert(oauthAccounts).values({
+			const user = await dbHelper.getUserByEmail(googleUser.email);
+			if (user) {
+				userId = user.id;
+			} else {
+				await db.insert(users).values({
+					id: userId,
+					email: googleUser.email
+				});
+			}
+			await db.insert(accounts).values({
 				userId,
 				provider: 'google',
 				providerUserId: userGoogleId
 			});
+		}
+		const session = await lucia.createSession(userId, {});
+		const sessionCookie = lucia.createSessionCookie(session.id);
+		event.cookies.set(sessionCookie.name, sessionCookie.value, {
+			path: '.',
+			...sessionCookie.attributes
+		});
 
-			const session = await lucia.createSession(userId, {});
-			const sessionCookie = lucia.createSessionCookie(session.id);
-			event.cookies.set(sessionCookie.name, sessionCookie.value, {
-				path: '.',
-				...sessionCookie.attributes
+		if (existingOauthAccount) {
+			event.cookies.set('app_user_logged_in_google', 'true', {
+				path: '/',
+				secure: !dev,
+				httpOnly: true,
+				maxAge: 60 * 10,
+				sameSite: 'lax'
+			});
+		} else {
+			event.cookies.set('app_user_registered_google', 'true', {
+				path: '/',
+				secure: !dev,
+				httpOnly: true,
+				maxAge: 60 * 10,
+				sameSite: 'lax'
 			});
 		}
+
 		return new Response(null, {
 			status: 302,
 			headers: {
@@ -70,15 +96,12 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			}
 		});
 	} catch (e) {
-		// the specific error message depends on the provider
-		if (e instanceof OAuth2RequestError) {
-			// invalid code
-			return new Response(null, {
-				status: 400
-			});
-		}
+		console.error(e);
 		return new Response(null, {
-			status: 500
+			status: 302,
+			headers: {
+				Location: redirectUrl
+			}
 		});
 	}
 }
@@ -98,4 +121,6 @@ interface GoogleIdToken {
 	sub: string;
 	iat: number;
 	exp: number;
+	email: string;
+	email_verified: boolean;
 }

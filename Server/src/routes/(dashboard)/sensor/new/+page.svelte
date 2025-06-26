@@ -4,7 +4,7 @@
 	import type { SensorCreatedDTO } from '$lib/types/api';
 
 	let error: string;
-	let createdSensor: SensorCreatedDTO;
+	let createdSensor: SensorCreatedDTO = $state();
 </script>
 
 <div class="page-header">
@@ -20,7 +20,7 @@
 						</div>
 						<div class="card-body">
 							<div class="row mb-3">
-								<div class="col-12 col-md-6 col-lg-4">
+								<div class="col-md-6 col-lg-4 col-12">
 									<CopyText
 										label="Zugangsschlüssel"
 										value={createdSensor.tokens.write}

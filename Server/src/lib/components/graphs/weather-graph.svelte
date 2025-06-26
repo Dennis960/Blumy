@@ -2,7 +2,11 @@
 	import type { SensorHistoryDTO } from '$lib/types/api';
 	import Apexchart, { type ChartOptions } from './apexchart.svelte';
 
-	export let history: SensorHistoryDTO;
+	interface Props {
+		history: SensorHistoryDTO;
+	}
+
+	let { history }: Props = $props();
 
 	function getOptions(history: SensorHistoryDTO): ChartOptions {
 		return {
@@ -70,7 +74,7 @@
 		};
 	}
 
-	$: chartOptions = getOptions(history);
+	let chartOptions = $derived(getOptions(history));
 </script>
 
 <Apexchart options={chartOptions} />

@@ -1,0 +1,155 @@
+export class MyURL {
+	constructor(
+		public pathname: string,
+		public searchParams: URLSearchParams = new URLSearchParams()
+	) {
+		this.pathname = pathname;
+		this.searchParams = searchParams;
+	}
+
+	addPath(path: string) {
+		this.pathname += `/${path}`;
+		return this;
+	}
+
+	addSearchParam(key: string, value: string) {
+		this.searchParams.append(key, value);
+		return this;
+	}
+
+	toString() {
+		if (this.searchParams.toString() === '') return this.pathname;
+		return `${this.pathname}?${this.searchParams.toString()}`;
+	}
+}
+
+/**
+ * @param _fetch Specify the fetch function to use. Use event.fetch if available because it is faster.
+ */
+export function clientApi(_fetch: typeof fetch, baseUrl: string = '') {
+	const url = new MyURL(baseUrl).addPath('api');
+	const fetchWithInit = <T>(
+		init: RequestInit | undefined,
+		parse: (res: Response) => Promise<T>
+	) => {
+		let responseCache: Promise<Response> | undefined = undefined;
+		const response = () => {
+			if (responseCache === undefined) responseCache = _fetch(url.toString(), init);
+			return responseCache;
+		};
+		return {
+			response: response,
+			parse: async () => parse(await response()),
+			url: url.toString()
+		};
+	};
+	const fetch = <T>(parse: (res: Response) => Promise<T>) => fetchWithInit<T>(undefined, parse);
+	return {
+		currentAccount: () => {
+			url.addPath('currentAccount');
+			return {
+				updateEmail: (email: string) => {
+					url.addPath('email');
+					return fetchWithInit(
+						{
+							method: 'PUT',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify({ email })
+						},
+						(res) => res.text()
+					);
+				},
+				updatePassword: (currentPassword: string, newPassword: string) => {
+					url.addPath('password');
+					return fetchWithInit(
+						{
+							method: 'PUT',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify({
+								currentPassword,
+								newPassword
+							})
+						},
+						(res) => res.text()
+					);
+				},
+				delete: () => {
+					return fetchWithInit(
+						{
+							method: 'DELETE'
+						},
+						(res) => res.text()
+					);
+				}
+			};
+		},
+		auth: () => {
+			url.addPath('auth');
+			return {
+				default: () => {
+					url.addPath('default');
+					return {
+						login: (email: string, password: string) => {
+							url.addPath('login');
+							return fetchWithInit(
+								{
+									method: 'POST',
+									headers: {
+										'Content-Type': 'application/json'
+									},
+									body: JSON.stringify({ email, password })
+								},
+								(res) => res.text()
+							);
+						},
+						register: (email: string, password: string) => {
+							url.addPath('register');
+							return fetchWithInit(
+								{
+									method: 'POST',
+									headers: {
+										'Content-Type': 'application/json'
+									},
+									body: JSON.stringify({ email, password })
+								},
+								(res) => res.text()
+							);
+						}
+					};
+				},
+				google: () => {
+					url.addPath('google');
+					return {
+						login: (redirectUrl?: string) => {
+							url.addPath('login');
+							if (redirectUrl) url.addSearchParam('redirectUrl', redirectUrl);
+							return fetchWithInit(
+								{
+									method: 'POST'
+								},
+								(res) => res.text()
+							);
+						},
+						callback: () => {
+							url.addPath('callback');
+							return fetch((res) => res.text());
+						}
+					};
+				},
+				logout: () => {
+					url.addPath('logout');
+					return fetchWithInit(
+						{
+							method: 'POST'
+						},
+						(res) => res.text()
+					);
+				}
+			};
+		}
+	};
+}

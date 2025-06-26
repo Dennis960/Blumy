@@ -15,7 +15,7 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 	},
 	allowAuthenticatedElseRedirect: function (redirectUrl = '/') {
 		if (!user || (session && session.fresh)) {
-			throw redirect(302, `/login?redirectUrl=${encodeURIComponent(redirectUrl)}`);
+			throw redirect(302, `/?redirectUrl=${encodeURIComponent(redirectUrl)}`);
 		}
 		return user;
 	},

@@ -1,23 +1,31 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
 	export type { Options as SliderOptions } from 'nouislider';
 </script>
 
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import type { API, Options } from 'nouislider';
 	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
 
-	export let options: Options;
-	export let values: (string | number)[];
+	interface Props {
+		options: Options;
+		values: (string | number)[];
+		[key: string]: any;
+	}
 
-	let slider: API;
+	let { options, values = $bindable(), ...rest }: Props = $props();
 
-	let container: HTMLDivElement;
+	let slider: API = $state();
+
+	let container: HTMLDivElement = $state();
 
 	const dispatch = createEventDispatcher();
 
 	onMount(async () => {
 		const NoUiSlider = (await import('nouislider')).default;
 		slider = NoUiSlider.create(container, options);
+		slider.updateOptions(options, false);
 		slider.on('update', () => {
 			const newValues = slider.getPositions();
 
@@ -27,15 +35,9 @@
 		});
 	});
 
-	$: {
-		if (slider) {
-			slider.updateOptions(options, false);
-		}
-	}
-
 	onDestroy(() => {
 		slider?.destroy();
 	});
 </script>
 
-<div bind:this={container} {...$$restProps} />
+<div bind:this={container} {...rest}></div>

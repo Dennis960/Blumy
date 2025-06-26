@@ -4,10 +4,14 @@
 	import type { SensorDTO } from '$lib/types/api';
 	import { onMount } from 'svelte';
 
-	export let sensor: SensorDTO;
+	interface Props {
+		sensor: SensorDTO;
+	}
+
+	let { sensor }: Props = $props();
 
 	let subscription: PushSubscription | null;
-	let subscribed: boolean = false;
+	let subscribed: boolean = $state(false);
 
 	onMount(async () => {
 		const sw = await navigator.serviceWorker.ready;
@@ -48,7 +52,7 @@
 				type="checkbox"
 				id="push-switch"
 				checked={subscribed}
-				on:input={handleToggleNotifications}
+				oninput={handleToggleNotifications}
 			/>
 			<span>{subscribed ? 'Aktiviert' : 'Deaktiviert'}</span>
 		</div>

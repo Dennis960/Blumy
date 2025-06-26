@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { DATA_DEPENDENCY } from '$lib/api.js';
@@ -6,12 +8,12 @@
 	import SensorDetailCard from '$lib/components/sensor-detail-card.svelte';
 	import { onMount } from 'svelte';
 
-	export let data;
+	let { data } = $props();
 
-	let dateRange = {
+	let dateRange = $state({
 		startDate: data.startDate,
 		endDate: data.endDate
-	};
+	});
 
 	async function updateDate(dateRange: { startDate: Date; endDate: Date }) {
 		$page.url.searchParams.set('from', dateRange.startDate.getTime().toString());
@@ -20,12 +22,14 @@
 		invalidate(DATA_DEPENDENCY.SENSOR);
 	}
 
-	$: if (
-		dateRange.startDate.getTime() != data.startDate.getTime() ||
-		dateRange.endDate.getTime() != data.endDate.getTime()
-	) {
-		updateDate(dateRange);
-	}
+	run(() => {
+		if (
+			dateRange.startDate.getTime() != data.startDate.getTime() ||
+			dateRange.endDate.getTime() != data.endDate.getTime()
+		) {
+			updateDate(dateRange);
+		}
+	});
 
 	onMount(() => {
 		const interval = setInterval(
@@ -39,15 +43,15 @@
 </script>
 
 <div class="page-body">
-	<div class="container container-xl">
+	<div class="container-xl container">
 		<div class="row row-cards row-deck">
-			<div class="col-12 col-md-5 col-lg-4">
+			<div class="col-md-5 col-lg-4 col-12">
 				{#if data.sensor != undefined}
 					<SensorDetailCard sensor={data.sensor} />
 				{/if}
 			</div>
 
-			<div class="col-12 col-md-7 col-lg-8">
+			<div class="col-md-7 col-lg-8 col-12">
 				{#if data.sensor != undefined && data.sensorData != undefined}
 					<SensorCapacityHistoryCard
 						sensor={data.sensor}

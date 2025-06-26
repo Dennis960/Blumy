@@ -3,7 +3,6 @@ import {
 	integer,
 	pgEnum,
 	pgTable,
-	primaryKey,
 	real,
 	serial,
 	text,
@@ -12,35 +11,19 @@ import {
 
 export const providerType = pgEnum('provider_type', ['google']);
 
-// User table, used by Lucia
+// Used by lucia
 export const users = pgTable('user', {
 	id: text('id').primaryKey(),
+	email: text('email').unique(),
+	hashedPassword: text('hashed_password'),
 	createdAt: timestamp('created_at', {
 		withTimezone: true,
 		mode: 'date'
-	}).defaultNow()
+	}).defaultNow(),
+	credits: integer('credits').notNull().default(0)
 });
 
-// OAuth accounts, used by Lucia
-export const oauthAccounts = pgTable(
-	'oauth_account',
-	{
-		userId: text('user_id')
-			.notNull()
-			.references(() => users.id),
-		provider: providerType('provider').notNull(),
-		providerUserId: text('provider_user_id').notNull()
-	},
-	(table) => {
-		return {
-			pk: primaryKey({
-				columns: [table.userId, table.provider]
-			})
-		};
-	}
-);
-
-// Sessions table, used by Lucia
+// Used by lucia
 export const sessions = pgTable('session', {
 	id: text('id').primaryKey(),
 	userId: text('user_id')
@@ -50,6 +33,19 @@ export const sessions = pgTable('session', {
 		withTimezone: true,
 		mode: 'date'
 	}).notNull()
+});
+
+export const accounts = pgTable('account', {
+	id: serial('id').primaryKey(),
+	userId: text('user_id')
+		.notNull()
+		.references(() => users.id),
+	provider: providerType('provider').notNull(),
+	providerUserId: text('provider_user_id').notNull(),
+	createdAt: timestamp('created_at', {
+		withTimezone: true,
+		mode: 'date'
+	}).defaultNow()
 });
 
 export const sensors = pgTable('sensor', {

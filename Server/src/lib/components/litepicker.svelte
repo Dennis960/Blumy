@@ -3,11 +3,16 @@
 	import type Litepicker from 'litepicker';
 	import type { ILPConfiguration } from 'litepicker/dist/types/interfaces';
 
-	export let options: ILPConfiguration;
+	interface Props {
+		options: ILPConfiguration;
+		children?: import('svelte').Snippet;
+	}
+
+	let { options, children }: Props = $props();
 
 	const dispatch = createEventDispatcher();
 
-	let container: HTMLDivElement;
+	let container: HTMLDivElement = $state();
 	let litepicker: Litepicker;
 	onMount(async () => {
 		const Litepicker = (await import('litepicker')).default;
@@ -34,5 +39,5 @@
 </script>
 
 <div class="datepicker-inline" bind:this={container}>
-	<slot />
+	{@render children?.()}
 </div>

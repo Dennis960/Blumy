@@ -1,13 +1,15 @@
 <script lang="ts">
 	import type { SensorDTO } from '$lib/types/api';
 
-	export let sensor: SensorDTO;
-	$: availableWaterCapacityPercent = (sensor.lastUpdate?.waterCapacity ?? 0) * 100;
-	$: color = sensor.plantHealth.critical
-		? 'danger'
-		: sensor.plantHealth.warning
-			? 'warning'
-			: 'primary';
+	interface Props {
+		sensor: SensorDTO;
+	}
+
+	let { sensor }: Props = $props();
+	let availableWaterCapacityPercent = $derived((sensor.lastUpdate?.waterCapacity ?? 0) * 100);
+	let color = $derived(
+		sensor.plantHealth.critical ? 'danger' : sensor.plantHealth.warning ? 'warning' : 'primary'
+	);
 </script>
 
 <div class="progress-container">
@@ -24,8 +26,8 @@
 			{Math.round(availableWaterCapacityPercent)}%
 		</div>
 	</div>
-	<span class="progress-bar-tick" style="left: {sensor.config.lowerThreshold * 100}%" />
-	<span class="progress-bar-tick" style="left: {sensor.config.upperThreshold * 100}%" />
+	<span class="progress-bar-tick" style="left: {sensor.config.lowerThreshold * 100}%"></span>
+	<span class="progress-bar-tick" style="left: {sensor.config.upperThreshold * 100}%"></span>
 </div>
 
 <style>

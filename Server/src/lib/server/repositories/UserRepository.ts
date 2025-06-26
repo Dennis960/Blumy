@@ -1,4 +1,4 @@
-import { oauthAccounts, users } from '$lib/server/db/schema';
+import { accounts, users } from '$lib/server/db/schema';
 import { db } from '$lib/server/db/worker';
 import { and, eq } from 'drizzle-orm';
 
@@ -13,8 +13,8 @@ export default class UserRepository {
 		return await db
 			.select()
 			.from(users)
-			.innerJoin(oauthAccounts, eq(users.id, oauthAccounts.userId))
-			.where(and(eq(oauthAccounts.provider, 'google'), eq(oauthAccounts.providerUserId, googleId)))
+			.innerJoin(accounts, eq(users.id, accounts.userId))
+			.where(and(eq(accounts.provider, 'google'), eq(accounts.providerUserId, googleId)))
 			.limit(1)
 			.then((results) => results.pop());
 	}

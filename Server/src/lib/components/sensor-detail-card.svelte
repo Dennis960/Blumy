@@ -25,14 +25,20 @@
 	import Time from './time.svelte';
 	import WaterCapacityBar from './water-capacity-bar.svelte';
 
-	export let sensor: SensorDTO;
+	interface Props {
+		sensor: SensorDTO;
+	}
 
-	$: waterToday =
+	let { sensor }: Props = $props();
+
+	let waterToday = $derived(
 		sensor.prediction != undefined &&
-		sensor.prediction.nextWatering.getTime() < new Date().getTime() + 24 * 60 * 60 * 1000;
-	$: waterTomorrow =
+			sensor.prediction.nextWatering.getTime() < new Date().getTime() + 24 * 60 * 60 * 1000
+	);
+	let waterTomorrow = $derived(
 		sensor.prediction != undefined &&
-		sensor.prediction.nextWatering.getTime() < new Date().getTime() + 48 * 60 * 60 * 1000;
+			sensor.prediction.nextWatering.getTime() < new Date().getTime() + 48 * 60 * 60 * 1000
+	);
 </script>
 
 <section class="card">
@@ -47,7 +53,9 @@
 		<div class="datagrid">
 			{#if sensor?.lastUpdate == undefined}
 				<SensorStatusDatagridItem title="Sensor-Status" value="Keine Daten" critical>
-					<IconAlertTriangle slot="icon" size={20} />
+					{#snippet icon()}
+						<IconAlertTriangle size={20} />
+					{/snippet}
 				</SensorStatusDatagridItem>
 			{:else}
 				<SensorStatusDatagridItem
@@ -60,7 +68,7 @@
 					warning={sensor.plantHealth.overwatered || sensor.plantHealth.underwatered}
 					critical={sensor.plantHealth.drowning || sensor.plantHealth.wilting}
 				>
-					<svelte:fragment slot="icon">
+					{#snippet icon()}
 						{#if sensor.plantHealth.drowning}
 							<IconScubaMask size={20} />
 						{:else if sensor.plantHealth.wilting}
@@ -72,9 +80,10 @@
 						{:else}
 							<IconDropletFilled2 size={20} />
 						{/if}
-					</svelte:fragment>
+					{/snippet}
 
-					<div slot="value" class="w-100 me-4">
+					<!-- @migration-task: migrate this slot by hand, `value` would shadow a prop on the parent component -->
+					<div slot="value" class="me-4 w-100">
 						<WaterCapacityBar {sensor} />
 					</div>
 				</SensorStatusDatagridItem>
@@ -85,14 +94,16 @@
 						critical={waterToday}
 						warning={waterTomorrow}
 					>
-						<svelte:fragment slot="icon">
+						{#snippet icon()}
 							{#if waterToday || waterTomorrow}
 								<IconClockExclamation size={20} />
 							{:else}
 								<IconBucketDroplet size={20} />
 							{/if}
-						</svelte:fragment>
-						<Time slot="value" relative timestamp={sensor.prediction.nextWatering} />
+						{/snippet}
+						{#snippet value()}
+							<Time relative timestamp={sensor.prediction.nextWatering} />
+						{/snippet}
 					</SensorStatusDatagridItem>
 				{/if}
 
@@ -110,7 +121,7 @@
 					critical={sensor.sensorHealth.critical}
 					warning={sensor.sensorHealth.warning}
 				>
-					<svelte:fragment slot="icon">
+					{#snippet icon()}
 						{#if sensor.sensorHealth.signalStrength == 'offline'}
 							<IconWifiOff size={16} />
 						{:else if sensor.sensorHealth.battery == 'low' || sensor.sensorHealth.signalStrength == 'weak'}
@@ -120,17 +131,19 @@
 						{:else if sensor.sensorHealth.signalStrength == 'moderate'}
 							<IconWifi1 size={16} />
 						{/if}
-					</svelte:fragment>
+					{/snippet}
 				</SensorStatusDatagridItem>
 
 				<SensorStatusDatagridItem
 					title="Letzte Aktualisierung"
 					critical={sensor.sensorHealth.signalStrength == 'offline'}
 				>
-					<svelte:fragment slot="icon">
+					{#snippet icon()}
 						<IconClock size={20} />
-					</svelte:fragment>
-					<Time slot="value" relative timestamp={sensor.lastUpdate.timestamp} />
+					{/snippet}
+					{#snippet value()}
+						<Time relative timestamp={sensor.lastUpdate.timestamp} />
+					{/snippet}
 				</SensorStatusDatagridItem>
 
 				<SensorStatusDatagridItem
@@ -139,7 +152,7 @@
 					warning={sensor.sensorHealth.battery == 'low'}
 					critical={sensor.sensorHealth.battery == 'empty'}
 				>
-					<svelte:fragment slot="icon">
+					{#snippet icon()}
 						{#if sensor.sensorHealth.battery == 'empty'}
 							<IconBatteryOff size={20} />
 						{:else if sensor.sensorHealth.battery == 'low'}
@@ -149,7 +162,7 @@
 						{:else}
 							<IconBattery4 size={20} />
 						{/if}
-					</svelte:fragment>
+					{/snippet}
 				</SensorStatusDatagridItem>
 			{/if}
 		</div>

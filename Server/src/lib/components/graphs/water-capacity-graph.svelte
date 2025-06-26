@@ -3,8 +3,12 @@
 	import type { SensorDTO, SensorHistoryDTO } from '$lib/types/api';
 	import Apexchart, { type ChartOptions } from './apexchart.svelte';
 
-	export let sensor: SensorDTO;
-	export let history: SensorHistoryDTO;
+	interface Props {
+		sensor: SensorDTO;
+		history: SensorHistoryDTO;
+	}
+
+	let { sensor, history }: Props = $props();
 
 	function getOptions(sensor: SensorDTO, history: SensorHistoryDTO): ChartOptions {
 		const historyEntriesMax = history.waterCapacityHistory
@@ -148,7 +152,7 @@
 		};
 	}
 
-	$: chartOptions = getOptions(sensor, history);
+	let chartOptions = $derived(getOptions(sensor, history));
 </script>
 
 <Apexchart options={chartOptions} />

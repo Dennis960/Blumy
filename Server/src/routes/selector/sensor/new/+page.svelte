@@ -1,11 +1,13 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { page } from '$app/stores';
 	import { setupSensorOnLocalEsp } from '$lib/api';
 	import SensorSettingsForm from '$lib/components/sensor-settings-form.svelte';
 	import type { SensorCreatedDTO } from '$lib/types/api';
 
-	let createdSensor: SensorCreatedDTO;
-	let error: string | undefined;
+	let createdSensor: SensorCreatedDTO = $state();
+	let error: string | undefined = $state();
 
 	async function onSensorCreate() {
 		const redirectUrl = $page.url.searchParams.get('redirect');
@@ -17,9 +19,11 @@
 		setupSensorOnLocalEsp(createdSensor.tokens.write, redirectUrl);
 	}
 
-	$: if (createdSensor) {
-		onSensorCreate();
-	}
+	run(() => {
+		if (createdSensor) {
+			onSensorCreate();
+		}
+	});
 </script>
 
 <div class="page-body">
