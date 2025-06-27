@@ -14,9 +14,10 @@
 		sensor: SensorDTO;
 		history: SensorHistoryDTO;
 		dateRange: { startDate: Date; endDate: Date };
+		onchange?: (dateRange: { startDate: Date; endDate: Date }) => void;
 	}
 
-	let { sensor, history, dateRange = $bindable() }: Props = $props();
+	let { sensor, history, dateRange = $bindable(), onchange }: Props = $props();
 
 	const litepickerOptions = {
 		singleMode: false,
@@ -33,6 +34,7 @@
 		startDate.setHours(0, 0, 0, 0);
 		endDate.setHours(23, 59, 59, 999);
 		dateRange = { startDate: startDate, endDate: endDate };
+		onchange?.(dateRange);
 	}
 
 	// true if "debug" is in the URL query

@@ -77,7 +77,7 @@
 							<IconDropletFilled2 size={20} />
 						{/if}
 					{/snippet}
-					<div class="me-4 w-100">
+					<div class="w-100 me-4">
 						<WaterCapacityBar {sensor} />
 					</div>
 				</SensorStatusDatagridItem>

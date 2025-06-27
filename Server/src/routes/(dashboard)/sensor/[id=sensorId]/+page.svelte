@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
 	import { goto, invalidate } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { DATA_DEPENDENCY } from '$lib/client/api.js';
+	import { SensorStorage } from '$lib/client/sensor-storage.js';
 	import SensorCapacityHistoryCard from '$lib/components/sensor-capacity-history-card.svelte';
 	import SensorDetailCard from '$lib/components/sensor-detail-card.svelte';
 	import { onMount } from 'svelte';
@@ -15,23 +14,18 @@
 		endDate: data.endDate
 	});
 
-	async function updateDate(dateRange: { startDate: Date; endDate: Date }) {
-		$page.url.searchParams.set('from', dateRange.startDate.getTime().toString());
-		$page.url.searchParams.set('to', dateRange.endDate.getTime().toString());
-		await goto($page.url);
+	async function updateDate() {
+		page.url.searchParams.set('from', dateRange.startDate.getTime().toString());
+		page.url.searchParams.set('to', dateRange.endDate.getTime().toString());
+		await goto(page.url);
 		invalidate(DATA_DEPENDENCY.SENSOR);
 	}
 
-	run(() => {
-		if (
-			dateRange.startDate.getTime() != data.startDate.getTime() ||
-			dateRange.endDate.getTime() != data.endDate.getTime()
-		) {
-			updateDate(dateRange);
-		}
-	});
-
 	onMount(() => {
+		if (data.accessThroughReadToken) {
+			SensorStorage.addSensor(data.sensor.id, data.sensor.readToken);
+		}
+
 		const interval = setInterval(
 			() => {
 				invalidate(DATA_DEPENDENCY.SENSOR);
@@ -57,6 +51,7 @@
 						sensor={data.sensor}
 						history={data.sensorData}
 						bind:dateRange
+						onchange={updateDate}
 					/>
 				{/if}
 			</div>
