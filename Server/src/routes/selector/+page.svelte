@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { clientApi } from '$lib/client/api.js';
+	import LoginButtonGoogle from '$lib/components/LoginButtonGoogle.svelte';
 	import { authenticationModalStore } from '$lib/components/modals/AuthenticateModal.svelte';
 	import SensorSelectionCard from '$lib/components/sensor-selection-card.svelte';
 	import { IconPlus } from '$lib/icons.js';
@@ -68,14 +69,25 @@
 		{:else}
 			<div class="d-flex flex-column align-items-center mt-5">
 				<p class="mb-4">Bitte melde dich an, um fortzufahren.</p>
-				<button
-					onclick={() => authenticationModalStore.set({ authenticationType: 'login' })}
-					class="btn btn-primary px-4 py-2"
-					data-bs-toggle="modal"
-					data-bs-target="#authentication-modal"
-				>
-					<span class="fw-bold">Login</span>
-				</button>
+				<div class="d-flex mb-3 gap-3">
+					<button
+						onclick={() => authenticationModalStore.set({ authenticationType: 'login' })}
+						class="btn btn-primary px-4 py-2"
+						data-bs-toggle="modal"
+						data-bs-target="#authentication-modal"
+					>
+						<span class="fw-bold">Login</span>
+					</button>
+					<button
+						onclick={() => authenticationModalStore.set({ authenticationType: 'register' })}
+						class="btn btn-secondary px-4 py-2"
+						data-bs-toggle="modal"
+						data-bs-target="#authentication-modal"
+					>
+						<span class="fw-bold">Registrieren</span>
+					</button>
+				</div>
+				<LoginButtonGoogle />
 			</div>
 		{/if}
 	</div>
