@@ -20,7 +20,7 @@
 				'Ein Fehler ist aufgetreten. Bitte verbinde dich mit dem Sensor und versuche es erneut.';
 			return;
 		}
-		clientApi(fetch).setupSensorOnLocalEsp(sensor.writeToken, redirectUrl);
+		clientApi().setupSensorOnLocalEsp(sensor.writeToken, redirectUrl);
 	}
 
 	async function createNewSensor() {

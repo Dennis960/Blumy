@@ -10,11 +10,7 @@
 	async function googleLogin() {
 		const queryRedirectUrl =
 			page.url.searchParams.get('redirectUrl') ?? encodeURIComponent(page.url.toString());
-		const google_redirect_url = await clientApi(fetch)
-			.auth()
-			.google()
-			.login(queryRedirectUrl)
-			.parse();
+		const google_redirect_url = await clientApi().auth().google().login(queryRedirectUrl).parse();
 		window.location.href = google_redirect_url;
 	}
 </script>

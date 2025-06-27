@@ -16,7 +16,7 @@
 				'Ein Fehler ist aufgetreten. Bitte verbinde dich mit dem Sensor und versuche es erneut.';
 			return;
 		}
-		clientApi(fetch).setupSensorOnLocalEsp(sensor.tokens.write, redirectUrl);
+		clientApi().setupSensorOnLocalEsp(sensor.tokens.write, redirectUrl);
 		text = 'Der Sensor wird nun eingerichtet, das sollte nur wenige Sekunden dauern.';
 		setTimeout(() => {
 			text = 'Etwas scheint nicht zu funktionieren. Bitte überprüfe die Verbindung zum Sensor.';

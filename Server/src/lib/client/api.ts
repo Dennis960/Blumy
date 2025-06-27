@@ -34,7 +34,7 @@ export class MyURL {
 /**
  * @param _fetch Specify the fetch function to use. Use event.fetch if available because it is faster.
  */
-export function clientApi(_fetch: typeof fetch, baseUrl: string = '') {
+export function clientApi(_fetch: typeof fetch = fetch, baseUrl: string = '') {
 	const url = new MyURL(baseUrl).addPath('api');
 	const fetchWithInit = <T>(
 		init: RequestInit | undefined,

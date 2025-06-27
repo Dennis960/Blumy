@@ -23,7 +23,7 @@
 				applicationServerKey: key
 			});
 		} else {
-			subscribed = await clientApi(fetch)
+			subscribed = await clientApi()
 				.sensors()
 				.withId(sensor.id, sensor.readToken)
 				.checkSubscription(subscription)
@@ -37,7 +37,7 @@
 		}
 		if (subscribed) {
 			if (
-				await clientApi(fetch)
+				await clientApi()
 					.sensors()
 					.withId(sensor.id, sensor.readToken)
 					.submitUnsubscription(subscription)
@@ -47,7 +47,7 @@
 			}
 		} else {
 			if (
-				await clientApi(fetch)
+				await clientApi()
 					.sensors()
 					.withId(sensor.id, sensor.readToken)
 					.submitSubscription(subscription)
