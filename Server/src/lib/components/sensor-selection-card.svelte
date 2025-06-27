@@ -20,7 +20,7 @@
 		/>
 	</div>
 	<div class="card-body flex-column">
-		<h1 class="card-title text-truncate text-nowrap text-center">
+		<h1 class="card-title text-truncate text-center text-nowrap">
 			<strong>{sensor.config.name}</strong>
 		</h1>
 	</div>

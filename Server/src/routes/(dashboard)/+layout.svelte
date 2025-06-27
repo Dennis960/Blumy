@@ -50,7 +50,7 @@
 			>
 				<span class="navbar-toggler-icon"></span>
 			</button>
-			<a class="navbar-brand ms-lg-0 me-auto ms-2" href={$page.url.origin}
+			<a class="navbar-brand ms-lg-0 ms-2 me-auto" href={$page.url.origin}
 				>Blumy Dashboard{env.PUBLIC_MODE === 'test' ? ' - Test' : ''}</a
 			>
 			<div class="navbar-collapse collapse" id="navbarNav">

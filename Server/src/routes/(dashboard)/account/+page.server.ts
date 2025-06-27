@@ -1,4 +1,4 @@
-import dbHelper from '$lib/server/db/dbHelper';
+import UserRepository from '$lib/server/repositories/UserRepository';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoadEvent } from './$types';
 
@@ -9,11 +9,11 @@ export const load = async (event: PageServerLoadEvent) => {
 	if (!userId) {
 		return redirect(302, '/');
 	}
-	const user = await dbHelper.getUser(userId);
+	const user = await UserRepository.getUser(userId);
 	if (!user) {
 		return redirect(302, '/');
 	}
-	const isDefaultLogin = await dbHelper.isDefaultLogin(userId);
+	const isDefaultLogin = await UserRepository.isDefaultLogin(userId);
 	return {
 		user: {
 			createdAt: user.createdAt,

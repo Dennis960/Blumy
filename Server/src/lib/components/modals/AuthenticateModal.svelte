@@ -58,7 +58,7 @@
 	dataTestId="authentication-modal"
 	modalId="authentication-modal"
 >
-	<form onsubmit={authenticate} class="d-flex flex-column w-100 align-items-start gap-3">
+	<form onsubmit={authenticate} class="d-flex flex-column align-items-start w-100 gap-3">
 		<label for="email" class="form-label fw-medium">Email</label>
 		<input
 			id="email"
@@ -100,7 +100,7 @@
 		<button
 			type="submit"
 			onclick={authenticate}
-			class="w-100 btn btn-primary mt-2"
+			class="btn btn-primary mt-2 w-100"
 			data-testid="authentication-modal-submit"
 			data-bs-dismiss="modal"
 		>
