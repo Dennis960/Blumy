@@ -230,6 +230,11 @@ export function clientApi(_fetch: typeof fetch, baseUrl: string = '') {
 								},
 								(res) => res.json()
 							);
+						},
+						getImage: (token: string) => {
+							url.addPath('image');
+							url.addSearchParam('token', token);
+							return fetchWithInit<Blob>(undefined, (res) => res.blob());
 						}
 					};
 				}
