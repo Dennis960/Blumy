@@ -21,18 +21,18 @@ sw.addEventListener('notificationclick', (event) => {
 	event.notification.close();
 	const url = event.notification.data?.url;
 	if (url) {
-		sw.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
-			// Check if the URL is already open
-			for (let client of windowClients) {
-				if (client.url === url && 'focus' in client) {
-					return client.focus();
+		event.waitUntil(
+			sw.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+				for (let client of windowClients) {
+					if (client.url === url && 'focus' in client) {
+						return client.focus();
+					}
 				}
-			}
-			// Otherwise, open a new tab/window
-			if (sw.clients.openWindow) {
-				return sw.clients.openWindow(url);
-			}
-		})
+				if (sw.clients.openWindow) {
+					return sw.clients.openWindow(url);
+				}
+			})
+		);
 	}
 });
 
