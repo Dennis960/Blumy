@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
-	import { DATA_DEPENDENCY } from '$lib/api.js';
+	import { DATA_DEPENDENCY } from '$lib/client/api.js';
 	import SensorSettingsForm from '$lib/components/sensor-settings-form.svelte';
 	import { onMount } from 'svelte';
 
@@ -26,8 +26,6 @@
 				writeToken={data.writeToken ?? undefined}
 				shareLink={data.shareLink}
 				sensorValueDistribution={data.sensorValueDistribution}
-				formAction="/api/sensors/{data.id}/settings"
-				formMethod="PUT"
 			>
 				{#snippet formActions()}
 					<a href={`/sensor/${data.id}`} class="btn btn-link">Abbrechen</a>

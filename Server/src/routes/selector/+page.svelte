@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
-	import { setupSensorOnLocalEsp } from '$lib/api.js';
+	import { page } from '$app/state';
+	import { clientApi } from '$lib/client/api.js';
 	import { authenticationModalStore } from '$lib/components/modals/AuthenticateModal.svelte';
 	import SensorSelectionCard from '$lib/components/sensor-selection-card.svelte';
 	import { IconPlus } from '$lib/icons.js';
 	import type { SensorDTO } from '$lib/types/api.js';
-	import { onMount } from 'svelte';
 
 	let { data } = $props();
 	let error: string | undefined = $state();
@@ -14,33 +13,23 @@
 
 	async function sensorClick(sensor: SensorDTO) {
 		sensorClicked = true;
-		const redirectUrl = $page.url.searchParams.get('redirect');
+		const redirectUrl = page.url.searchParams.get('redirect');
 		if (!redirectUrl) {
 			error =
 				'Ein Fehler ist aufgetreten. Bitte verbinde dich mit dem Sensor und versuche es erneut.';
 			return;
 		}
-		setupSensorOnLocalEsp(sensor.writeToken, redirectUrl);
+		clientApi(fetch).setupSensorOnLocalEsp(sensor.writeToken, redirectUrl);
 	}
 
 	async function createNewSensor() {
-		await goto('/selector/sensor/new?' + $page.url.searchParams.toString());
+		await goto('/selector/sensor/new?' + page.url.searchParams.toString());
 	}
-
-	onMount(() => {
-		console.log(data);
-
-		if (!data.authenticated) {
-			authenticationModalStore.set({
-				authenticationType: 'login'
-			});
-		}
-	});
 </script>
 
-{#if data.authenticated}
-	<div class="page-body">
-		<div class="container-xl">
+<div class="page-body">
+	<div class="container-xl">
+		{#if data.authenticated}
 			{#if !error}
 				{#if !sensorClicked}
 					<h2>Wähle einen Sensor aus</h2>
@@ -76,15 +65,18 @@
 				<h2>Ein Fehler ist aufgetreten</h2>
 				<p>{error}</p>
 			{/if}
-		</div>
+		{:else}
+			<div class="d-flex flex-column align-items-center mt-5">
+				<p class="mb-4">Bitte melde dich an, um fortzufahren.</p>
+				<button
+					onclick={() => authenticationModalStore.set({ authenticationType: 'login' })}
+					class="btn btn-primary px-4 py-2"
+					data-bs-toggle="modal"
+					data-bs-target="#authentication-modal"
+				>
+					<span class="fw-bold">Login</span>
+				</button>
+			</div>
+		{/if}
 	</div>
-{:else}
-	<button
-		onclick={() => authenticationModalStore.set({ authenticationType: 'login' })}
-		class="btn btn-primary"
-		data-bs-toggle="modal"
-		data-bs-target="#authentication-modal"
-	>
-		Login
-	</button>
-{/if}
+</div>
