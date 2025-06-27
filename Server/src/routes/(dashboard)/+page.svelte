@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation';
-	import { clientApi, DATA_DEPENDENCY } from '$lib/client/api.js';
+	import { DATA_DEPENDENCY } from '$lib/client/api.js';
 	import { SensorStorage } from '$lib/client/sensor-storage.js';
 	import SensorCard from '$lib/components/sensor-card.svelte';
 	import type { SensorDTO } from '$lib/types/api.js';
@@ -12,23 +12,10 @@
 
 	let storedSensors: SensorDTO[] = $state([]);
 
-	async function loadStoredSensors() {
-		const sensors = SensorStorage.getSensors();
-		const apiCall = clientApi().sensorList().withIdsAndTokens(sensors);
-		if ((await apiCall.response()).ok) {
-			storedSensors = await apiCall.parse();
-			for (const sensor of storedSensors) {
-				// TODO, make it so parsing string to date is not necessary (use superjson?)
-				if (sensor.prediction?.nextWatering)
-					sensor.prediction.nextWatering = new Date(sensor.prediction.nextWatering);
-				if (sensor.lastUpdate?.timestamp)
-					sensor.lastUpdate.timestamp = new Date(sensor.lastUpdate.timestamp);
-			}
-		}
-	}
-
 	onMount(() => {
-		loadStoredSensors();
+		SensorStorage.loadStoredSensors().then((sensors) => {
+			storedSensors = sensors;
+		});
 		const interval = setInterval(
 			() => {
 				invalidate(DATA_DEPENDENCY.SENSOR_VALUE_DISTRIBUTION);
@@ -59,7 +46,7 @@
 			{/each}
 
 			{#if filteredStoredSensors.length > 0}
-				<div class="col-12 mb-2 mt-4">
+				<div class="col-12 mt-4 mb-2">
 					<h2>Geteilte Sensoren</h2>
 				</div>
 				{#each filteredStoredSensors as sensor (sensor.id)}
@@ -97,10 +84,6 @@
 					</button>
 				</div>
 			</div>
-
-			<script lang="ts">
-				let sensorLink = '';
-			</script>
 		{/if}
 	</div>
 </div>

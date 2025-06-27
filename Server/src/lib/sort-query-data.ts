@@ -1,4 +1,4 @@
-import type { SensorDTO, SensorOverviewDTO } from './types/api';
+import type { SensorDTO } from './types/api';
 
 export enum SortKey {
 	NAME,
@@ -7,8 +7,8 @@ export enum SortKey {
 	NEXT_WATERING,
 	SENSOR_HEALTH
 }
-export function sortQueryDataBy(queryData: SensorOverviewDTO, sortKey: SortKey, ascending = true) {
-	return queryData.sensors.sort((a, b) => {
+export function sortQueryDataBy(sensors: SensorDTO[], sortKey: SortKey, ascending = true) {
+	return sensors.sort((a, b) => {
 		const comparison = compareSensorsBy(a, b, sortKey);
 		return ascending ? comparison : -comparison;
 	});

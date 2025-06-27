@@ -7,6 +7,7 @@
 	import Time from '$lib/components/time.svelte';
 	import { IconBucketDroplet, IconPlant } from '$lib/icons';
 	import { SortKey, sortQueryDataBy } from '$lib/sort-query-data';
+	import type { SensorDTO } from '$lib/types/api.js';
 	import { onMount } from 'svelte';
 
 	let { data } = $props();
@@ -63,7 +64,10 @@
 		sortKey = key;
 		sortAsc = asc;
 	}
-	let queryDataSorted = $derived(sortQueryDataBy(data, sortKey, sortAsc));
+	let queryDataSorted: SensorDTO[] = $state([]);
+	$effect(() => {
+		queryDataSorted = sortQueryDataBy(data.sensors, sortKey, sortAsc);
+	});
 </script>
 
 <div class="page-body">
