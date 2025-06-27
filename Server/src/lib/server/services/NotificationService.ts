@@ -24,6 +24,7 @@ export default class NotificationService {
 
 		const payload = JSON.stringify({
 			title: `${sensor.name} braucht Wasser!`,
+			body: `Bitte gieße jetzt!`,
 			icon: clientApi(null!, env.ORIGIN)
 				.sensors()
 				.withId(sensor.sensorAddress)
