@@ -1,7 +1,7 @@
 import { createAuthenticationSession } from '$lib/server/auth';
-import dbHelper from '$lib/server/db/dbHelper';
 import { users } from '$lib/server/db/schema';
 import { db } from '$lib/server/db/worker';
+import UserRepository from '$lib/server/repositories/UserRepository';
 import { eq } from 'drizzle-orm';
 import type { RequestEvent } from './$types';
 
@@ -19,14 +19,14 @@ export const PUT = async (event: RequestEvent) => {
 		});
 	}
 
-	const isDefaultLogin = await dbHelper.isDefaultLogin(userId);
+	const isDefaultLogin = await UserRepository.isDefaultLogin(userId);
 	if (!isDefaultLogin) {
 		return new Response('Email cannot be updated', {
 			status: 400
 		});
 	}
 
-	const user = await dbHelper.getUser(userId);
+	const user = await UserRepository.getUser(userId);
 	if (!user) {
 		return new Response('User not found', { status: 404 });
 	}

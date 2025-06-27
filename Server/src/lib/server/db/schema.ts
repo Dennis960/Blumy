@@ -19,7 +19,7 @@ export const users = pgTable('user', {
 	createdAt: timestamp('created_at', {
 		withTimezone: true,
 		mode: 'date'
-	}).defaultNow(),
+	}).defaultNow()
 });
 
 // Used by lucia

@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import { generateId } from 'lucia';
 
 import { dev } from '$app/environment';
-import dbHelper from '$lib/server/db/dbHelper';
+import UserRepository from '$lib/server/repositories/UserRepository';
 import { type RequestEvent } from '@sveltejs/kit';
 import { and, eq } from 'drizzle-orm';
 
@@ -49,7 +49,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		} else {
 			userId = generateId(15);
 
-			const user = await dbHelper.getUserByEmail(googleUser.email);
+			const user = await UserRepository.getUserByEmail(googleUser.email);
 			if (user) {
 				userId = user.id;
 			} else {

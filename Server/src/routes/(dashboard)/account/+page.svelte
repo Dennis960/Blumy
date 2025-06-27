@@ -58,8 +58,8 @@
 	</div>
 
 	<div class="row align-items-center mb-3">
-		<label for="email" class="col-12 col-form-label">Email</label>
-		<div class="col-8 position-relative">
+		<label for="email" class="col-form-label col-12">Email</label>
+		<div class="position-relative col-8">
 			<input
 				type="text"
 				id="email"
@@ -69,7 +69,7 @@
 				class="form-control"
 				disabled={!data.user.isDefaultLogin}
 			/>
-			<span class="position-absolute top-50 translate-middle-y end-0 me-2">
+			<span class="position-absolute translate-middle-y end-0 top-50 me-2">
 				{#if emailUpdateStatus === 'updating'}
 					<IconLoader2 class="text-muted" size={20} />
 				{:else if emailUpdateStatus === 'success'}
@@ -119,8 +119,8 @@
 			</div>
 		</div>
 		<div class="row align-items-center mb-3">
-			<div class="col-8 position-relative">
-				<span class="position-absolute top-50 translate-middle-y end-0 me-2">
+			<div class="position-relative col-8">
+				<span class="position-absolute translate-middle-y end-0 top-50 me-2">
 					{#if passwordUpdateStatus === 'updating'}
 						<IconLoader2 class="text-muted" size={20} />
 					{:else if passwordUpdateStatus === 'success'}
