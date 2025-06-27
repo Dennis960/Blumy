@@ -1,0 +1,15 @@
+{
+	"name": "Blumy",
+	"short_name": "Blumy",
+	"start_url": "/",
+	"display": "standalone",
+	"background_color": "#ffffff",
+	"theme_color": "#2E7D32",
+	"icons": [
+		{
+			"src": "/flower512.png",
+			"sizes": "512x512",
+			"type": "image/png"
+		}
+	]
+}

@@ -19,5 +19,10 @@
 	});
 </script>
 
+<svelte:head>
+	<link rel="manifest" href="/manifest.json" />
+	<meta name="theme-color" content="#2E7D32" />
+</svelte:head>
+
 <AuthenticateModal />
 {@render children?.()}
