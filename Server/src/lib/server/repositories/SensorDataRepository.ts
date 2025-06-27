@@ -130,4 +130,20 @@ export default class SensorDataRepository {
 
 		return dist;
 	}
+
+	static async getLastBySensorId(
+		sensorAddress: number
+	): Promise<typeof sensorReadings.$inferSelect | undefined> {
+		const data = await db
+			.select()
+			.from(sensorReadings)
+			.where(eq(sensorReadings.sensorAddress, sensorAddress))
+			.orderBy(desc(sensorReadings.date))
+			.limit(1);
+
+		if (data.length === 0) {
+			return undefined;
+		}
+		return invertMoisture(data[0]);
+	}
 }

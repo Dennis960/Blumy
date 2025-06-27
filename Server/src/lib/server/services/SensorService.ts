@@ -31,6 +31,22 @@ export default class SensorService {
 		sensorData.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 		return sensorData;
 	}
+
+	/**
+	 * Get last reading of a sensor
+	 */
+	public static async getLastReading(id: number): Promise<SensorReadingDTO | undefined> {
+		const sensorEntity = await SensorRepository.getById(id);
+		if (sensorEntity == undefined) {
+			return undefined;
+		}
+		const data = await SensorDataRepository.getLastBySensorId(id);
+		if (data == undefined) {
+			return undefined;
+		}
+		return SensorReadingEntity.toDTO(data, sensorEntity);
+	}
+
 	/**
 	 * Find all readings where the sensor was watered
 	 */

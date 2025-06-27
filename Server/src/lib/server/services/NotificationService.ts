@@ -1,8 +1,10 @@
+import { sensors } from '$lib/server/db/schema';
 import webpush, { WebPushError } from 'web-push';
 import SensorRepository from '../repositories/SensorRepository';
 import SubscriptionRepository from '../repositories/SubscriptionRepository';
 import SensorService from './SensorService';
-import { sensors } from '$lib/server/db/schema';
+import { clientApi } from '$lib/client/api';
+import { env } from '$env/dynamic/private';
 
 export default class NotificationService {
 	public static async triggerPushNotifications(): Promise<void> {
@@ -10,12 +12,8 @@ export default class NotificationService {
 		const sensors = await SensorRepository.getAll();
 
 		for (const sensor of sensors) {
-			const sensorData = await SensorService.getRecentReadings(sensor.sensorAddress);
-			const model = SensorService.fitModel(sensorData);
-			const predictedTimestamp = model?.predictTimestamp(sensor.lowerThreshold) ?? new Date();
-
-			console.log(`Sensor ${sensor.name}, predicted watering: ${predictedTimestamp.toISOString()}`);
-			if (predictedTimestamp < new Date()) {
+			const lastReading = await SensorService.getLastReading(sensor.sensorAddress);
+			if (lastReading !== undefined && lastReading.availableWaterCapacity < sensor.lowerThreshold) {
 				await this.notifySensor(sensor);
 			}
 		}
@@ -25,7 +23,14 @@ export default class NotificationService {
 		const subscriptions = await SubscriptionRepository.getBySensorAddress(sensor.sensorAddress);
 
 		const payload = JSON.stringify({
-			title: `${sensor.name} braucht Wasser!`
+			title: `${sensor.name} braucht Wasser!`,
+			icon: clientApi(null!, env.ORIGIN)
+				.sensors()
+				.withId(sensor.sensorAddress)
+				.getImage(sensor.readToken).url,
+			data: {
+				url: `${env.ORIGIN}/sensor/${sensor.sensorAddress}?token=${sensor.readToken}`
+			}
 		});
 
 		console.log(
