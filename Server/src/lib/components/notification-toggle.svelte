@@ -25,7 +25,7 @@
 		} else {
 			subscribed = await clientApi(fetch)
 				.sensors()
-				.withId(sensor.id)
+				.withId(sensor.id, sensor.readToken)
 				.checkSubscription(subscription)
 				.parse();
 		}
@@ -39,7 +39,7 @@
 			if (
 				await clientApi(fetch)
 					.sensors()
-					.withId(sensor.id)
+					.withId(sensor.id, sensor.readToken)
 					.submitUnsubscription(subscription)
 					.parse()
 			) {
@@ -47,7 +47,11 @@
 			}
 		} else {
 			if (
-				await clientApi(fetch).sensors().withId(sensor.id).submitSubscription(subscription).parse()
+				await clientApi(fetch)
+					.sensors()
+					.withId(sensor.id, sensor.readToken)
+					.submitSubscription(subscription)
+					.parse()
 			) {
 				subscribed = true;
 			}

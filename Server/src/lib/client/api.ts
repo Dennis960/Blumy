@@ -171,8 +171,9 @@ export function clientApi(_fetch: typeof fetch, baseUrl: string = '') {
 						(res) => res.json()
 					);
 				},
-				withId: (id: number) => {
+				withId: (id: number, readToken?: string) => {
 					url.addPath(id.toString());
+					if (readToken) url.addSearchParam('token', readToken);
 					return {
 						update: (config: FormData) => {
 							url.addPath('settings');
