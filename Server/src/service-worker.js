@@ -11,7 +11,8 @@ sw.addEventListener('push', (event) => {
 	event.waitUntil(
 		sw.registration.showNotification(data.title, {
 			body: data.body,
-			data: { url: data.url } // Pass the URL in notification data
+			icon: data.icon,
+			data: { url: data.data.url },
 		})
 	);
 });
