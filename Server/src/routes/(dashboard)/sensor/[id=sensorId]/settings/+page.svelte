@@ -6,8 +6,6 @@
 
 	let { data } = $props();
 
-	let error: string;
-
 	onMount(() => {
 		const interval = setInterval(
 			() => {
@@ -25,15 +23,15 @@
 			<SensorSettingsForm
 				sensorId={data.sensor.id}
 				config={data.sensor.config}
-				{error}
 				writeToken={data.writeToken ?? undefined}
 				shareLink={data.shareLink}
 				sensorValueDistribution={data.sensorValueDistribution}
 				formAction="/api/sensors/{data.id}/settings"
 				formMethod="PUT"
 			>
-				<!-- @migration-task: migrate this slot by hand, `form-actions` is an invalid identifier -->
-				<a slot="form-actions" href={`/sensor/${data.id}`} class="btn btn-link">Abbrechen</a>
+				{#snippet formActions()}
+					<a href={`/sensor/${data.id}`} class="btn btn-link">Abbrechen</a>
+				{/snippet}
 			</SensorSettingsForm>
 		{/if}
 	</div>

@@ -70,7 +70,7 @@
 		>
 			{#if sensor.sensorHealth.signalStrength == 'offline'}
 				<IconWifiOff class="align-text-bottom" size={16} />
-			{:else if sensor.sensorHealth.lowBattery || sensor.sensorHealth.signalStrength == 'weak'}
+			{:else if sensor.sensorHealth.battery == 'low' || sensor.sensorHealth.signalStrength == 'weak'}
 				<IconAlertTriangle class="align-text-bottom" size={16} />
 			{:else if sensor.sensorHealth.signalStrength == 'strong'}
 				<IconWifi2 class="align-text-bottom" size={16} />
@@ -79,7 +79,7 @@
 			{/if}
 			{#if sensor.sensorHealth.signalStrength == 'offline'}
 				<span>Offline</span>
-			{:else if sensor.sensorHealth.lowBattery}
+			{:else if sensor.sensorHealth.battery == 'low'}
 				<span>Batterie schwach</span>
 			{:else if sensor.sensorHealth.signalStrength == 'weak'}
 				<span>Empfang schlecht</span>

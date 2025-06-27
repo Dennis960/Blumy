@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { clientApi } from '$lib/client/api';
-	import { addToast } from '$lib/components/toastModalStore.js';
 	import IconCheck from '@tabler/icons-svelte/icons/check';
 	import IconLoader2 from '@tabler/icons-svelte/icons/loader-2';
 	import IconX from '@tabler/icons-svelte/icons/x';
@@ -14,6 +13,7 @@
 	let newPassword = $state('');
 
 	async function changeEmail() {
+		if (!email) return;
 		emailUpdateStatus = 'updating';
 		const updateEmailApiCall = clientApi(fetch).currentAccount().updateEmail(email);
 		const updateEmailResponse = await updateEmailApiCall.response();
@@ -45,15 +45,6 @@
 			const deleteResponse = await deleteApiCall.response();
 			if (deleteResponse.ok) {
 				invalidateAll();
-				addToast({
-					type: 'success',
-					message: 'Account deleted.'
-				});
-			} else {
-				addToast({
-					type: 'error',
-					message: 'Failed to delete account.'
-				});
 			}
 		}
 	}

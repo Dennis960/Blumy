@@ -1,6 +1,6 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot (form-actions to form_actions) making the component unusable -->
 <script lang="ts">
 	import { applyAction, deserialize } from '$app/forms';
+	import { goto } from '$app/navigation';
 	import WaterCapacityDistribution from '$lib/components/graphs/water-capacity-distribution.svelte';
 	import Slider, { type SliderOptions } from '$lib/components/slider.svelte';
 	import { funnyPlantNames } from '$lib/funny-plant-names';
@@ -11,21 +11,35 @@
 	} from '$lib/types/api';
 	import type { ActionResult } from '@sveltejs/kit';
 	import { PipsMode } from 'nouislider';
-	import { onMount } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
 	import Base64Image from './base64-image.svelte';
 	import CopyText from './copy-text.svelte';
-	import { goto } from '$app/navigation';
 
-	export let sensorId: number | undefined = undefined;
-	export let config: SensorConfigurationDTO | undefined = undefined;
-	export let sensorValueDistribution: SensorValueDistributionDTO | undefined = undefined;
-	export let error: string | undefined = undefined;
-	export let writeToken: string | undefined = undefined;
-	export let shareLink: string | undefined = undefined;
-	export let createdSensor: SensorCreatedDTO | undefined = undefined;
-
-	export let formAction = '/sensor';
-	export let formMethod: 'POST' | 'PUT' = 'POST';
+	let {
+		sensorId = undefined,
+		config = undefined,
+		sensorValueDistribution = undefined,
+		error = undefined,
+		writeToken = undefined,
+		shareLink = undefined,
+		createdSensor = $bindable(undefined),
+		formAction = '/sensor',
+		formMethod = 'POST',
+		formActions,
+		onSensorCreate
+	}: {
+		sensorId?: number;
+		config?: SensorConfigurationDTO;
+		sensorValueDistribution?: SensorValueDistributionDTO;
+		error?: string;
+		writeToken?: string;
+		shareLink?: string;
+		createdSensor?: SensorCreatedDTO;
+		formAction?: string;
+		formMethod?: 'POST' | 'PUT';
+		formActions?: Snippet;
+		onSensorCreate?: (sensor: SensorCreatedDTO) => void;
+	} = $props();
 
 	const MAX_FIELD_CAPACITY = 2500;
 
@@ -41,13 +55,20 @@
 					lowerThreshold: 0.4
 				};
 
-	let sliderOptions: SliderOptions;
-	let image: HTMLImageElement | undefined = undefined;
-	let sliderValues: (number | string)[] = [];
+	let sliderOptions: SliderOptions | undefined = $state();
+	let image: HTMLImageElement | undefined = $state(undefined);
+	let sliderValues: (number | string)[] = $state([]);
 
-	$: [permanentWiltingPoint, lowerThreshold, upperThreshold, fieldCapacity] = sliderValues.map(
-		(v) => Math.floor((parseFloat(v.toString()) / 100) * MAX_FIELD_CAPACITY)
-	);
+	let permanentWiltingPoint = $state(initialConfig.permanentWiltingPoint);
+	let lowerThreshold = $state(initialConfig.lowerThreshold * MAX_FIELD_CAPACITY);
+	let upperThreshold = $state(initialConfig.upperThreshold * MAX_FIELD_CAPACITY);
+	let fieldCapacity = $state(initialConfig.fieldCapacity);
+
+	function onSliderChange(values: (number | string)[]) {
+		[permanentWiltingPoint, lowerThreshold, upperThreshold, fieldCapacity] = values.map((v) =>
+			Math.floor((parseFloat(v.toString()) / 100) * MAX_FIELD_CAPACITY)
+		);
+	}
 
 	onMount(async () => {
 		const sliderLabels = ['Lufttrocken', 'Trocken', 'Feucht', 'Nass', 'Unter Wasser'];
@@ -120,6 +141,7 @@
 
 		if (result.type === 'success' && result.data) {
 			createdSensor = result.data as SensorCreatedDTO;
+			onSensorCreate?.(createdSensor);
 		}
 
 		applyAction(result);
@@ -141,7 +163,7 @@
 
 <div class="row row-gap-3 align-items-center">
 	<div class="col-12">
-		<form action={formAction} method="POST" enctype="multipart/form-data" on:submit={handleSubmit}>
+		<form action={formAction} method="POST" enctype="multipart/form-data" onsubmit={handleSubmit}>
 			<section class="card">
 				<div class="card-header">
 					<h1 class="card-title">Sensor-Einstellungen</h1>
@@ -164,10 +186,8 @@
 						<div class="col-md-6 col-lg-4 col-12">
 							<label for="image" class="form-label">Foto</label>
 							{#if image}
-								<span
-									class="avatar avatar-2xl mb-2"
-									style={`background-image: url(${image.src})`}
-								/>
+								<span class="avatar avatar-2xl mb-2" style={`background-image: url(${image.src})`}
+								></span>
 							{:else}
 								<Base64Image
 									class="avatar avatar-2xl mb-2"
@@ -180,7 +200,7 @@
 								class="form-control"
 								id="image"
 								name="image"
-								on:change={handleImageInput}
+								onchange={handleImageInput}
 								required={image === undefined && initialConfig.imageBase64 === undefined}
 								capture="environment"
 							/>
@@ -199,7 +219,11 @@
 										/>
 									{/if}
 									<div>
-										<Slider options={sliderOptions} bind:values={sliderValues} />
+										<Slider
+											options={sliderOptions}
+											bind:values={sliderValues}
+											change={onSliderChange}
+										/>
 
 										<input
 											type="hidden"
@@ -263,7 +287,7 @@
 								class="col -md-6
 								col-lg-4 col-12"
 							>
-								<button type="button" class="btn btn-danger" on:click={deleteSensor}>
+								<button type="button" class="btn btn-danger" onclick={deleteSensor}>
 									Sensor löschen
 								</button>
 							</div>
@@ -272,7 +296,7 @@
 
 					<div class="card-footer text-end">
 						<div class="d-flex justify-content-end column-gap-2">
-							<slot name="form-actions" />
+							{@render formActions?.()}
 							<button type="submit" class="btn btn-primary">Speichern</button>
 						</div>
 					</div>

@@ -1,7 +1,4 @@
 <script lang="ts">
-	import { createBubbler } from 'svelte/legacy';
-
-	const bubble = createBubbler();
 	import Time from '$lib/components/time.svelte';
 	import {
 		IconAlertTriangle,
@@ -19,9 +16,10 @@
 
 	interface Props {
 		sensor: SensorDTO;
+		onclick?: () => void;
 	}
 
-	let { sensor }: Props = $props();
+	let { sensor, onclick }: Props = $props();
 
 	let waterToday = $derived(
 		sensor.prediction != undefined &&
@@ -37,7 +35,7 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<section onclick={bubble('click')} class="card d-flex flex-column cursor-pointer">
+<section {onclick} class="card d-flex flex-column cursor-pointer">
 	<div class="row row-0 h-100">
 		<div class="col-4">
 			<Base64Image

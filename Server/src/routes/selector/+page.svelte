@@ -62,7 +62,7 @@
 						</section>
 						{#each data.sensors as sensor (sensor.id)}
 							<SensorSelectionCard
-								on:click={() => {
+								onclick={() => {
 									sensorClick(sensor);
 								}}
 								{sensor}

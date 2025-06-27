@@ -1,10 +1,21 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot (value to value_1) making the component unusable -->
 <script lang="ts">
-	export let title: string;
-	export let value: string = '';
-	export let ok: boolean = false;
-	export let warning: boolean = false;
-	export let critical: boolean = false;
+	import type { Snippet } from 'svelte';
+
+	let {
+		title,
+		icon,
+		children,
+		ok = false,
+		warning = false,
+		critical = false
+	}: {
+		title: string;
+		children?: Snippet;
+		icon?: Snippet;
+		ok?: boolean;
+		warning?: boolean;
+		critical?: boolean;
+	} = $props();
 </script>
 
 <section class="card">
@@ -15,10 +26,8 @@
 				? 'text-green'
 				: ''} {warning && !critical ? 'text-warning' : ''} {critical ? 'text-danger' : ''}"
 		>
-			<slot name="icon" />
-			<slot name="value">
-				{value}
-			</slot>
+			{@render icon?.()}
+			{@render children?.()}
 		</div>
 	</div>
 </section>

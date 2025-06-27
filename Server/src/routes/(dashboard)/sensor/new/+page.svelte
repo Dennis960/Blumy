@@ -3,14 +3,13 @@
 	import SensorSettingsForm from '$lib/components/sensor-settings-form.svelte';
 	import type { SensorCreatedDTO } from '$lib/types/api';
 
-	let error: string;
-	let createdSensor: SensorCreatedDTO = $state();
+	let createdSensor: SensorCreatedDTO | undefined = $state();
 </script>
 
 <div class="page-header">
 	<div class="container">
 		{#if createdSensor == undefined}
-			<SensorSettingsForm {error} bind:createdSensor />
+			<SensorSettingsForm bind:createdSensor />
 		{:else}
 			<div class="row row-gap-3 align-items-center">
 				<div class="col-12">

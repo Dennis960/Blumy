@@ -1,5 +1,3 @@
-<svelte:options />
-
 <script module lang="ts">
 	export type SortDirection = 'asc' | 'desc' | undefined;
 </script>
@@ -7,23 +5,20 @@
 <script lang="ts">
 	import type { SortKey } from '$lib/sort-query-data';
 
-	import { createEventDispatcher } from 'svelte';
-
 	interface Props {
 		sortKey: SortKey;
 		sortDirection?: SortDirection;
 		children?: import('svelte').Snippet;
+		onsort?: (key: SortKey, direction: SortDirection) => void;
 	}
 
-	let { sortKey, sortDirection = $bindable(undefined), children }: Props = $props();
+	let { sortKey, sortDirection = $bindable(undefined), children, onsort: sort }: Props = $props();
 
 	let asc = $derived(sortDirection === 'asc');
 	let desc = $derived(sortDirection === 'desc');
 
-	const dispatch = createEventDispatcher();
-
 	function handleSortClick() {
-		dispatch('sort', { key: sortKey, direction: sortDirection });
+		sort?.(sortKey, sortDirection);
 	}
 	function click() {
 		if (sortDirection === 'asc') {

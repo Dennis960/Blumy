@@ -47,8 +47,7 @@
 	let sortKey = $state(SortKey.NEXT_WATERING);
 	let sortAsc = $state(true);
 
-	function sort(event: CustomEvent<{ key: SortKey; direction: SortDirection }>) {
-		const { key, direction } = event.detail;
+	function sort(key: SortKey, direction: SortDirection) {
 		if (direction === undefined) {
 			// default sorting is by id
 			sortKey = SortKey.ID;
@@ -71,10 +70,11 @@
 	<div class="container-xl">
 		<div class="row row-deck row-cards">
 			<div class="col-md-4 col-lg-3 col-12">
-				<SensorStatusCard title="Pflanzen" value={totalSensors.toString()}>
+				<SensorStatusCard title="Pflanzen">
 					{#snippet icon()}
 						<IconPlant size={24} />
 					{/snippet}
+					{totalSensors.toString()}
 				</SensorStatusCard>
 			</div>
 
@@ -88,9 +88,7 @@
 						{#snippet icon()}
 							<IconBucketDroplet size={24} />
 						{/snippet}
-						{#snippet value()}
-							<Time relative timestamp={minNextWatering} />
-						{/snippet}
+						<Time relative timestamp={minNextWatering} />
 					</SensorStatusCard>
 				</div>
 			{/if}
@@ -98,19 +96,21 @@
 			<div class="col-md-4 col-lg-3 col-12">
 				<SensorStatusCard
 					title="Planzen-Status"
-					value={`${poorPlantHealth} ${poorPlantHealth == 1 ? 'Problem' : 'Probleme'}`}
 					ok={poorPlantHealth == 0}
 					critical={poorPlantHealth > 0}
-				/>
+				>
+					{`${poorPlantHealth} ${poorPlantHealth == 1 ? 'Problem' : 'Probleme'}`}
+				</SensorStatusCard>
 			</div>
 
 			<div class="col-md-4 col-lg-3 col-12">
 				<SensorStatusCard
 					title="Sensor-Status"
-					value={`${poorSensorHealth} ${poorSensorHealth == 1 ? 'Problem' : 'Probleme'}`}
 					ok={poorSensorHealth == 0}
 					critical={poorSensorHealth > 0}
-				/>
+				>
+					{`${poorSensorHealth} ${poorSensorHealth == 1 ? 'Problem' : 'Probleme'}`}
+				</SensorStatusCard>
 			</div>
 
 			<div class="col-12">
@@ -121,14 +121,14 @@
 								<tr>
 									<th></th>
 									<th>
-										<TableSorter sortKey={SortKey.NAME} on:sort={sort} bind:this={tableSorters[0]}>
+										<TableSorter sortKey={SortKey.NAME} onsort={sort} bind:this={tableSorters[0]}>
 											Name
 										</TableSorter>
 									</th>
 									<th>
 										<TableSorter
 											sortKey={SortKey.WATER_CAPACITY}
-											on:sort={sort}
+											onsort={sort}
 											bind:this={tableSorters[1]}
 										>
 											Wasserkapazität
@@ -137,7 +137,7 @@
 									<th>
 										<TableSorter
 											sortKey={SortKey.NEXT_WATERING}
-											on:sort={sort}
+											onsort={sort}
 											bind:this={tableSorters[2]}
 											sortDirection="asc"
 										>
@@ -147,7 +147,7 @@
 									<th>
 										<TableSorter
 											sortKey={SortKey.SENSOR_HEALTH}
-											on:sort={sort}
+											onsort={sort}
 											bind:this={tableSorters[3]}
 										>
 											Sensor-Status
