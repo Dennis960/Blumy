@@ -54,7 +54,7 @@
 </script>
 
 <Modal
-	title={$authenticationModalStore.authenticationType === 'login' ? 'Login' : 'Register'}
+	title={$authenticationModalStore.authenticationType === 'login' ? 'Login' : 'Registrieren'}
 	dataTestId="authentication-modal"
 	modalId="authentication-modal"
 >
@@ -71,7 +71,7 @@
 			<p class="form-text text-danger" data-testid="authentication-modal-error">{errorText}</p>
 		{/if}
 
-		<label for="password" class="form-label fw-medium">Password</label>
+		<label for="password" class="form-label fw-medium">Passwort</label>
 		<input
 			id="password"
 			type="password"
@@ -81,7 +81,7 @@
 		/>
 
 		{#if $authenticationModalStore.authenticationType === 'register'}
-			<label for="repeat-password" class="form-label fw-medium">Repeat Password</label>
+			<label for="repeat-password" class="form-label fw-medium">Passwort wiederholen</label>
 			<input
 				id="repeat-password"
 				type="password"
@@ -100,11 +100,11 @@
 		<button
 			type="submit"
 			onclick={authenticate}
-			class="btn btn-primary mt-2 w-100"
+			class="btn btn-primary w-100 mt-2"
 			data-testid="authentication-modal-submit"
 			data-bs-dismiss="modal"
 		>
-			{$authenticationModalStore.authenticationType === 'login' ? 'Login' : 'Register'}
+			{$authenticationModalStore.authenticationType === 'login' ? 'Login' : 'Registrieren'}
 		</button>
 
 		{#if errorText && !errorText.toLowerCase().includes('email') && !errorText
@@ -115,7 +115,7 @@
 
 		<div class="form-text">
 			{#if $authenticationModalStore.authenticationType === 'login'}
-				Don't have an account?
+				Du hast noch keinen Account?
 				<button
 					type="button"
 					onclick={() => ($authenticationModalStore.authenticationType = 'register')}
@@ -123,10 +123,10 @@
 					data-testid="authentication-modal-register"
 					style="cursor:pointer"
 				>
-					Register
+					Registrieren
 				</button>
 			{:else}
-				Already have an account?
+				Du hast bereits einen Account?
 				<button
 					type="button"
 					onclick={() => ($authenticationModalStore.authenticationType = 'login')}

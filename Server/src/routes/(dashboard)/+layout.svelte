@@ -50,16 +50,18 @@
 			>
 				<span class="navbar-toggler-icon"></span>
 			</button>
-			<a class="navbar-brand ms-lg-0 ms-2 me-auto" href={$page.url.origin}
+			<a class="navbar-brand ms-lg-0 me-auto ms-2" href={$page.url.origin}
 				>Blumy Dashboard{env.PUBLIC_MODE === 'test' ? ' - Test' : ''}</a
 			>
 			<div class="navbar-collapse collapse" id="navbarNav">
-				<ul class="navbar-nav">
+				<ul class="navbar-nav me-auto gap-3">
 					<li class="nav-item">
 						<a class="nav-link {$page.url.pathname == `/` ? 'active' : ''}" href={$page.url.origin}>
 							Sensoren
 						</a>
 					</li>
+				</ul>
+				<ul class="navbar-nav ms-auto gap-4">
 					{#if !data.authenticated}
 						<li class="nav-item">
 							<button
@@ -73,7 +75,7 @@
 								Login
 							</button>
 						</li>
-						<li class="nav-item ms-2">
+						<li class="nav-item">
 							<button
 								type="button"
 								class="nav-link btn btn-link p-0"
@@ -82,10 +84,10 @@
 								data-bs-toggle="modal"
 								data-bs-target="#authentication-modal"
 							>
-								Register
+								Registrieren
 							</button>
 						</li>
-						<li class="nav-item ms-2">
+						<li class="nav-item">
 							<LoginButtonGoogle />
 						</li>
 					{:else}
@@ -101,7 +103,10 @@
 								>
 									<div>Account</div>
 								</div>
-								<div class="dropdown-menu" aria-labelledby="navbarAccountDropdown">
+								<div
+									class="dropdown-menu dropdown-menu-end"
+									aria-labelledby="navbarAccountDropdown"
+								>
 									<a class="dropdown-item" href="/account" data-testid="nav-bar-account-settings">
 										Account settings
 									</a>

@@ -19,12 +19,7 @@
 	}
 </script>
 
-<button
-	onclick={googleLogin}
-	{...rest}
-	class="btn btn-light btn-sm d-flex align-items-center gap-2"
-	type="button"
->
+<button onclick={googleLogin} {...rest} class="btn" type="button">
 	<img
 		class="me-2"
 		style="height: 20px; width: 20px;"
@@ -32,5 +27,5 @@
 		loading="lazy"
 		alt="google logo"
 	/>
-	<span>Login with Google</span>
+	<span> Über Google anmelden </span>
 </button>
