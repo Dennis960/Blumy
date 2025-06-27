@@ -17,11 +17,11 @@
 	let repeatPassword = $state('');
 	let errorText = $state('');
 	async function login() {
-		return clientApi(fetch).auth().default().login(email, password).response();
+		return clientApi().auth().default().login(email, password).response();
 	}
 
 	async function register() {
-		return clientApi(fetch).auth().default().register(email, password).response();
+		return clientApi().auth().default().register(email, password).response();
 	}
 
 	async function authenticate(event: Event) {
@@ -100,7 +100,7 @@
 		<button
 			type="submit"
 			onclick={authenticate}
-			class="btn btn-primary w-100 mt-2"
+			class="btn btn-primary mt-2 w-100"
 			data-testid="authentication-modal-submit"
 			data-bs-dismiss="modal"
 		>

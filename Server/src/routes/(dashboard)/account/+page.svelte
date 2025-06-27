@@ -15,7 +15,7 @@
 	async function changeEmail() {
 		if (!email) return;
 		emailUpdateStatus = 'updating';
-		const updateEmailApiCall = clientApi(fetch).currentAccount().updateEmail(email);
+		const updateEmailApiCall = clientApi().currentAccount().updateEmail(email);
 		const updateEmailResponse = await updateEmailApiCall.response();
 		if (updateEmailResponse.ok) {
 			emailUpdateStatus = 'success';
@@ -27,7 +27,7 @@
 
 	async function changePassword() {
 		passwordUpdateStatus = 'updating';
-		const updatePasswordApiCall = clientApi(fetch)
+		const updatePasswordApiCall = clientApi()
 			.currentAccount()
 			.updatePassword(currentPassword, newPassword);
 		const updatePasswordResponse = await updatePasswordApiCall.response();
@@ -41,7 +41,7 @@
 
 	async function deleteAccount() {
 		if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-			const deleteApiCall = clientApi(fetch).currentAccount().delete();
+			const deleteApiCall = clientApi().currentAccount().delete();
 			const deleteResponse = await deleteApiCall.response();
 			if (deleteResponse.ok) {
 				invalidateAll();

@@ -128,14 +128,14 @@
 		const data = new FormData(event.currentTarget);
 
 		if (sensorId !== undefined) {
-			const apiCall = clientApi(fetch).sensors().withId(sensorId).update(data);
+			const apiCall = clientApi().sensors().withId(sensorId).update(data);
 			if ((await apiCall.response()).ok) {
 				goto(`/sensor/${sensorId}`, {
 					invalidateAll: true
 				});
 			}
 		} else {
-			const apiCall = clientApi(fetch).sensors().create(data);
+			const apiCall = clientApi().sensors().create(data);
 			if ((await apiCall.response()).ok) {
 				const sensor = await apiCall.parse();
 				onSensorCreate?.(sensor);
@@ -152,7 +152,7 @@
 				'Soll der Sensor wirklich gelöscht werden? Dieser Prozess kann nicht rückgängig gemacht werden.'
 			)
 		) {
-			await clientApi(fetch).sensors().withId(sensorId).delete().response();
+			await clientApi().sensors().withId(sensorId).delete().response();
 			goto('/');
 		}
 	}

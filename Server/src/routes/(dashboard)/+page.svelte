@@ -17,6 +17,13 @@
 		);
 		return () => clearInterval(interval);
 	});
+
+	function gotoSensor() {
+		if (sensorLink.trim()) {
+			// TODO add sensor to local storage to show it in the list next time
+			goto(sensorLink.trim());
+		}
+	}
 </script>
 
 <div class="page-body">
@@ -46,13 +53,7 @@
 						placeholder="z.B. https://blumy.cloud/sensor/1234?token=1234567890abcdef"
 						autocomplete="off"
 					/>
-					<button
-						class="btn btn-primary"
-						type="button"
-						onclick={() => {
-							if (sensorLink.trim()) goto(sensorLink.trim());
-						}}
-					>
+					<button class="btn btn-primary" type="button" onclick={gotoSensor}>
 						Gehe zu Sensor
 					</button>
 				</div>

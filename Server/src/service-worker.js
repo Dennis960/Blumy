@@ -12,7 +12,7 @@ sw.addEventListener('push', (event) => {
 		sw.registration.showNotification(data.title, {
 			body: data.body,
 			icon: data.icon,
-			data: { url: data.data.url },
+			data: { url: data.data.url }
 		})
 	);
 });
@@ -22,7 +22,7 @@ sw.addEventListener('notificationclick', (event) => {
 	const url = event.notification.data?.url;
 	if (url) {
 		event.waitUntil(
-			sw.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+			sw.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
 				for (let client of windowClients) {
 					if (client.url === url && 'focus' in client) {
 						return client.focus();
