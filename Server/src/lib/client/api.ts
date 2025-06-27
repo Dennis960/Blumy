@@ -241,6 +241,28 @@ export function clientApi(_fetch: typeof fetch = fetch, baseUrl: string = '') {
 				}
 			};
 		},
+		sensorList: () => {
+			url.addPath('sensorList');
+			return {
+				withIdsAndTokens: (
+					sensors: {
+						id: number;
+						readToken: string;
+					}[]
+				) => {
+					return fetchWithInit<SensorDTO[]>(
+						{
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify(sensors)
+						},
+						(res) => res.json()
+					);
+				}
+			};
+		},
 		setupSensorOnLocalEsp: (writeToken: string, redirectUrl: string) => {
 			const originHttp = window.location.origin.replace('https', 'http');
 			const urlObj = new URL(redirectUrl);
