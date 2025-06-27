@@ -50,7 +50,7 @@
 			>
 				<span class="navbar-toggler-icon"></span>
 			</button>
-			<a class="navbar-brand ms-lg-0 ms-2 me-auto" href={$page.url.origin}
+			<a class="navbar-brand ms-lg-0 me-auto ms-2" href={$page.url.origin}
 				>Blumy Dashboard{env.PUBLIC_MODE === 'test' ? ' - Test' : ''}</a
 			>
 			<div class="navbar-collapse collapse" id="navbarNav">
@@ -91,8 +91,7 @@
 					{:else}
 						<li class="nav-item">
 							<div class="dropdown">
-								<a
-									href="#"
+								<div
 									class="nav-link dropdown-toggle cursor-pointer"
 									id="navbarAccountDropdown"
 									role="button"
@@ -101,7 +100,7 @@
 									data-testid="nav-bar-account"
 								>
 									<div>Account</div>
-								</a>
+								</div>
 								<div class="dropdown-menu" aria-labelledby="navbarAccountDropdown">
 									<a class="dropdown-item" href="/account" data-testid="nav-bar-account-settings">
 										Account settings
