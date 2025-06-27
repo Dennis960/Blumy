@@ -3,7 +3,7 @@
 
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { DATA_DEPENDENCY } from '$lib/api.js';
+	import { DATA_DEPENDENCY } from '$lib/client/api.js';
 	import SensorCapacityHistoryCard from '$lib/components/sensor-capacity-history-card.svelte';
 	import SensorDetailCard from '$lib/components/sensor-detail-card.svelte';
 	import { onMount } from 'svelte';

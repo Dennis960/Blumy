@@ -1,4 +1,4 @@
-import { DATA_DEPENDENCY } from '$lib/api';
+import { DATA_DEPENDENCY } from '$lib/client/api';
 import SensorController from '$lib/server/controllers/SensorController';
 import type { PageServerLoad } from './$types';
 

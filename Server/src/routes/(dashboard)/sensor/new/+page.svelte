@@ -1,15 +1,26 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import CopyText from '$lib/components/copy-text.svelte';
 	import SensorSettingsForm from '$lib/components/sensor-settings-form.svelte';
 	import type { SensorCreatedDTO } from '$lib/types/api';
 
 	let createdSensor: SensorCreatedDTO | undefined = $state();
+
+	function onSensorCreate(sensor: SensorCreatedDTO) {
+		goto(`/sensor/${sensor.id}`, {
+			invalidateAll: true
+		});
+	}
 </script>
 
 <div class="page-header">
 	<div class="container">
 		{#if createdSensor == undefined}
-			<SensorSettingsForm bind:createdSensor />
+			<SensorSettingsForm bind:createdSensor {onSensorCreate}>
+				{#snippet formActions()}
+					<a href={`/`} class="btn btn-link">Abbrechen</a>
+				{/snippet}
+			</SensorSettingsForm>
 		{:else}
 			<div class="row row-gap-3 align-items-center">
 				<div class="col-12">

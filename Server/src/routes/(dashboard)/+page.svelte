@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation';
-	import { DATA_DEPENDENCY } from '$lib/api.js';
+	import { DATA_DEPENDENCY } from '$lib/client/api.js';
 	import SensorCard from '$lib/components/sensor-card.svelte';
 	import { onMount } from 'svelte';
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { env } from '$env/dynamic/public';
-	import { checkSubscription, submitSubscription, submitUnsubscription } from '$lib/api';
+	import { clientApi } from '$lib/client/api';
 	import type { SensorDTO } from '$lib/types/api';
 	import { onMount } from 'svelte';
 
@@ -23,7 +23,11 @@
 				applicationServerKey: key
 			});
 		} else {
-			subscribed = await checkSubscription(sensor.id, subscription);
+			subscribed = await clientApi(fetch)
+				.sensors()
+				.withId(sensor.id)
+				.checkSubscription(subscription)
+				.parse();
 		}
 	});
 
@@ -32,11 +36,19 @@
 			return;
 		}
 		if (subscribed) {
-			if (await submitUnsubscription(sensor.id, subscription)) {
+			if (
+				await clientApi(fetch)
+					.sensors()
+					.withId(sensor.id)
+					.submitUnsubscription(subscription)
+					.parse()
+			) {
 				subscribed = false;
 			}
 		} else {
-			if (await submitSubscription(sensor.id, subscription)) {
+			if (
+				await clientApi(fetch).sensors().withId(sensor.id).submitSubscription(subscription).parse()
+			) {
 				subscribed = true;
 			}
 		}

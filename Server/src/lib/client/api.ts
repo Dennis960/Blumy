@@ -1,3 +1,11 @@
+import type { SensorCreatedDTO, SensorDTO } from '$lib/types/api';
+
+export enum DATA_DEPENDENCY {
+	SENSOR = 'SENSOR',
+	SENSOR_OVERVIEW = 'SENSOR_OVERVIEW',
+	SENSOR_VALUE_DISTRIBUTION = 'SENSOR_VALUE_DISTRIBUTION'
+}
+
 export class MyURL {
 	constructor(
 		public pathname: string,
@@ -150,6 +158,91 @@ export function clientApi(_fetch: typeof fetch, baseUrl: string = '') {
 					);
 				}
 			};
+		},
+		sensors: () => {
+			url.addPath('sensors');
+			return {
+				create: (config: FormData) => {
+					return fetchWithInit<SensorCreatedDTO>(
+						{
+							method: 'POST',
+							body: config
+						},
+						(res) => res.json()
+					);
+				},
+				withId: (id: number) => {
+					url.addPath(id.toString());
+					return {
+						update: (config: FormData) => {
+							url.addPath('settings');
+							return fetchWithInit<SensorDTO>(
+								{
+									method: 'PUT',
+									body: config
+								},
+								(res) => res.json()
+							);
+						},
+						delete: () => {
+							return fetchWithInit(
+								{
+									method: 'DELETE'
+								},
+								(res) => res.text()
+							);
+						},
+						checkSubscription: (subscription: PushSubscription) => {
+							url.addPath('check-subscription');
+							return fetchWithInit<boolean>(
+								{
+									method: 'POST',
+									headers: {
+										'Content-Type': 'application/json'
+									},
+									body: JSON.stringify(subscription)
+								},
+								(res) => res.json()
+							);
+						},
+						submitSubscription: (subscription: PushSubscription) => {
+							url.addPath('subscribe');
+							return fetchWithInit<boolean>(
+								{
+									method: 'POST',
+									headers: {
+										'Content-Type': 'application/json'
+									},
+									body: JSON.stringify(subscription)
+								},
+								(res) => res.json()
+							);
+						},
+						submitUnsubscription: (subscription: PushSubscription) => {
+							url.addPath('unsubscribe');
+							return fetchWithInit<boolean>(
+								{
+									method: 'POST',
+									headers: {
+										'Content-Type': 'application/json'
+									},
+									body: JSON.stringify(subscription)
+								},
+								(res) => res.json()
+							);
+						}
+					};
+				}
+			};
+		},
+		setupSensorOnLocalEsp: (writeToken: string, redirectUrl: string) => {
+			const originHttp = window.location.origin.replace('https', 'http');
+			const urlObj = new URL(redirectUrl);
+			const query = new URLSearchParams(urlObj.search);
+			query.set('token', writeToken);
+			query.set('blumyUrl', `${originHttp}/api/v2/data`);
+			urlObj.search = query.toString();
+			location.href = urlObj.toString();
 		}
 	};
 }

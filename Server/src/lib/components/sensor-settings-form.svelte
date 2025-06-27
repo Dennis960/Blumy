@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { applyAction, deserialize } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import { clientApi } from '$lib/client/api';
 	import WaterCapacityDistribution from '$lib/components/graphs/water-capacity-distribution.svelte';
 	import Slider, { type SliderOptions } from '$lib/components/slider.svelte';
 	import { funnyPlantNames } from '$lib/funny-plant-names';
@@ -9,7 +9,6 @@
 		SensorCreatedDTO,
 		SensorValueDistributionDTO
 	} from '$lib/types/api';
-	import type { ActionResult } from '@sveltejs/kit';
 	import { PipsMode } from 'nouislider';
 	import { onMount, type Snippet } from 'svelte';
 	import Base64Image from './base64-image.svelte';
@@ -23,8 +22,6 @@
 		writeToken = undefined,
 		shareLink = undefined,
 		createdSensor = $bindable(undefined),
-		formAction = '/sensor',
-		formMethod = 'POST',
 		formActions,
 		onSensorCreate
 	}: {
@@ -35,8 +32,6 @@
 		writeToken?: string;
 		shareLink?: string;
 		createdSensor?: SensorCreatedDTO;
-		formAction?: string;
-		formMethod?: 'POST' | 'PUT';
 		formActions?: Snippet;
 		onSensorCreate?: (sensor: SensorCreatedDTO) => void;
 	} = $props();
@@ -132,30 +127,32 @@
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
 
-		const response = await fetch(event.currentTarget.action, {
-			method: formMethod,
-			body: data
-		});
-
-		const result: ActionResult = deserialize(await response.text());
-
-		if (result.type === 'success' && result.data) {
-			createdSensor = result.data as SensorCreatedDTO;
-			onSensorCreate?.(createdSensor);
+		if (sensorId !== undefined) {
+			const apiCall = clientApi(fetch).sensors().withId(sensorId).update(data);
+			if ((await apiCall.response()).ok) {
+				goto(`/sensor/${sensorId}`, {
+					invalidateAll: true
+				});
+			}
+		} else {
+			const apiCall = clientApi(fetch).sensors().create(data);
+			if ((await apiCall.response()).ok) {
+				const sensor = await apiCall.parse();
+				onSensorCreate?.(sensor);
+			}
 		}
-
-		applyAction(result);
 	}
 
 	async function deleteSensor() {
+		if (!sensorId) {
+			return;
+		}
 		if (
 			window.confirm(
 				'Soll der Sensor wirklich gelöscht werden? Dieser Prozess kann nicht rückgängig gemacht werden.'
 			)
 		) {
-			await fetch(`/api/sensors/${sensorId}`, {
-				method: 'DELETE'
-			});
+			await clientApi(fetch).sensors().withId(sensorId).delete().response();
 			goto('/');
 		}
 	}
@@ -163,7 +160,7 @@
 
 <div class="row row-gap-3 align-items-center">
 	<div class="col-12">
-		<form action={formAction} method="POST" enctype="multipart/form-data" onsubmit={handleSubmit}>
+		<form onsubmit={handleSubmit}>
 			<section class="card">
 				<div class="card-header">
 					<h1 class="card-title">Sensor-Einstellungen</h1>
