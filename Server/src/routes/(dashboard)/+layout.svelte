@@ -6,7 +6,6 @@
 	import { clientApi } from '$lib/client/api.js';
 	import LoginButtonGoogle from '$lib/components/LoginButtonGoogle.svelte';
 	import { authenticationModalStore } from '$lib/components/modals/AuthenticateModal.svelte';
-	import ToastContainer from '$lib/components/ToastContainer.svelte';
 	// @ts-expect-error no declaration file
 	import { pwaInfo } from 'virtual:pwa-info';
 
@@ -38,9 +37,6 @@
 </svelte:head>
 
 <div class="page">
-	<div class="absolute right-6 top-6">
-		<ToastContainer />
-	</div>
 	<header class="navbar navbar-expand-sm d-print-none">
 		<div class="container-xl">
 			<button

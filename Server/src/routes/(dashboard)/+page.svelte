@@ -25,7 +25,7 @@
 			<div class="row row-deck row-cards">
 				{#each data.sensors as sensor (sensor.id)}
 					<div class="col-md-6 col-lg-4 col-12">
-						<SensorCard on:click={() => goto(`/sensor/${sensor.id}`)} {sensor} />
+						<SensorCard onclick={() => goto(`/sensor/${sensor.id}`)} {sensor} />
 					</div>
 				{/each}
 				<div class="col-12">

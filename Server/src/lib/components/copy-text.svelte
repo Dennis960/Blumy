@@ -7,7 +7,7 @@
 
 	let { label, value, hint }: Props = $props();
 
-	let tokenInput: HTMLInputElement = $state();
+	let tokenInput: HTMLInputElement = $state()!;
 	let copied = $state(false);
 
 	async function handleCopy() {

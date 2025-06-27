@@ -52,19 +52,15 @@
 	<div class="card-body">
 		<div class="datagrid">
 			{#if sensor?.lastUpdate == undefined}
-				<SensorStatusDatagridItem title="Sensor-Status" value="Keine Daten" critical>
+				<SensorStatusDatagridItem title="Sensor-Status" critical>
 					{#snippet icon()}
 						<IconAlertTriangle size={20} />
 					{/snippet}
+					Keine Daten
 				</SensorStatusDatagridItem>
 			{:else}
 				<SensorStatusDatagridItem
 					title="Wasserkapazität"
-					value={sensor.plantHealth.drowning
-						? '>100%'
-						: sensor.plantHealth.wilting
-							? '<0%'
-							: Math.round(sensor.lastUpdate.waterCapacity * 100) + '%'}
 					warning={sensor.plantHealth.overwatered || sensor.plantHealth.underwatered}
 					critical={sensor.plantHealth.drowning || sensor.plantHealth.wilting}
 				>
@@ -81,9 +77,7 @@
 							<IconDropletFilled2 size={20} />
 						{/if}
 					{/snippet}
-
-					<!-- @migration-task: migrate this slot by hand, `value` would shadow a prop on the parent component -->
-					<div slot="value" class="me-4 w-100">
+					<div class="w-100 me-4">
 						<WaterCapacityBar {sensor} />
 					</div>
 				</SensorStatusDatagridItem>
@@ -101,9 +95,7 @@
 								<IconBucketDroplet size={20} />
 							{/if}
 						{/snippet}
-						{#snippet value()}
-							<Time relative timestamp={sensor.prediction.nextWatering} />
-						{/snippet}
+						<Time relative timestamp={sensor.prediction.nextWatering} />
 					</SensorStatusDatagridItem>
 				{/if}
 
@@ -111,13 +103,6 @@
 
 				<SensorStatusDatagridItem
 					title="Sensor-Status"
-					value={sensor.sensorHealth.signalStrength == 'offline'
-						? 'Offline'
-						: sensor.sensorHealth.battery == 'low'
-							? 'Batterie schwach'
-							: sensor.sensorHealth.signalStrength == 'weak'
-								? 'Empfang schlecht'
-								: 'Ok'}
 					critical={sensor.sensorHealth.critical}
 					warning={sensor.sensorHealth.warning}
 				>
@@ -132,6 +117,15 @@
 							<IconWifi1 size={16} />
 						{/if}
 					{/snippet}
+					{#if sensor.sensorHealth.signalStrength == 'offline'}
+						Offline
+					{:else if sensor.sensorHealth.battery == 'low'}
+						Batterie schwach
+					{:else if sensor.sensorHealth.signalStrength == 'weak'}
+						Empfang schlecht
+					{:else}
+						Ok
+					{/if}
 				</SensorStatusDatagridItem>
 
 				<SensorStatusDatagridItem
@@ -141,14 +135,11 @@
 					{#snippet icon()}
 						<IconClock size={20} />
 					{/snippet}
-					{#snippet value()}
-						<Time relative timestamp={sensor.lastUpdate.timestamp} />
-					{/snippet}
+					<Time relative timestamp={sensor.lastUpdate.timestamp} />
 				</SensorStatusDatagridItem>
 
 				<SensorStatusDatagridItem
 					title="Batteriestatus"
-					value={Math.floor(100 * sensor.lastUpdate.batteryCapacity) + '%'}
 					warning={sensor.sensorHealth.battery == 'low'}
 					critical={sensor.sensorHealth.battery == 'empty'}
 				>
@@ -163,6 +154,7 @@
 							<IconBattery4 size={20} />
 						{/if}
 					{/snippet}
+					{Math.floor(100 * sensor.lastUpdate.batteryCapacity) + '%'}
 				</SensorStatusDatagridItem>
 			{/if}
 		</div>
