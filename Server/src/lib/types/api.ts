@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export interface SensorReadingDTO {
 	id: number;
+	firmwareVersion: number;
 	timestamp: Date;
 	moisture: number; // sensor units in range 0-1000
 	availableWaterCapacity: number; // sensor unit relative to field capacity

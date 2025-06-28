@@ -1,12 +1,13 @@
 import SensorController from '$lib/server/controllers/SensorController';
 import type { ESPSensorReadingDTO } from '$lib/server/entities/SensorReadingEntity';
 import SensorRepository from '$lib/server/repositories/SensorRepository';
+import FirmwareUpdateService from '$lib/server/services/FirmwareUpdateService';
 import { json, type RequestHandler } from '@sveltejs/kit';
 
 const dataController = new SensorController();
 
 export const POST = (async (event) => {
-	await event.locals.security.allowAll();
+	event.locals.security.allowAll();
 	const authorizationHeader = event.request.headers.get('Authorization');
 	if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
@@ -19,7 +20,19 @@ export const POST = (async (event) => {
 
 	const sensorReading = (await event.request.json()) as ESPSensorReadingDTO;
 	const data = await dataController.addSensorData(sensorId, sensorReading);
-	return json(data);
+	const latestVersion = FirmwareUpdateService.getLatestFirmwareVersion();
+	let statusCode = 200;
+	const isOldFirmwareVersionFormat = sensorReading.firmwareVersion > 1000000; // Old format used the time in milliseconds as firmware version, new format uses the github workflow run number
+	if (
+		isOldFirmwareVersionFormat ||
+		(latestVersion !== null && sensorReading.firmwareVersion < latestVersion)
+	) {
+		console.log(isOldFirmwareVersionFormat, latestVersion, sensorReading.firmwareVersion);
+		statusCode = 426; // Upgrade Required
+	}
+	return json(data, {
+		status: statusCode
+	});
 }) satisfies RequestHandler;
 
 export const GET = (async (event) => {
