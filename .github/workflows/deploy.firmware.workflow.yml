@@ -64,7 +64,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: Firmware/build/firmware-${{ github.run_number }}.bin
+          path: Firmware/build/firmware*.bin
 
   deploy-firmware:
     runs-on: ubuntu-latest
