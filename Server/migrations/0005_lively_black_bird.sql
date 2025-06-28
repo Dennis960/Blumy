@@ -1,0 +1,1 @@
+ALTER TABLE "data" DROP COLUMN "client_version";

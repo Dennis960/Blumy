@@ -62,7 +62,6 @@ export const sensors = pgTable('sensor', {
 
 export const sensorReadings = pgTable('data', {
 	id: serial('id').primaryKey(),
-	clientVersion: integer('client_version').notNull().default(1),
 	sensorAddress: integer('sensor_address')
 		.notNull()
 		.references(() => sensors.sensorAddress),

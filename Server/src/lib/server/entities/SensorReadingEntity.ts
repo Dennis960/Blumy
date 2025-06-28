@@ -3,6 +3,7 @@ import { z } from 'zod';
 import SensorEntity from './SensorEntity';
 
 export const espSensorReadingSchema = z.object({
+	firmwareVersion: z.number(),
 	light: z.number(),
 	voltage: z.number(),
 	temperature: z.number(),
@@ -22,7 +23,7 @@ export type ESPSensorReadingDTO = z.infer<typeof espSensorReadingSchema>;
 export default class SensorReadingEntity {
 	constructor(
 		public id: number,
-		public clientVersion: number,
+		public firmwareVersion: number,
 		public sensorAddress: number,
 		public date: Date,
 		public light: number,
@@ -42,6 +43,7 @@ export default class SensorReadingEntity {
 	public static toDTO(reading: SensorReadingEntity, sensor: SensorEntity): SensorReadingDTO {
 		return {
 			id: reading.id,
+			firmwareVersion: reading.firmwareVersion,
 			timestamp: new Date(reading.date),
 			moisture: reading.moisture,
 			availableWaterCapacity:

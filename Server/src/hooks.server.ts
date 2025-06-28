@@ -3,6 +3,7 @@ import { env as publicEnv } from '$env/dynamic/public';
 import { lucia } from '$lib/server/auth';
 import { db } from '$lib/server/db/worker';
 import { authenticated } from '$lib/server/security/authenticated';
+import FirmwareUpdateService from '$lib/server/services/FirmwareUpdateService';
 import NotificationService from '$lib/server/services/NotificationService';
 import { type Handle, type HandleServerError } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
@@ -21,10 +22,15 @@ if (publicEnv.PUBLIC_MODE === 'test-ci') {
 }
 
 webpush.setVapidDetails('mailto:' + privateEnv.VAPID_EMAIL, publicVapidKey, privateVapidKey);
+await FirmwareUpdateService.fetchAndSaveLatestFirmwareVersion();
 
 // send notifications every day at 8, 12, 16 and 20
 cron.schedule('0 8,12,16,20 * * *', async () => {
 	await NotificationService.triggerPushNotifications();
+});
+// check for firmware updates every day at 4
+cron.schedule('0 4 * * *', async () => {
+	await FirmwareUpdateService.fetchAndSaveLatestFirmwareVersion();
 });
 
 const luciaHandle: Handle = async ({ event, resolve }) => {

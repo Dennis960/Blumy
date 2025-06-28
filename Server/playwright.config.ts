@@ -7,6 +7,7 @@ const config: PlaywrightTestConfig = {
 		stdout: "pipe",
 		stderr: "pipe",
 	},
+	workers: 1,
 	testDir: 'tests',
 	testMatch: /(.+\.)?(test|spec)\.[jt]s/,
 	use: {

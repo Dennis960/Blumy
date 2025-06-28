@@ -193,7 +193,6 @@ export default class SensorController {
 
 	public async addSensorData(sensorAddress: number, data: ESPSensorReadingDTO) {
 		return await SensorDataRepository.create({
-			clientVersion: 2,
 			sensorAddress,
 			light: data.light,
 			voltage: data.voltage,
