@@ -52,16 +52,19 @@ jobs:
 
       - name: Build Firmware
         run: |
-          docker run --rm -v $PWD:/project -w /project/Firmware -u $UID -e HOME=/tmp espressif/idf idf.py build
+          docker run --rm -v $PWD:/project -w /project/Firmware -u $UID -e HOME=/tmp -e FIRMWARE_VERSION=${{ github.run_number }} espressif/idf idf.py build
 
       - name: Rename Firmware to firmware
         run: mv Firmware/build/Firmware.bin Firmware/build/firmware.bin
+
+      - name: Create a copy of the firmware with run number
+        run: cp Firmware/build/firmware.bin Firmware/build/firmware-${{ github.run_number }}.bin
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: Firmware/build/firmware.bin
+          path: Firmware/build/firmware-${{ github.run_number }}.bin
 
   deploy-firmware:
     runs-on: ubuntu-latest
@@ -82,7 +85,7 @@ jobs:
         uses: easingthemes/ssh-deploy@main
         with:
           SSH_PRIVATE_KEY: ${{ secrets.BLUMY_KEY }}
-          ARGS: "-rlgoDzvc -i"
+          ARGS: "-rlgoDztvc -i"
           SOURCE: "firmware"
           REMOTE_HOST: ${{ secrets.BLUMY_HOST }}
           REMOTE_USER: ${{ secrets.BLUMY_USER }}
