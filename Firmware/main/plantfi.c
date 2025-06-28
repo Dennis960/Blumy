@@ -17,6 +17,7 @@
 #include "plantstore.h"
 #include "defaults.h"
 #include "update.h"
+#include "plantmqtt.h"
 #include <esp_http_client.h>
 #include "esp_timer.h"
 #include <dhcpserver/dhcpserver.h>
@@ -543,7 +544,7 @@ int plantfi_get_http(char *url, char *authHeader)
 esp_mqtt_client_handle_t plantfi_init_mqtt_client()
 {
     char server[100];
-    int16_t port;
+    uint32_t port;
     char username[100];
     char password[100];
     char clientId[100];
@@ -616,50 +617,10 @@ bool plantfi_test_http_connection(char *sensorId, char *url, char *auth)
 
 void plantfi_send_sensor_data_mqtt(sensors_full_data_t *sensors_data, int8_t rssi)
 {
-    char sensorId[100];
-    char topic[100];
-
-    if (!plantstore_getCloudConfigurationMqtt(sensorId, NULL, 0, NULL, NULL, topic, NULL, sizeof(sensorId), 0, 0, 0, sizeof(topic), 0))
-    {
-        ESP_LOGE(PLANTFI_TAG, "No MQTT configuration found");
-        return;
-    }
-
-    char data[400];
-    plantfi_create_sensor_data_json(data, sensors_data, rssi, sensorId);
-
-    esp_mqtt_client_handle_t client = plantfi_init_mqtt_client();
-    if (client == NULL)
-    {
-        ESP_LOGE(PLANTFI_TAG, "Failed to initialize MQTT client");
-        return;
-    }
-    esp_mqtt_client_start(client);
-    esp_mqtt_client_publish(client, topic, data, strlen(data), 0, 0);
-    esp_mqtt_client_destroy(client);
+    plantmqtt_homeassistant_publish_sensor_data(sensors_data, rssi);
 }
 
-bool plantfi_test_mqtt_connection(char *sensorId, char *server, int16_t port, char *username, char *password, char *topic, char *clientId)
+bool plantfi_test_mqtt_connection(char *sensorId, char *server, uint32_t port, char *username, char *password, char *topic, char *clientId)
 {
-    esp_mqtt_client_config_t mqtt_cfg = {
-        .broker.address.uri = server,
-        .broker.address.port = port,
-        .credentials.username = username,
-        .credentials.authentication.password = password,
-        .credentials.client_id = clientId,
-    };
-
-    esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
-    if (client == NULL)
-    {
-        ESP_LOGE(PLANTFI_TAG, "Failed to initialize MQTT client");
-        return false;
-    }
-    if (esp_mqtt_client_start(client) != ESP_OK)
-    {
-        ESP_LOGE(PLANTFI_TAG, "Failed to start MQTT client");
-        return false;
-    }
-    esp_mqtt_client_destroy(client);
-    return true;
+    return plantmqtt_test_connection(sensorId, server, port, username, password, topic, clientId);
 }

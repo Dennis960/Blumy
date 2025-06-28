@@ -8,6 +8,7 @@
 #include "peripherals/sensors.h"
 #include "defaults.h"
 #include "update.h"
+#include "plantmqtt.h"
 
 #include "esp_https_ota.h"
 
@@ -173,9 +174,10 @@ esp_err_t post_api_cloudSetup_mqtt_handler(httpd_req_t *req)
         return ESP_FAIL;
     }
 
-    int16_t port = atoi(portString);
+    uint32_t port = atoi(portString);
 
     plantstore_setCloudConfigurationMqtt(sensorId, server, port, username, password, topic, clientId);
+    plantmqtt_homeassistant_create_sensor();
 
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
@@ -223,7 +225,7 @@ esp_err_t get_api_cloudSetup_mqtt_handler(httpd_req_t *req)
 {
     char sensorId[100];
     char server[100];
-    int16_t port;
+    uint32_t port;
     char username[100];
     char password[100];
     char topic[100];
@@ -236,6 +238,7 @@ esp_err_t get_api_cloudSetup_mqtt_handler(httpd_req_t *req)
     }
 
     cJSON *root = cJSON_CreateObject();
+    cJSON_AddStringToObject(root, "sensorId", sensorId);
     cJSON_AddStringToObject(root, "server", server);
     cJSON_AddNumberToObject(root, "port", port);
     cJSON_AddStringToObject(root, "username", username);
@@ -314,7 +317,7 @@ esp_err_t post_api_cloudTest_mqtt_handler(httpd_req_t *req)
         return ESP_FAIL;
     }
 
-    int16_t port = atoi(portString);
+    uint32_t port = atoi(portString);
 
     const bool connectionOk = plantfi_test_mqtt_connection(sensorId, server, port, username, password, topic, clientId);
     char resp[6];
@@ -464,6 +467,35 @@ esp_err_t post_api_timeouts_wdt_handler(httpd_req_t *req)
     sscanf(timoutString, "%llu", &timeout);
 
     plantstore_setWatchdogTimeoutMs(timeout);
+
+    const char resp[] = "OK";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+esp_err_t get_api_timeouts_mqtt_message_handler(httpd_req_t *req)
+{
+    uint64_t timeout = DEFAULT_MQTT_MESSAGE_TIMEOUT_MS;
+    plantstore_getMqttMessageTimeoutMs(&timeout);
+
+    char resp[15];
+    sprintf(resp, "%llu", timeout);
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+esp_err_t post_api_timeouts_mqtt_message_handler(httpd_req_t *req)
+{
+    char timoutString[10];
+    if (!get_single_value(req, timoutString, 10) || !is_number(timoutString))
+    {
+        return ESP_FAIL;
+    }
+
+    uint64_t timeout;
+    sscanf(timoutString, "%llu", &timeout);
+
+    plantstore_setMqttMessageTimeoutMs(timeout);
 
     const char resp[] = "OK";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
@@ -783,6 +815,18 @@ httpd_uri_t post_api_timeouts_wdt = {
     .handler = post_api_timeouts_wdt_handler,
     .user_ctx = NULL};
 
+httpd_uri_t get_api_timeouts_mqtt_message = {
+    .uri = "/api/timeouts/mqttMessage",
+    .method = HTTP_GET,
+    .handler = get_api_timeouts_mqtt_message_handler,
+    .user_ctx = NULL};
+
+httpd_uri_t post_api_timeouts_mqtt_message = {
+    .uri = "/api/timeouts/mqttMessage",
+    .method = HTTP_POST,
+    .handler = post_api_timeouts_mqtt_message_handler,
+    .user_ctx = NULL};
+
 httpd_uri_t post_api_led_brightness = {
     .uri = "/api/led/brightness",
     .method = HTTP_POST,
@@ -873,6 +917,8 @@ void register_uri_handlers(httpd_handle_t server)
     httpd_register_uri_handler(server, &post_api_timeouts_configurationMode);
     httpd_register_uri_handler(server, &get_api_timeouts_wdt);
     httpd_register_uri_handler(server, &post_api_timeouts_wdt);
+    httpd_register_uri_handler(server, &get_api_timeouts_mqtt_message);
+    httpd_register_uri_handler(server, &post_api_timeouts_mqtt_message);
     httpd_register_uri_handler(server, &post_api_led_brightness);
     httpd_register_uri_handler(server, &get_api_led_brightness);
     httpd_register_uri_handler(server, &get_api_update_percentage);
