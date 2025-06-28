@@ -63,4 +63,4 @@ bool plantfi_test_blumy_connection(char *token, char *url);
 void plantfi_send_sensor_data_http(sensors_full_data_t *sensors_data, int8_t rssi);
 bool plantfi_test_http_connection(char *sensorId, char *url, char *auth);
 void plantfi_send_sensor_data_mqtt(sensors_full_data_t *sensors_data, int8_t rssi);
-bool plantfi_test_mqtt_connection(char *sensorId, char *server, int16_t port, char *username, char *password, char *topic, char *clientId);
+bool plantfi_test_mqtt_connection(char *sensorId, char *server, uint32_t port, char *username, char *password, char *topic, char *clientId);

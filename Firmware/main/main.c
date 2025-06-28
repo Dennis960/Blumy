@@ -89,6 +89,7 @@ void configuration_mode(bool isConfigured)
     ESP_LOGI("MODE", "Starting webserver");
     httpd_handle_t webserver = start_webserver();
     plantfi_configureStaFromPlantstore();
+    sensors_setLedRedBrightness(0);
     sensors_blinkLedGreenAsync(0, 500, ledBrightness);
 
     while (1)
@@ -181,12 +182,14 @@ void sensor_mode()
 
 void app_main()
 {
+    ESP_LOGI("MAIN", "Starting Blumy firmware");
     // Reset button and inserting batteries is both ESP_RST_POWERON
     bool isManualReset = (esp_reset_reason() == ESP_RST_POWERON ||
                           esp_reset_reason() == ESP_RST_JTAG ||
                           esp_reset_reason() == ESP_RST_SDIO ||
                           esp_reset_reason() == ESP_RST_USB);
 
+    ESP_LOGI("MAIN", "Checking if plantstore is configured");
     bool isConfigured = plantstore_isConfigured();
 
     if (isManualReset || !isConfigured)

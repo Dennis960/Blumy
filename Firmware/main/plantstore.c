@@ -42,6 +42,7 @@ nvs_handle_t plantstore_openNvsReadWrite()
 
 bool plantstore_getWifiCredentials(char *ssid, char *password, size_t ssid_size, size_t password_size)
 {
+    ESP_LOGI("PLANTSTORE", "Getting WiFi credentials");
     nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
 
     esp_err_t ssid_err = nvs_get_str(nvs_handle, CREDENTIALS_SSID_KEY, ssid, &ssid_size);
@@ -63,6 +64,7 @@ void plantstore_setWifiCredentials(char *ssid, char *password)
 
 bool plantstore_getCloudConfigurationHttp(char *sensorId, char *url, char *auth, size_t sensorId_size, size_t url_size, size_t auth_size)
 {
+    ESP_LOGI("PLANTSTORE", "Getting HTTP cloud configuration");
     nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
 
     esp_err_t sensorId_err = nvs_get_str(nvs_handle, HTTP_SENSORID_KEY, sensorId, &sensorId_size);
@@ -87,20 +89,40 @@ void plantstore_setCloudConfigurationHttp(char *sensorId, char *url, char *auth)
 void plantstore_resetCloudConfigurationHttp()
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
-    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, HTTP_SENSORID_KEY));
-    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, HTTP_URL_KEY));
-    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, HTTP_AUTH_KEY));
-    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    bool erased = false;
+
+    if (nvs_get_str(nvs_handle, HTTP_SENSORID_KEY, NULL, NULL) == ESP_OK)
+    {
+        ESP_ERROR_CHECK(nvs_erase_key(nvs_handle, HTTP_SENSORID_KEY));
+        erased = true;
+    }
+    if (nvs_get_str(nvs_handle, HTTP_URL_KEY, NULL, NULL) == ESP_OK)
+    {
+        ESP_ERROR_CHECK(nvs_erase_key(nvs_handle, HTTP_URL_KEY));
+        erased = true;
+    }
+    if (nvs_get_str(nvs_handle, HTTP_AUTH_KEY, NULL, NULL) == ESP_OK)
+    {
+        ESP_ERROR_CHECK(nvs_erase_key(nvs_handle, HTTP_AUTH_KEY));
+        erased = true;
+    }
+
+    if (erased)
+    {
+        ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    }
     nvs_close(nvs_handle);
 }
 
-bool plantstore_getCloudConfigurationMqtt(char *sensorId, char *server, int16_t *port, char *username, char *password, char *topic, char *clientId, size_t sensorId_size, size_t server_size, size_t username_size, size_t password_size, size_t topic_size, size_t clientId_size)
+bool plantstore_getCloudConfigurationMqtt(char *sensorId, char *server, uint32_t *port, char *username, char *password, char *topic, char *clientId, size_t sensorId_size, size_t server_size, size_t username_size, size_t password_size, size_t topic_size, size_t clientId_size)
 {
+    ESP_LOGI("PLANTSTORE", "Getting MQTT cloud configuration");
     nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
 
     esp_err_t sensorId_err = nvs_get_str(nvs_handle, MQTT_SENSORID_KEY, sensorId, &sensorId_size);
     esp_err_t server_err = nvs_get_str(nvs_handle, MQTT_SERVER_KEY, server, &server_size);
-    esp_err_t port_err = nvs_get_i16(nvs_handle, MQTT_PORT_KEY, port);
+    uint32_t dummy_port;
+    esp_err_t port_err = nvs_get_u32(nvs_handle, MQTT_PORT_KEY, port ? port : &dummy_port);
     esp_err_t username_err = nvs_get_str(nvs_handle, MQTT_USERNAME_KEY, username, &username_size);
     esp_err_t password_err = nvs_get_str(nvs_handle, MQTT_PASSWORD_KEY, password, &password_size);
     esp_err_t topic_err = nvs_get_str(nvs_handle, MQTT_TOPIC_KEY, topic, &topic_size);
@@ -111,12 +133,12 @@ bool plantstore_getCloudConfigurationMqtt(char *sensorId, char *server, int16_t 
     return sensorId_err == ESP_OK && server_err == ESP_OK && port_err == ESP_OK && username_err == ESP_OK && password_err == ESP_OK && topic_err == ESP_OK && clientId_err == ESP_OK;
 }
 
-void plantstore_setCloudConfigurationMqtt(char *sensorId, char *server, int16_t port, char *username, char *password, char *topic, char *clientId)
+void plantstore_setCloudConfigurationMqtt(char *sensorId, char *server, uint32_t port, char *username, char *password, char *topic, char *clientId)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
     ESP_ERROR_CHECK(nvs_set_str(nvs_handle, MQTT_SENSORID_KEY, sensorId));
     ESP_ERROR_CHECK(nvs_set_str(nvs_handle, MQTT_SERVER_KEY, server));
-    ESP_ERROR_CHECK(nvs_set_i16(nvs_handle, MQTT_PORT_KEY, port));
+    ESP_ERROR_CHECK(nvs_set_u32(nvs_handle, MQTT_PORT_KEY, port));
     ESP_ERROR_CHECK(nvs_set_str(nvs_handle, MQTT_USERNAME_KEY, username));
     ESP_ERROR_CHECK(nvs_set_str(nvs_handle, MQTT_PASSWORD_KEY, password));
     ESP_ERROR_CHECK(nvs_set_str(nvs_handle, MQTT_TOPIC_KEY, topic));
@@ -128,19 +150,55 @@ void plantstore_setCloudConfigurationMqtt(char *sensorId, char *server, int16_t 
 void plantstore_resetCloudConfigurationMqtt()
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
-    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, MQTT_SENSORID_KEY));
-    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, MQTT_SERVER_KEY));
-    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, MQTT_PORT_KEY));
-    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, MQTT_USERNAME_KEY));
-    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, MQTT_PASSWORD_KEY));
-    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, MQTT_TOPIC_KEY));
-    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, MQTT_CLIENTID_KEY));
-    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    bool erased = false;
+
+    if (nvs_get_str(nvs_handle, MQTT_SENSORID_KEY, NULL, NULL) == ESP_OK)
+    {
+        ESP_ERROR_CHECK(nvs_erase_key(nvs_handle, MQTT_SENSORID_KEY));
+        erased = true;
+    }
+    if (nvs_get_str(nvs_handle, MQTT_SERVER_KEY, NULL, NULL) == ESP_OK)
+    {
+        ESP_ERROR_CHECK(nvs_erase_key(nvs_handle, MQTT_SERVER_KEY));
+        erased = true;
+    }
+    uint32_t dummy_port;
+    if (nvs_get_u32(nvs_handle, MQTT_PORT_KEY, &dummy_port) == ESP_OK)
+    {
+        ESP_ERROR_CHECK(nvs_erase_key(nvs_handle, MQTT_PORT_KEY));
+        erased = true;
+    }
+    if (nvs_get_str(nvs_handle, MQTT_USERNAME_KEY, NULL, NULL) == ESP_OK)
+    {
+        ESP_ERROR_CHECK(nvs_erase_key(nvs_handle, MQTT_USERNAME_KEY));
+        erased = true;
+    }
+    if (nvs_get_str(nvs_handle, MQTT_PASSWORD_KEY, NULL, NULL) == ESP_OK)
+    {
+        ESP_ERROR_CHECK(nvs_erase_key(nvs_handle, MQTT_PASSWORD_KEY));
+        erased = true;
+    }
+    if (nvs_get_str(nvs_handle, MQTT_TOPIC_KEY, NULL, NULL) == ESP_OK)
+    {
+        ESP_ERROR_CHECK(nvs_erase_key(nvs_handle, MQTT_TOPIC_KEY));
+        erased = true;
+    }
+    if (nvs_get_str(nvs_handle, MQTT_CLIENTID_KEY, NULL, NULL) == ESP_OK)
+    {
+        ESP_ERROR_CHECK(nvs_erase_key(nvs_handle, MQTT_CLIENTID_KEY));
+        erased = true;
+    }
+
+    if (erased)
+    {
+        ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    }
     nvs_close(nvs_handle);
 }
 
 bool plantstore_getCloudConfigurationBlumy(char *token, char *url, size_t token_size, size_t url_size)
 {
+    ESP_LOGI("PLANTSTORE", "Getting Blumy cloud configuration");
     nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
 
     esp_err_t token_err = nvs_get_str(nvs_handle, BLUMY_TOKEN_KEY, token, &token_size);
@@ -163,9 +221,23 @@ void plantstore_setCloudConfigurationBlumy(char *token, char *url)
 void plantstore_resetCloudConfigurationBlumy()
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
-    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, BLUMY_TOKEN_KEY));
-    ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_erase_key(nvs_handle, BLUMY_URL_KEY));
-    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    bool erased = false;
+
+    if (nvs_get_str(nvs_handle, BLUMY_TOKEN_KEY, NULL, NULL) == ESP_OK)
+    {
+        ESP_ERROR_CHECK(nvs_erase_key(nvs_handle, BLUMY_TOKEN_KEY));
+        erased = true;
+    }
+    if (nvs_get_str(nvs_handle, BLUMY_URL_KEY, NULL, NULL) == ESP_OK)
+    {
+        ESP_ERROR_CHECK(nvs_erase_key(nvs_handle, BLUMY_URL_KEY));
+        erased = true;
+    }
+
+    if (erased)
+    {
+        ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    }
     nvs_close(nvs_handle);
 }
 
@@ -216,6 +288,23 @@ void plantstore_setWatchdogTimeoutMs(uint64_t timeoutMs)
 {
     nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
     ESP_ERROR_CHECK(nvs_set_u64(nvs_handle, WATCHDOG_TIMEOUT_KEY, timeoutMs));
+    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+    nvs_close(nvs_handle);
+}
+
+bool plantstore_getMqttMessageTimeoutMs(uint64_t *timeoutMs)
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadOnly();
+    esp_err_t timeout_err = nvs_get_u64(nvs_handle, MQTT_MESSAGE_TIMEOUT_KEY, timeoutMs);
+    nvs_close(nvs_handle);
+
+    return timeout_err == ESP_OK;
+}
+
+void plantstore_setMqttMessageTimeoutMs(uint64_t timeoutMs)
+{
+    nvs_handle_t nvs_handle = plantstore_openNvsReadWrite();
+    ESP_ERROR_CHECK(nvs_set_u64(nvs_handle, MQTT_MESSAGE_TIMEOUT_KEY, timeoutMs));
     ESP_ERROR_CHECK(nvs_commit(nvs_handle));
     nvs_close(nvs_handle);
 }

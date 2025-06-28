@@ -21,6 +21,7 @@
 #define SENSOR_TIMEOUT_SLEEP_KEY "timeout_sleep"
 #define SENSOR_TIMEOUT_CONFIG_KEY "timeout_config"
 #define WATCHDOG_TIMEOUT_KEY "timeout_wdt"
+#define MQTT_MESSAGE_TIMEOUT_KEY "timeout_mqtt_msg"
 #define FIRMWARE_UPDATE_URL_KEY "update_url"
 #define LED_BRIGHTNESS_KEY "led_brightness"
 
@@ -29,8 +30,8 @@ void plantstore_setWifiCredentials(char *ssid, char *password);
 bool plantstore_getCloudConfigurationHttp(char *sensorId, char *url, char *auth, size_t sensorId_size, size_t url_size, size_t auth_size);
 void plantstore_setCloudConfigurationHttp(char *sensorId, char *url, char *auth);
 void plantstore_resetCloudConfigurationHttp();
-bool plantstore_getCloudConfigurationMqtt(char *sensorId, char *server, int16_t *port, char *username, char *password, char *topic, char *clientId, size_t sensorId_size, size_t server_size, size_t username_size, size_t password_size, size_t topic_size, size_t clientId_size);
-void plantstore_setCloudConfigurationMqtt(char *sensorId, char *server, int16_t port, char *username, char *password, char *topic, char *clientId);
+bool plantstore_getCloudConfigurationMqtt(char *sensorId, char *server, uint32_t *port, char *username, char *password, char *topic, char *clientId, size_t sensorId_size, size_t server_size, size_t username_size, size_t password_size, size_t topic_size, size_t clientId_size);
+void plantstore_setCloudConfigurationMqtt(char *sensorId, char *server, uint32_t port, char *username, char *password, char *topic, char *clientId);
 void plantstore_resetCloudConfigurationMqtt();
 bool plantstore_getCloudConfigurationBlumy(char *token, char *url, size_t token_size, size_t url_size);
 void plantstore_setCloudConfigurationBlumy(char *token, char *url);
@@ -41,6 +42,8 @@ bool plantstore_getConfigurationModeTimeoutMs(int32_t *timeoutMs);
 void plantstore_setConfigurationModeTimeoutMs(int32_t timeoutMs);
 bool plantstore_getWatchdogTimeoutMs(uint64_t *timeoutMs);
 void plantstore_setWatchdogTimeoutMs(uint64_t timeoutMs);
+bool plantstore_getMqttMessageTimeoutMs(uint64_t *timeoutMs);
+void plantstore_setMqttMessageTimeoutMs(uint64_t timeoutMs);
 void plantstore_setFirmwareUpdateUrl(char *url);
 bool plantstore_getFirmwareUpdateUrl(char *url, size_t url_size);
 bool plantstore_getLedBrightness(uint8_t *brightness);

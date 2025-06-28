@@ -134,7 +134,7 @@ export class CloudPage extends BasePage {
             (value) =>
                 value.open &&
                 value.configuration &&
-                Object.values(value.configuration).every((v) => !!v)
+                Object.values(value.configuration).some((v) => !!v)
         );
         if (this.configured) {
             this.errorText = "";
@@ -327,7 +327,7 @@ export class CloudPage extends BasePage {
                 />
             </collapsible-element>
             <collapsible-element
-                summary="MQTT"
+                summary="MQTT - Home Assistant"
                 ?open=${this.configurationStates["mqtt"].open}
                 @opened=${() => this.handleOpen("mqtt")}
                 @closed=${() => this.handleClose("mqtt")}
