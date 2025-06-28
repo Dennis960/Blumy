@@ -3,7 +3,7 @@ import { customElement } from "lit/decorators.js";
 import { BasePage } from "./base-page";
 
 @customElement("setup-finish-page")
-export class ResetPage extends BasePage {
+export class SetupFinishPage extends BasePage {
     render() {
         return html`
             <title-element>Fertig!</title-element>

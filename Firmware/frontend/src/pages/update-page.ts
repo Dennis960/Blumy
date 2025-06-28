@@ -96,6 +96,12 @@ export class UpdatePage extends BasePage {
         enableDotNavigation.state = true;
     }
 
+    onUrlChange() {
+        this.updateAvailable = false;
+        this.errorText = "";
+        this.successText = "";
+    }
+
     render() {
         return html`
             <title-element>Firmware aktualisieren</title-element>
@@ -104,12 +110,14 @@ export class UpdatePage extends BasePage {
                     id="url"
                     label="Update Url"
                     type="text"
+                    @input="${this.onUrlChange}"
                 ></input-element>
                 <progress-bar-element
                     progress="${this.firmwareUpdateProgress ?? 0}"
                 ></progress-bar-element>
             </input-element-grid>
             <text-element
+                .styleCustom="${{ marginBottom: "1rem" }}"
                 text="${this.errorText || this.successText || this.infoText}"
                 color="${this.errorText
                     ? "error"
@@ -118,18 +126,9 @@ export class UpdatePage extends BasePage {
                     : "warning"}"
             ></text-element>
             <button-nav-element>
-                <button-element
-                    name="Zurück"
-                    @click="${this.back}"
-                    ?secondary="${false}"
-                    ?disabled="${this.firmwareUpdateProgress !== null}"
-                ></button-element>
-                <button-element
-                    name="Überspringen"
-                    @click="${() => this.next()}"
-                    ?secondary="${true}"
-                    ?disabled="${this.firmwareUpdateProgress !== null}"
-                ></button-element>
+                <div>
+                    <!-- Empty div to put submit button on the right side -->
+                </div>
                 ${this.updateAvailable
                     ? html`
                           <button-element

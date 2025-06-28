@@ -62,16 +62,24 @@ export class DotsStepperElement extends LitElement {
 
     @property({ type: Number })
     numberOfDots: number;
-    @property({ type: Number })
-    currentDot: number;
+    @property({ type: String })
+    currentDot: string;
+
+    get currentDotNumber(): number | null {
+        const n = parseInt(this.currentDot, 10);
+        return isNaN(n) ? null : n;
+    }
 
     render() {
+        if (this.currentDotNumber === null) {
+            return null;
+        }
         return html`
             <ol>
                 ${Array.from({ length: this.numberOfDots }, (_, i) => {
                     return html`<dot-element
-                        ?active=${i === this.currentDot}
-                        ?done=${i < this.currentDot}
+                        ?active=${i === this.currentDotNumber}
+                        ?done=${i < this.currentDotNumber!}
                         @dotClicked="${() => {
                             this.dispatchEvent(
                                 new CustomEvent("dotClicked", {

@@ -42,7 +42,7 @@ export class HttpFormElement extends LitElement {
             <input-element-grid>
                 <input-element
                     id="sensorId"
-                    type="sensorId"
+                    type="text"
                     label="Sensor Id"
                     placeholder="z.B. sensor1"
                     @input=${this.handleChange}

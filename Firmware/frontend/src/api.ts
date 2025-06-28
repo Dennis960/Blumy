@@ -183,6 +183,24 @@ export async function getConfigurationModeTimeout() {
     return Number(await getDataFromEsp("/timeouts/configurationMode"));
 }
 
+export async function setMqttMessageTimeout(timeout: number) {
+    timeout = Math.round(timeout);
+    return await postDataToEsp("/timeouts/mqttMessage", timeout.toString());
+}
+
+export async function getMqttMessageTimeout() {
+    return Number(await getDataFromEsp("/timeouts/mqttMessage"));
+}
+
+export async function setWatchDogTimeout(timeout: number) {
+    timeout = Math.round(timeout);
+    return await postDataToEsp("/timeouts/wdt", timeout.toString());
+}
+
+export async function getWatchDogTimeout() {
+    return Number(await getDataFromEsp("/timeouts/wdt"));
+}
+
 export async function getUpdatePercentage() {
     return Number(
         await getDataFromEspWithoutLoadingState("/update/percentage")
@@ -209,4 +227,17 @@ export async function checkUpdateAvailable(url: string): Promise<boolean> {
     return await postDataToEsp("/update/check", { url }).then((res) =>
         res.json()
     );
+}
+
+export async function getFirmwareVersion(): Promise<number> {
+    return await getDataFromEsp("/firmware/version");
+}
+
+export async function getLedBrightness(): Promise<number> {
+    return await getDataFromEsp("/led/brightness");
+}
+
+export async function setLedBrightness(brightness: number) {
+    brightness = Math.round(brightness);
+    return await postDataToEsp("/led/brightness", brightness.toString());
 }

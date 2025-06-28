@@ -9,7 +9,7 @@ import "./pages/home-page";
 import "./pages/before-setup-finish-page";
 import "./pages/setup-finish-page";
 import "./pages/reset-page";
-import "./pages/timeout-page";
+import "./pages/settings-page";
 import "./pages/update-page";
 import "./pages/welcome-page";
 import "./pages/wifi-scanner-page";
@@ -60,7 +60,7 @@ export class FirstSetupScreen extends LitElement {
             @back="${this.back}"
         />`,
         update: html`<update-page @next="${this.next}" @back="${this.back}" />`,
-        settings: html`<timeout-page
+        settings: html`<settings-page
             @next="${this.next}"
             @back="${this.back}"
         />`,

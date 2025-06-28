@@ -104,42 +104,49 @@ export class HomePage extends BasePage {
                     name="Temperatur"
                     type="text"
                     label="Temperatur"
-                    readonly="true"
+                    ?readonly="${true}"
                 ></input-element>
                 <input-element
                     id="humidity"
                     name="Luftfeuchtigkeit"
                     type="text"
                     label="Luftfeuchtigkeit"
-                    readonly="true"
+                    ?readonly="${true}"
                 ></input-element>
+                <span
+                    style="grid-column: 1 / -1; color: var(--helper); font-size: 0.95em; margin-bottom: 0.75rem;"
+                >
+                    Temperatur und Luftfeuchtigkeit weichen aufrund der
+                    Eigenwärme des Mikrochips während der Konfiguration von
+                    tatsächlichen Werten ab.
+                </span>
                 <input-element
                     id="light"
                     name="Licht"
                     type="text"
                     label="Licht"
-                    readonly="true"
+                    ?readonly="${true}"
                 ></input-element>
                 <input-element
                     id="moisture"
                     name="Bodenfeuchtigkeit"
                     type="text"
                     label="Bodenfeuchtigkeit"
-                    readonly="true"
+                    ?readonly="${true}"
                 ></input-element>
                 <input-element
                     id="voltage"
                     name="Spannung"
                     type="text"
                     label="Spannung"
-                    readonly="true"
+                    ?readonly="${true}"
                 ></input-element>
                 <input-element
                     id="usb"
                     name="USB"
                     type="text"
                     label="USB"
-                    readonly="true"
+                    ?readonly="${true}"
                 ></input-element>
             </input-element-grid>
             <button-nav-element>

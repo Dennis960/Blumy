@@ -7,6 +7,7 @@ export class ColoredTextElement extends LitElement {
     @property({ type: String }) text!: string;
     @property({ type: String }) color: "success" | "error" | "warning" =
         "error";
+    @property({ type: Object }) styleCustom: Record<string, string> = {};
 
     render() {
         return html`
@@ -14,6 +15,7 @@ export class ColoredTextElement extends LitElement {
                 style="${styleMap({
                     display: this.text ? "block" : "none",
                     color: `var(--${this.color})`,
+                    ...this.styleCustom,
                 })}"
             >
                 ${this.text}

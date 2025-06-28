@@ -4,7 +4,7 @@ import { resetEsp } from "../api";
 import { BasePage } from "./base-page";
 
 @customElement("before-setup-finish-page")
-export class ResetPage extends BasePage {
+export class BeforeSetupFinishPage extends BasePage {
     @state() errorText: string = "";
 
     async reset() {
@@ -20,12 +20,11 @@ export class ResetPage extends BasePage {
     render() {
         return html`
             <title-element>Ende vom Setup</title-element>
-            <description-element
-                >Nach Abschluss der Konfiguration sendet der Sensor in
+            <description-element>
+                Nach Abschluss der Konfiguration sendet der Sensor in
                 regelmäßigen Abständen Daten an die konfigurierten Endpunkte.
-                Deine Verbindung zum Sensor wird automatisch
-                getrennt.</description-element
-            >
+                Deine Verbindung zum Sensor wird automatisch getrennt.
+            </description-element>
             <text-element text="${this.errorText}"></text-element>
             <button-nav-element>
                 <button-element
