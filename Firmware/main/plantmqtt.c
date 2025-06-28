@@ -177,20 +177,8 @@ static void publish_sensor_config(esp_mqtt_client_handle_t mqtt_client, const ch
     }
 }
 
-esp_mqtt_client_handle_t plantmqtt_mqtt_init(char *sensorId, size_t sensorId_size)
+esp_mqtt_client_handle_t plantmqtt_mqtt_init(char *sensorId, size_t sensorId_size, const char *server, uint32_t port, const char *username, const char *password, const char *clientId)
 {
-    ESP_LOGI("Plantmqtt", "Initializing Plantmqtt MQTT");
-    char server[100];
-    uint32_t port;
-    char username[100];
-    char password[100];
-    char clientId[100];
-    if (!plantstore_getCloudConfigurationMqtt(sensorId, server, &port, username, password, NULL, clientId, sensorId_size, sizeof(server), sizeof(username), sizeof(password), 0, sizeof(clientId)))
-    {
-        ESP_LOGI("Plantmqtt", "No MQTT configuration found");
-        return NULL;
-    }
-
     const esp_mqtt_client_config_t mqtt_cfg = {
         .broker.address.uri = server,
         .broker.address.port = port,
@@ -223,10 +211,26 @@ esp_mqtt_client_handle_t plantmqtt_mqtt_init(char *sensorId, size_t sensorId_siz
     return mqtt_client;
 }
 
+esp_mqtt_client_handle_t plantmqtt_mqtt_init_from_plantstore(char *sensorId, size_t sensorId_size)
+{
+    ESP_LOGI("Plantmqtt", "Initializing Plantmqtt MQTT");
+    char server[100];
+    uint32_t port;
+    char username[100];
+    char password[100];
+    char clientId[100];
+    if (!plantstore_getCloudConfigurationMqtt(sensorId, server, &port, username, password, NULL, clientId, sensorId_size, sizeof(server), sizeof(username), sizeof(password), 0, sizeof(clientId)))
+    {
+        ESP_LOGI("Plantmqtt", "No MQTT configuration found");
+        return NULL;
+    }
+    return plantmqtt_mqtt_init(sensorId, sensorId_size, server, port, username, password, clientId);
+}
+
 void plantmqtt_homeassistant_create_sensor(void)
 {
     char sensorId[100];
-    esp_mqtt_client_handle_t mqtt_client = plantmqtt_mqtt_init(sensorId, 100);
+    esp_mqtt_client_handle_t mqtt_client = plantmqtt_mqtt_init_from_plantstore(sensorId, 100);
     if (mqtt_client == NULL)
     {
         ESP_LOGE("Plantmqtt", "MQTT client not initialized, cannot create sensor");
@@ -245,7 +249,7 @@ void plantmqtt_homeassistant_create_sensor(void)
 void plantmqtt_homeassistant_publish_sensor_data(const sensors_full_data_t *sensors_data, int16_t rssi)
 {
     char sensorId[100];
-    esp_mqtt_client_handle_t mqtt_client = plantmqtt_mqtt_init(sensorId, 100);
+    esp_mqtt_client_handle_t mqtt_client = plantmqtt_mqtt_init_from_plantstore(sensorId, 100);
     if (mqtt_client == NULL)
     {
         ESP_LOGE("Plantmqtt", "MQTT client not initialized, cannot publish sensor data");
@@ -283,7 +287,7 @@ void plantmqtt_homeassistant_publish_sensor_data(const sensors_full_data_t *sens
 bool plantmqtt_test_connection(char *sensorId, char *server, uint32_t port, char *username, char *password, char *topic, char *clientId)
 {
     ESP_LOGI("Plantmqtt", "Testing MQTT connection");
-    esp_mqtt_client_handle_t mqtt_client = plantmqtt_mqtt_init(sensorId, 100);
+    esp_mqtt_client_handle_t mqtt_client = plantmqtt_mqtt_init(sensorId, 100, server, port, username, password, clientId);
     if (mqtt_client == NULL)
     {
         ESP_LOGE("Plantmqtt", "MQTT client not initialized");
