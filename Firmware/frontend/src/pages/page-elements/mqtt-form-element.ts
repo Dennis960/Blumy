@@ -60,18 +60,21 @@ export class MqttFormElement extends LitElement {
                     id="sensorId"
                     type="sensorId"
                     label="Sensor Id"
+                    placeholder="z.B. sensor1234"
                     @input=${this.handleChange}
                 ></input-element>
                 <input-element
                     id="server"
                     type="text"
-                    label="Server"
+                    label="Server URL"
+                    placeholder="z.B. mqtt://192.168.2.1"
                     @input=${this.handleChange}
                 ></input-element>
                 <input-element
                     id="port"
                     type="number"
                     label="Port"
+                    placeholder="z.B. 1883"
                     @input=${this.handleChange}
                 ></input-element>
                 <input-element
@@ -90,8 +93,15 @@ export class MqttFormElement extends LitElement {
                     id="topic"
                     type="text"
                     label="Topic"
+                    placeholder="z.B. blumy_%s_state"
                     @input=${this.handleChange}
                 ></input-element>
+                <div
+                    style="grid-column: 1 / -1; color: #888; font-size: 0.9em; margin-bottom: 4px;"
+                >
+                    Hinweis: Verwende <code>%s</code> als Platzhalter für die
+                    Sensor Id.
+                </div>
                 <input-element
                     id="client-id"
                     type="text"

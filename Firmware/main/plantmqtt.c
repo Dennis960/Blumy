@@ -131,7 +131,7 @@ static void publish_sensor_config(esp_mqtt_client_handle_t mqtt_client, const ch
         snprintf(payload, sizeof(payload),
                  "{"
                  "\"name\":\"%s\","
-                 "\"state_topic\":\"blumy_%s_state\","
+                 "\"state_topic\":\"blumy_%s_state\"," // TODO use the configured topic with a templating mechanism
                  "\"unit_of_measurement\":\"%s\","
                  "\"device_class\":\"%s\","
                  "\"value_template\":\"{{ value_json.%s }}\","

@@ -44,18 +44,21 @@ export class HttpFormElement extends LitElement {
                     id="sensorId"
                     type="sensorId"
                     label="Sensor Id"
+                    placeholder="z.B. sensor1"
                     @input=${this.handleChange}
                 ></input-element>
                 <input-element
                     id="url"
                     type="url"
                     label="Webhook-URL"
+                    placeholder="z.B. https://example.com/data"
                     @input=${this.handleChange}
                 ></input-element>
                 <input-element
                     id="auth"
                     type="text"
                     label="Auth Header"
+                    placeholder="z.B. Bearer my_token"
                     @input=${this.handleChange}
                 ></input-element>
             </input-element-grid>

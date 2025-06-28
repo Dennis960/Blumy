@@ -40,12 +40,14 @@ export class CloudFormElement extends LitElement {
                     id="token"
                     type="text"
                     label="Zugangsschlüssel"
+                    placeholder="z.B. blumy_1234567890"
                     @input=${this.handleChange}
                 ></input-element>
                 <input-element
                     id="url"
                     type="text"
                     label="Endpunkt Url"
+                    placeholder="http://blumy.cloud/api/v2/data"
                     @input=${this.handleChange}
                 ></input-element>
             </input-element-grid>

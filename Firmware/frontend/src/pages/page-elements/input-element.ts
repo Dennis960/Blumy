@@ -24,6 +24,7 @@ export class InputElement extends LitElement {
         `,
     ];
     @property({ type: String }) label!: string;
+    @property({ type: String }) placeholder: string = "";
     @property({ type: String }) type?:
         | "button"
         | "checkbox"
@@ -66,6 +67,7 @@ export class InputElement extends LitElement {
                 <input
                     id="input"
                     type="${this.type}"
+                    placeholder="${this.placeholder}"
                     ?readonly="${this.readonly}"
                 />
                 <slot></slot>
