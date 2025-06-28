@@ -90,7 +90,11 @@ export class HeaderElement extends LitElement {
     render() {
         return html`
             <header>
-                <div class="title">
+                <div
+                    class="title"
+                    style="cursor: pointer;"
+                    @click="${() => (window.location.href = "/")}"
+                >
                     <span>${this.icon}</span>
                     <span>${this.title}</span>
                 </div>
@@ -98,6 +102,7 @@ export class HeaderElement extends LitElement {
             </header>
             <nav class="${this.menuOpen ? "show" : ""}">
                 <a href="/">Setup</a>
+                <a href="?page=settings">Einstellungen</a>
                 <a href="?page=update">Update</a>
                 <a href="?page=sensor">Sensorwerte</a>
                 <a href="?page=reset">Zurücksetzen</a>

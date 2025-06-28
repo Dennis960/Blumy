@@ -58,7 +58,7 @@ export class MqttFormElement extends LitElement {
             <input-element-grid>
                 <input-element
                     id="sensorId"
-                    type="sensorId"
+                    type="text"
                     label="Sensor Id"
                     placeholder="z.B. sensor1234"
                     @input=${this.handleChange}
@@ -97,7 +97,7 @@ export class MqttFormElement extends LitElement {
                     @input=${this.handleChange}
                 ></input-element>
                 <div
-                    style="grid-column: 1 / -1; color: #888; font-size: 0.9em; margin-bottom: 4px;"
+                    style="grid-column: 1 / -1; color: var(--helper); font-size: 0.9em; margin-bottom: 4px;"
                 >
                     Hinweis: Verwende <code>%s</code> als Platzhalter für die
                     Sensor Id.

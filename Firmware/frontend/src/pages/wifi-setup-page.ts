@@ -5,7 +5,6 @@ import {
     connectToNetwork,
     getConnectedNetwork,
     isConnected,
-    Network,
     WifiStatus,
 } from "../api";
 import { loadingState, networkState } from "../states";
@@ -112,7 +111,7 @@ export class WifiSetupPage extends BasePage {
                     id="ssid"
                     type="text"
                     label="SSID"
-                    initialValue="${networkState.state?.network?.ssid}"
+                    initialValue="${networkState.state?.network?.ssid ?? ""}"
                 ></input-element>
                 <input-element
                     id="password"

@@ -16,6 +16,9 @@ export class InputElement extends LitElement {
                 font-size: 100%;
                 width: 100%;
             }
+            input:read-only {
+                border: none;
+            }
             div {
                 display: flex;
                 flex-direction: row;
@@ -23,9 +26,10 @@ export class InputElement extends LitElement {
             }
         `,
     ];
+
     @property({ type: String }) label!: string;
     @property({ type: String }) placeholder: string = "";
-    @property({ type: String }) type?:
+    @property({ type: String }) type:
         | "button"
         | "checkbox"
         | "color"
@@ -49,7 +53,7 @@ export class InputElement extends LitElement {
         | "url"
         | "week" = "text";
     @property() initialValue: any;
-    @property() readonly!: boolean;
+    @property({ type: Boolean }) readonly!: boolean;
 
     @query("#input")
     input!: HTMLInputElement;

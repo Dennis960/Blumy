@@ -4,9 +4,15 @@ import { BasePage } from "./base-page";
 import { factoryResetEsp } from "../api";
 
 @customElement("reset-page")
-export class HomePage extends BasePage {
+export class ResetPage extends BasePage {
     async factoryReset() {
-        await factoryResetEsp();
+        if (
+            window.confirm(
+                "Bist du sicher, dass du den Sensor auf Werkseinstellungen zurücksetzen möchtest?"
+            )
+        ) {
+            await factoryResetEsp();
+        }
     }
 
     static styles = css`
