@@ -30,7 +30,7 @@ export default class NotificationService {
 				.withId(sensor.sensorAddress)
 				.getImage(sensor.readToken).url,
 			data: {
-				url: `/sensor/${sensor.sensorAddress}?token=${sensor.readToken}`
+				url: `/dashboard/sensor/${sensor.sensorAddress}?token=${sensor.readToken}`
 			}
 		});
 

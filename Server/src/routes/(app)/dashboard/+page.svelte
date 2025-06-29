@@ -3,6 +3,7 @@
 	import { DATA_DEPENDENCY } from '$lib/client/api.js';
 	import { SensorStorage } from '$lib/client/sensor-storage.js';
 	import SensorCard from '$lib/components/sensor-card.svelte';
+	import { route } from '$lib/ROUTES.js';
 	import type { SensorDTO } from '$lib/types/api.js';
 	import { onMount } from 'svelte';
 
@@ -41,18 +42,25 @@
 		<div class="row row-deck row-cards">
 			{#each data.sensors as sensor (sensor.id)}
 				<div class="col-md-6 col-lg-4 col-12">
-					<SensorCard onclick={() => goto(`/sensor/${sensor.id}`)} {sensor} />
+					<SensorCard
+						onclick={() =>
+							goto(route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }))}
+						{sensor}
+					/>
 				</div>
 			{/each}
 
 			{#if filteredStoredSensors.length > 0}
-				<div class="col-12 mt-4 mb-2">
+				<div class="col-12 mb-2 mt-4">
 					<h2>Geteilte Sensoren</h2>
 				</div>
 				{#each filteredStoredSensors as sensor (sensor.id)}
 					<div class="col-md-6 col-lg-4 col-12">
 						<SensorCard
-							onclick={() => goto(`/sensor/${sensor.id}?token=${sensor.readToken}`)}
+							onclick={() =>
+								goto(
+									`${route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() })}?token=${sensor.readToken}`
+								)}
 							{sensor}
 						/>
 					</div>
@@ -62,7 +70,9 @@
 			{#if data.authenticated}
 				<div class="col-12">
 					<div class="d-flex justify-content-end column-gap-2 w-full">
-						<a href="sensor/new" class="btn btn-primary">Neuen Sensor einrichten</a>
+						<a href={route('/dashboard/sensor/new')} class="btn btn-primary">
+							Neuen Sensor einrichten
+						</a>
 					</div>
 				</div>
 			{/if}

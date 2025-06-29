@@ -2,12 +2,13 @@
 	import { goto } from '$app/navigation';
 	import CopyText from '$lib/components/copy-text.svelte';
 	import SensorSettingsForm from '$lib/components/sensor-settings-form.svelte';
+	import { route } from '$lib/ROUTES';
 	import type { SensorCreatedDTO } from '$lib/types/api';
 
 	let createdSensor: SensorCreatedDTO | undefined = $state();
 
 	function onSensorCreate(sensor: SensorCreatedDTO) {
-		goto(`/sensor/${sensor.id}`, {
+		goto(route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }), {
 			invalidateAll: true
 		});
 	}
@@ -18,7 +19,7 @@
 		{#if createdSensor == undefined}
 			<SensorSettingsForm bind:createdSensor {onSensorCreate}>
 				{#snippet formActions()}
-					<a href={`/`} class="btn btn-link">Abbrechen</a>
+					<a href={route(`/`)} class="btn btn-link">Abbrechen</a>
 				{/snippet}
 			</SensorSettingsForm>
 		{:else}
@@ -41,7 +42,12 @@
 						</div>
 						<div class="card-footer text-end">
 							<div class="d-flex justify-content-end column-gap-2">
-								<a href={`/sensor/${createdSensor.id}`} class="btn btn-primary">Fertig</a>
+								<a
+									href={route(`/dashboard/sensor/[id=sensorId]`, {
+										id: createdSensor.id.toString()
+									})}
+									class="btn btn-primary">Fertig</a
+								>
 							</div>
 						</div>
 					</div>

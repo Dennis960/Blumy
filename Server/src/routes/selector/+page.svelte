@@ -6,6 +6,7 @@
 	import { authenticationModalStore } from '$lib/components/modals/AuthenticateModal.svelte';
 	import SensorSelectionCard from '$lib/components/sensor-selection-card.svelte';
 	import { IconPlus } from '$lib/icons.js';
+	import { currentSp, route } from '$lib/ROUTES.js';
 	import type { SensorDTO } from '$lib/types/api.js';
 
 	let { data } = $props();
@@ -24,7 +25,7 @@
 	}
 
 	async function createNewSensor() {
-		await goto('/selector/sensor/new?' + page.url.searchParams.toString());
+		await goto(route('/selector/sensor/new') + `?${page.url.searchParams.toString()}`);
 	}
 </script>
 

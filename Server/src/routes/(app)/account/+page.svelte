@@ -40,7 +40,11 @@
 	}
 
 	async function deleteAccount() {
-		if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+		if (
+			confirm(
+				'Bist du sicher, dass du dein Konto löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.'
+			)
+		) {
 			const deleteApiCall = clientApi().currentAccount().delete();
 			const deleteResponse = await deleteApiCall.response();
 			if (deleteResponse.ok) {
@@ -53,23 +57,23 @@
 <div class="container mt-4" style="max-width: 600px;">
 	<div class="row mb-4">
 		<div class="col">
-			<h4>Account Settings</h4>
+			<h4>Kontoeinstellungen</h4>
 		</div>
 	</div>
 
 	<div class="row align-items-center mb-3">
-		<label for="email" class="col-form-label col-12">Email</label>
+		<label for="email" class="col-form-label col-12">E-Mail</label>
 		<div class="position-relative col-8">
 			<input
 				type="text"
 				id="email"
-				placeholder="Email"
+				placeholder="E-Mail"
 				bind:value={email}
 				data-testid="account-settings-email"
 				class="form-control"
 				disabled={!data.user.isDefaultLogin}
 			/>
-			<span class="position-absolute translate-middle-y end-0 top-50 me-2">
+			<span class="position-absolute translate-middle-y top-50 end-0 me-2">
 				{#if emailUpdateStatus === 'updating'}
 					<IconLoader2 class="text-muted" size={20} />
 				{:else if emailUpdateStatus === 'success'}
@@ -87,7 +91,7 @@
 					disabled={email === data.user.email}
 					data-testid="account-settings-change-email"
 				>
-					Change Email
+					E-Mail ändern
 				</button>
 			</div>
 		{/if}
@@ -96,22 +100,22 @@
 	{#if data.user.isDefaultLogin}
 		<div class="row mb-3">
 			<div class="col-6">
-				<label for="current-password" class="form-label">Current Password</label>
+				<label for="current-password" class="form-label">Aktuelles Passwort</label>
 				<input
 					type="password"
 					id="current-password"
-					placeholder="Current Password"
+					placeholder="Aktuelles Passwort"
 					bind:value={currentPassword}
 					data-testid="account-settings-current-password"
 					class="form-control"
 				/>
 			</div>
 			<div class="col-6">
-				<label for="new-password" class="form-label">New Password</label>
+				<label for="new-password" class="form-label">Neues Passwort</label>
 				<input
 					type="password"
 					id="new-password"
-					placeholder="New Password"
+					placeholder="Neues Passwort"
 					bind:value={newPassword}
 					data-testid="account-settings-new-password"
 					class="form-control"
@@ -120,7 +124,7 @@
 		</div>
 		<div class="row align-items-center mb-3">
 			<div class="position-relative col-8">
-				<span class="position-absolute translate-middle-y end-0 top-50 me-2">
+				<span class="position-absolute translate-middle-y top-50 end-0 me-2">
 					{#if passwordUpdateStatus === 'updating'}
 						<IconLoader2 class="text-muted" size={20} />
 					{:else if passwordUpdateStatus === 'success'}
@@ -137,7 +141,7 @@
 					disabled={currentPassword === '' || newPassword === ''}
 					data-testid="account-settings-change-password"
 				>
-					Change Password
+					Passwort ändern
 				</button>
 			</div>
 		</div>
@@ -145,7 +149,8 @@
 		<div class="row mb-3">
 			<div class="col">
 				<p class="text-muted">
-					You are logged in with a third-party provider. You cannot change your email or password.
+					Du bist mit einem Drittanbieter angemeldet. Du kannst deine E-Mail oder dein Passwort
+					nicht ändern.
 				</p>
 			</div>
 		</div>
@@ -154,12 +159,12 @@
 	<hr class="my-4" />
 	<div class="row mb-3">
 		<div class="col">
-			<h4>Danger Zone</h4>
+			<h4>Gefahrenzone</h4>
 		</div>
 	</div>
 	<div class="row">
 		<div class="col">
-			<button class="btn btn-danger w-100" onclick={deleteAccount}> Delete Account </button>
+			<button class="btn btn-danger w-100" onclick={deleteAccount}> Konto löschen </button>
 		</div>
 	</div>
 </div>

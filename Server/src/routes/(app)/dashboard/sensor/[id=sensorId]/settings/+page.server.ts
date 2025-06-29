@@ -12,7 +12,7 @@ export const load: PageServerLoad = async function ({ depends, params, parent, l
 	const sensor = (await parent()).sensor;
 	const shareLink =
 		sensor.readToken != undefined
-			? `${url.origin}/sensor/${id}?token=${sensor.readToken}`
+			? `${url.origin}/dashboard/sensor/${id}?token=${sensor.readToken}`
 			: undefined;
 
 	return {

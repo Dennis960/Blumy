@@ -13,6 +13,7 @@
 	import { onMount, type Snippet } from 'svelte';
 	import Base64Image from './base64-image.svelte';
 	import CopyText from './copy-text.svelte';
+	import { route } from '$lib/ROUTES';
 
 	let {
 		sensorId = undefined,
@@ -130,7 +131,7 @@
 		if (sensorId !== undefined) {
 			const apiCall = clientApi().sensors().withId(sensorId).update(data);
 			if ((await apiCall.response()).ok) {
-				goto(`/sensor/${sensorId}`, {
+				goto(route('/dashboard/sensor/[id=sensorId]', { id: sensorId.toString() }), {
 					invalidateAll: true
 				});
 			}
@@ -153,7 +154,7 @@
 			)
 		) {
 			await clientApi().sensors().withId(sensorId).delete().response();
-			goto('/');
+			goto(route('/'));
 		}
 	}
 </script>

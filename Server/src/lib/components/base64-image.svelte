@@ -6,10 +6,10 @@
 	interface Props {
 		imageBase64?: string | undefined;
 		style?: string | undefined;
-		[key: string]: any;
+		class?: string | undefined;
 	}
 
-	let { imageBase64 = undefined, style = undefined, ...rest }: Props = $props();
+	let { imageBase64 = undefined, style = undefined, class: clazz }: Props = $props();
 	const emptyImage =
 		'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAOElEQVR42mNkAAIAAAoAAv/lxKUAAAAASUVORK5CYII=';
 	let image: HTMLImageElement | undefined = $state();
@@ -28,4 +28,4 @@
 	});
 </script>
 
-<span {...rest} style="background-image: url({imageUrl}); {style ?? ''}"></span>
+<span class={clazz} style="background-image: url({imageUrl}); {style ?? ''}"></span>
