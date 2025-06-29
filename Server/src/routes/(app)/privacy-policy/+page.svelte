@@ -30,11 +30,17 @@
 				können Sie möglicherweise einige Teile unseres Service nicht nutzen.
 			</p>
 
-			<!-- <h2 class="h4 mt-4">Plausible</h2>
-            <p>Plausible verwendet keine Cookies und ist vollständig konform mit DSGVO, CCPA und PECR.</p>
-            <p>
-                Wir verwenden ein Tool namens "Plausible", um Informationen über die Nutzung dieser Website zu sammeln. Plausible sammelt Informationen wie die Häufigkeit der Besuche dieser Website und welche Seiten bei diesen Besuchen aufgerufen werden. Wir verwenden die von Plausible erhaltenen Informationen nur zur Verbesserung dieser Website. Plausible sammelt nur die Ihnen am Tag Ihres Besuchs zugewiesene IP-Adresse, nicht jedoch Ihren Namen oder andere identifizierende Informationen. Wir kombinieren die durch Plausible gesammelten Informationen nicht mit personenbezogenen Daten.
-            </p> -->
+			<h2 class="h4 mt-4">Plausible</h2>
+			<p>Plausible verwendet keine Cookies und ist vollständig konform mit DSGVO, CCPA und PECR.</p>
+			<p>
+				Wir verwenden ein Tool namens "Plausible", um Informationen über die Nutzung dieser Website
+				zu sammeln. Plausible sammelt Informationen wie die Häufigkeit der Besuche dieser Website
+				und welche Seiten bei diesen Besuchen aufgerufen werden. Wir verwenden die von Plausible
+				erhaltenen Informationen nur zur Verbesserung dieser Website. Plausible sammelt nur die
+				Ihnen am Tag Ihres Besuchs zugewiesene IP-Adresse, nicht jedoch Ihren Namen oder andere
+				identifizierende Informationen. Wir kombinieren die durch Plausible gesammelten
+				Informationen nicht mit personenbezogenen Daten.
+			</p>
 
 			<!-- <h2 class="h4 mt-4">Stripe</h2>
             <p>
