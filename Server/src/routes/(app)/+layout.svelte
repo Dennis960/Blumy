@@ -46,7 +46,6 @@
 			</button>
 
 			<div class="navbar-collapse collapse" id="mainNavbar">
-				<!-- Left Navigation -->
 				<ul class="navbar-nav mb-lg-0 gap-lg-3 mb-2 me-auto">
 					<li class="nav-item">
 						<a class="nav-link" href={route('/dashboard')}>Dashboard</a>
@@ -59,7 +58,6 @@
 					</li>
 				</ul>
 
-				<!-- Right Authentication -->
 				<ul class="navbar-nav mb-lg-0 gap-lg-3 mb-2 ms-auto">
 					{#if !data.authenticated}
 						<li class="nav-item">
@@ -150,6 +148,16 @@
 				data-testid="footer-privacy-policy-link"
 			>
 				Datenschutzerklärung
+			</a>
+			<span class="mx-2">|</span>
+			<a
+				href="https://github.com/Dennis960/Blumy"
+				class="text-muted"
+				target="_blank"
+				rel="noopener noreferrer"
+				data-testid="footer-github-link"
+			>
+				GitHub
 			</a>
 		</div>
 	</footer>
