@@ -18,6 +18,7 @@
 		IconWifi2,
 		IconWifiOff
 	} from '$lib/icons';
+	import { route } from '$lib/ROUTES';
 	import type { SensorDTO } from '$lib/types/api';
 	import Base64Image from './base64-image.svelte';
 	import NotificationToggle from './notification-toggle.svelte';
@@ -77,7 +78,7 @@
 							<IconDropletFilled2 size={20} />
 						{/if}
 					{/snippet}
-					<div class="w-100 me-4">
+					<div class="me-4 w-100">
 						<WaterCapacityBar {sensor} />
 					</div>
 				</SensorStatusDatagridItem>
@@ -161,7 +162,10 @@
 	</div>
 	<div class="card-footer">
 		<div class="d-flex justify-content-end">
-			<a class="btn" href={`/sensor/${sensor.id}/settings`}>
+			<a
+				class="btn"
+				href={route('/dashboard/sensor/[id=sensorId]/settings', { id: sensor.id.toString() })}
+			>
 				<IconSettings />
 				<span class="ms-2">Einstellungen</span>
 			</a>

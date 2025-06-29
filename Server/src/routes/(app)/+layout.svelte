@@ -1,17 +1,12 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
-	// TODO remove all vendors except litepicker
-	import { page } from '$app/stores';
 	import { env } from '$env/dynamic/public';
 	import { clientApi } from '$lib/client/api.js';
 	import LoginButtonGoogle from '$lib/components/LoginButtonGoogle.svelte';
 	import { authenticationModalStore } from '$lib/components/modals/AuthenticateModal.svelte';
-	// @ts-expect-error no declaration file
-	import { pwaInfo } from 'virtual:pwa-info';
+	import { route } from '$lib/ROUTES.js';
 
 	let { data, children } = $props();
-
-	let webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : '');
 
 	async function logout() {
 		await clientApi().auth().logout().response();
@@ -31,11 +26,6 @@
 	}
 </script>
 
-<svelte:head>
-	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-	{@html webManifestLink}
-</svelte:head>
-
 <div class="page">
 	<header class="navbar navbar-expand-sm d-print-none">
 		<div class="container-xl">
@@ -50,15 +40,19 @@
 			>
 				<span class="navbar-toggler-icon"></span>
 			</button>
-			<a class="navbar-brand ms-lg-0 ms-2 me-auto" href={$page.url.origin}
-				>Blumy Dashboard{env.PUBLIC_MODE === 'test' ? ' - Test' : ''}</a
-			>
+			<a class="navbar-brand ms-lg-0 me-auto ms-2" href={route('/')}>
+				Blumy{env.PUBLIC_MODE === 'test' ? ' - Test' : ''}
+			</a>
 			<div class="navbar-collapse collapse" id="navbarNav">
-				<ul class="navbar-nav me-auto gap-3">
+				<ul class="navbar-nav me-auto ms-4 gap-3">
 					<li class="nav-item">
-						<a class="nav-link {$page.url.pathname == `/` ? 'active' : ''}" href={$page.url.origin}>
-							Sensoren
-						</a>
+						<a class="nav-link}" href={route('/dashboard')}>Dashboard</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link}" href={route('/tutorials/getting-started')}>Erste Schritte</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link}" href={route('/shop')}>Shop</a>
 					</li>
 				</ul>
 				<ul class="navbar-nav ms-auto gap-4">
@@ -101,14 +95,18 @@
 									aria-expanded="false"
 									data-testid="nav-bar-account"
 								>
-									<div>Account</div>
+									<div>Konto</div>
 								</div>
 								<div
 									class="dropdown-menu dropdown-menu-end"
 									aria-labelledby="navbarAccountDropdown"
 								>
-									<a class="dropdown-item" href="/account" data-testid="nav-bar-account-settings">
-										Account settings
+									<a
+										class="dropdown-item"
+										href={route('/account')}
+										data-testid="nav-bar-account-settings"
+									>
+										Kontoeinstellungen
 									</a>
 									<div class="dropdown-divider"></div>
 									<button
@@ -117,7 +115,7 @@
 										onclick={logout}
 										data-testid="nav-bar-logout"
 									>
-										Logout
+										Abmelden
 									</button>
 								</div>
 							</div>
@@ -130,4 +128,23 @@
 	<div class="page-wrapper">
 		{@render children?.()}
 	</div>
+	<footer class="footer bg-light border-top mt-auto py-3">
+		<div class="container-xl text-center">
+			<span class="text-muted">
+				&copy; {new Date().getFullYear()} Blumy. Alle Rechte vorbehalten.
+			</span>
+			<span class="mx-2">|</span>
+			<a href={route('/impressum')} class="text-muted" data-testid="footer-impressum-link">
+				Impressum
+			</a>
+			<span class="mx-2">|</span>
+			<a
+				href={route('/privacy-policy')}
+				class="text-muted"
+				data-testid="footer-privacy-policy-link"
+			>
+				Datenschutzerklärung
+			</a>
+		</div>
+	</footer>
 </div>

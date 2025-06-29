@@ -9,6 +9,7 @@
 		IconWifi2,
 		IconWifiOff
 	} from '$lib/icons';
+	import { route } from '$lib/ROUTES';
 	import type { SensorDTO, SensorHistoryDTO } from '$lib/types/api';
 	import Base64Image from './base64-image.svelte';
 	import SensorSparkline from './graphs/sensor-sparkline.svelte';
@@ -33,7 +34,7 @@
 	);
 </script>
 
-<tr onclick={() => goto(`/sensor/${sensor.id}`)}>
+<tr onclick={() => goto(route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }))}>
 	<th class="w-1">
 		<Base64Image class="avatar avatar-xs" imageBase64={sensor.config.imageBase64} />
 	</th>
@@ -96,7 +97,7 @@
 	</td>
 
 	<td class="text-end">
-		<a href="/sensor/{sensor.id}">Details</a>
+		<a href={route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() })}>Details</a>
 	</td>
 </tr>
 

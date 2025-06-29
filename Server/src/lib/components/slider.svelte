@@ -10,7 +10,6 @@
 		options: Options;
 		values: (string | number)[];
 		change: (values: (string | number)[]) => void;
-		[key: string]: any;
 	}
 
 	let { options, values = $bindable(), change, ...rest }: Props = $props();

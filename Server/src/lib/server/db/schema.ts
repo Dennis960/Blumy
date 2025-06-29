@@ -62,6 +62,7 @@ export const sensors = pgTable('sensor', {
 
 export const sensorReadings = pgTable('data', {
 	id: serial('id').primaryKey(),
+	firmwareVersion: integer('firmware_version').notNull().default(0),
 	sensorAddress: integer('sensor_address')
 		.notNull()
 		.references(() => sensors.sensorAddress),
@@ -99,4 +100,16 @@ export const subscriptions = pgTable('subscription', {
 	endpoint: text('endpoint').notNull(),
 	keysP256dh: text('keys_p256dh').notNull(),
 	keysAuth: text('keys_auth').notNull()
+});
+
+/**
+ * Waitlist table for users who want to be notified when the product is available.
+ */
+export const waitlist = pgTable('waitlist', {
+	id: serial('id').primaryKey(),
+	email: text('email').notNull().unique(),
+	createdAt: timestamp('created_at', {
+		withTimezone: true,
+		mode: 'date'
+	}).defaultNow()
 });

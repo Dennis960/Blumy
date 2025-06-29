@@ -263,6 +263,23 @@ export function clientApi(_fetch: typeof fetch = fetch, baseUrl: string = '') {
 				}
 			};
 		},
+		waitingList: () => {
+			url.addPath('waitingList');
+			return {
+				join: (email: string) => {
+					return fetchWithInit(
+						{
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify({ email })
+						},
+						(res) => res.text()
+					);
+				}
+			};
+		},
 		setupSensorOnLocalEsp: (writeToken: string, redirectUrl: string) => {
 			const originHttp = window.location.origin.replace('https', 'http');
 			const urlObj = new URL(redirectUrl);

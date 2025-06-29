@@ -10,7 +10,6 @@
 	interface Props {
 		timestamp: Date | string;
 		relative?: boolean;
-		[key: string]: any;
 	}
 
 	let { timestamp = new Date(), relative = false, ...rest }: Props = $props();

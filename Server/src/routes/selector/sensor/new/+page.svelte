@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { clientApi } from '$lib/client/api';
 	import SensorSettingsForm from '$lib/components/sensor-settings-form.svelte';
+	import { route } from '$lib/ROUTES';
 	import type { SensorCreatedDTO } from '$lib/types/api';
 
 	let createdSensor: SensorCreatedDTO | undefined = $state();
@@ -33,7 +34,7 @@
 						<button
 							type="button"
 							class="btn btn-link"
-							onclick={() => goto(`/selector?${page.url.searchParams.toString()}`)}
+							onclick={() => goto(route('/selector') + `?${page.url.searchParams.toString()}`)}
 						>
 							Abbrechen
 						</button>

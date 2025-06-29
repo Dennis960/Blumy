@@ -12,7 +12,7 @@ export default class SensorEntity {
 		public permanentWiltingPoint: number,
 		public lowerThreshold: number, // relative to fieldCapacity
 		public upperThreshold: number,
-		public owner: string,
+		public owner: string | null,
 		public writeToken: string,
 		public readToken: string
 	) {}

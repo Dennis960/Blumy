@@ -1,11 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { clientApi } from '$lib/client/api';
-	interface Props {
-		[key: string]: any;
-	}
 
-	let { ...rest }: Props = $props();
+	let { ...rest } = $props();
 
 	async function googleLogin() {
 		const queryRedirectUrl =
