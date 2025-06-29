@@ -27,35 +27,40 @@
 </script>
 
 <div class="page">
-	<header class="navbar navbar-expand-sm d-print-none">
+	<header class="navbar navbar-expand-lg navbar-light border-bottom d-print-none bg-white">
 		<div class="container-xl">
+			<a class="navbar-brand me-4" href={route('/')}>
+				Blumy{env.PUBLIC_MODE === 'test' ? ' - Test' : ''}
+			</a>
+
 			<button
 				class="navbar-toggler"
 				type="button"
 				data-bs-toggle="collapse"
-				data-bs-target="#navbarNav"
-				aria-controls="navbarNav"
+				data-bs-target="#mainNavbar"
+				aria-controls="mainNavbar"
 				aria-expanded="false"
 				aria-label="Toggle navigation"
 			>
 				<span class="navbar-toggler-icon"></span>
 			</button>
-			<a class="navbar-brand ms-lg-0 me-auto ms-2" href={route('/')}>
-				Blumy{env.PUBLIC_MODE === 'test' ? ' - Test' : ''}
-			</a>
-			<div class="navbar-collapse collapse" id="navbarNav">
-				<ul class="navbar-nav me-auto ms-4 gap-3">
+
+			<div class="navbar-collapse collapse" id="mainNavbar">
+				<!-- Left Navigation -->
+				<ul class="navbar-nav mb-lg-0 gap-lg-3 mb-2 me-auto">
 					<li class="nav-item">
-						<a class="nav-link}" href={route('/dashboard')}>Dashboard</a>
+						<a class="nav-link" href={route('/dashboard')}>Dashboard</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link}" href={route('/tutorials/getting-started')}>Erste Schritte</a>
+						<a class="nav-link" href={route('/tutorials/getting-started')}>Erste Schritte</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link}" href={route('/shop')}>Shop</a>
+						<a class="nav-link" href={route('/shop')}>Shop</a>
 					</li>
 				</ul>
-				<ul class="navbar-nav ms-auto gap-4">
+
+				<!-- Right Authentication -->
+				<ul class="navbar-nav mb-lg-0 gap-lg-3 mb-2 ms-auto">
 					{#if !data.authenticated}
 						<li class="nav-item">
 							<button
@@ -85,22 +90,19 @@
 							<LoginButtonGoogle />
 						</li>
 					{:else}
-						<li class="nav-item">
-							<div class="dropdown">
-								<div
-									class="nav-link dropdown-toggle cursor-pointer"
-									id="navbarAccountDropdown"
-									role="button"
-									data-bs-toggle="dropdown"
-									aria-expanded="false"
-									data-testid="nav-bar-account"
-								>
-									<div>Konto</div>
-								</div>
-								<div
-									class="dropdown-menu dropdown-menu-end"
-									aria-labelledby="navbarAccountDropdown"
-								>
+						<li class="nav-item dropdown">
+							<a
+								class="nav-link dropdown-toggle"
+								id="navbarAccountDropdown"
+								role="button"
+								data-bs-toggle="dropdown"
+								aria-expanded="false"
+								data-testid="nav-bar-account"
+							>
+								Konto
+							</a>
+							<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarAccountDropdown">
+								<li>
 									<a
 										class="dropdown-item"
 										href={route('/account')}
@@ -108,7 +110,9 @@
 									>
 										Kontoeinstellungen
 									</a>
-									<div class="dropdown-divider"></div>
+								</li>
+								<li><hr class="dropdown-divider" /></li>
+								<li>
 									<button
 										type="button"
 										class="dropdown-item"
@@ -117,17 +121,19 @@
 									>
 										Abmelden
 									</button>
-								</div>
-							</div>
+								</li>
+							</ul>
 						</li>
 					{/if}
 				</ul>
 			</div>
 		</div>
 	</header>
+
 	<div class="page-wrapper">
 		{@render children?.()}
 	</div>
+
 	<footer class="footer bg-light border-top mt-auto py-3">
 		<div class="container-xl text-center">
 			<span class="text-muted">
