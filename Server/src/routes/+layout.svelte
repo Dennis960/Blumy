@@ -7,6 +7,7 @@
 	import '@tabler/core/dist/css/tabler.css';
 	import { onMount } from 'svelte';
 	// @ts-expect-error no declaration file
+	import Plausible from '$lib/components/tracking/Plausible.svelte';
 	import { pwaInfo } from 'virtual:pwa-info';
 
 	let webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : '');
@@ -25,6 +26,7 @@
 	<meta name="theme-color" content="#2E7D32" />
 </svelte:head>
 
+<Plausible enabled={true} />
 <AuthenticateModal />
 
 {@render children()}

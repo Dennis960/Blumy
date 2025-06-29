@@ -61,7 +61,7 @@
 									<li>🌡️ Messung von Temperatur und Luftfeuchtigkeit</li>
 									<li>💡 Lichtintensitätsmessung</li>
 									<li>📱 Benachrichtigungen auf dein Handy</li>
-									<li>🏡 Smart-Home-Integration mit Home Assistant</li>
+									<li><strong>🏡 Smart-Home-Integration mit Home Assistant</strong></li>
 								</ul>
 							</div>
 						</div>
