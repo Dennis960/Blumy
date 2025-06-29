@@ -122,9 +122,11 @@
 						<h3 class="card-title mb-3 text-center">Produktdetails & Komponenten</h3>
 						<ul class="list-group list-group-flush">
 							{#each components as comp}
-								<li class="list-group-item d-flex justify-content-between align-items-center">
-									<span>{comp.name}</span>
-									<span class="text-muted">{comp.detail}</span>
+								<li
+									class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-1"
+								>
+									<span class="fw-semibold">{comp.name}</span>
+									<span class="text-muted small text-md-end">{comp.detail}</span>
 								</li>
 							{/each}
 						</ul>
