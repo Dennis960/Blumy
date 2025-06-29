@@ -28,9 +28,10 @@
 
 	interface Props {
 		sensor: SensorDTO;
+		isOwner?: boolean;
 	}
 
-	let { sensor }: Props = $props();
+	let { sensor, isOwner = false }: Props = $props();
 
 	let waterToday = $derived(
 		sensor.prediction != undefined &&
@@ -78,7 +79,7 @@
 							<IconDropletFilled2 size={20} />
 						{/if}
 					{/snippet}
-					<div class="me-4 w-100">
+					<div class="w-100 me-4">
 						<WaterCapacityBar {sensor} />
 					</div>
 				</SensorStatusDatagridItem>
@@ -160,15 +161,17 @@
 			{/if}
 		</div>
 	</div>
-	<div class="card-footer">
-		<div class="d-flex justify-content-end">
-			<a
-				class="btn"
-				href={route('/dashboard/sensor/[id=sensorId]/settings', { id: sensor.id.toString() })}
-			>
-				<IconSettings />
-				<span class="ms-2">Einstellungen</span>
-			</a>
+	{#if isOwner}
+		<div class="card-footer">
+			<div class="d-flex justify-content-end">
+				<a
+					class="btn"
+					href={route('/dashboard/sensor/[id=sensorId]/settings', { id: sensor.id.toString() })}
+				>
+					<IconSettings />
+					<span class="ms-2">Einstellungen</span>
+				</a>
+			</div>
 		</div>
-	</div>
+	{/if}
 </section>

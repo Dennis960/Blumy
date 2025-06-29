@@ -41,7 +41,7 @@
 		<div class="row row-cards row-deck">
 			<div class="col-md-5 col-lg-4 col-12">
 				{#if data.sensor != undefined}
-					<SensorDetailCard sensor={data.sensor} />
+					<SensorDetailCard sensor={data.sensor} isOwner={!data.accessThroughReadToken} />
 				{/if}
 			</div>
 
