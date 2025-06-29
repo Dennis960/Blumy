@@ -27,7 +27,6 @@ export const POST = (async (event) => {
 		isOldFirmwareVersionFormat ||
 		(latestVersion !== null && sensorReading.firmwareVersion < latestVersion)
 	) {
-		console.log(isOldFirmwareVersionFormat, latestVersion, sensorReading.firmwareVersion);
 		statusCode = 426; // Upgrade Required
 	}
 	return json(data, {
