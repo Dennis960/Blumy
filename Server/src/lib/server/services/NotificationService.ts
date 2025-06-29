@@ -5,6 +5,7 @@ import SubscriptionRepository from '../repositories/SubscriptionRepository';
 import SensorService from './SensorService';
 import { clientApi } from '$lib/client/api';
 import { env } from '$env/dynamic/private';
+import { route } from '$lib/ROUTES';
 
 export default class NotificationService {
 	public static async triggerPushNotifications(): Promise<void> {
@@ -30,7 +31,9 @@ export default class NotificationService {
 				.withId(sensor.sensorAddress)
 				.getImage(sensor.readToken).url,
 			data: {
-				url: `/dashboard/sensor/${sensor.sensorAddress}?token=${sensor.readToken}`
+				url:
+					route('/dashboard/sensor/[id=sensorId]', { id: sensor.sensorAddress.toString() }) +
+					`?token=${sensor.readToken}`
 			}
 		});
 
