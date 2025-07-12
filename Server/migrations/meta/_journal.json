@@ -57,6 +57,13 @@
       "when": 1751191048183,
       "tag": "0007_curly_midnight",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1752349647666,
+      "tag": "0008_silly_talisman",
+      "breakpoints": true
     }
   ]
 }

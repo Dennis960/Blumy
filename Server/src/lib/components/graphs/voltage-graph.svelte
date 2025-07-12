@@ -1,4 +1,12 @@
 <script lang="ts">
+	import {
+		BATTERY_EMPTY_THRESHOLD,
+		BATTERY_LOW_THRESHOLD,
+		MAX_BATTERY_VOLTAGE,
+		MAX_VOLTAGE_GRAPH,
+		MIN_BATTERY_VOLTAGE,
+		MIN_VOLTAGE_GRAPH
+	} from '$lib/client/config';
 	import type { SensorHistoryDTO } from '$lib/types/api';
 	import Apexchart, { type ChartOptions } from './apexchart.svelte';
 
@@ -51,24 +59,24 @@
 				type: 'datetime'
 			},
 			yaxis: {
-				min: (min) => Math.min(min, 2.0),
-				max: (max) => Math.max(max, 3.1)
+				min: (min) => Math.min(min, MIN_BATTERY_VOLTAGE),
+				max: (max) => Math.max(max, MAX_BATTERY_VOLTAGE)
 			},
 			annotations: {
 				yaxis: [
 					{
-						y: 2.7,
-						y2: 3.1,
+						y: BATTERY_LOW_THRESHOLD,
+						y2: MAX_VOLTAGE_GRAPH,
 						fillColor: 'var(--tblr-green)'
 					},
 					{
-						y: 2.5,
-						y2: 2.7,
+						y: BATTERY_EMPTY_THRESHOLD,
+						y2: BATTERY_LOW_THRESHOLD,
 						fillColor: 'var(--tblr-warning)'
 					},
 					{
-						y: 2.1,
-						y2: 2.5,
+						y: MIN_VOLTAGE_GRAPH,
+						y2: BATTERY_EMPTY_THRESHOLD,
 						fillColor: 'var(--tblr-danger)'
 					}
 				]

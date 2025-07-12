@@ -7,6 +7,10 @@ interface Sensor {
 
 const STORAGE_KEY = 'sensors';
 
+/**
+ * SensorStorage is a utility class for managing sensor data in local storage.
+ * It allows adding, removing, and retrieving sensors that are not owned by the current user but can be accessed via read tokens.
+ */
 export class SensorStorage {
 	static getSensors(): Sensor[] {
 		if (typeof localStorage === 'undefined') return [];

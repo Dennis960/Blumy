@@ -317,12 +317,6 @@ float sensors_readVoltage()
     return voltage * (r1 + r2) / (float)r2 / (float)1000;
 }
 
-bool sensors_isUsbConnected()
-{
-    ESP_LOGI("SENSORS", "Checking if USB is connected");
-    return gpio_get_level(POWER_USB_VIN);
-}
-
 aht20_dev_handle_t aht_handle = NULL;
 
 void configureI2cBus(int sda, int scl)
@@ -498,9 +492,6 @@ void sensors_initSensors()
 
     // Set digital input pins
     io_conf.mode = GPIO_MODE_INPUT;
-    io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
-    io_conf.pin_bit_mask = (1ULL << POWER_USB_VIN);
-    ESP_ERROR_CHECK(gpio_config(&io_conf));
     io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
     io_conf.pin_bit_mask |= (1ULL << BOOT_BUTTON);
     ESP_ERROR_CHECK(gpio_config(&io_conf));
@@ -537,7 +528,6 @@ void sensors_full_read(sensors_full_data_t *data)
     data->humidity = aht_data.humidity;
     data->temperature_raw = aht_data.temperature_raw;
     data->humidity_raw = aht_data.humidity_raw;
-    data->is_usb_connected = sensors_isUsbConnected();
     sensors_moisture_sensor_output_t moisture_sensor_output;
     data->moisture_measurement_successful = sensors_read_moisture(&moisture_sensor_output);
     data->moisture_measurement = moisture_sensor_output.measurement;

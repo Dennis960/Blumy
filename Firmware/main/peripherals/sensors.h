@@ -22,7 +22,6 @@ typedef struct
     float voltage;
     float temperature;
     float humidity;
-    bool is_usb_connected;
     int moisture_measurement;
     unsigned long moisture_stabilization_time;
     bool moisture_measurement_successful;
@@ -74,7 +73,6 @@ void sensors_blinkLedYellowAsync(int times, int duration_ms, uint8_t brightness)
  */
 float sensors_readLightPercentage();
 float sensors_readVoltage();
-bool sensors_isUsbConnected();
 void sensors_aht_read_data(sensors_aht_data_t *data);
 bool sensors_read_moisture(sensors_moisture_sensor_output_t *output);
 /**

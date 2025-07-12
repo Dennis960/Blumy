@@ -450,14 +450,13 @@ void plantfi_create_sensor_data_json(char *data, sensors_full_data_t *sensors_da
     const uint64_t firmware_version = FIRMWARE_VERSION;
     if (sensorId != NULL)
     {
-        sprintf(data, "{\"firmwareVersion\":\"%llu\",\"sensorId\":\"%s\",\"light\":%2.2f,\"voltage\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f,\"isUsbConnected\":%s,\"moisture\":%d,\"moistureStabilizationTime\":%lu,\"isMoistureMeasurementSuccessful\":%s,\"humidityRaw\":%lu,\"temperatureRaw\":%lu,\"rssi\":%d,\"duration\":%lld}",
+        sprintf(data, "{\"firmwareVersion\":\"%llu\",\"sensorId\":\"%s\",\"light\":%2.2f,\"voltage\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f,\"moisture\":%d,\"moistureStabilizationTime\":%lu,\"isMoistureMeasurementSuccessful\":%s,\"humidityRaw\":%lu,\"temperatureRaw\":%lu,\"rssi\":%d,\"duration\":%lld}",
                 firmware_version,
                 sensorId,
                 sensors_data->light,
                 sensors_data->voltage,
                 sensors_data->temperature,
                 sensors_data->humidity,
-                sensors_data->is_usb_connected ? "true" : "false",
                 sensors_data->moisture_measurement,
                 sensors_data->moisture_stabilization_time,
                 sensors_data->moisture_measurement_successful ? "true" : "false",
@@ -468,13 +467,12 @@ void plantfi_create_sensor_data_json(char *data, sensors_full_data_t *sensors_da
     }
     else
     {
-        sprintf(data, "{\"firmwareVersion\":\"%llu\",\"light\":%2.2f,\"voltage\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f,\"isUsbConnected\":%s,\"moisture\":%d,\"moistureStabilizationTime\":%lu,\"isMoistureMeasurementSuccessful\":%s,\"humidityRaw\":%lu,\"temperatureRaw\":%lu,\"rssi\":%d,\"duration\":%lld}",
+        sprintf(data, "{\"firmwareVersion\":\"%llu\",\"light\":%2.2f,\"voltage\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f,\"moisture\":%d,\"moistureStabilizationTime\":%lu,\"isMoistureMeasurementSuccessful\":%s,\"humidityRaw\":%lu,\"temperatureRaw\":%lu,\"rssi\":%d,\"duration\":%lld}",
                 firmware_version,
                 sensors_data->light,
                 sensors_data->voltage,
                 sensors_data->temperature,
                 sensors_data->humidity,
-                sensors_data->is_usb_connected ? "true" : "false",
                 sensors_data->moisture_measurement,
                 sensors_data->moisture_stabilization_time,
                 sensors_data->moisture_measurement_successful ? "true" : "false",

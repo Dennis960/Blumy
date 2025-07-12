@@ -15,7 +15,6 @@ typedef enum
     SENSOR_VOLTAGE,
     SENSOR_TEMPERATURE,
     SENSOR_HUMIDITY,
-    SENSOR_USB_CONNECTED,
     SENSOR_SOIL_MOISTURE,
     SENSOR_RSSI,
     SENSOR_DURATION,
@@ -35,7 +34,6 @@ static const sensor_info_t sensor_info[SENSOR_TYPE_COUNT] = {
     {"voltage", "V", "voltage", "Spannung"},
     {"temperature", "°C", "temperature", "Temperatur"},
     {"humidity", "%", "humidity", "Luftfeuchtigkeit"},
-    {"isUsbConnected", "", "power", "USB verbunden"},
     {"moisture", "%", "moisture", "Bodenfeuchtigkeit"},
     {"rssi", "dBm", "signal_strength", "RSSI"},
     {"duration", "us", "duration", "Dauer der letzten Messung"}};
@@ -150,65 +148,32 @@ static void publish_sensor_config(esp_mqtt_client_handle_t mqtt_client, const ch
 {
     char config_topic[128];
     char payload[512];
-    const bool is_binary_sensor = type == SENSOR_USB_CONNECTED;
-    if (is_binary_sensor)
-    {
-        snprintf(payload, sizeof(payload),
-                 "{"
-                 "\"name\":\"%s\","
-                 "\"state_topic\":\"%s\","
-                 "\"device_class\":\"%s\","
-                 "\"value_template\":\"{{ value_json.%s }}\","
-                 "\"unique_id\":\"blumy_%s_%s\","
-                 "\"payload_on\":true,"
-                 "\"payload_off\":false,"
-                 "\"device\":{"
-                 "\"identifiers\":[\"blumy_%s\"],"
-                 "\"name\":\"Blumy %s\","
-                 "\"manufacturer\":\"Blumy\","
-                 "\"model\":\"Blumy Bellis\""
-                 "}"
-                 "}",
-                 sensor_info[type].name,
-                 topic,
-                 sensor_info[type].device_class,
-                 sensor_info[type].id,
-                 sensorId,
-                 sensor_info[type].id,
-                 sensorId,
-                 sensorId);
-        snprintf(config_topic, sizeof(config_topic),
-                 "homeassistant/binary_sensor/blumy_%s_%s/config", sensorId, sensor_info[type].id);
-    }
-    else
-    {
-        snprintf(payload, sizeof(payload),
-                 "{"
-                 "\"name\":\"%s\","
-                 "\"state_topic\":\"%s\","
-                 "\"unit_of_measurement\":\"%s\","
-                 "\"device_class\":\"%s\","
-                 "\"value_template\":\"{{ value_json.%s }}\","
-                 "\"unique_id\":\"blumy_%s_%s\","
-                 "\"device\":{"
-                 "\"identifiers\":[\"blumy_%s\"],"
-                 "\"name\":\"Blumy %s\","
-                 "\"manufacturer\":\"Blumy\","
-                 "\"model\":\"Blumy Bellis\""
-                 "}"
-                 "}",
-                 sensor_info[type].name,
-                 topic,
-                 sensor_info[type].unit,
-                 sensor_info[type].device_class,
-                 sensor_info[type].id,
-                 sensorId,
-                 sensor_info[type].id,
-                 sensorId,
-                 sensorId);
-        snprintf(config_topic, sizeof(config_topic),
-                 "homeassistant/sensor/blumy_%s_%s/config", sensorId, sensor_info[type].id);
-    }
+    snprintf(payload, sizeof(payload),
+             "{"
+             "\"name\":\"%s\","
+             "\"state_topic\":\"%s\","
+             "\"unit_of_measurement\":\"%s\","
+             "\"device_class\":\"%s\","
+             "\"value_template\":\"{{ value_json.%s }}\","
+             "\"unique_id\":\"blumy_%s_%s\","
+             "\"device\":{"
+             "\"identifiers\":[\"blumy_%s\"],"
+             "\"name\":\"Blumy %s\","
+             "\"manufacturer\":\"Blumy\","
+             "\"model\":\"Blumy Bellis\""
+             "}"
+             "}",
+             sensor_info[type].name,
+             topic,
+             sensor_info[type].unit,
+             sensor_info[type].device_class,
+             sensor_info[type].id,
+             sensorId,
+             sensor_info[type].id,
+             sensorId,
+             sensorId);
+    snprintf(config_topic, sizeof(config_topic),
+             "homeassistant/sensor/blumy_%s_%s/config", sensorId, sensor_info[type].id);
 
     ESP_LOGI("Plantmqtt", "Publishing sensor config for type: %s, topic: %s", sensor_info[type].name, config_topic);
     ESP_LOGD("Plantmqtt", "Payload: %s", payload);
@@ -314,12 +279,11 @@ void plantmqtt_homeassistant_publish_sensor_data(const sensors_full_data_t *sens
     }
 
     char data[400];
-    sprintf(data, "{\"light\":%.2f,\"voltage\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f,\"isUsbConnected\":%s,\"moisture\":%.2f,\"rssi\":%d,\"duration\":%lld}",
+    sprintf(data, "{\"light\":%.2f,\"voltage\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f,\"moisture\":%.2f,\"rssi\":%d,\"duration\":%lld}",
             sensors_data->light * 100.0f,
             sensors_data->voltage,
             sensors_data->temperature,
             sensors_data->humidity,
-            sensors_data->is_usb_connected ? "true" : "false",
             sensors_convert_moisture_measurement_to_percentage(sensors_data->moisture_measurement),
             rssi,
             esp_timer_get_time());

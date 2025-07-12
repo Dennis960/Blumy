@@ -76,7 +76,6 @@ export const sensorReadings = pgTable('data', {
 	voltage: real('voltage').notNull().default(-1),
 	temperature: real('temperature').notNull().default(-1),
 	humidity: real('humidity').notNull().default(-1),
-	isUsbConnected: boolean('is_usb_connected').notNull().default(false),
 	moisture: integer('moisture').notNull(),
 	moistureStabilizationTime: integer('moisture_stabilization_time').notNull().default(-1),
 	isMoistureMeasurementSuccessful: boolean('is_moisture_measurement_successful')

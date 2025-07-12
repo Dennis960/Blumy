@@ -1,0 +1,1 @@
+ALTER TABLE "data" DROP COLUMN "is_usb_connected";

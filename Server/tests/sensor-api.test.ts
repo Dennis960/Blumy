@@ -18,7 +18,6 @@ const testDate: Omit<ESPSensorReadingDTO, 'sensorAddress'> = {
 	voltage: 3.2,
 	temperature: 24.5,
 	humidity: 53.1,
-	isUsbConnected: false,
 	moisture: 879,
 	moistureStabilizationTime: 2034,
 	isMoistureMeasurementSuccessful: true,

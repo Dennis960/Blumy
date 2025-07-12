@@ -598,7 +598,6 @@ esp_err_t get_api_sensor_data_handler(httpd_req_t *req)
     cJSON_AddNumberToObject(root, "light", sensors_data.light);
     cJSON_AddNumberToObject(root, "moisture", sensors_data.moisture_measurement);
     cJSON_AddNumberToObject(root, "voltage", sensors_data.voltage);
-    cJSON_AddBoolToObject(root, "usb", sensors_data.is_usb_connected);
 
     char *resp = cJSON_Print(root);
     cJSON_Delete(root);

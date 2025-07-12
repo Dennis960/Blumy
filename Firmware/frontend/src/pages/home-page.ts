@@ -27,7 +27,6 @@ export class HomePage extends BasePage {
     @query("#light") lightElement!: InputElement;
     @query("#moisture") moistureElement!: InputElement;
     @query("#voltage") voltageElement!: InputElement;
-    @query("#usb") usbElement!: InputElement;
 
     @state()
     loading = false;
@@ -81,9 +80,6 @@ export class HomePage extends BasePage {
             );
             this.voltageElement.input.value =
                 sensorData.voltage.toFixed(2) + " V";
-            this.usbElement.input.value = sensorData.usb
-                ? "angeschlossen"
-                : "nicht angeschlossen";
             await new Promise((resolve) => setTimeout(resolve, 2000));
         }
     }
@@ -157,13 +153,6 @@ export class HomePage extends BasePage {
                     name="Spannung"
                     type="text"
                     label="Spannung"
-                    ?readonly="${true}"
-                ></input-element>
-                <input-element
-                    id="usb"
-                    name="USB"
-                    type="text"
-                    label="USB"
                     ?readonly="${true}"
                 ></input-element>
             </input-element-grid>

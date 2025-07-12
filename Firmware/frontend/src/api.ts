@@ -21,7 +21,6 @@ export interface SensorData {
     light: number;
     moisture: number;
     voltage: number;
-    usb: boolean;
 }
 
 export const cloudConfigurationTypes = ["http", "mqtt", "blumy"] as const;

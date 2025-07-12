@@ -8,6 +8,5 @@ export default defineMock({
         light: 0.7,
         moisture: 645,
         voltage: 2.8,
-        usb: true,
     },
 });

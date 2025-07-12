@@ -1,3 +1,13 @@
+import {
+	BATTERY_EMPTY_THRESHOLD,
+	BATTERY_LOW_THRESHOLD,
+	MAX_BATTERY_VOLTAGE,
+	MIN_BATTERY_VOLTAGE,
+	OFFLINE_TIMEOUT,
+	RSSI_MODERATE_THRESHOLD,
+	RSSI_STRONG_THRESHOLD,
+	USB_CONNECTED_THRESHOLD
+} from '$lib/client/config';
 import type { ESPSensorReadingDTO } from '$lib/server/entities/SensorReadingEntity';
 import type {
 	LightHistoryEntry,
@@ -18,8 +28,6 @@ import SensorEntity from '../entities/SensorEntity';
 import SensorDataRepository from '../repositories/SensorDataRepository';
 import SensorRepository from '../repositories/SensorRepository';
 import SensorService from '../services/SensorService';
-
-const OFFLINE_TIMEOUT = 120 * 60 * 1000; // 2 hours
 
 export default class SensorController {
 	public async getSensorHistory(
@@ -89,7 +97,14 @@ export default class SensorController {
 					? {
 							timestamp: lastReading.timestamp,
 							waterCapacity: lastReading.availableWaterCapacity,
-							batteryCapacity: Math.min(1, Math.max(0, (lastReading.voltage - 2.14) / (3.0 - 2.14)))
+							batteryCapacity: Math.min(
+								1,
+								Math.max(
+									0,
+									(lastReading.voltage - MIN_BATTERY_VOLTAGE) /
+										(MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE)
+								)
+							)
 						}
 					: undefined,
 			prediction:
@@ -166,17 +181,17 @@ export default class SensorController {
 			signalStrength:
 				lastReading == undefined || lastReading.timestamp < new Date(Date.now() - OFFLINE_TIMEOUT)
 					? 'offline'
-					: lastReading.rssi > -55
+					: lastReading.rssi > RSSI_STRONG_THRESHOLD
 						? 'strong'
-						: lastReading.rssi > -67
+						: lastReading.rssi > RSSI_MODERATE_THRESHOLD
 							? 'moderate'
 							: 'weak',
 			battery:
-				lastReading == undefined || lastReading.voltage > 4
+				lastReading == undefined || lastReading.voltage > USB_CONNECTED_THRESHOLD
 					? 'usb'
-					: lastReading.voltage < 2.3
+					: lastReading.voltage < BATTERY_EMPTY_THRESHOLD
 						? 'empty'
-						: lastReading.voltage < 2.4
+						: lastReading.voltage < BATTERY_LOW_THRESHOLD
 							? 'low'
 							: 'full'
 		};
@@ -199,7 +214,6 @@ export default class SensorController {
 			voltage: data.voltage,
 			temperature: data.temperature,
 			humidity: data.humidity,
-			isUsbConnected: data.isUsbConnected,
 			moisture: data.moisture,
 			moistureStabilizationTime: data.moistureStabilizationTime,
 			isMoistureMeasurementSuccessful: data.isMoistureMeasurementSuccessful,
