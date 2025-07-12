@@ -5,8 +5,11 @@ import { styleMap } from "lit/directives/style-map.js";
 @customElement("text-element")
 export class ColoredTextElement extends LitElement {
     @property({ type: String }) text!: string;
-    @property({ type: String }) color: "success" | "error" | "warning" =
-        "error";
+    @property({ type: String }) color:
+        | "success"
+        | "error"
+        | "warning"
+        | "helper" = "error";
     @property({ type: Object }) styleCustom: Record<string, string> = {};
 
     render() {

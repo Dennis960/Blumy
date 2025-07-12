@@ -59,7 +59,7 @@ static void mqtt_event_handler_cb(void *handler_args, esp_event_base_t base, int
     }
 }
 
-int plantmqtt_mqtt_client_publish(esp_mqtt_client_handle_t client, const char *topic, const char *data, int len, int qos, int retain)
+static int plantmqtt_mqtt_client_publish(esp_mqtt_client_handle_t client, const char *topic, const char *data, int len, int qos, int retain)
 {
     mqtt_queued_messages++;
     return esp_mqtt_client_publish(client, topic, data, len, qos, retain);
@@ -92,7 +92,61 @@ static bool plantmqtt_wait_for_publish()
     return mqtt_queued_messages == 0;
 }
 
-static void publish_sensor_config(esp_mqtt_client_handle_t mqtt_client, const char *sensorId, const sensor_type_t type)
+/**
+ * Inserts the sensor ID into the topic string by replacing all occurrences of '$' with the sensor ID.
+ */
+static void insert_sensor_id_in_topic(char *topic, size_t topic_size, const char *sensorId)
+{
+    ESP_LOGI("Plantmqtt", "Inserting sensor ID '%s' into topic '%s'", sensorId, topic);
+    size_t replace_len = strlen(sensorId);
+    size_t orig_len = strlen(topic);
+    size_t dollar_count = 0;
+
+    // First, count the number of '$' characters
+    for (size_t i = 0; i < orig_len; i++)
+    {
+        if (topic[i] == '$')
+        {
+            dollar_count++;
+        }
+    }
+
+    // Calculate the new length after replacement
+    size_t new_len = orig_len + dollar_count * (replace_len - 1);
+
+    if (new_len >= topic_size)
+    {
+        ESP_LOGE("Plantmqtt", "Topic buffer too small for replacement, required: %zu, available: %zu", new_len, topic_size);
+        return;
+    }
+
+    // Start replacing from the end to avoid overwriting
+    size_t i = orig_len;
+    size_t j = new_len;
+    topic[j--] = '\0'; // null-terminate the new string
+
+    while (i > 0)
+    {
+        i--;
+        if (topic[i] == '$')
+        {
+            for (size_t k = 0; k < replace_len; k++)
+            {
+                topic[j--] = sensorId[replace_len - 1 - k];
+            }
+        }
+        else
+        {
+            topic[j--] = topic[i];
+        }
+    }
+
+    ESP_LOGI("Plantmqtt", "Topic after insertion: '%s'", topic);
+
+    return;
+}
+
+static void publish_sensor_config(esp_mqtt_client_handle_t mqtt_client, const char *sensorId, const sensor_type_t type, const char *topic)
 {
     char config_topic[128];
     char payload[512];
@@ -102,7 +156,7 @@ static void publish_sensor_config(esp_mqtt_client_handle_t mqtt_client, const ch
         snprintf(payload, sizeof(payload),
                  "{"
                  "\"name\":\"%s\","
-                 "\"state_topic\":\"blumy_%s_state\","
+                 "\"state_topic\":\"%s\","
                  "\"device_class\":\"%s\","
                  "\"value_template\":\"{{ value_json.%s }}\","
                  "\"unique_id\":\"blumy_%s_%s\","
@@ -116,7 +170,7 @@ static void publish_sensor_config(esp_mqtt_client_handle_t mqtt_client, const ch
                  "}"
                  "}",
                  sensor_info[type].name,
-                 sensorId,
+                 topic,
                  sensor_info[type].device_class,
                  sensor_info[type].id,
                  sensorId,
@@ -131,7 +185,7 @@ static void publish_sensor_config(esp_mqtt_client_handle_t mqtt_client, const ch
         snprintf(payload, sizeof(payload),
                  "{"
                  "\"name\":\"%s\","
-                 "\"state_topic\":\"blumy_%s_state\"," // TODO use the configured topic with a templating mechanism
+                 "\"state_topic\":\"%s\","
                  "\"unit_of_measurement\":\"%s\","
                  "\"device_class\":\"%s\","
                  "\"value_template\":\"{{ value_json.%s }}\","
@@ -144,7 +198,7 @@ static void publish_sensor_config(esp_mqtt_client_handle_t mqtt_client, const ch
                  "}"
                  "}",
                  sensor_info[type].name,
-                 sensorId,
+                 topic,
                  sensor_info[type].unit,
                  sensor_info[type].device_class,
                  sensor_info[type].id,
@@ -177,7 +231,7 @@ static void publish_sensor_config(esp_mqtt_client_handle_t mqtt_client, const ch
     }
 }
 
-esp_mqtt_client_handle_t plantmqtt_mqtt_init(char *sensorId, size_t sensorId_size, const char *server, uint32_t port, const char *username, const char *password, const char *clientId)
+static esp_mqtt_client_handle_t plantmqtt_mqtt_init(char *sensorId, size_t sensorId_size, const char *server, uint32_t port, const char *username, const char *password, const char *clientId)
 {
     const esp_mqtt_client_config_t mqtt_cfg = {
         .broker.address.uri = server,
@@ -211,7 +265,7 @@ esp_mqtt_client_handle_t plantmqtt_mqtt_init(char *sensorId, size_t sensorId_siz
     return mqtt_client;
 }
 
-esp_mqtt_client_handle_t plantmqtt_mqtt_init_from_plantstore(char *sensorId, size_t sensorId_size)
+static esp_mqtt_client_handle_t plantmqtt_mqtt_init_from_plantstore(char *sensorId, size_t sensorId_size, char *topic, size_t topic_size)
 {
     ESP_LOGI("Plantmqtt", "Initializing Plantmqtt MQTT");
     char server[100];
@@ -219,18 +273,20 @@ esp_mqtt_client_handle_t plantmqtt_mqtt_init_from_plantstore(char *sensorId, siz
     char username[100];
     char password[100];
     char clientId[100];
-    if (!plantstore_getCloudConfigurationMqtt(sensorId, server, &port, username, password, NULL, clientId, sensorId_size, sizeof(server), sizeof(username), sizeof(password), 0, sizeof(clientId)))
+    if (!plantstore_getCloudConfigurationMqtt(sensorId, server, &port, username, password, topic, clientId, sensorId_size, sizeof(server), sizeof(username), sizeof(password), topic_size, sizeof(clientId)))
     {
         ESP_LOGI("Plantmqtt", "No MQTT configuration found");
         return NULL;
     }
+    insert_sensor_id_in_topic(topic, topic_size, sensorId);
     return plantmqtt_mqtt_init(sensorId, sensorId_size, server, port, username, password, clientId);
 }
 
 void plantmqtt_homeassistant_create_sensor(void)
 {
     char sensorId[100];
-    esp_mqtt_client_handle_t mqtt_client = plantmqtt_mqtt_init_from_plantstore(sensorId, 100);
+    char topic[200];
+    esp_mqtt_client_handle_t mqtt_client = plantmqtt_mqtt_init_from_plantstore(sensorId, 100, topic, sizeof(topic));
     if (mqtt_client == NULL)
     {
         ESP_LOGE("Plantmqtt", "MQTT client not initialized, cannot create sensor");
@@ -238,7 +294,7 @@ void plantmqtt_homeassistant_create_sensor(void)
     }
     for (int i = 0; i < SENSOR_TYPE_COUNT; i++)
     {
-        publish_sensor_config(mqtt_client, sensorId, (sensor_type_t)i);
+        publish_sensor_config(mqtt_client, sensorId, (sensor_type_t)i, topic);
     }
     plantmqtt_wait_for_publish();
     esp_mqtt_client_stop(mqtt_client);
@@ -249,15 +305,13 @@ void plantmqtt_homeassistant_create_sensor(void)
 void plantmqtt_homeassistant_publish_sensor_data(const sensors_full_data_t *sensors_data, int16_t rssi)
 {
     char sensorId[100];
-    esp_mqtt_client_handle_t mqtt_client = plantmqtt_mqtt_init_from_plantstore(sensorId, 100);
+    char topic[200];
+    esp_mqtt_client_handle_t mqtt_client = plantmqtt_mqtt_init_from_plantstore(sensorId, 100, topic, sizeof(topic));
     if (mqtt_client == NULL)
     {
         ESP_LOGE("Plantmqtt", "MQTT client not initialized, cannot publish sensor data");
         return;
     }
-
-    char topic[128];
-    snprintf(topic, sizeof(topic), "blumy_%s_state", sensorId);
 
     char data[400];
     sprintf(data, "{\"light\":%2.2f,\"voltage\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f,\"isUsbConnected\":%s,\"moisture\":%d,\"rssi\":%d,\"duration\":%lld}",

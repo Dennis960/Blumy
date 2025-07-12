@@ -24,7 +24,7 @@ esp_err_t get_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
-bool get_value(char *content, char *key, char *value)
+bool get_value(char *content, char *key, char *value, size_t value_size)
 {
     // Request bodies are in the form of key=value\nkey2=value2\n
     char *key_start = strstr(content, key);
@@ -38,12 +38,18 @@ bool get_value(char *content, char *key, char *value)
     {
         return false;
     }
-    strncpy(value, key_start, key_end - key_start);
-    value[key_end - key_start] = '\0';
+    size_t copy_len = key_end - key_start;
+    if (copy_len >= value_size)
+    {
+        copy_len = value_size - 1;
+    }
+    strncpy(value, key_start, copy_len);
+    value[copy_len] = '\0';
+    ESP_LOGI("Configuration", "Extracted value for key '%s': '%s'", key, value);
     return true;
 }
 
-bool get_values(httpd_req_t *req, char *keys[], char *values[], int num_keys)
+bool get_values(httpd_req_t *req, char *keys[], char *values[], size_t *sizes, int num_keys)
 {
     char content[1000];
     size_t recv_size = MIN(req->content_len, sizeof(content) - 1);
@@ -59,7 +65,7 @@ bool get_values(httpd_req_t *req, char *keys[], char *values[], int num_keys)
     content[ret] = '\0'; // Ensure null terminator
     for (int i = 0; i < num_keys; i++)
     {
-        if (!get_value(content, keys[i], values[i]))
+        if (!get_value(content, keys[i], values[i], sizes[i]))
         {
             return false;
         }
@@ -102,7 +108,8 @@ esp_err_t post_api_connect_handler(httpd_req_t *req)
     char password[DEFAULT_PASSWORD_MAX_LENGTH];
     char *keys[] = {"ssid", "password"};
     char *values[] = {ssid, password};
-    if (!get_values(req, keys, values, 2))
+    size_t sizes[] = {sizeof(ssid), sizeof(password)};
+    if (!get_values(req, keys, values, sizes, 2))
     {
         return ESP_FAIL;
     }
@@ -169,7 +176,8 @@ esp_err_t post_api_cloudSetup_mqtt_handler(httpd_req_t *req)
     char clientId[100];
     char *keys[] = {"sensorId", "server", "port", "username", "password", "topic", "clientId"};
     char *values[] = {sensorId, server, portString, username, password, topic, clientId};
-    if (!get_values(req, keys, values, 7) || !is_number(portString))
+    size_t sizes[] = {sizeof(sensorId), sizeof(server), sizeof(portString), sizeof(username), sizeof(password), sizeof(topic), sizeof(clientId)};
+    if (!get_values(req, keys, values, sizes, 7) || !is_number(portString))
     {
         return ESP_FAIL;
     }
@@ -191,7 +199,8 @@ esp_err_t post_api_cloudSetup_http_handler(httpd_req_t *req)
     char auth[100];
     char *keys[] = {"sensorId", "url", "auth"};
     char *values[] = {sensorId, url, auth};
-    if (!get_values(req, keys, values, 3))
+    size_t sizes[] = {sizeof(sensorId), sizeof(url), sizeof(auth)};
+    if (!get_values(req, keys, values, sizes, 3))
     {
         return ESP_FAIL;
     }
@@ -209,7 +218,8 @@ esp_err_t post_api_cloudSetup_blumy_handler(httpd_req_t *req)
     char url[100];
     char *keys[] = {"token", "url"};
     char *values[] = {token, url};
-    if (!get_values(req, keys, values, 2))
+    size_t sizes[] = {sizeof(token), sizeof(url)};
+    if (!get_values(req, keys, values, sizes, 2))
     {
         return ESP_FAIL;
     }
@@ -312,7 +322,8 @@ esp_err_t post_api_cloudTest_mqtt_handler(httpd_req_t *req)
 
     char *keys[] = {"sensorId", "server", "port", "username", "password", "topic", "clientId"};
     char *values[] = {sensorId, server, portString, username, password, topic, clientId};
-    if (!get_values(req, keys, values, 7) || !is_number(portString))
+    size_t sizes[] = {sizeof(sensorId), sizeof(server), sizeof(portString), sizeof(username), sizeof(password), sizeof(topic), sizeof(clientId)};
+    if (!get_values(req, keys, values, sizes, 7) || !is_number(portString))
     {
         return ESP_FAIL;
     }
@@ -333,7 +344,8 @@ esp_err_t post_api_cloudTest_http_handler(httpd_req_t *req)
 
     char *keys[] = {"sensorId", "url", "auth"};
     char *values[] = {sensorId, url, auth};
-    if (!get_values(req, keys, values, 3))
+    size_t sizes[] = {sizeof(sensorId), sizeof(url), sizeof(auth)};
+    if (!get_values(req, keys, values, sizes, 3))
     {
         return ESP_FAIL;
     }
@@ -350,7 +362,8 @@ esp_err_t post_api_cloudTest_blumy_handler(httpd_req_t *req)
     char url[100];
     char *keys[] = {"token", "url"};
     char *values[] = {token, url};
-    if (!get_values(req, keys, values, 2))
+    size_t sizes[] = {sizeof(token), sizeof(url)};
+    if (!get_values(req, keys, values, sizes, 2))
     {
         return ESP_FAIL;
     }
@@ -611,7 +624,8 @@ esp_err_t post_api_update_firmware_handler(httpd_req_t *req)
     char url[100];
     char *keys[] = {"url"};
     char *values[] = {url};
-    if (!get_values(req, keys, values, 1))
+    size_t sizes[] = {sizeof(url)};
+    if (!get_values(req, keys, values, sizes, 1))
     {
         return ESP_FAIL;
     }
@@ -647,7 +661,8 @@ esp_err_t post_api_update_check_handler(httpd_req_t *req)
     char url[100];
     char *keys[] = {"url"};
     char *values[] = {url};
-    if (!get_values(req, keys, values, 1))
+    size_t sizes[] = {sizeof(url)};
+    if (!get_values(req, keys, values, sizes, 1))
     {
         return ESP_FAIL;
     }
