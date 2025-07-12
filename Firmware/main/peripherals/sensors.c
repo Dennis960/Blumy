@@ -493,7 +493,7 @@ void sensors_initSensors()
     // Set digital input pins
     io_conf.mode = GPIO_MODE_INPUT;
     io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-    io_conf.pin_bit_mask |= (1ULL << BOOT_BUTTON);
+    io_conf.pin_bit_mask = (1ULL << BOOT_BUTTON);
     ESP_ERROR_CHECK(gpio_config(&io_conf));
 
     adc_initAdc();
