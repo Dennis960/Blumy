@@ -41,7 +41,8 @@ export class UpdatePage extends BasePage {
             } else if (this.firmwareUpdateProgress < 100) {
                 await new Promise((resolve) => setTimeout(resolve, 200));
                 if (this.firmwareUpdateProgress > 80) {
-                    this.infoText = "Der Sensor wird jetzt neu gestartet";
+                    this.infoText =
+                        "Der Sensor wird jetzt neu gestartet. Bitte warte noch etwa 20 Sekunden und betätige dann den Knopf am Sensor.";
                 }
             }
         }
