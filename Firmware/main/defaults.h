@@ -12,3 +12,5 @@
 #define DEFAULT_FIRMWARE_UPDATE_URL "http://firmware.blumy.cloud/firmware/firmware.bin"
 
 #define DEFAULT_LED_BRIGHTNESS 128 // Default brightness for LEDs between 0 and 255
+
+#define MAX_MOISTURE_MEASUREMENT 2500

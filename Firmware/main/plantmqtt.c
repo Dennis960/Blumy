@@ -31,14 +31,14 @@ typedef struct
 } sensor_info_t;
 
 static const sensor_info_t sensor_info[SENSOR_TYPE_COUNT] = {
-    {"light", "lx", "illuminance", "Light"},
-    {"voltage", "V", "voltage", "Voltage"},
-    {"temperature", "°C", "temperature", "Temperature"},
-    {"humidity", "%", "humidity", "Humidity"},
-    {"isUsbConnected", "", "power", "USB Connected"},
-    {"moisture", "", "moisture", "Soil Moisture"},
+    {"light", "%", "illuminance", "Lichtintensität"},
+    {"voltage", "V", "voltage", "Spannung"},
+    {"temperature", "°C", "temperature", "Temperatur"},
+    {"humidity", "%", "humidity", "Luftfeuchtigkeit"},
+    {"isUsbConnected", "", "power", "USB verbunden"},
+    {"moisture", "%", "moisture", "Bodenfeuchtigkeit"},
     {"rssi", "dBm", "signal_strength", "RSSI"},
-    {"duration", "us", "duration", "Duration"}};
+    {"duration", "us", "duration", "Dauer der letzten Messung"}};
 
 static int mqtt_queued_messages = 0;
 
@@ -314,13 +314,13 @@ void plantmqtt_homeassistant_publish_sensor_data(const sensors_full_data_t *sens
     }
 
     char data[400];
-    sprintf(data, "{\"light\":%2.2f,\"voltage\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f,\"isUsbConnected\":%s,\"moisture\":%d,\"rssi\":%d,\"duration\":%lld}",
-            sensors_data->light,
+    sprintf(data, "{\"light\":%.2f,\"voltage\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f,\"isUsbConnected\":%s,\"moisture\":%.2f,\"rssi\":%d,\"duration\":%lld}",
+            sensors_data->light * 100.0f,
             sensors_data->voltage,
             sensors_data->temperature,
             sensors_data->humidity,
             sensors_data->is_usb_connected ? "true" : "false",
-            sensors_data->moisture_measurement,
+            sensors_convert_moisture_measurement_to_percentage(sensors_data->moisture_measurement),
             rssi,
             esp_timer_get_time());
 

@@ -12,6 +12,8 @@
 #include "peripherals/adc.h"
 #include "peripherals/config.h"
 
+#include "defaults.h"
+
 const unsigned long maxStabilizationTime = 500;
 const int stabilizationDifference = 5;
 
@@ -456,6 +458,22 @@ bool sensors_read_moisture(sensors_moisture_sensor_output_t *output)
     bool success = measure_stabilized_output(output);
     stopMoistureSensor();
     return success;
+}
+
+float sensors_convert_moisture_measurement_to_percentage(int measurement)
+{
+    ESP_LOGI("SENSORS", "Calculating moisture percentage");
+    if (measurement < 0)
+    {
+        measurement = 0;
+    }
+    if (measurement > MAX_MOISTURE_MEASUREMENT)
+    {
+        measurement = MAX_MOISTURE_MEASUREMENT;
+    }
+    int inverted_measurement = MAX_MOISTURE_MEASUREMENT - measurement;                    // 0 = dry, 2500 = wet
+    float percentage = (inverted_measurement / (float)MAX_MOISTURE_MEASUREMENT) * 100.0f; // 0% = dry, 100% = wet
+    return percentage;
 }
 
 // End moisture sensor
