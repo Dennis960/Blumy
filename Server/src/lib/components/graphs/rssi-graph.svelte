@@ -1,4 +1,10 @@
 <script lang="ts">
+	import {
+		MAX_RSSI_GRAPH,
+		MIN_RSSI_GRAPH,
+		RSSI_MODERATE_THRESHOLD,
+		RSSI_STRONG_THRESHOLD
+	} from '$lib/client/config';
 	import type { SensorHistoryDTO } from '$lib/types/api';
 	import Apexchart, { type ChartOptions } from './apexchart.svelte';
 
@@ -51,23 +57,23 @@
 				type: 'datetime'
 			},
 			yaxis: {
-				min: (min) => Math.min(min, -80),
-				max: (max) => Math.max(max, -45)
+				min: (min) => Math.min(min, MIN_RSSI_GRAPH),
+				max: (max) => Math.max(max, MAX_RSSI_GRAPH)
 			},
 			annotations: {
 				yaxis: [
 					{
 						y: 0,
-						y2: -55,
+						y2: RSSI_STRONG_THRESHOLD,
 						fillColor: 'var(--tblr-green)'
 					},
 					{
-						y: -55,
-						y2: -67,
+						y: RSSI_STRONG_THRESHOLD,
+						y2: RSSI_MODERATE_THRESHOLD,
 						fillColor: 'var(--tblr-warning)'
 					},
 					{
-						y: -67,
+						y: RSSI_MODERATE_THRESHOLD,
 						y2: -100,
 						fillColor: 'var(--tblr-danger)'
 					}

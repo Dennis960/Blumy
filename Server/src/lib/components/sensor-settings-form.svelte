@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { route } from '$lib/ROUTES';
 	import { clientApi } from '$lib/client/api';
+	import { defaultSensorConfig, MAX_FIELD_CAPACITY } from '$lib/client/config';
 	import WaterCapacityDistribution from '$lib/components/graphs/water-capacity-distribution.svelte';
 	import Slider, { type SliderOptions } from '$lib/components/slider.svelte';
 	import { funnyPlantNames } from '$lib/funny-plant-names';
@@ -13,7 +15,6 @@
 	import { onMount, type Snippet } from 'svelte';
 	import Base64Image from './base64-image.svelte';
 	import CopyText from './copy-text.svelte';
-	import { route } from '$lib/ROUTES';
 
 	let {
 		sensorId = undefined,
@@ -37,18 +38,13 @@
 		onSensorCreate?: (sensor: SensorCreatedDTO) => void;
 	} = $props();
 
-	const MAX_FIELD_CAPACITY = 2500;
-
 	let initialConfig: SensorConfigurationDTO =
 		config != undefined
 			? { ...config }
 			: {
+					...defaultSensorConfig,
 					name: funnyPlantNames[Math.floor(Math.random() * funnyPlantNames.length)],
-					imageBase64: undefined,
-					fieldCapacity: MAX_FIELD_CAPACITY * 0.85,
-					permanentWiltingPoint: MAX_FIELD_CAPACITY * 0.15,
-					upperThreshold: 0.75,
-					lowerThreshold: 0.4
+					imageBase64: undefined
 				};
 
 	let sliderOptions: SliderOptions | undefined = $state();
