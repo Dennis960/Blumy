@@ -76,6 +76,7 @@ export class CloudPage extends BasePage {
     loadingStateController = new StateController(this, loadingState);
 
     private async submit() {
+        loadingState.state++;
         let numberOfCorrectConfigurations = 0;
         let numberOfFailedConfigurations = 0;
         for (const key of cloudConfigurationTypes) {
@@ -116,6 +117,7 @@ export class CloudPage extends BasePage {
                 await disableCloudConnection(key);
             }
         }
+        loadingState.state--;
         this.configurationStates = { ...this.configurationStates };
         if (numberOfCorrectConfigurations === 0) {
             this.errorText =
