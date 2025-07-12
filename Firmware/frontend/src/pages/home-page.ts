@@ -32,6 +32,9 @@ export class HomePage extends BasePage {
     @state()
     loading = false;
 
+    @state()
+    showAhtValues = false;
+
     shouldFetchData = true;
 
     getMoistureHumandReadable(moisture: number): string {
@@ -65,10 +68,12 @@ export class HomePage extends BasePage {
             if (!sensorData) {
                 return;
             }
-            this.temperatureElement.input.value =
-                sensorData.temperature.toFixed(2) + " °C";
-            this.humidityElement.input.value =
-                String(Math.round(sensorData.humidity)) + "%";
+            this.temperatureElement.input.value = this.showAhtValues
+                ? sensorData.temperature.toFixed(2) + " °C"
+                : "-";
+            this.humidityElement.input.value = this.showAhtValues
+                ? String(Math.round(sensorData.humidity)) + "%"
+                : "-";
             this.lightElement.input.value =
                 String(Math.round(sensorData.light * 100)) + "%";
             this.moistureElement.input.value = this.getMoistureHumandReadable(
@@ -113,6 +118,18 @@ export class HomePage extends BasePage {
                     label="Luftfeuchtigkeit"
                     ?readonly="${true}"
                 ></input-element>
+                ${this.showAhtValues
+                    ? ""
+                    : html`
+                          <button-element
+                              @click="${() => {
+                                  this.showAhtValues = true;
+                              }}"
+                              style="grid-column: 1 / -1;"
+                          >
+                              Werte anzeigen
+                          </button-element>
+                      `}
                 <span
                     style="grid-column: 1 / -1; color: var(--helper); font-size: 0.95em; margin-bottom: 0.75rem;"
                 >
@@ -120,6 +137,7 @@ export class HomePage extends BasePage {
                     Eigenwärme des Mikrochips während der Konfiguration von
                     tatsächlichen Werten ab.
                 </span>
+
                 <input-element
                     id="light"
                     name="Licht"
