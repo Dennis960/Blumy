@@ -236,7 +236,7 @@ export class SettingsPage extends BasePage {
                 <span
                     style="grid-column: 1 / -1; color: var(--helper); font-size: 0.95em; margin-bottom: 0.75rem;"
                 >
-                    Zeitintervall zwischen zwei Messungen (z.B. 1h, 30m, 10s).
+                    Zeitintervall zwischen zwei Messungen (z.B. 1h, 30m).
                     Je größer das Intervall, desto weniger Strom verbraucht der
                     Sensor.
                 </span>
