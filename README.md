@@ -4,6 +4,7 @@
 
 ## Project Structure
 
+- [.devcontainer](.devcontainer): Contains the configurations for the devcontainers
 - [.github](.github): Contains the configuration for GitHub Actions
 - [Board](Board): Contains the KiCad project for the board
 - [Panel](Panel): Contains the KiCad project for the board panel. Generation of the panel is done with `KiKit`

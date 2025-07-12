@@ -1,22 +1,24 @@
-# create-svelte
+# Blumy Server
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+## Environment Variables
 
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+| Variable Name              | Recommended Value for testing            | Description                                      |
+|----------------------------|-------------------------|--------------------------------------------------|
+| `PUBLIC_VAPID_KEY`         | *(none)*                | Public VAPID key for push notifications.         |
+| `PRIVATE_VAPID_KEY`        | *(none)*                | Private VAPID key for push notifications.        |
+| `VAPID_EMAIL`              | `root@localhost`        | Email address used for VAPID contact.            |
+| `GOOGLE_CLIENT_ID`         | *(none)*                | Google OAuth client ID.                          |
+| `GOOGLE_CLIENT_SECRET`     | *(none)*                | Google OAuth client secret.                      |
+| `ORIGIN`                   | `http://localhost:5173` | Allowed origin for CORS and redirects.           |
+| `PUBLIC_MODE`              | `test`                  | Application mode (e.g., `test`, `production`).   |
+| `PUBLIC_IMPRESSUM_NAME`    | *(none)*                | Name for legal disclosure (Impressum).           |
+| `PUBLIC_IMPRESSUM_ADDRESS` | *(none)*                | Address for legal disclosure (Impressum).        |
+| `PUBLIC_IMPRESSUM_CITY`    | *(none)*                | City for legal disclosure (Impressum).           |
+| `PUBLIC_IMPRESSUM_COUNTRY` | *(none)*                | Country for legal disclosure (Impressum).        |
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Install dependencies with `npm install`
 
 ```bash
 npm run dev
@@ -24,15 +26,3 @@ npm run dev
 # or start the server and open the app in a new browser tab
 npm run dev -- --open
 ```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
