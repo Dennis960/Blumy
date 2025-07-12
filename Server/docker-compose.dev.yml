@@ -14,14 +14,9 @@ services:
       - db-data:/var/lib/postgresql/data
       - ./pg-init-scripts:/docker-entrypoint-initdb.d
   server:
-    image: server-dev
+    image: mcr.microsoft.com/devcontainers/typescript-node:1-20
     depends_on:
       - db
-    build:
-      context: Server
-      dockerfile: ./Dockerfile.dev
-    volumes:
-      - .:/workspace:cached
     command: sleep infinity
     environment:
       - POSTGRES_USER=blumy

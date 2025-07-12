@@ -1,8 +1,11 @@
 {
-	"name": "server container",
+	"name": "Server container",
 	"service": "server",
 	"workspaceFolder": "/workspace",
-	"dockerComposeFile": "../../docker-compose.dev.yml",
+	"mounts": [
+		"source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+	],
+	"dockerComposeFile": "../../Server/docker-compose.dev.yml",
 	"customizations": {
 		"vscode": {
 			"extensions": [
