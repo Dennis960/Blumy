@@ -1,3 +1,7 @@
+<script>
+	import { env as publicEnv } from "$env/dynamic/public";
+
+</script>
 <div class="container py-5">
 	<div class="row justify-content-center">
 		<div class="col-md-8">
@@ -8,10 +12,10 @@
 				<div class="card-body">
 					<h2 class="h4">Angaben gemäß § 5 TMG</h2>
 					<p>
-						{privateEnv.IMPRESSUM_NAME}<br />
-						{privateEnv.IMPRESSUM_ADDRESS}<br />
-						{privateEnv.IMPRESSUM_CITY}<br />
-						{privateEnv.IMPRESSUM_COUNTRY}
+						{publicEnv.PUBLIC_IMPRESSUM_NAME}<br />
+						{publicEnv.PUBLIC_IMPRESSUM_ADDRESS}<br />
+						{publicEnv.PUBLIC_IMPRESSUM_CITY}<br />
+						{publicEnv.PUBLIC_IMPRESSUM_COUNTRY}
 					</p>
 
 					<h2 class="h4 mt-4">Kontakt</h2>
@@ -21,10 +25,10 @@
 
 					<h2 class="h4 mt-4">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
 					<p>
-						{privateEnv.IMPRESSUM_NAME}<br />
-						{privateEnv.IMPRESSUM_ADDRESS}<br />
-						{privateEnv.IMPRESSUM_CITY}<br />
-						{privateEnv.IMPRESSUM_COUNTRY}
+						{publicEnv.PUBLIC_IMPRESSUM_NAME}<br />
+						{publicEnv.PUBLIC_IMPRESSUM_ADDRESS}<br />
+						{publicEnv.PUBLIC_IMPRESSUM_CITY}<br />
+						{publicEnv.PUBLIC_IMPRESSUM_COUNTRY}
 					</p>
 
 					<h2 class="h4 mt-4">Haftungsausschluss</h2>
