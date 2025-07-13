@@ -68,15 +68,25 @@
 				>
 					{#snippet icon()}
 						{#if sensor.plantHealth.drowning}
-							<IconScubaMask size={20} />
+							<span title="Pflanze ertrinkt">
+								<IconScubaMask size={20} />
+							</span>
 						{:else if sensor.plantHealth.wilting}
-							<IconGrave size={20} />
+							<span title="Pflanze vertrocknet">
+								<IconGrave size={20} />
+							</span>
 						{:else if sensor.plantHealth.overwatered}
-							<IconDropletFilled size={20} />
+							<span title="Zu viel Wasser">
+								<IconDropletFilled size={20} />
+							</span>
 						{:else if sensor.plantHealth.underwatered}
-							<IconDroplet size={20} />
+							<span title="Zu wenig Wasser">
+								<IconDroplet size={20} />
+							</span>
 						{:else}
-							<IconDropletFilled2 size={20} />
+							<span title="Wasserstand normal">
+								<IconDropletFilled2 size={20} />
+							</span>
 						{/if}
 					{/snippet}
 					<div class="w-100 me-4">

@@ -63,21 +63,41 @@
 							: ''}"
 					>
 						{#if waterToday || waterTomorrow}
-							<IconClockExclamation size={16} />
+							<span title="Baldige Bewässerung erforderlich">
+								<IconClockExclamation size={16} />
+							</span>
 						{:else if sensor.plantHealth.drowning}
-							<IconScubaMask size={16} />
+							<span title="Pflanze ertrinkt">
+								<IconScubaMask size={16} />
+							</span>
 						{:else if sensor.plantHealth.wilting}
-							<IconGrave size={16} />
+							<span title="Pflanze vertrocknet">
+								<IconGrave size={16} />
+							</span>
 						{:else if sensor.plantHealth.overwatered}
-							<IconDropletFilled size={16} />
+							<span title="Zu viel Wasser">
+								<IconDropletFilled size={16} />
+							</span>
 						{:else if sensor.plantHealth.underwatered}
-							<IconDroplet size={16} />
+							<span title="Zu wenig Wasser">
+								<IconDroplet size={16} />
+							</span>
 						{:else if sensor.sensorHealth.signalStrength == 'offline'}
-							<IconWifiOff size={16} />
+							<span title="Sensor offline">
+								<IconWifiOff size={16} />
+							</span>
 						{:else if sensor.sensorHealth.battery == 'empty'}
-							<IconBatteryOff size={16} />
-						{:else if sensor.sensorHealth.battery == 'low' || sensor.sensorHealth.signalStrength == 'weak'}
-							<IconAlertTriangle size={16} />
+							<span title="Batterie leer">
+								<IconBatteryOff size={16} />
+							</span>
+						{:else if sensor.sensorHealth.battery == 'low'}
+							<span title="Warnung: Schwache Batterie">
+								<IconAlertTriangle size={16} />
+							</span>
+						{:else if sensor.sensorHealth.signalStrength == 'weak'}
+							<span title="Warnung: Schwaches Signal">
+								<IconAlertTriangle size={16} />
+							</span>
 						{/if}
 					</div>
 				</div>
