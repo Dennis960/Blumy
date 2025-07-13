@@ -1,13 +1,4 @@
-import {
-	BATTERY_EMPTY_THRESHOLD,
-	BATTERY_LOW_THRESHOLD,
-	MAX_BATTERY_VOLTAGE,
-	MIN_BATTERY_VOLTAGE,
-	OFFLINE_TIMEOUT,
-	RSSI_MODERATE_THRESHOLD,
-	RSSI_STRONG_THRESHOLD,
-	USB_CONNECTED_THRESHOLD
-} from '$lib/client/config';
+import { MAX_BATTERY_VOLTAGE, MIN_BATTERY_VOLTAGE } from '$lib/client/config';
 import type { ESPSensorReadingDTO } from '$lib/server/entities/SensorReadingEntity';
 import type {
 	LightHistoryEntry,
@@ -15,7 +6,6 @@ import type {
 	SensorConfigurationDTO,
 	SensorCreatedDTO,
 	SensorDTO,
-	SensorHealthDTO,
 	SensorHistoryDTO,
 	SensorOverviewDTO,
 	SensorReadingDTO,
@@ -84,7 +74,7 @@ export default class SensorController {
 		const lastReading = sensorData[sensorData.length - 1];
 		const model = SensorService.fitModel(sensorData);
 
-		const sensorHealth = this.getSensorHealth(lastReading);
+		const sensorHealth = SensorService.getSensorHealth(lastReading);
 		const plantHealth = this.getPlantHealth(lastReading, config);
 
 		return {
@@ -169,36 +159,6 @@ export default class SensorController {
 
 		const warning = status.overwatered || status.underwatered;
 		const critical = status.drowning || status.wilting;
-		return {
-			...status,
-			warning,
-			critical
-		};
-	}
-
-	private getSensorHealth(lastReading: SensorReadingDTO | undefined): SensorHealthDTO {
-		const status: Pick<SensorHealthDTO, 'signalStrength' | 'battery'> = {
-			signalStrength:
-				lastReading == undefined || lastReading.timestamp < new Date(Date.now() - OFFLINE_TIMEOUT)
-					? 'offline'
-					: lastReading.rssi > RSSI_STRONG_THRESHOLD
-						? 'strong'
-						: lastReading.rssi > RSSI_MODERATE_THRESHOLD
-							? 'moderate'
-							: 'weak',
-			battery:
-				lastReading == undefined || lastReading.voltage > USB_CONNECTED_THRESHOLD
-					? 'usb'
-					: lastReading.voltage < BATTERY_EMPTY_THRESHOLD
-						? 'empty'
-						: lastReading.voltage < BATTERY_LOW_THRESHOLD
-							? 'low'
-							: 'full'
-		};
-
-		const warning = status.signalStrength == 'weak' || status.battery == 'low';
-		const critical = status.signalStrength == 'offline' || status.battery == 'empty';
-
 		return {
 			...status,
 			warning,

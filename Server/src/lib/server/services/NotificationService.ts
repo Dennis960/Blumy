@@ -1,11 +1,11 @@
+import { env } from '$env/dynamic/private';
+import { clientApi } from '$lib/client/api';
+import { route } from '$lib/ROUTES';
 import { sensors } from '$lib/server/db/schema';
 import webpush, { WebPushError } from 'web-push';
 import SensorRepository from '../repositories/SensorRepository';
 import SubscriptionRepository from '../repositories/SubscriptionRepository';
 import SensorService from './SensorService';
-import { clientApi } from '$lib/client/api';
-import { env } from '$env/dynamic/private';
-import { route } from '$lib/ROUTES';
 
 export default class NotificationService {
 	public static async triggerPushNotifications(): Promise<void> {
@@ -14,18 +14,40 @@ export default class NotificationService {
 
 		for (const sensor of sensors) {
 			const lastReading = await SensorService.getLastReading(sensor.sensorAddress);
-			if (lastReading !== undefined && lastReading.availableWaterCapacity < sensor.lowerThreshold) {
-				await this.notifySensor(sensor);
+			if (lastReading === undefined) {
+				continue;
+			}
+			const sensorHealth = SensorService.getSensorHealth(lastReading);
+			if (sensorHealth.signalStrength === 'offline') {
+				if (sensorHealth.battery === 'empty') {
+					await this.notifySensor(
+						sensor,
+						`${sensor.name} ist offline!`,
+						`Die Batterie könnte leer sein, bitte tausche sie aus!`
+					);
+				} else {
+					await this.notifySensor(
+						sensor,
+						`${sensor.name} ist offline!`,
+						`Bitte überprüfe die Verbindung!`
+					);
+				}
+			} else if (lastReading.availableWaterCapacity < sensor.lowerThreshold) {
+				await this.notifySensor(sensor, `${sensor.name} braucht Wasser!`, `Bitte gieße jetzt!`);
 			}
 		}
 	}
 
-	public static async notifySensor(sensor: typeof sensors.$inferSelect) {
+	public static async notifySensor(
+		sensor: typeof sensors.$inferSelect,
+		notificationTitle: string,
+		notificationBody: string
+	) {
 		const subscriptions = await SubscriptionRepository.getBySensorAddress(sensor.sensorAddress);
 
 		const payload = JSON.stringify({
-			title: `${sensor.name} braucht Wasser!`,
-			body: `Bitte gieße jetzt!`,
+			title: notificationTitle,
+			body: notificationBody,
 			icon: clientApi(null!, env.ORIGIN)
 				.sensors()
 				.withId(sensor.sensorAddress)

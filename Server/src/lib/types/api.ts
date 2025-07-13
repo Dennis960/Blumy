@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export interface SensorReadingDTO {
+	date: Date; // date of the reading
 	id: number;
 	firmwareVersion: number;
 	timestamp: Date;

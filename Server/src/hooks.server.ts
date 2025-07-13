@@ -1,3 +1,4 @@
+import { dev } from '$app/environment';
 import { env as privateEnv } from '$env/dynamic/private';
 import { env as publicEnv } from '$env/dynamic/public';
 import { lucia } from '$lib/server/auth';
@@ -24,14 +25,19 @@ if (publicEnv.PUBLIC_MODE === 'test-ci') {
 webpush.setVapidDetails('mailto:' + privateEnv.VAPID_EMAIL, publicVapidKey, privateVapidKey);
 await FirmwareUpdateService.fetchAndSaveLatestFirmwareVersion();
 
-// send notifications every day at 8, 12, 16 and 20
-cron.schedule('0 8,12,16,20 * * *', async () => {
-	await NotificationService.triggerPushNotifications();
-});
-// check for firmware updates every day at 4
-cron.schedule('0 4 * * *', async () => {
-	await FirmwareUpdateService.fetchAndSaveLatestFirmwareVersion();
-});
+if (!dev) {
+	console.log('Scheduling cron jobs');
+	// send notifications every day at 8, 12, 16 and 20
+	cron.schedule('0 8,12,16,20 * * *', async () => {
+		await NotificationService.triggerPushNotifications();
+	});
+	// check for firmware updates every day at 4
+	cron.schedule('0 4 * * *', async () => {
+		await FirmwareUpdateService.fetchAndSaveLatestFirmwareVersion();
+	});
+} else {
+	console.log('Cron jobs are disabled in development mode');
+}
 
 const luciaHandle: Handle = async ({ event, resolve }) => {
 	event.locals.lucia = lucia;

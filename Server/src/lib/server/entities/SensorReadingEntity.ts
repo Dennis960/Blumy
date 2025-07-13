@@ -40,6 +40,7 @@ export default class SensorReadingEntity {
 
 	public static toDTO(reading: SensorReadingEntity, sensor: SensorEntity): SensorReadingDTO {
 		return {
+			date: reading.date,
 			id: reading.id,
 			firmwareVersion: reading.firmwareVersion,
 			timestamp: new Date(reading.date),

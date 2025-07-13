@@ -1,5 +1,13 @@
+import {
+	BATTERY_EMPTY_THRESHOLD,
+	BATTERY_LOW_THRESHOLD,
+	OFFLINE_TIMEOUT,
+	RSSI_MODERATE_THRESHOLD,
+	RSSI_STRONG_THRESHOLD,
+	USB_CONNECTED_THRESHOLD
+} from '$lib/client/config';
 import { calculateDerivative, exponentialRegression } from '$lib/server/util/ml';
-import type { SensorReadingDTO, WaterCapacityHistoryEntry } from '$lib/types/api';
+import type { SensorHealthDTO, SensorReadingDTO, WaterCapacityHistoryEntry } from '$lib/types/api';
 import SensorReadingEntity from '../entities/SensorReadingEntity';
 import SensorDataRepository from '../repositories/SensorDataRepository';
 import SensorRepository from '../repositories/SensorRepository';
@@ -140,6 +148,39 @@ export default class SensorService {
 		return {
 			predictEntries,
 			predictTimestamp
+		};
+	}
+
+	/**
+	 * Get sensor health based on last reading
+	 */
+	public static getSensorHealth(lastReading: SensorReadingDTO | undefined): SensorHealthDTO {
+		const status: Pick<SensorHealthDTO, 'signalStrength' | 'battery'> = {
+			signalStrength:
+				lastReading == undefined || lastReading.timestamp < new Date(Date.now() - OFFLINE_TIMEOUT)
+					? 'offline'
+					: lastReading.rssi > RSSI_STRONG_THRESHOLD
+						? 'strong'
+						: lastReading.rssi > RSSI_MODERATE_THRESHOLD
+							? 'moderate'
+							: 'weak',
+			battery:
+				lastReading == undefined || lastReading.voltage > USB_CONNECTED_THRESHOLD
+					? 'usb'
+					: lastReading.voltage < BATTERY_EMPTY_THRESHOLD
+						? 'empty'
+						: lastReading.voltage < BATTERY_LOW_THRESHOLD
+							? 'low'
+							: 'full'
+		};
+
+		const warning = status.signalStrength == 'weak' || status.battery == 'low';
+		const critical = status.signalStrength == 'offline' || status.battery == 'empty';
+
+		return {
+			...status,
+			warning,
+			critical
 		};
 	}
 }

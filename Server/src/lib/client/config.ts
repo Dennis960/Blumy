@@ -14,7 +14,7 @@ export const MIN_VOLTAGE_GRAPH = 0;
 export const MAX_VOLTAGE_GRAPH = 5;
 
 /** If no data was received in this duration the sensor is considered offline */
-export const OFFLINE_TIMEOUT = 120 * 60 * 1000; // 2 hours
+export const OFFLINE_TIMEOUT = 4 * 60 * 60 * 1000; // 4 hours
 
 /** The rssi value above which the connection is considered strong */
 export const RSSI_STRONG_THRESHOLD = -55;
