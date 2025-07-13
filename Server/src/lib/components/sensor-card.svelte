@@ -11,15 +11,17 @@
 		IconWifiOff
 	} from '$lib/icons';
 	import type { SensorDTO } from '$lib/types/api';
+	import type { Snippet } from 'svelte';
 	import Base64Image from './base64-image.svelte';
 	import WaterCapacityBar from './water-capacity-bar.svelte';
 
 	interface Props {
 		sensor: SensorDTO;
 		onclick?: () => void;
+		children?: Snippet;
 	}
 
-	let { sensor, onclick }: Props = $props();
+	let { sensor, onclick, children }: Props = $props();
 
 	let waterToday = $derived(
 		sensor.prediction != undefined &&
@@ -96,6 +98,7 @@
 				<div class="mt-auto">
 					<WaterCapacityBar {sensor} />
 				</div>
+				{@render children?.()}
 			</div>
 		</div>
 	</div>

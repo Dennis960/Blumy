@@ -18,6 +18,7 @@ export { default as IconBattery4 } from '@tabler/icons-svelte/icons/battery-4';
 export { default as IconBatteryOff } from '@tabler/icons-svelte/icons/battery-off';
 export { default as IconBatteryCharging2 } from '@tabler/icons-svelte/icons/battery-charging-2';
 export { default as IconPlus } from '@tabler/icons-svelte/icons/plus';
+export { default as IconTrash } from '@tabler/icons-svelte/icons/trash';
 
 export { default as IconChevronLeftRaw } from '@tabler/icons/outline/chevron-left.svg?raw';
 export { default as IconChevronRightRaw } from '@tabler/icons/outline/chevron-right.svg?raw';

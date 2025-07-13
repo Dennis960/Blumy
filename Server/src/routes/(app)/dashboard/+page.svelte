@@ -62,7 +62,26 @@
 									`${route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() })}?token=${sensor.readToken}`
 								)}
 							{sensor}
-						/>
+						>
+							<button
+								class="btn text-info mt-4"
+								onclick={(e) => {
+									e.stopPropagation();
+									if (
+										!confirm(
+											'Möchtest du diesen Sensor wirklich aus deinen geteilten Sensoren ausblenden?'
+										)
+									) {
+										return;
+									}
+									SensorStorage.removeSensor(sensor.id);
+									storedSensors = storedSensors.filter((s) => s.id !== sensor.id);
+									invalidate(DATA_DEPENDENCY.SENSOR_VALUE_DISTRIBUTION);
+								}}
+							>
+								Ausblenden
+							</button>
+						</SensorCard>
 					</div>
 				{/each}
 			{/if}
