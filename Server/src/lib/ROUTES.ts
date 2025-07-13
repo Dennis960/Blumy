@@ -38,6 +38,7 @@ const SERVERS = {
   "GET /api/auth/google/callback": `/api/auth/google/callback`,
   "POST /api/auth/google/login": `/api/auth/google/login`,
   "POST /api/auth/logout": `/api/auth/logout`,
+  "GET /api/blumyWrl": `/api/blumyWrl`,
   "POST /api/cron": `/api/cron`,
   "DELETE /api/currentAccount": `/api/currentAccount`,
   "PUT /api/currentAccount/email": `/api/currentAccount/email`,
@@ -194,7 +195,7 @@ type ExtractParamType<T extends (param: any) => any> = ExtractFnPredicate<T> ext
 */
 export type KIT_ROUTES = {
   PAGES: { '/': never, '/account': never, '/dashboard': never, '/dashboard/sensor/[id=sensorId]': 'id', '/dashboard/sensor/[id=sensorId]/settings': 'id', '/dashboard/sensor/new': never, '/dashboard/table': never, '/impressum': never, '/privacy-policy': never, '/shop': never, '/tutorials/getting-started': never, '/tutorials/home-assistant': never, '/selector': never, '/selector/sensor/new': never }
-  SERVERS: { 'POST /api/auth/default/login': never, 'POST /api/auth/default/register': never, 'GET /api/auth/google/callback': never, 'POST /api/auth/google/login': never, 'POST /api/auth/logout': never, 'POST /api/cron': never, 'DELETE /api/currentAccount': never, 'PUT /api/currentAccount/email': never, 'PUT /api/currentAccount/password': never, 'POST /api/sensorList': never, 'POST /api/sensors': never, 'DELETE /api/sensors/[id]': 'id', 'POST /api/sensors/[id]/check-subscription': 'id', 'GET /api/sensors/[id]/image': 'id', 'PUT /api/sensors/[id]/settings': 'id', 'POST /api/sensors/[id]/subscribe': 'id', 'POST /api/sensors/[id]/unsubscribe': 'id', 'POST /api/sensors/[id]/write-token': 'id', 'POST /api/v2/data': never, 'GET /api/v2/data': never, 'POST /api/waitingList': never }
+  SERVERS: { 'POST /api/auth/default/login': never, 'POST /api/auth/default/register': never, 'GET /api/auth/google/callback': never, 'POST /api/auth/google/login': never, 'POST /api/auth/logout': never, 'GET /api/blumyWrl': never, 'POST /api/cron': never, 'DELETE /api/currentAccount': never, 'PUT /api/currentAccount/email': never, 'PUT /api/currentAccount/password': never, 'POST /api/sensorList': never, 'POST /api/sensors': never, 'DELETE /api/sensors/[id]': 'id', 'POST /api/sensors/[id]/check-subscription': 'id', 'GET /api/sensors/[id]/image': 'id', 'PUT /api/sensors/[id]/settings': 'id', 'POST /api/sensors/[id]/subscribe': 'id', 'POST /api/sensors/[id]/unsubscribe': 'id', 'POST /api/sensors/[id]/write-token': 'id', 'POST /api/v2/data': never, 'GET /api/v2/data': never, 'POST /api/waitingList': never }
   ACTIONS: Record<string, never>
   LINKS: Record<string, never>
   Params: { 'id': never }

@@ -288,6 +288,10 @@ export function clientApi(_fetch: typeof fetch = fetch, baseUrl: string = '') {
 			query.set('blumyUrl', `${originHttp}/api/v2/data`);
 			urlObj.search = query.toString();
 			location.href = urlObj.toString();
+		},
+		blumyWrl: () => {
+			url.addPath('blumyWrl');
+			return fetch((res) => res.blob());
 		}
 	};
 }
