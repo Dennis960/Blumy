@@ -1,5 +1,4 @@
 <script lang="ts">
-	import VrmlViewer from '$lib/components/VRMLViewer.svelte';
 	import { route } from '$lib/ROUTES';
 
 	const tutorials = [
@@ -132,12 +131,6 @@
 							{/each}
 						</ul>
 					</div>
-				</div>
-
-				<div class="mt-5 text-center">
-					<h3 class="h2 mb-3">Blumy in 3D entdecken</h3>
-					<VrmlViewer class="card border-0 shadow-sm" style="width: 100%; height: 600px;"
-					></VrmlViewer>
 				</div>
 			</div>
 		</div>
