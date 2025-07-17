@@ -4720,12 +4720,6 @@
 		(uuid "06c15820-a3f9-4333-9aad-3681fd13e962")
 	)
 	(junction
-		(at 254.635 99.06)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "0812d6d6-353e-44bf-b02d-ba3ca1c7c64f")
-	)
-	(junction
 		(at 205.74 101.6)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -4874,12 +4868,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "668c2b7c-33f6-4dae-a983-b04dcf4fbdd9")
-	)
-	(junction
-		(at 271.145 99.06)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "73c1e77a-b2f6-4654-a42b-9dcab3ff7503")
 	)
 	(junction
 		(at 50.8 168.275)
@@ -5197,16 +5185,6 @@
 	)
 	(wire
 		(pts
-			(xy 271.145 102.87) (xy 271.145 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "18f74b8f-71ea-4fca-a5ab-b088f5377f12")
-	)
-	(wire
-		(pts
 			(xy 205.74 99.06) (xy 205.74 101.6)
 		)
 		(stroke
@@ -5397,7 +5375,7 @@
 	)
 	(wire
 		(pts
-			(xy 254.635 99.06) (xy 255.27 99.06)
+			(xy 251.46 99.06) (xy 255.27 99.06)
 		)
 		(stroke
 			(width 0)
@@ -5907,16 +5885,6 @@
 	)
 	(wire
 		(pts
-			(xy 254.635 102.87) (xy 254.635 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "9280f73f-1a99-4367-877c-73f8f9dee6d5")
-	)
-	(wire
-		(pts
 			(xy 165.1 55.245) (xy 163.83 55.245)
 		)
 		(stroke
@@ -6057,7 +6025,7 @@
 	)
 	(wire
 		(pts
-			(xy 271.145 99.06) (xy 274.955 99.06)
+			(xy 270.51 99.06) (xy 274.955 99.06)
 		)
 		(stroke
 			(width 0)
@@ -6214,16 +6182,6 @@
 			(type default)
 		)
 		(uuid "b739902b-359c-40a0-9564-9ef7cf7c9cf0")
-	)
-	(wire
-		(pts
-			(xy 266.7 102.87) (xy 271.145 102.87)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b75e277b-bb40-4828-a071-6f34bc2cb78a")
 	)
 	(polyline
 		(pts
@@ -6417,16 +6375,6 @@
 	)
 	(wire
 		(pts
-			(xy 251.46 99.06) (xy 254.635 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "d9cb60bb-aef0-4991-9533-5488100e6a20")
-	)
-	(wire
-		(pts
 			(xy 149.86 183.515) (xy 149.86 178.435)
 		)
 		(stroke
@@ -6577,16 +6525,6 @@
 	)
 	(wire
 		(pts
-			(xy 259.08 102.87) (xy 254.635 102.87)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f5c508ae-ef47-46ca-aac4-eec5969984cb")
-	)
-	(wire
-		(pts
 			(xy 45.72 93.98) (xy 43.18 93.98)
 		)
 		(stroke
@@ -6644,16 +6582,6 @@
 			(type default)
 		)
 		(uuid "fe5b177f-d4ad-49dd-a7a7-ab83f9a63763")
-	)
-	(wire
-		(pts
-			(xy 270.51 99.06) (xy 271.145 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "fe9a86d9-456a-4164-83ef-c3de7a386a6d")
 	)
 	(wire
 		(pts
@@ -12501,100 +12429,6 @@
 			(project "Board"
 				(path "/fa2a81f8-bf39-4c28-beef-a6fc807c4564"
 					(reference "C4")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:C")
-		(at 262.89 102.87 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "c75745eb-0df3-488a-b5ab-3a8fabf9d660")
-		(property "Reference" "C5"
-			(at 269.24 104.14 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "100nF-Ceramic"
-			(at 269.24 101.6 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
-			(at 259.08 103.8352 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 262.89 102.87 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 262.89 102.87 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C1525"
-			(at 262.89 102.87 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "C1525"
-			(at 262.89 102.87 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "JLCPCB Position Offset" ""
-			(at 262.89 102.87 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "e56956b7-2a93-43f0-85e2-7ede7c47cc6e")
-		)
-		(pin "2"
-			(uuid "1c27d270-7050-4f19-a6f7-3b8932552d00")
-		)
-		(instances
-			(project "Board"
-				(path "/fa2a81f8-bf39-4c28-beef-a6fc807c4564"
-					(reference "C5")
 					(unit 1)
 				)
 			)
