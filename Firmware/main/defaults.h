@@ -14,3 +14,5 @@
 #define DEFAULT_LED_BRIGHTNESS 128 // Default brightness for LEDs between 0 and 255
 
 #define MAX_MOISTURE_MEASUREMENT 2500
+
+#define DEFAULT_SSID_BLUMY "Blumy"

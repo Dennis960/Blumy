@@ -622,3 +622,39 @@ bool plantfi_test_mqtt_connection(char *sensorId, char *server, uint32_t port, c
 {
     return plantmqtt_test_connection(sensorId, server, port, username, password, topic, clientId);
 }
+
+bool plantfi_found_blumy_network()
+{
+    ESP_LOGI(PLANTFI_TAG, "Searching for Blumy network");
+    if (plantfi_sta_status == PLANTFI_STA_STATUS_UNINITIALIZED)
+    {
+        ESP_LOGE(PLANTFI_TAG, "STA not initialized");
+        return false;
+    }
+    if (plantfi_sta_status == PLANTFI_STA_STATUS_PENDING)
+    {
+        plantfi_waitForStaConnection(NULL);
+    }
+    wifi_scan_config_t scan_config = {
+        .ssid = (uint8_t *)DEFAULT_SSID_BLUMY,
+        .bssid = NULL,
+        .channel = 1, // Scan only channel 1, which is the default channel for Blumy
+        .scan_type = WIFI_SCAN_TYPE_ACTIVE,
+        .scan_time = {
+            .active = {
+                .min = 10,
+                .max = 200,
+            },
+        },
+    };
+    ESP_ERROR_CHECK(esp_wifi_scan_start(&scan_config, true));
+    uint16_t ap_num = 0;
+    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_num(&ap_num));
+    if (ap_num == 0)
+    {
+        ESP_LOGI(PLANTFI_TAG, "No Blumy network found");
+        return false;
+    }
+    ESP_LOGI(PLANTFI_TAG, "Blumy network found");
+    return true;
+}

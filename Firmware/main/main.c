@@ -71,20 +71,23 @@ void handleLedsForWifiEvents()
     }
 }
 
-void configuration_mode(bool isConfigured)
+void multi_configuration_mode()
 {
-    ESP_LOGI("MODE", "Starting configuration mode%s", isConfigured ? " (sensor is configured)" : " (no config)");
-    sensors_initSensors();
-    plantstore_getLedBrightness(&ledBrightness);
-    sensors_setLedRedBrightness(ledBrightness);
-    sensors_playStartupSound();
-    plantfi_setEnableNatAndDnsOnConnect(true);
-    plantfi_initWifiApSta();
+    ESP_LOGI("MODE", "Starting multi configuration mode");
+    sensors_setLedYellowBrightness(ledBrightness);
+    // TODO connect to Blumy network and ask for wifi credentials
+    vTaskDelay(1000 / portTICK_PERIOD_MS); // Simulate some work
+    sensors_setLedYellowBrightness(0);
+}
+
+void single_configuration_mode(bool isConfigured)
+{
+    ESP_LOGI("MODE", "Starting single configuration mode%s", isConfigured ? " (sensor is configured)" : " (no config)");
     uint64_t start_time = esp_timer_get_time();
     uint64_t current_time = start_time;
     int32_t timeoutMs = DEFAULT_CONFIGURATION_MODE_TIMEOUT_MS;
     plantstore_getConfigurationModeTimeoutMs(&timeoutMs);
-    plantfi_configureAp("Blumy", "", 4);
+    plantfi_configureAp(DEFAULT_SSID_BLUMY, "", 4);
 
     ESP_LOGI("MODE", "Starting webserver");
     httpd_handle_t webserver = start_webserver();
@@ -112,6 +115,28 @@ void configuration_mode(bool isConfigured)
         vTaskDelay(10 / portTICK_PERIOD_MS); // Reset watchdog
     }
     stop_webserver(webserver);
+}
+
+void configuration_mode(bool isConfigured)
+{
+    ESP_LOGI("MODE", "Starting configuration mode%s", isConfigured ? " (sensor is configured)" : " (no config)");
+    sensors_initSensors();
+    plantstore_getLedBrightness(&ledBrightness);
+    sensors_setLedRedBrightness(ledBrightness);
+    sensors_playStartupSound();
+    plantfi_setEnableNatAndDnsOnConnect(true);
+    plantfi_initWifiApSta();
+
+    bool foundBlumyNetwork = plantfi_found_blumy_network();
+    if (foundBlumyNetwork)
+    {
+        multi_configuration_mode();
+    }
+    else
+    {
+        single_configuration_mode(isConfigured);
+    }
+
     sensors_playShutdownSound();
     sensors_setLedGreenBrightness(0);
     sensors_blinkLedRed(3, 100, ledBrightness);
