@@ -192,6 +192,8 @@ void app_main()
     ESP_LOGI("MAIN", "Checking if plantstore is configured");
     bool isConfigured = plantstore_isConfigured();
 
+    sensors_detectBlumyType();
+
     if (isManualReset || !isConfigured)
     {
         configuration_mode(isConfigured);

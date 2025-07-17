@@ -1,6 +1,7 @@
 #pragma once
 
 #include "freertos/FreeRTOS.h"
+#include "peripherals/config.h"
 
 typedef struct
 {
@@ -77,7 +78,7 @@ void sensors_aht_read_data(sensors_aht_data_t *data);
 bool sensors_read_moisture(sensors_moisture_sensor_output_t *output);
 /**
  * Calculate the moisture percentage based on the raw measurement.
- * 
+ *
  * @param measurement The raw measurement from the moisture sensor.
  * @return Moisture percentage (0.0 to 100.0, dry = 0%, wet = 100%)
  */
@@ -88,3 +89,4 @@ void sensors_full_read(sensors_full_data_t *data);
 void sensors_playStartupSound();
 void sensors_playShutdownSound();
 bool sensors_isBootButtonPressed();
+void sensors_detectBlumyType();

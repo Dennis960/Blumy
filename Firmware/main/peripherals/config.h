@@ -1,35 +1,57 @@
-// ANALOG INPUT
-#define ADC_MOISTURE_SENSOR GPIO_NUM_0
-#define ADC_MOISTURE_SENSOR_CHANNEL ADC_CHANNEL_0     // GPIO 0, LP
-#define ADC_LIGHT_SENSOR_CHANNEL ADC_CHANNEL_3        // GPIO 3, LP
-#define ADC_VOLTAGE_MEASUREMENT_CHANNEL ADC_CHANNEL_6 // GPIO 6, LP
+#pragma once
 
-// DIGITAL OUTPUT
-#define LIGHT_SENSOR_IN GPIO_NUM_2             // LP
-#define LED_RED GPIO_NUM_4                     // LP
-#define LED_GREEN GPIO_NUM_5                   // LP
-#define MOISTURE_SQUARE_WAVE_SIGNAL GPIO_NUM_7 // LP
-#define BUZZER GPIO_NUM_21
+#include "freertos/FreeRTOS.h"
+#include "driver/gpio.h"
+#include "driver/ledc.h"
+#include "esp_adc/adc_oneshot.h"
 
-// BOOT BUTTON
-#define BOOT_BUTTON GPIO_NUM_9
+typedef enum
+{
+    SENSOR_TYPE_ACONTIUM = 0,
+    SENSOR_TYPE_BELLIS = 1,
+} blumy_type_t;
 
-// LEDC CHANNELS
-#define BUZZER_CHANNEL LEDC_CHANNEL_0
-#define LED_RED_CHANNEL LEDC_CHANNEL_1
-#define LED_GREEN_CHANNEL LEDC_CHANNEL_2
-#define MOISTURE_SQUARE_WAVE_SIGNAL_CHANNEL LEDC_CHANNEL_3
+typedef struct
+{
+    // ANALOG INPUT
+    gpio_num_t ADC_MOISTURE_SENSOR;
+    adc_channel_t ADC_MOISTURE_SENSOR_CHANNEL;
+    adc_channel_t ADC_LIGHT_SENSOR_CHANNEL;
+    adc_channel_t ADC_VOLTAGE_MEASUREMENT_CHANNEL;
 
-// DIGITAL INPUT/OUTPUT
-#define LIGHT_SENSOR_SELECT GPIO_NUM_1 // LP
-#define VOLTAGE_MEASUREMENT_SELECT GPIO_NUM_14
+    // DIGITAL OUTPUT
+    gpio_num_t LIGHT_SENSOR_IN;
+    gpio_num_t LED_RED;
+    gpio_num_t LED_GREEN;
+    gpio_num_t MOISTURE_SQUARE_WAVE_SIGNAL;
+    gpio_num_t BUZZER;
 
-// I2C
-#define TEMPERATURE_SENSOR_SDA GPIO_NUM_22
-#define TEMPERATURE_SENSOR_SCL GPIO_NUM_23
+    // BOOT BUTTON
+    gpio_num_t BOOT_BUTTON;
 
-// USED FOR PROGRAMMING
-// #define USB_DM GPIO_NUM_12
-// #define USB_DP GPIO_NUM_13
-// #define TXD GPIO_NUM_?
-// #define RXD GPIO_NUM_?
+    // LEDC CHANNELS
+    ledc_channel_t BUZZER_CHANNEL;
+    ledc_channel_t LED_RED_CHANNEL;
+    ledc_channel_t LED_GREEN_CHANNEL;
+    ledc_channel_t MOISTURE_SQUARE_WAVE_SIGNAL_CHANNEL;
+
+    // DIGITAL INPUT/OUTPUT
+    gpio_num_t LIGHT_SENSOR_SELECT;
+    gpio_num_t VOLTAGE_MEASUREMENT_SELECT;
+
+    // I2C
+    gpio_num_t TEMPERATURE_SENSOR_SDA;
+    gpio_num_t TEMPERATURE_SENSOR_SCL;
+} config_t;
+
+extern const config_t CONFIG_ACONTIUM;
+
+extern const config_t CONFIG_BELLIS;
+
+extern config_t blumy_config;
+
+/**
+ * @brief Set the configuration based on the sensor type
+ * @param sensor_type The type of sensor
+ */
+void set_config(blumy_type_t sensor_type);

@@ -87,11 +87,11 @@ void analogWrite(int gpio, int frequency, float duty_cycle, ledc_channel_t chann
 TimerHandle_t toneTimer;
 void buzzerOffCallback(TimerHandle_t xTimer)
 {
-    analogWrite(BUZZER, 0, 0, BUZZER_CHANNEL);
+    analogWrite(blumy_config.BUZZER, 0, 0, blumy_config.BUZZER_CHANNEL);
 }
 void sensors_playToneAsync(int frequency, int duration_ms)
 {
-    analogWrite(BUZZER, frequency, 0.5, BUZZER_CHANNEL);
+    analogWrite(blumy_config.BUZZER, frequency, 0.5, blumy_config.BUZZER_CHANNEL);
 
     if (toneTimer == NULL)
     {
@@ -105,21 +105,21 @@ void sensors_playToneAsync(int frequency, int duration_ms)
 }
 void sensors_playToneSync(int frequency, int duration_ms)
 {
-    analogWrite(BUZZER, frequency, 0.5, BUZZER_CHANNEL);
+    analogWrite(blumy_config.BUZZER, frequency, 0.5, blumy_config.BUZZER_CHANNEL);
     vTaskDelay(duration_ms / portTICK_PERIOD_MS);
-    analogWrite(BUZZER, 0, 0, BUZZER_CHANNEL);
+    analogWrite(blumy_config.BUZZER, 0, 0, blumy_config.BUZZER_CHANNEL);
 }
 
 void setLedBrightness(int led_pin, uint8_t brightness)
 {
     float duty_cycle = (brightness / 255.0f) * (brightness / 255.0f); // Square the brightness for a more linear perception
-    if (led_pin == LED_RED)
+    if (led_pin == blumy_config.LED_RED)
     {
-        analogWrite(LED_RED, 5000, duty_cycle, LED_RED_CHANNEL);
+        analogWrite(blumy_config.LED_RED, 5000, duty_cycle, blumy_config.LED_RED_CHANNEL);
     }
-    else if (led_pin == LED_GREEN)
+    else if (led_pin == blumy_config.LED_GREEN)
     {
-        analogWrite(LED_GREEN, 5000, duty_cycle, LED_GREEN_CHANNEL);
+        analogWrite(blumy_config.LED_GREEN, 5000, duty_cycle, blumy_config.LED_GREEN_CHANNEL);
     }
     else
     {
@@ -159,22 +159,22 @@ void stop_led_blink_task()
 void sensors_setLedRedBrightness(uint8_t brightness)
 {
     stop_led_blink_task();
-    setLedBrightness(LED_GREEN, 0.0);
-    setLedBrightness(LED_RED, brightness);
+    setLedBrightness(blumy_config.LED_GREEN, 0.0);
+    setLedBrightness(blumy_config.LED_RED, brightness);
 }
 
 void sensors_setLedGreenBrightness(uint8_t brightness)
 {
     stop_led_blink_task();
-    setLedBrightness(LED_RED, 0.0);
-    setLedBrightness(LED_GREEN, brightness);
+    setLedBrightness(blumy_config.LED_RED, 0.0);
+    setLedBrightness(blumy_config.LED_GREEN, brightness);
 }
 
 void sensors_setLedYellowBrightness(uint8_t brightness)
 {
     stop_led_blink_task();
-    setLedBrightness(LED_RED, brightness);
-    setLedBrightness(LED_GREEN, brightness);
+    setLedBrightness(blumy_config.LED_RED, brightness);
+    setLedBrightness(blumy_config.LED_GREEN, brightness);
 }
 
 void blinkLed(bool led_red, bool led_green, int times, int duration_ms, uint8_t brightness)
@@ -184,21 +184,21 @@ void blinkLed(bool led_red, bool led_green, int times, int duration_ms, uint8_t 
     {
         if (led_red)
         {
-            setLedBrightness(LED_RED, brightness);
+            setLedBrightness(blumy_config.LED_RED, brightness);
         }
         if (led_green)
         {
-            setLedBrightness(LED_GREEN, brightness);
+            setLedBrightness(blumy_config.LED_GREEN, brightness);
         }
         vTaskDelay(duration_ms / portTICK_PERIOD_MS);
 
         if (led_red)
         {
-            setLedBrightness(LED_RED, 0.0);
+            setLedBrightness(blumy_config.LED_RED, 0.0);
         }
         if (led_green)
         {
-            setLedBrightness(LED_GREEN, 0.0);
+            setLedBrightness(blumy_config.LED_GREEN, 0.0);
         }
         vTaskDelay(duration_ms / portTICK_PERIOD_MS);
 
@@ -211,13 +211,13 @@ void blinkLed(bool led_red, bool led_green, int times, int duration_ms, uint8_t 
 
 void sensors_blinkLedRed(int times, int duration_ms, uint8_t brightness)
 {
-    setLedBrightness(LED_GREEN, 0.0);
+    setLedBrightness(blumy_config.LED_GREEN, 0.0);
     blinkLed(true, false, times, duration_ms, brightness);
 }
 
 void sensors_blinkLedGreen(int times, int duration_ms, uint8_t brightness)
 {
-    setLedBrightness(LED_RED, 0.0);
+    setLedBrightness(blumy_config.LED_RED, 0.0);
     blinkLed(false, true, times, duration_ms, brightness);
 }
 
@@ -271,13 +271,13 @@ void sensors_blinkLedYellowAsync(int times, int duration_ms, uint8_t brightness)
 void enableLightSensor()
 {
     ESP_LOGI("SENSORS", "Enabling light sensor");
-    gpio_set_level(LIGHT_SENSOR_IN, 1);
+    gpio_set_level(blumy_config.LIGHT_SENSOR_IN, 1);
 }
 
 void disableLightSensor()
 {
     ESP_LOGI("SENSORS", "Disabling light sensor");
-    gpio_set_level(LIGHT_SENSOR_IN, 0);
+    gpio_set_level(blumy_config.LIGHT_SENSOR_IN, 0);
 }
 
 /**
@@ -288,7 +288,7 @@ float sensors_readLightPercentage()
     ESP_LOGI("SENSORS", "Reading light sensor");
     enableLightSensor();
     vTaskDelay(20 / portTICK_PERIOD_MS); // Wait for the sensor to stabilize (statistically >10ms is enough)
-    int light_sensor_value = adc_analogReadAverageRaw(ADC_LIGHT_SENSOR_CHANNEL, 20, 5);
+    int light_sensor_value = adc_analogReadAverageRaw(blumy_config.ADC_LIGHT_SENSOR_CHANNEL, 20, 5);
     disableLightSensor();
     const int max_value = 4095;
     return light_sensor_value / (float)max_value;
@@ -297,20 +297,20 @@ float sensors_readLightPercentage()
 void enableVoltageMeasurement()
 {
     ESP_LOGI("SENSORS", "Enabling voltage measurement");
-    gpio_set_level(VOLTAGE_MEASUREMENT_SELECT, 0);
+    gpio_set_level(blumy_config.VOLTAGE_MEASUREMENT_SELECT, 0);
 }
 
 void disableVoltageMeasurement()
 {
     ESP_LOGI("SENSORS", "Disabling voltage measurement");
-    gpio_set_level(VOLTAGE_MEASUREMENT_SELECT, 1);
+    gpio_set_level(blumy_config.VOLTAGE_MEASUREMENT_SELECT, 1);
 }
 
 float sensors_readVoltage()
 {
     ESP_LOGI("SENSORS", "Reading voltage");
     enableVoltageMeasurement();
-    int voltage = adc_analogReadAverageVoltage(ADC_VOLTAGE_MEASUREMENT_CHANNEL, 10, 3);
+    int voltage = adc_analogReadAverageVoltage(blumy_config.ADC_VOLTAGE_MEASUREMENT_CHANNEL, 10, 3);
     disableVoltageMeasurement();
     const int r1 = 5100;
     const int r2 = 2000;
@@ -379,7 +379,7 @@ bool measure_stabilized_output(sensors_moisture_sensor_output_t *output)
         int sum = 0;
         for (int i = 0; i < numberOfMeasurements; i++)
         {
-            int measurement = adc_analogReadAverageRaw(ADC_MOISTURE_SENSOR_CHANNEL, 100, 10);
+            int measurement = adc_analogReadAverageRaw(blumy_config.ADC_MOISTURE_SENSOR_CHANNEL, 100, 10);
             if (measurement < min)
             {
                 min = measurement;
@@ -415,26 +415,26 @@ bool measure_stabilized_output(sensors_moisture_sensor_output_t *output)
 void setupMoistureSensor(long frequency, int dutyCycle)
 {
     ESP_LOGI("SENSORS", "Setting up moisture sensor");
-    analogWrite(MOISTURE_SQUARE_WAVE_SIGNAL, frequency, dutyCycle / 255.0, MOISTURE_SQUARE_WAVE_SIGNAL_CHANNEL);
+    analogWrite(blumy_config.MOISTURE_SQUARE_WAVE_SIGNAL, frequency, dutyCycle / 255.0, blumy_config.MOISTURE_SQUARE_WAVE_SIGNAL_CHANNEL);
 }
 
 void resetToZero()
 {
     ESP_LOGI("SENSORS", "Resetting moisture sensor to zero");
     int strength = 1;
-    int analogValue = adc_analogReadVoltage(ADC_MOISTURE_SENSOR_CHANNEL);
-    analogWrite(MOISTURE_SQUARE_WAVE_SIGNAL, 0, 0, MOISTURE_SQUARE_WAVE_SIGNAL_CHANNEL);
+    int analogValue = adc_analogReadVoltage(blumy_config.ADC_MOISTURE_SENSOR_CHANNEL);
+    analogWrite(blumy_config.MOISTURE_SQUARE_WAVE_SIGNAL, 0, 0, blumy_config.MOISTURE_SQUARE_WAVE_SIGNAL_CHANNEL);
     while (analogValue > 0 && strength <= 256)
     {
-        ESP_ERROR_CHECK(gpio_set_direction(ADC_MOISTURE_SENSOR, GPIO_MODE_OUTPUT));
-        ESP_ERROR_CHECK(gpio_set_level(ADC_MOISTURE_SENSOR, 0));
+        ESP_ERROR_CHECK(gpio_set_direction(blumy_config.ADC_MOISTURE_SENSOR, GPIO_MODE_OUTPUT));
+        ESP_ERROR_CHECK(gpio_set_level(blumy_config.ADC_MOISTURE_SENSOR, 0));
 
         vTaskDelay(strength / portTICK_PERIOD_MS);
         strength *= 2;
-        ESP_ERROR_CHECK(gpio_set_direction(ADC_MOISTURE_SENSOR, GPIO_MODE_INPUT));
+        ESP_ERROR_CHECK(gpio_set_direction(blumy_config.ADC_MOISTURE_SENSOR, GPIO_MODE_INPUT));
 
         // wait until the output is 0 again
-        analogValue = adc_analogReadVoltage(ADC_MOISTURE_SENSOR_CHANNEL);
+        analogValue = adc_analogReadVoltage(blumy_config.ADC_MOISTURE_SENSOR_CHANNEL);
     }
 }
 
@@ -479,25 +479,25 @@ void sensors_initSensors()
     gpio_config_t io_conf = {
         .mode = GPIO_MODE_OUTPUT,
         .intr_type = GPIO_INTR_DISABLE,
-        .pin_bit_mask = (1ULL << LIGHT_SENSOR_IN) |
-                        (1ULL << LIGHT_SENSOR_SELECT) |
-                        (1ULL << VOLTAGE_MEASUREMENT_SELECT) |
-                        (1ULL << LED_RED) |
-                        (1ULL << LED_GREEN) |
-                        (1ULL << MOISTURE_SQUARE_WAVE_SIGNAL) |
-                        (1ULL << BUZZER)};
+        .pin_bit_mask = (1ULL << blumy_config.LIGHT_SENSOR_IN) |
+                        (1ULL << blumy_config.LIGHT_SENSOR_SELECT) |
+                        (1ULL << blumy_config.VOLTAGE_MEASUREMENT_SELECT) |
+                        (1ULL << blumy_config.LED_RED) |
+                        (1ULL << blumy_config.LED_GREEN) |
+                        (1ULL << blumy_config.MOISTURE_SQUARE_WAVE_SIGNAL) |
+                        (1ULL << blumy_config.BUZZER)};
     ESP_ERROR_CHECK(gpio_config(&io_conf));
-    gpio_set_level(LIGHT_SENSOR_SELECT, 0);
+    gpio_set_level(blumy_config.LIGHT_SENSOR_SELECT, 0);
     disableVoltageMeasurement();
 
     // Set digital input pins
     io_conf.mode = GPIO_MODE_INPUT;
     io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-    io_conf.pin_bit_mask = (1ULL << BOOT_BUTTON);
+    io_conf.pin_bit_mask = (1ULL << blumy_config.BOOT_BUTTON);
     ESP_ERROR_CHECK(gpio_config(&io_conf));
 
     adc_initAdc();
-    initAht(TEMPERATURE_SENSOR_SDA, TEMPERATURE_SENSOR_SCL);
+    initAht(blumy_config.TEMPERATURE_SENSOR_SDA, blumy_config.TEMPERATURE_SENSOR_SCL);
     isSensorsInit = true;
 }
 
@@ -564,5 +564,40 @@ void sensors_playShutdownSound()
 
 bool sensors_isBootButtonPressed()
 {
-    return gpio_get_level(BOOT_BUTTON) == 0; // Assuming active low button
+    return gpio_get_level(blumy_config.BOOT_BUTTON) == 0; // Assuming active low button
+}
+
+/**
+ * Pin 21 on Blumy Bellis is connected to a strong pull up resistor.
+ * Pin 21 on Blumy Acontium is floating.
+ * Therefore, this function can be used to determine the type of blumy.
+ *
+ * The config will be set based on the detected type.
+ */
+void sensors_detectBlumyType()
+{
+    gpio_config_t io_conf = {
+        .mode = GPIO_MODE_INPUT,
+        .intr_type = GPIO_INTR_DISABLE,
+        .pin_bit_mask = (1ULL << GPIO_NUM_21),
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_ENABLE};
+    ESP_ERROR_CHECK(gpio_config(&io_conf));
+
+    blumy_type_t type;
+    if (gpio_get_level(GPIO_NUM_21) == 1)
+    {
+        type = SENSOR_TYPE_BELLIS;
+        ESP_LOGI("SENSORS", "Detected sensor type: Bellis");
+    }
+    else
+    {
+        type = SENSOR_TYPE_ACONTIUM;
+        ESP_LOGI("SENSORS", "Detected sensor type: Acontium");
+    }
+
+    io_conf.mode = GPIO_MODE_DISABLE;
+    ESP_ERROR_CHECK(gpio_config(&io_conf));
+
+    set_config(type);
 }

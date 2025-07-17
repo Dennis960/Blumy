@@ -1,0 +1,81 @@
+#include "peripherals/config.h"
+
+const config_t CONFIG_ACONTIUM = {
+    // ANALOG INPUT
+    .ADC_MOISTURE_SENSOR = GPIO_NUM_0,                // GPIO 0
+    .ADC_MOISTURE_SENSOR_CHANNEL = ADC_CHANNEL_0,     // GPIO 0, LP
+    .ADC_LIGHT_SENSOR_CHANNEL = ADC_CHANNEL_3,        // GPIO 3, LP
+    .ADC_VOLTAGE_MEASUREMENT_CHANNEL = ADC_CHANNEL_6, // GPIO 6, LP
+
+    // DIGITAL OUTPUT
+    .LIGHT_SENSOR_IN = GPIO_NUM_2,             // GPIO 2, LP
+    .LED_RED = GPIO_NUM_4,                     // GPIO 4, LP
+    .LED_GREEN = GPIO_NUM_5,                   // GPIO 5, LP
+    .MOISTURE_SQUARE_WAVE_SIGNAL = GPIO_NUM_7, // GPIO 7, LP
+    .BUZZER = GPIO_NUM_21,                     // GPIO 21
+
+    // BOOT BUTTON
+    .BOOT_BUTTON = GPIO_NUM_9, // GPIO 9
+
+    // LEDC CHANNELS
+    .BUZZER_CHANNEL = LEDC_CHANNEL_0,
+    .LED_RED_CHANNEL = LEDC_CHANNEL_1,
+    .LED_GREEN_CHANNEL = LEDC_CHANNEL_2,
+    .MOISTURE_SQUARE_WAVE_SIGNAL_CHANNEL = LEDC_CHANNEL_3,
+
+    // DIGITAL INPUT/OUTPUT
+    .LIGHT_SENSOR_SELECT = GPIO_NUM_1,         // GPIO 1, LP
+    .VOLTAGE_MEASUREMENT_SELECT = GPIO_NUM_14, // GPIO 14
+
+    // I2C
+    .TEMPERATURE_SENSOR_SDA = GPIO_NUM_22, // GPIO 22
+    .TEMPERATURE_SENSOR_SCL = GPIO_NUM_23  // GPIO 23
+};
+
+const config_t CONFIG_BELLIS = {
+    // ANALOG INPUT
+    .ADC_MOISTURE_SENSOR = GPIO_NUM_0,                // GPIO 0
+    .ADC_MOISTURE_SENSOR_CHANNEL = ADC_CHANNEL_0,     // GPIO 0, LP
+    .ADC_LIGHT_SENSOR_CHANNEL = ADC_CHANNEL_3,        // GPIO 3, LP
+    .ADC_VOLTAGE_MEASUREMENT_CHANNEL = ADC_CHANNEL_1, // GPIO 1, LP
+
+    // DIGITAL OUTPUT
+    .LIGHT_SENSOR_IN = GPIO_NUM_2,             // GPIO 2, LP
+    .LED_RED = GPIO_NUM_4,                     // GPIO 4, LP
+    .LED_GREEN = GPIO_NUM_5,                   // GPIO 5, LP
+    .MOISTURE_SQUARE_WAVE_SIGNAL = GPIO_NUM_7, // GPIO 7, LP
+    .BUZZER = GPIO_NUM_23,                     // GPIO 23
+
+    // BOOT BUTTON
+    .BOOT_BUTTON = GPIO_NUM_9, // GPIO 9
+
+    // LEDC CHANNELS
+    .BUZZER_CHANNEL = LEDC_CHANNEL_0,
+    .LED_RED_CHANNEL = LEDC_CHANNEL_1,
+    .LED_GREEN_CHANNEL = LEDC_CHANNEL_2,
+    .MOISTURE_SQUARE_WAVE_SIGNAL_CHANNEL = LEDC_CHANNEL_3,
+
+    // DIGITAL INPUT/OUTPUT
+    .LIGHT_SENSOR_SELECT = GPIO_NUM_14,       // GPIO 14
+    .VOLTAGE_MEASUREMENT_SELECT = GPIO_NUM_6, // GPIO 6, LP
+
+    // I2C
+    .TEMPERATURE_SENSOR_SDA = GPIO_NUM_21, // GPIO 21
+    .TEMPERATURE_SENSOR_SCL = GPIO_NUM_22  // GPIO 22
+};
+
+config_t blumy_config = CONFIG_BELLIS;
+
+void set_config(blumy_type_t sensor_type)
+{
+    switch (sensor_type)
+    {
+    case SENSOR_TYPE_BELLIS:
+        blumy_config = CONFIG_BELLIS;
+        break;
+    case SENSOR_TYPE_ACONTIUM:
+    default:
+        blumy_config = CONFIG_ACONTIUM;
+        break;
+    }
+}

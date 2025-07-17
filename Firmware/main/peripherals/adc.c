@@ -52,9 +52,9 @@ void adc_initAdc()
         .bitwidth = ADC_BITWIDTH_DEFAULT,
         .atten = ADC_ATTEN_DB_0,
     };
-    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_LIGHT_SENSOR_CHANNEL, &config2));
-    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_MOISTURE_SENSOR_CHANNEL, &config));
-    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_VOLTAGE_MEASUREMENT_CHANNEL, &config));
+    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, blumy_config.ADC_LIGHT_SENSOR_CHANNEL, &config2));
+    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, blumy_config.ADC_MOISTURE_SENSOR_CHANNEL, &config));
+    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, blumy_config.ADC_VOLTAGE_MEASUREMENT_CHANNEL, &config));
 
     //-------------ADC1 Calibration Init---------------//
     // FOR ESP32-S2
@@ -71,7 +71,7 @@ void analogRead(adc_channel_t channel)
     adc_unit_t unit = ADC_UNIT_1;
     ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, channel, &adc_raw[unit][channel]));
     ESP_LOGD(ADC_TAG, "ADC%d Channel[%d] Raw Data: %d", unit + 1, channel, adc_raw[unit][channel]);
-    adc_cali_handle_t cali_handle = channel == ADC_LIGHT_SENSOR_CHANNEL ? adc1_cali_handle2 : adc1_cali_handle;
+    adc_cali_handle_t cali_handle = channel == blumy_config.ADC_LIGHT_SENSOR_CHANNEL ? adc1_cali_handle2 : adc1_cali_handle;
     ESP_ERROR_CHECK(adc_cali_raw_to_voltage(cali_handle, adc_raw[unit][channel], &voltage[unit][channel]));
     ESP_LOGD(ADC_TAG, "ADC%d Channel[%d] Cali Voltage: %d mV", unit + 1, channel, voltage[unit][channel]);
 }
