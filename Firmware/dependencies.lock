@@ -30,6 +30,6 @@ dependencies:
 direct_dependencies:
 - espressif/aht20
 - idf
-manifest_hash: 1033058b6464c23e99a19fe97c394bec548e293abc378d336a230e95d6b3d9d3
+manifest_hash: 407e1f9597277ca35d001850adfab20b22b5e0be70352fdc651ec442a1e3e2a5
 target: esp32c6
 version: 2.0.0
