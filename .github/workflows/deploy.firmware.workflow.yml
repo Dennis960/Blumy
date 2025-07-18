@@ -52,7 +52,7 @@ jobs:
 
       - name: Build Firmware
         run: |
-          docker run --rm -v $PWD:/project -w /project/Firmware -u $UID -e HOME=/tmp -e FIRMWARE_VERSION=${{ github.run_number }} espressif/idf:release-v5.4.1 idf.py build
+          docker run --rm -v $PWD:/project -w /project/Firmware -u $UID -e HOME=/tmp -e FIRMWARE_VERSION=${{ github.run_number }} espressif/idf:v5.4.1 idf.py build
 
       - name: Rename Firmware to firmware
         run: mv Firmware/build/Firmware.bin Firmware/build/firmware.bin
