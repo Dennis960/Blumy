@@ -16,6 +16,7 @@
 #include "plantstore.h"
 #include "defaults.h"
 #include "update.h"
+#include "plantnow.h"
 
 void wait_until_boot_button_released()
 {
@@ -75,8 +76,9 @@ void multi_configuration_mode()
 {
     ESP_LOGI("MODE", "Starting multi configuration mode");
     sensors_setLedYellowBrightness(ledBrightness);
-    // TODO connect to Blumy network and ask for wifi credentials
-    vTaskDelay(1000 / portTICK_PERIOD_MS); // Simulate some work
+    plantnow_init(false);
+    plantnow_connectToMaster();
+    plantnow_wait_for_exchange(portMAX_DELAY);
     sensors_setLedYellowBrightness(0);
 }
 
@@ -94,6 +96,8 @@ void single_configuration_mode(bool isConfigured)
     plantfi_configureStaFromPlantstore();
     sensors_setLedRedBrightness(0);
     sensors_blinkLedGreenAsync(0, 500, ledBrightness);
+
+    plantnow_init(true);
 
     while (1)
     {
