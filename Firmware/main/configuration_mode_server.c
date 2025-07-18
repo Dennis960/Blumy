@@ -9,6 +9,7 @@
 #include "defaults.h"
 #include "update.h"
 #include "plantmqtt.h"
+#include "plantnow.h"
 
 #include "esp_https_ota.h"
 
@@ -705,6 +706,41 @@ esp_err_t get_api_firmware_version_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
+esp_err_t plantnow_hasReceivedPeerMacHandler(httpd_req_t *req)
+{
+    uint8_t *mac = plantnow_getPeerMac();
+    char resp[20]; // Enough for "xx:xx:xx:xx:xx:xx"
+    if (mac == NULL)
+    {
+        sprintf(resp, "\"\"");
+    }
+    else
+    {
+        sprintf(resp, "\"%02x:%02x:%02x:%02x:%02x:%02x\"",
+                mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    }
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+esp_err_t plantnow_sendCredentialsHandler(httpd_req_t *req)
+{
+    if (plantnow_getPeerMac() == NULL)
+    {
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "ERROR: No peer MAC address received");
+        return ESP_FAIL;
+    }
+    else if (plantnow_sendWifiCredentials(true) != ESP_OK)
+    {
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "ERROR: Failed to send WiFi credentials");
+        return ESP_FAIL;
+    }
+
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
 httpd_uri_t post_api_connect = {
     .uri = "/api/connect",
     .method = HTTP_POST,
@@ -901,6 +937,18 @@ httpd_uri_t get_api_firmware_version = {
     .handler = get_api_firmware_version_handler,
     .user_ctx = NULL};
 
+httpd_uri_t get_api_plantnow_hasReceivedPeerMac = {
+    .uri = "/api/plantnow/hasReceivedPeerMac",
+    .method = HTTP_GET,
+    .handler = plantnow_hasReceivedPeerMacHandler,
+    .user_ctx = NULL};
+
+httpd_uri_t post_api_plantnow_sendCredentials = {
+    .uri = "/api/plantnow/sendCredentials",
+    .method = HTTP_POST,
+    .handler = plantnow_sendCredentialsHandler,
+    .user_ctx = NULL};
+
 httpd_uri_t get = {
     .uri = "*",
     .method = HTTP_GET,
@@ -943,6 +991,8 @@ void register_uri_handlers(httpd_handle_t server)
     httpd_register_uri_handler(server, &get_api_update_firmware);
     httpd_register_uri_handler(server, &post_api_update_check);
     httpd_register_uri_handler(server, &get_api_firmware_version);
+    httpd_register_uri_handler(server, &get_api_plantnow_hasReceivedPeerMac);
+    httpd_register_uri_handler(server, &post_api_plantnow_sendCredentials);
 
     // Every other get request returns index.html
     httpd_register_uri_handler(server, &get);

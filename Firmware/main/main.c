@@ -77,7 +77,6 @@ void multi_configuration_mode()
     ESP_LOGI("MODE", "Starting multi configuration mode");
     sensors_setLedYellowBrightness(ledBrightness);
     plantnow_init(false);
-    plantnow_connectToMaster();
     plantnow_wait_for_exchange(portMAX_DELAY);
     sensors_setLedYellowBrightness(0);
 }

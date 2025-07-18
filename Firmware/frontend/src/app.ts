@@ -1,15 +1,16 @@
 import { StateController } from "@lit-app/state";
+import { plantnowHasReceivedPeerMac, plantnowSendCredentials } from "./api";
 import { css, html, LitElement, TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import "./elements/dots-stepper-element";
 import "./elements/header-element";
 import "./elements/loader-bar-element";
+import "./pages/before-setup-finish-page";
 import "./pages/cloud-page";
 import "./pages/home-page";
-import "./pages/before-setup-finish-page";
-import "./pages/setup-finish-page";
 import "./pages/reset-page";
 import "./pages/settings-page";
+import "./pages/setup-finish-page";
 import "./pages/update-page";
 import "./pages/welcome-page";
 import "./pages/wifi-scanner-page";
@@ -68,6 +69,9 @@ export class FirstSetupScreen extends LitElement {
         reset: html`<reset-page @next="${this.next}" @back="${this.back}" />`,
     };
 
+    timeoutId?: number;
+    macs: string[] = [];
+
     next(event: CustomEvent<number>) {
         this.currentDot = (parseInt(this.currentDot) + event.detail).toString();
     }
@@ -102,6 +106,40 @@ export class FirstSetupScreen extends LitElement {
         const page = urlParams.get("page");
         if (page) {
             this.currentDot = page;
+        }
+    }
+
+    connectedCallback() {
+        super.connectedCallback();
+        const pollMac = async () => {
+            try {
+                const mac = await plantnowHasReceivedPeerMac();
+                if (mac && !this.macs.includes(mac)) {
+                    if (
+                        window.confirm(
+                            `Blumy mit MAC-Adresse ${mac} möchte sich verbinden. Möchtest du die Verbindung zulassen?`
+                        )
+                    ) {
+                        const success = await plantnowSendCredentials();
+                        if (!success) {
+                            alert(
+                                `Fehler beim Senden der Anmeldedaten. Bitte starte den zweiten Blumy Sensor neu und versuche es erneut.`
+                            );
+                        }
+                    } else {
+                        this.macs.push(mac); // Ignore this MAC in the future
+                    }
+                }
+            } catch (e) {}
+            this.timeoutId = window.setTimeout(pollMac, 2000);
+        };
+        pollMac();
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        if (this.timeoutId) {
+            clearTimeout(this.timeoutId);
         }
     }
 

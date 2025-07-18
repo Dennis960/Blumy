@@ -240,3 +240,13 @@ export async function setLedBrightness(brightness: number) {
     brightness = Math.round(brightness);
     return await postDataToEsp("/led/brightness", brightness.toString());
 }
+
+export async function plantnowHasReceivedPeerMac(): Promise<string> {
+    return await getDataFromEsp("/plantnow/hasReceivedPeerMac", window.fetch);
+}
+
+export async function plantnowSendCredentials(): Promise<boolean> {
+    return await postDataToEsp("/plantnow/sendCredentials").then(
+        (res) => res.ok
+    );
+}
