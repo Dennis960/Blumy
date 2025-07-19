@@ -107,7 +107,7 @@
 			<h2 class="h4 mt-4">Kontakt</h2>
 			<p>
 				Wenn Sie Fragen oder Anregungen zu unserer Datenschutzerklärung haben, zögern Sie nicht, uns
-				unter <a href="mailto:support@paramecad.com">support@paramecad.com</a> zu kontaktieren.
+				unter <a href="mailto:support@blumy.cloud">support@blumy.cloud</a> zu kontaktieren.
 			</p>
 		</div>
 	</div>

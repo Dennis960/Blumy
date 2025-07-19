@@ -20,7 +20,7 @@
 
 					<h2 class="h4 mt-4">Kontakt</h2>
 					<p>
-						E-Mail: <a href="mailto:support@paramecad.com">support@paramecad.com</a>
+						E-Mail: <a href="mailto:support@blumy.cloud">support@blumy.cloud</a>
 					</p>
 
 					<h2 class="h4 mt-4">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
