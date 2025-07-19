@@ -115,8 +115,7 @@ esp_err_t post_api_connect_handler(httpd_req_t *req)
         return ESP_FAIL;
     }
 
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
 
     plantfi_configureSta(ssid, password, 5, true);
     return ESP_OK;
@@ -124,8 +123,7 @@ esp_err_t post_api_connect_handler(httpd_req_t *req)
 
 esp_err_t post_api_reset_handler(httpd_req_t *req)
 {
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
 
     sensors_playShutdownSound();
     esp_restart();
@@ -188,8 +186,7 @@ esp_err_t post_api_cloudSetup_mqtt_handler(httpd_req_t *req)
     plantstore_setCloudConfigurationMqtt(sensorId, server, port, username, password, topic, clientId);
     plantmqtt_homeassistant_create_sensor();
 
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
@@ -208,8 +205,7 @@ esp_err_t post_api_cloudSetup_http_handler(httpd_req_t *req)
 
     plantstore_setCloudConfigurationHttp(sensorId, url, auth);
 
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
@@ -227,8 +223,7 @@ esp_err_t post_api_cloudSetup_blumy_handler(httpd_req_t *req)
 
     plantstore_setCloudConfigurationBlumy(token, url);
 
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
@@ -379,24 +374,21 @@ esp_err_t post_api_cloudTest_blumy_handler(httpd_req_t *req)
 esp_err_t post_api_cloudDisable_mqtt_handler(httpd_req_t *req)
 {
     plantstore_resetCloudConfigurationMqtt();
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
 esp_err_t post_api_cloudDisable_http_handler(httpd_req_t *req)
 {
     plantstore_resetCloudConfigurationHttp();
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
 esp_err_t post_api_cloudDisable_blumy_handler(httpd_req_t *req)
 {
     plantstore_resetCloudConfigurationBlumy();
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
@@ -413,8 +405,7 @@ esp_err_t post_api_timeouts_sleep_handler(httpd_req_t *req)
 
     plantstore_setSensorTimeoutSleepMs(timeout);
 
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
@@ -453,8 +444,7 @@ esp_err_t post_api_timeouts_configurationMode_handler(httpd_req_t *req)
 
     plantstore_setConfigurationModeTimeoutMs(timeout);
 
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
@@ -482,8 +472,7 @@ esp_err_t post_api_timeouts_wdt_handler(httpd_req_t *req)
 
     plantstore_setWatchdogTimeoutMs(timeout);
 
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
@@ -511,8 +500,7 @@ esp_err_t post_api_timeouts_mqtt_message_handler(httpd_req_t *req)
 
     plantstore_setMqttMessageTimeoutMs(timeout);
 
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
@@ -547,8 +535,7 @@ esp_err_t post_api_led_brightness_handler(httpd_req_t *req)
 
     plantstore_setLedBrightness(brightness);
 
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
@@ -611,8 +598,7 @@ esp_err_t get_api_sensor_data_handler(httpd_req_t *req)
 
 esp_err_t post_api_factoryReset_handler(httpd_req_t *req)
 {
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
 
     plantstore_factoryReset();
     esp_restart();
@@ -633,8 +619,7 @@ esp_err_t post_api_update_firmware_handler(httpd_req_t *req)
     plantstore_setFirmwareUpdateUrl(url);
     ota_update_percentage = 0;
 
-    const char resp[] = "OK";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
     update_updateFirmware(&ota_update_percentage);
     return ESP_OK;
 }
@@ -731,7 +716,12 @@ esp_err_t plantnow_sendCredentialsHandler(httpd_req_t *req)
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "ERROR: No peer MAC address received");
         return ESP_FAIL;
     }
-    else if (plantnow_sendWifiCredentials(true) != ESP_OK)
+    if (!plantstore_getWifiCredentials(NULL, NULL, 0, 0))
+    {
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "ERROR: No WiFi credentials stored");
+        return ESP_FAIL;
+    }
+    if (plantnow_sendWifiCredentials(true) != ESP_OK)
     {
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "ERROR: Failed to send WiFi credentials");
         return ESP_FAIL;

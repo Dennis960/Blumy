@@ -76,7 +76,7 @@ void multi_configuration_mode()
 {
     ESP_LOGI("MODE", "Starting multi configuration mode");
     sensors_setLedYellowBrightness(ledBrightness);
-    plantnow_init(false);
+    plantnow_init(false); // Has to be called before configuring the sta or ap
     plantnow_wait_for_exchange(portMAX_DELAY);
     sensors_setLedYellowBrightness(0);
 }
@@ -88,15 +88,17 @@ void single_configuration_mode(bool isConfigured)
     uint64_t current_time = start_time;
     int32_t timeoutMs = DEFAULT_CONFIGURATION_MODE_TIMEOUT_MS;
     plantstore_getConfigurationModeTimeoutMs(&timeoutMs);
+
+    plantnow_init(true); // Has to be called before configuring the sta or ap
+
+    plantfi_setEnableNatAndDnsOnConnect(true);
     plantfi_configureAp(DEFAULT_SSID_BLUMY, "", 4);
+    plantfi_configureStaFromPlantstore();
 
     ESP_LOGI("MODE", "Starting webserver");
     httpd_handle_t webserver = start_webserver();
-    plantfi_configureStaFromPlantstore();
     sensors_setLedRedBrightness(0);
     sensors_blinkLedGreenAsync(0, 500, ledBrightness);
-
-    plantnow_init(true);
 
     while (1)
     {
@@ -108,6 +110,10 @@ void single_configuration_mode(bool isConfigured)
                 ESP_LOGI("MODE", "Timeout reached, going to sleep");
                 break;
             }
+        }
+        else if (plantfi_is_user_connected_to_ap())
+        {
+            start_time = esp_timer_get_time(); // Reset timeout if user is connected
         }
         if (sensors_isBootButtonPressed())
         {
@@ -127,8 +133,6 @@ void configuration_mode(bool isConfigured)
     plantstore_getLedBrightness(&ledBrightness);
     sensors_setLedRedBrightness(ledBrightness);
     sensors_playStartupSound();
-    plantfi_setEnableNatAndDnsOnConnect(true);
-    plantfi_initWifiApSta();
 
     bool foundBlumyNetwork = plantfi_found_blumy_network();
     if (foundBlumyNetwork)
@@ -173,7 +177,6 @@ void sensor_mode()
 {
     ESP_LOGI("MODE", "Starting sensor mode");
     esp_timer_handle_t watchdog_timer = init_watchdog(DEFAULT_WATCHDOG_TIMEOUT_MS);
-    plantfi_initWifiStaOnly();
     plantfi_configureStaFromPlantstore();
     sensors_initSensors();
     sensors_full_data_t sensors_data;
@@ -221,6 +224,7 @@ void app_main()
     bool isConfigured = plantstore_isConfigured();
 
     sensors_detectBlumyType();
+    plantfi_initWifi();
 
     if (isManualReset || !isConfigured)
     {

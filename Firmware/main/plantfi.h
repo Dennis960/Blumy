@@ -28,8 +28,7 @@ typedef struct
 
 void plantfi_event_handler(void *arg, esp_event_base_t event_base,
                            int32_t event_id, void *event_data);
-void plantfi_initWifiApSta();
-void plantfi_initWifiStaOnly();
+void plantfi_initWifi();
 void plantfi_configureAp(const char *ssid, const char *password, int max_connection);
 void plantfi_configureSta(const char *ssid, const char *password, int max_retry, bool credentialsChanged);
 void plantfi_setEnableNatAndDnsOnConnect(bool isConfigurationMode);

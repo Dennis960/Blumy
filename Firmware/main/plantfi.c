@@ -138,7 +138,7 @@ void plantfi_event_handler(void *arg, esp_event_base_t event_base,
     }
 }
 
-void plantfi_initWifi(bool staOnly)
+void plantfi_initWifi()
 {
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
@@ -147,24 +147,14 @@ void plantfi_initWifi(bool staOnly)
     ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &plantfi_event_handler, &instance_any_wifi_event)); // TODO unregister event handlers on deinit
     ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &plantfi_event_handler, &instance_any_ip_event));
 
+    ap_netif = esp_netif_create_default_wifi_ap();
     sta_netif = esp_netif_create_default_wifi_sta();
-    if (!staOnly)
-    {
-        ap_netif = esp_netif_create_default_wifi_ap();
-    }
 
     // esp_wifi_set_max_tx_power(84); :D
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-    if (staOnly)
-    {
-        ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-    }
-    else
-    {
-        ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
-    }
+    esp_wifi_set_mode(WIFI_MODE_STA); // Always have STA mode enabled, so espnow works
     if (_enableNatAndDnsOnConnect)
     {
         plantfi_configure_dns_ap();
@@ -173,16 +163,6 @@ void plantfi_initWifi(bool staOnly)
 
     plantfi_sta_event_group = xEventGroupCreate();
     plantfi_sta_status = PLANTFI_STA_STATUS_DISCONNECTED;
-}
-
-void plantfi_initWifiApSta()
-{
-    plantfi_initWifi(false);
-}
-
-void plantfi_initWifiStaOnly()
-{
-    plantfi_initWifi(true);
 }
 
 void plantfi_configureAp(const char *ssid, const char *password, int max_connection)
@@ -202,6 +182,12 @@ void plantfi_configureAp(const char *ssid, const char *password, int max_connect
 
 void plantfi_configureSta(const char *ssid, const char *password, int max_retry, bool credentialsChanged)
 {
+    wifi_mode_t mode;
+    ESP_ERROR_CHECK(esp_wifi_get_mode(&mode));
+    if (mode == WIFI_MODE_AP)
+    {
+        ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
+    }
     _isStaConnecting = true;
     _credentialsChanged = credentialsChanged;
     if (plantfi_sta_status == PLANTFI_STA_STATUS_CONNECTED)
@@ -211,7 +197,6 @@ void plantfi_configureSta(const char *ssid, const char *password, int max_retry,
         esp_wifi_disconnect();
     }
     plantfi_sta_status = PLANTFI_STA_STATUS_PENDING;
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
     plantfi_max_retry = max_retry;
     xEventGroupClearBits(plantfi_sta_event_group, PLANTFI_CONNECTED_BIT | PLANTFI_FAIL_BIT | PLANTFI_PASSWORD_WRONG_BIT);
 

@@ -70,7 +70,8 @@ export class FirstSetupScreen extends LitElement {
     };
 
     timeoutId?: number;
-    macs: string[] = [];
+    ignoredMACs: string[] = [];
+    allowedMACs: string[] = [];
 
     next(event: CustomEvent<number>) {
         this.currentDot = (parseInt(this.currentDot) + event.detail).toString();
@@ -109,31 +110,34 @@ export class FirstSetupScreen extends LitElement {
         }
     }
 
+    async pollMAC() {
+        const mac = await plantnowHasReceivedPeerMac();
+        if (!mac || this.ignoredMACs.includes(mac)) {
+            return;
+        }
+        const shouldAddMac = window.confirm(
+            `Blumy mit MAC-Adresse ${mac} möchte sich verbinden. Möchtest du die Verbindung zulassen?`
+        );
+        if (!shouldAddMac) {
+            this.ignoredMACs.push(mac);
+            return;
+        }
+        const success = await plantnowSendCredentials();
+        if (!success) {
+            alert(
+                `Fehler beim Senden der Anmeldedaten. Bitte starte den Blumy Sensor neu und versuche es erneut.`
+            );
+        }
+    }
+
+    async startPollMACInterval() {
+        await this.pollMAC();
+        this.timeoutId = window.setTimeout(this.startPollMACInterval, 2000);
+    }
+
     connectedCallback() {
         super.connectedCallback();
-        const pollMac = async () => {
-            try {
-                const mac = await plantnowHasReceivedPeerMac();
-                if (mac && !this.macs.includes(mac)) {
-                    if (
-                        window.confirm(
-                            `Blumy mit MAC-Adresse ${mac} möchte sich verbinden. Möchtest du die Verbindung zulassen?`
-                        )
-                    ) {
-                        const success = await plantnowSendCredentials();
-                        if (!success) {
-                            alert(
-                                `Fehler beim Senden der Anmeldedaten. Bitte starte den zweiten Blumy Sensor neu und versuche es erneut.`
-                            );
-                        }
-                    } else {
-                        this.macs.push(mac); // Ignore this MAC in the future
-                    }
-                }
-            } catch (e) {}
-            this.timeoutId = window.setTimeout(pollMac, 2000);
-        };
-        pollMac();
+        this.startPollMACInterval();
     }
 
     disconnectedCallback() {
