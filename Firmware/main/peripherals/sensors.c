@@ -351,7 +351,7 @@ void sensors_aht_read_data(sensors_aht_data_t *data)
     ESP_LOGI("SENSORS", "Reading AHT20 sensor data");
     uint32_t temperature_raw, humidity_raw;
     float temperature, humidity;
-    ESP_ERROR_CHECK(aht20_read_temperature_humidity(aht_handle, &temperature_raw, &temperature, &humidity_raw, &humidity));
+    aht20_read_temperature_humidity(aht_handle, &temperature_raw, &temperature, &humidity_raw, &humidity);
     data->temperature_raw = temperature_raw;
     data->humidity_raw = humidity_raw;
     data->temperature = temperature;
