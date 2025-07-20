@@ -22,6 +22,7 @@
 #include "esp_timer.h"
 #include <dhcpserver/dhcpserver.h>
 #include <mqtt_client.h>
+#include "plantdns.h"
 
 EventGroupHandle_t plantfi_sta_event_group;
 
@@ -110,6 +111,10 @@ void plantfi_ip_event_handler(int32_t event_id, void *event_data)
         ESP_LOGI(PLANTFI_TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         plantfi_retry_num = 0;
         xEventGroupSetBits(plantfi_sta_event_group, PLANTFI_CONNECTED_BIT);
+        if (plantdns_is_running())
+        {
+            plantdns_stop();
+        }
         if (_enableNatAndDnsOnConnect)
         {
             plantfi_start_nat();

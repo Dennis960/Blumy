@@ -17,6 +17,7 @@
 #include "defaults.h"
 #include "update.h"
 #include "plantnow.h"
+#include "plantdns.h"
 
 void wait_until_boot_button_released()
 {
@@ -106,7 +107,10 @@ void single_configuration_mode(bool isConfigured)
 
     plantfi_setEnableNatAndDnsOnConnect(true);
     plantfi_configureAp(DEFAULT_SSID_BLUMY, "", 4);
-    plantfi_configureStaFromPlantstore();
+    if (!plantfi_configureStaFromPlantstore())
+    {
+        plantdns_start();
+    }
 
     ESP_LOGI("MODE", "Starting webserver");
     httpd_handle_t webserver = start_webserver();

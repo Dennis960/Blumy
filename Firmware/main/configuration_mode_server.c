@@ -20,8 +20,65 @@ float ota_update_percentage = -1;
 // Returns the index_html from index_html.c
 esp_err_t get_handler(httpd_req_t *req)
 {
-    httpd_resp_set_type(req, "text/html");
-    httpd_resp_send(req, index_html, sizeof(index_html));
+    const char *uri = req->uri;
+    char host[100] = {0};
+    esp_err_t err = httpd_req_get_hdr_value_str(req, "Host", host, sizeof(host));
+    if (err != ESP_OK)
+    {
+        ESP_LOGW("GET_HANDLER", "Host header not found");
+    }
+
+    ESP_LOGI("GET_HANDLER", "Request for URI: %s Host: %s", uri, host);
+
+    if (strcmp(uri, "/generate_204") == 0)
+    {
+        // Android and ChromeOS probe expects 204 No Content
+        ESP_LOGI("GET_HANDLER", "Spoof type: Android/ChromeOS (204 No Content)");
+        httpd_resp_set_status(req, "204 No Content");
+        return httpd_resp_send(req, NULL, 0);
+    }
+    else if (strcmp(uri, "/hotspot-detect.html") == 0)
+    {
+        // iOS/macOS probe expects 200 OK with body "Success"
+        ESP_LOGI("GET_HANDLER", "Spoof type: iOS/macOS (hotspot-detect.html)");
+        const char *resp_str = "Success";
+        httpd_resp_set_type(req, "text/html");
+        httpd_resp_set_status(req, "200 OK");
+        return httpd_resp_send(req, resp_str, strlen(resp_str));
+    }
+    else if (strcmp(uri, "/connecttest.txt") == 0)
+    {
+        // Windows probe expects 200 OK with "Microsoft Connect Test"
+        ESP_LOGI("GET_HANDLER", "Spoof type: Windows (connecttest.txt)");
+        const char *resp_str = "Microsoft Connect Test";
+        httpd_resp_set_type(req, "text/plain");
+        httpd_resp_set_status(req, "200 OK");
+        return httpd_resp_send(req, resp_str, strlen(resp_str));
+    }
+    else if (strcmp(uri, "/check_network_status.txt") == 0)
+    {
+        // Linux NetworkManager probe expects 200 OK with "NetworkManager is online"
+        ESP_LOGI("GET_HANDLER", "Spoof type: Linux NetworkManager (check_network_status.txt)");
+        const char *resp_str = "NetworkManager is online";
+        httpd_resp_set_type(req, "text/plain");
+        httpd_resp_set_status(req, "200 OK");
+        return httpd_resp_send(req, resp_str, strlen(resp_str));
+    }
+    else if (strcmp(uri, "/success.txt") == 0)
+    {
+        // Firefox probe expects 200 OK with "success"
+        ESP_LOGI("GET_HANDLER", "Spoof type: Firefox (success.txt)");
+        const char *resp_str = "success";
+        httpd_resp_set_type(req, "text/plain");
+        httpd_resp_set_status(req, "200 OK");
+        return httpd_resp_send(req, resp_str, strlen(resp_str));
+    }
+    else
+    {
+        ESP_LOGI("GET_HANDLER", "Spoof type: Default (index.html)");
+        httpd_resp_set_type(req, "text/html");
+        httpd_resp_send(req, index_html, sizeof(index_html));
+    }
     return ESP_OK;
 }
 
