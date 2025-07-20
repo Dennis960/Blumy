@@ -25,7 +25,14 @@ export class BeforeSetupFinishPage extends BasePage {
                 regelmäßigen Abständen Daten an die konfigurierten Endpunkte.
                 Deine Verbindung zum Sensor wird automatisch getrennt.
             </description-element>
+            <title-element>Weitere Sensoren einrichten</title-element>
+            <description-element>
+                Starte jetzt einen weiteren Sensor um den
+                Multikonfigurationsmodus zu aktivieren. Oder drücke auf
+                "Konfiguration abschließen" um die Konfiguration zu beenden.
+            </description-element>
             <text-element text="${this.errorText}"></text-element>
+            <br />
             <button-nav-element>
                 <button-element
                     name="Zurück"

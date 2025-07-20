@@ -1,5 +1,4 @@
 import { StateController } from "@lit-app/state";
-import { plantnowHasReceivedPeerMac, plantnowSendCredentials } from "./api";
 import { css, html, LitElement, TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import "./elements/dots-stepper-element";
@@ -8,6 +7,7 @@ import "./elements/loader-bar-element";
 import "./pages/before-setup-finish-page";
 import "./pages/cloud-page";
 import "./pages/home-page";
+import "./pages/multiconfiguration-page";
 import "./pages/reset-page";
 import "./pages/settings-page";
 import "./pages/setup-finish-page";
@@ -15,6 +15,7 @@ import "./pages/update-page";
 import "./pages/welcome-page";
 import "./pages/wifi-scanner-page";
 import "./pages/wifi-setup-page";
+import { startPollMACInterval, stopPollMACInterval } from "./plantnow";
 import { enableDotNavigation, loadingState } from "./states";
 
 @customElement("app-element")
@@ -67,11 +68,11 @@ export class FirstSetupScreen extends LitElement {
         />`,
         sensor: html`<home-page @back="${this.back}"></home-page>`,
         reset: html`<reset-page @next="${this.next}" @back="${this.back}" />`,
+        multiconfiguration: html`<multiconfiguration-page
+            @next="${this.next}"
+            @back="${this.back}"
+        ></multiconfiguration-page>`,
     };
-
-    timeoutId?: number;
-    ignoredMACs: string[] = [];
-    allowedMACs: string[] = [];
 
     next(event: CustomEvent<number>) {
         this.currentDot = (parseInt(this.currentDot) + event.detail).toString();
@@ -110,41 +111,20 @@ export class FirstSetupScreen extends LitElement {
         }
     }
 
-    async pollMAC() {
-        const mac = await plantnowHasReceivedPeerMac();
-        if (!mac || this.ignoredMACs.includes(mac)) {
-            return;
-        }
-        const shouldAddMac = window.confirm(
-            `Blumy mit MAC-Adresse ${mac} möchte sich verbinden. Möchtest du die Verbindung zulassen?`
-        );
-        if (!shouldAddMac) {
-            this.ignoredMACs.push(mac);
-            return;
-        }
-        const success = await plantnowSendCredentials();
-        if (!success) {
-            alert(
-                `Fehler beim Senden der Anmeldedaten. Bitte starte den Blumy Sensor neu und versuche es erneut.`
-            );
-        }
-    }
-
-    async startPollMACInterval() {
-        await this.pollMAC();
-        this.timeoutId = window.setTimeout(this.startPollMACInterval, 2000);
-    }
-
     connectedCallback() {
         super.connectedCallback();
-        this.startPollMACInterval();
+
+        if (this.currentDot !== "multiconfiguration") {
+            // Polling is handled separately in the multiconfiguration page
+            startPollMACInterval((mac) => {
+                location.href = `${location.origin}/?page=multiconfiguration&mac=${mac}`;
+            });
+        }
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
-        if (this.timeoutId) {
-            clearTimeout(this.timeoutId);
-        }
+        stopPollMACInterval();
     }
 
     render() {

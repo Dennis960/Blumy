@@ -709,7 +709,7 @@ esp_err_t plantnow_hasReceivedPeerMacHandler(httpd_req_t *req)
     return ESP_OK;
 }
 
-esp_err_t plantnow_sendCredentialsHandler(httpd_req_t *req)
+esp_err_t plantnow_sendWifiCredentialsHandler(httpd_req_t *req)
 {
     if (plantnow_getPeerMac() == NULL)
     {
@@ -724,6 +724,35 @@ esp_err_t plantnow_sendCredentialsHandler(httpd_req_t *req)
     if (plantnow_sendWifiCredentials(true) != ESP_OK)
     {
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "ERROR: Failed to send WiFi credentials");
+        return ESP_FAIL;
+    }
+
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+esp_err_t plantnow_sendCloudSetup_blumyHandler(httpd_req_t *req)
+{
+    char token[100];
+    char url[100];
+    char *keys[] = {"token", "url"};
+    char *values[] = {token, url};
+    size_t sizes[] = {sizeof(token), sizeof(url)};
+    if (!get_values(req, keys, values, sizes, 2))
+    {
+        return ESP_FAIL;
+    }
+    if (plantnow_getPeerMac() == NULL)
+    {
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "ERROR: No peer MAC address received");
+        return ESP_FAIL;
+    }
+    cloud_setup_blumy_t setup;
+    strcpy(setup.token, token);
+    strcpy(setup.url, url);
+    if (plantnow_sendCloudSetupBlumy(&setup, true) != ESP_OK)
+    {
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "ERROR: Failed to send Blumy cloud setup");
         return ESP_FAIL;
     }
 
@@ -933,10 +962,16 @@ httpd_uri_t get_api_plantnow_hasReceivedPeerMac = {
     .handler = plantnow_hasReceivedPeerMacHandler,
     .user_ctx = NULL};
 
-httpd_uri_t post_api_plantnow_sendCredentials = {
-    .uri = "/api/plantnow/sendCredentials",
+httpd_uri_t post_api_plantnow_sendWifiCredentials = {
+    .uri = "/api/plantnow/sendWifiCredentials",
     .method = HTTP_POST,
-    .handler = plantnow_sendCredentialsHandler,
+    .handler = plantnow_sendWifiCredentialsHandler,
+    .user_ctx = NULL};
+
+httpd_uri_t post_api_plantnow_sendCloudSetup_blumy = {
+    .uri = "/api/plantnow/sendCloudSetup/blumy",
+    .method = HTTP_POST,
+    .handler = plantnow_sendCloudSetup_blumyHandler,
     .user_ctx = NULL};
 
 httpd_uri_t get = {
@@ -982,7 +1017,8 @@ void register_uri_handlers(httpd_handle_t server)
     httpd_register_uri_handler(server, &post_api_update_check);
     httpd_register_uri_handler(server, &get_api_firmware_version);
     httpd_register_uri_handler(server, &get_api_plantnow_hasReceivedPeerMac);
-    httpd_register_uri_handler(server, &post_api_plantnow_sendCredentials);
+    httpd_register_uri_handler(server, &post_api_plantnow_sendWifiCredentials);
+    httpd_register_uri_handler(server, &post_api_plantnow_sendCloudSetup_blumy);
 
     // Every other get request returns index.html
     httpd_register_uri_handler(server, &get);

@@ -124,7 +124,7 @@ export class UpdatePage extends BasePage {
                     ? "error"
                     : this.successText
                     ? "success"
-                    : "warning"}"
+                    : "helper"}"
             ></text-element>
             <button-nav-element>
                 <div>

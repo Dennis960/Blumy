@@ -303,10 +303,10 @@ class BlumyApi:
     def has_received_peer_mac() -> str:
         return BlumyApi.get("/plantnow/hasReceivedPeerMac")
 
-    # /api/plantnow/sendCredentials POST->OK:string
+    # /api/plantnow/sendWifiCredentials POST->OK:string
     @staticmethod
     def send_credentials() -> Literal["OK"]:
-        return BlumyApi.post("/plantnow/sendCredentials", {})
+        return BlumyApi.post("/plantnow/sendWifiCredentials", {})
 
     @staticmethod
     def wait_for_connection(timeout: int = 30) -> bool:

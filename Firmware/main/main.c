@@ -77,8 +77,21 @@ void multi_configuration_mode()
     ESP_LOGI("MODE", "Starting multi configuration mode");
     sensors_setLedYellowBrightness(ledBrightness);
     plantnow_init(false); // Has to be called before configuring the sta or ap
-    plantnow_wait_for_exchange(portMAX_DELAY);
-    sensors_setLedYellowBrightness(0);
+
+    while (1)
+    {
+        if (sensors_isBootButtonPressed())
+        {
+            ESP_LOGI("MODE", "Boot button pressed, going to sleep");
+            break;
+        }
+        if (plantnow_hasExchangedBlumy())
+        {
+            ESP_LOGI("MODE", "Blumy credentials exchanged, going to sensor mode");
+            break;
+        }
+        vTaskDelay(10 / portTICK_PERIOD_MS); // Reset watchdog
+    }
 }
 
 void single_configuration_mode(bool isConfigured)

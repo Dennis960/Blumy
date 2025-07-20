@@ -21,11 +21,10 @@ uint8_t pmk[] = {0xDA, 0x11, 0xDA, 0xCD, 0x87, 0xEF, 0x1F, 0x7C,
 uint8_t lmk[] = {0xD9, 0x85, 0x42, 0x21, 0x17, 0x27, 0x83, 0x04,
                  0x3C, 0xCA, 0xD6, 0x74, 0xC2, 0x1A, 0x4B, 0xB1};
 
-#define PLANTNOW_EVT_INITIALIZED (1 << 0)    // Indicates that plantnow has been initialized
-#define PLANTNOW_EVT_PEER_ADDED (1 << 1)     // Indicates that the MAC address of the peer has been received and is added as a peer
-#define PLANTNOW_EVT_WIFI_EXCHANGED (1 << 2) // Indicates that WiFi credentials have been sent or received successfully
-#define PLANTNOW_EVT_ERROR (1 << 3)          // Indicates that an error has occurred during the exchange
-#define PLANTNOW_EVT_SENT (1 << 4)           // Indicates that the last send operation was successful
+#define PLANTNOW_EVT_PEER_ADDED (1 << 0)      // Indicates that the MAC address of the peer has been received and is added as a peer
+#define PLANTNOW_EVT_ERROR (1 << 1)           // Indicates that an error has occurred during the exchange
+#define PLANTNOW_EVT_SENT (1 << 2)            // Indicates that the last send operation was successful
+#define PLANTNOW_EVT_BLUMY_EXCHANGED (1 << 3) // Indicates that Blumy credentials have been sent or received successfully
 
 static EventGroupHandle_t plantnow_evt_group = NULL;
 static bool is_master = false;
@@ -35,6 +34,23 @@ typedef struct
     char ssid[32];
     char password[64];
 } wifi_credentials_t;
+
+esp_err_t plantnow_send(const uint8_t *peer_addr, const uint8_t *data, size_t len)
+{
+    if (!plantnow_evt_group)
+    {
+        ESP_LOGE(TAG, "plantnow not initialized");
+        return ESP_ERR_INVALID_STATE;
+    }
+    xEventGroupClearBits(plantnow_evt_group, PLANTNOW_EVT_SENT);
+    esp_err_t ret = esp_now_send(peer_addr, data, len);
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to send data: %d", ret);
+        xEventGroupSetBits(plantnow_evt_group, PLANTNOW_EVT_ERROR);
+    }
+    return ret;
+}
 
 static esp_err_t sendMac(const uint8_t *peer_addr)
 {
@@ -50,7 +66,7 @@ static esp_err_t sendMac(const uint8_t *peer_addr)
     ESP_LOGI(TAG, "Sending MAC address: %02X:%02X:%02X:%02X:%02X:%02X",
              mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     xEventGroupClearBits(plantnow_evt_group, PLANTNOW_EVT_SENT);
-    ret = esp_now_send(peer_addr, mac, ESP_NOW_ETH_ALEN);
+    ret = plantnow_send(peer_addr, mac, ESP_NOW_ETH_ALEN);
     if (ret != ESP_OK)
     {
         ESP_LOGE(TAG, "Failed to send MAC address: %d", ret);
@@ -61,6 +77,75 @@ static esp_err_t sendMac(const uint8_t *peer_addr)
         ESP_LOGI(TAG, "MAC address sent to peer");
     }
     return ret;
+}
+
+/**
+ * @brief Send WiFi credentials to the peer.
+ * @return ESP_OK on success, or an error code on failure.
+ */
+esp_err_t plantnow_sendWifiCredentials(bool waitForSendComplete)
+{
+    wifi_credentials_t creds = {0};
+    bool isWifiConfigured = plantstore_getWifiCredentials(creds.ssid, creds.password, sizeof(creds.ssid), sizeof(creds.password));
+    if (!isWifiConfigured)
+    {
+        ESP_LOGE(TAG, "No WiFi credentials found in plantstore");
+        xEventGroupSetBits(plantnow_evt_group, PLANTNOW_EVT_ERROR);
+        return ESP_ERR_NOT_FOUND;
+    }
+
+    ESP_LOGI(TAG, "Sending WiFi credentials to slave");
+    esp_err_t ret = plantnow_send(esp_peer_mac, (uint8_t *)&creds, sizeof(creds));
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to send WiFi credentials: %d", ret);
+        xEventGroupSetBits(plantnow_evt_group, PLANTNOW_EVT_ERROR);
+        return ret;
+    }
+
+    if (waitForSendComplete)
+    {
+        if (!plantnow_waitForSendComplete(portMAX_DELAY))
+        {
+            ESP_LOGE(TAG, "Sending WiFi credentials failed");
+            return ESP_FAIL;
+        }
+    }
+
+    return ESP_OK;
+}
+
+esp_err_t plantnow_sendCloudSetupBlumy(cloud_setup_blumy_t *creds, bool waitForSendComplete)
+{
+    if (creds == NULL)
+    {
+        ESP_LOGE(TAG, "Blumy credentials are NULL");
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    ESP_LOGI(TAG, "Sending Blumy credentials to slave");
+    esp_err_t ret = plantnow_send(esp_peer_mac, (uint8_t *)creds, sizeof(cloud_setup_blumy_t));
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to send Blumy credentials: %d", ret);
+        xEventGroupSetBits(plantnow_evt_group, PLANTNOW_EVT_ERROR);
+        return ret;
+    }
+
+    if (waitForSendComplete)
+    {
+        if (!plantnow_waitForSendComplete(portMAX_DELAY))
+        {
+            ESP_LOGE(TAG, "Sending Blumy credentials failed");
+            return ESP_FAIL;
+        }
+    }
+
+    xEventGroupSetBits(plantnow_evt_group, PLANTNOW_EVT_BLUMY_EXCHANGED);
+    esp_now_del_peer(esp_peer_mac);
+    xEventGroupClearBits(plantnow_evt_group, PLANTNOW_EVT_PEER_ADDED);
+
+    return ESP_OK;
 }
 
 static void receiveMac(const uint8_t *data, size_t len)
@@ -116,7 +201,18 @@ static void receiveWifiCredentials(const uint8_t *data, size_t len)
     // Store credentials to plantstore
     plantstore_setWifiCredentials(creds.ssid, creds.password);
     ESP_LOGI(TAG, "WiFi credentials stored successfully");
-    xEventGroupSetBits(plantnow_evt_group, PLANTNOW_EVT_WIFI_EXCHANGED);
+}
+
+static void receiveCloudSetupBlumy(const uint8_t *data, size_t len)
+{
+    cloud_setup_blumy_t creds;
+    memcpy(&creds, data, sizeof(creds));
+    ESP_LOGI(TAG, "Received Blumy credentials: Token=%s, URL=%s", creds.token, creds.url);
+
+    // Store credentials to plantstore
+    plantstore_setCloudConfigurationBlumy(creds.token, creds.url);
+    ESP_LOGI(TAG, "Blumy credentials stored successfully");
+    xEventGroupSetBits(plantnow_evt_group, PLANTNOW_EVT_BLUMY_EXCHANGED);
 }
 
 static void espnow_recv_cb(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int data_len)
@@ -132,6 +228,10 @@ static void espnow_recv_cb(const esp_now_recv_info_t *esp_now_info, const uint8_
     else if (data_len == sizeof(wifi_credentials_t))
     {
         receiveWifiCredentials(data, data_len);
+    }
+    else if (data_len == sizeof(cloud_setup_blumy_t))
+    {
+        receiveCloudSetupBlumy(data, data_len);
     }
     else
     {
@@ -171,7 +271,6 @@ void plantnow_init(bool isMaster)
     }
 
     ESP_LOGI(TAG, "plantnow initialized as %s", isMaster ? "master" : "slave");
-    xEventGroupSetBits(plantnow_evt_group, PLANTNOW_EVT_INITIALIZED);
 
     esp_now_register_send_cb(espnow_send_cb);
     esp_now_register_recv_cb(espnow_recv_cb);
@@ -198,8 +297,6 @@ void plantnow_init(bool isMaster)
         }
         esp_now_del_peer(broadcast_mac);
     }
-
-    xEventGroupSetBits(plantnow_evt_group, PLANTNOW_EVT_INITIALIZED);
 }
 /**
  * Wait until the current send operation is complete.
@@ -224,59 +321,15 @@ bool plantnow_waitForSendComplete(TickType_t ticks_to_wait)
 }
 
 /**
- * @brief Send WiFi credentials to the peer.
- * @return ESP_OK on success, or an error code on failure.
+ * Check if Blumy credentials have been exchanged.
+ * @return true if Blumy credentials have been exchanged, false otherwise.
  */
-esp_err_t plantnow_sendWifiCredentials(bool waitForSendComplete)
-{
-    wifi_credentials_t creds = {0};
-    bool isWifiConfigured = plantstore_getWifiCredentials(creds.ssid, creds.password, sizeof(creds.ssid), sizeof(creds.password));
-    if (!isWifiConfigured)
-    {
-        ESP_LOGE(TAG, "No WiFi credentials found in plantstore");
-        xEventGroupSetBits(plantnow_evt_group, PLANTNOW_EVT_ERROR);
-        return ESP_ERR_NOT_FOUND;
-    }
-
-    ESP_LOGI(TAG, "Sending WiFi credentials to slave");
-    xEventGroupClearBits(plantnow_evt_group, PLANTNOW_EVT_SENT);
-    esp_err_t ret = esp_now_send(esp_peer_mac, (uint8_t *)&creds, sizeof(creds));
-    if (ret != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Failed to send WiFi credentials: %d", ret);
-        xEventGroupSetBits(plantnow_evt_group, PLANTNOW_EVT_ERROR);
-        return ret;
-    }
-
-    if (waitForSendComplete)
-    {
-        if (!plantnow_waitForSendComplete(portMAX_DELAY))
-        {
-            ESP_LOGE(TAG, "Sending WiFi credentials failed");
-            return ESP_FAIL;
-        }
-    }
-
-    xEventGroupSetBits(plantnow_evt_group, PLANTNOW_EVT_WIFI_EXCHANGED);
-    esp_now_del_peer(esp_peer_mac);
-    xEventGroupClearBits(plantnow_evt_group, PLANTNOW_EVT_PEER_ADDED);
-
-    return ESP_OK;
-}
-
-/**
- * @param ticks_to_wait The maximum time to wait for the bits to be set.
- */
-void plantnow_wait_for_exchange(TickType_t ticks_to_wait)
+bool plantnow_hasExchangedBlumy(void)
 {
     if (!plantnow_evt_group)
-        return;
-    xEventGroupWaitBits(
-        plantnow_evt_group,
-        PLANTNOW_EVT_ERROR | PLANTNOW_EVT_WIFI_EXCHANGED,
-        pdFALSE,
-        pdFALSE,
-        ticks_to_wait);
+        return false;
+    EventBits_t bits = xEventGroupGetBits(plantnow_evt_group);
+    return (bits & PLANTNOW_EVT_BLUMY_EXCHANGED) != 0;
 }
 
 bool plantnow_hasReceivedPeerMac(void)

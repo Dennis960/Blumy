@@ -246,7 +246,16 @@ export async function plantnowHasReceivedPeerMac(): Promise<string> {
 }
 
 export async function plantnowSendCredentials(): Promise<boolean> {
-    return await postDataToEsp("/plantnow/sendCredentials").then(
+    return await postDataToEsp("/plantnow/sendWifiCredentials").then(
+        (res) => res.ok
+    );
+}
+
+export async function plantnowSendCloudSetupBlumy(creds: {
+    token: string;
+    url: string;
+}): Promise<boolean> {
+    return await postDataToEsp("/plantnow/sendCloudSetup/blumy", creds).then(
         (res) => res.ok
     );
 }

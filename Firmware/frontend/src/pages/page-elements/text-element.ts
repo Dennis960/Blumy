@@ -8,7 +8,6 @@ export class ColoredTextElement extends LitElement {
     @property({ type: String }) color:
         | "success"
         | "error"
-        | "warning"
         | "helper" = "error";
     @property({ type: Object }) styleCustom: Record<string, string> = {};
 

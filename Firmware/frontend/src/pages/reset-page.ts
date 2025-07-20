@@ -34,7 +34,6 @@ export class ResetPage extends BasePage {
                 Dadurch wird der Sensor neu gestartet. Die aktuelle Verbindung
                 wird getrennt. Du kannst die Seite danach schließen.
             </span>
-            <div></div>
             <button-element
                 name="Alle Einstellungen zurücksetzen"
                 @click="${this.factoryReset}"
