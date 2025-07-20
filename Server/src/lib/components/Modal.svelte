@@ -3,16 +3,18 @@
 		title = '',
 		dataTestId = '',
 		modalId = 'modal',
+		modalInstance = $bindable(),
 		children
 	}: {
 		title?: string;
 		dataTestId?: string;
 		modalId?: string;
+		modalInstance?: HTMLElement;
 		children?: import('svelte').Snippet;
 	} = $props();
 </script>
 
-<div class="modal" id={modalId} tabindex="-1" data-testid={dataTestId}>
+<div class="modal" id={modalId} tabindex="-1" data-testid={dataTestId} bind:this={modalInstance}>
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">

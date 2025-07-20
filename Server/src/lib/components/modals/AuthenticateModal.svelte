@@ -16,6 +16,7 @@
 	let password = $state('');
 	let repeatPassword = $state('');
 	let errorText = $state('');
+	let modalInstance: HTMLElement = $state()!;
 	async function login() {
 		return clientApi().auth().default().login(email, password).response();
 	}
@@ -47,6 +48,7 @@
 			if (redirectUrl) {
 				goto(decodeURIComponent(redirectUrl));
 			}
+			window.bootstrap.Modal.getInstance(modalInstance)?.hide();
 		} else {
 			errorText = await res.text();
 		}
@@ -57,6 +59,7 @@
 	title={$authenticationModalStore.authenticationType === 'login' ? 'Login' : 'Registrieren'}
 	dataTestId="authentication-modal"
 	modalId="authentication-modal"
+	bind:modalInstance
 >
 	<form onsubmit={authenticate} class="d-flex flex-column align-items-start w-100 gap-3">
 		<label for="email" class="form-label fw-medium">Email</label>
@@ -100,9 +103,8 @@
 		<button
 			type="submit"
 			onclick={authenticate}
-			class="btn btn-primary mt-2 w-100"
+			class="btn btn-primary w-100 mt-2"
 			data-testid="authentication-modal-submit"
-			data-bs-dismiss="modal"
 		>
 			{$authenticationModalStore.authenticationType === 'login' ? 'Login' : 'Registrieren'}
 		</button>

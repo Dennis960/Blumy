@@ -1,4 +1,5 @@
 import { lucia } from '$lib/server/auth';
+import type * as bootstrap from 'bootstrap';
 
 declare global {
 	namespace App {
@@ -9,6 +10,7 @@ declare global {
 			lucia: typeof lucia;
 		}
 	}
+	interface Window {
+		bootstrap: typeof bootstrap;
+	}
 }
-
-export {};

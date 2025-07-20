@@ -27,6 +27,7 @@
 		"@tabler/icons": "^3.34.0",
 		"@tabler/icons-svelte": "^3.34.0",
 		"@tailwindcss/vite": "^4.0.0",
+		"@types/bootstrap": "^5.2.10",
 		"@types/jsonwebtoken": "^9.0.7",
 		"@types/lodash-es": "^4.17.12",
 		"@types/node": "^22.5.0",
