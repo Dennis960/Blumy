@@ -254,7 +254,10 @@ export class CloudPage extends BasePage {
     }
 
     async handleExternalSetup() {
+        loadingState.state++;
         location.href = `https://blumy.cloud/selector?redirect=${location.href}`;
+        await new Promise((resolve) => setTimeout(resolve, 5000)); // I expect the page to be redirected before this timeout
+        loadingState.state--;
     }
     static styles = [
         css`
