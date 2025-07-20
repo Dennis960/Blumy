@@ -112,7 +112,7 @@ void plantfi_ip_event_handler(int32_t event_id, void *event_data)
         xEventGroupSetBits(plantfi_sta_event_group, PLANTFI_CONNECTED_BIT);
         if (_enableNatAndDnsOnConnect)
         {
-            plantfi_start_nat();
+            ESP_ERROR_CHECK_WITHOUT_ABORT(esp_netif_napt_enable(ap_netif));
         }
     }
     else
@@ -156,6 +156,7 @@ void plantfi_initWifi()
 
     plantfi_sta_event_group = xEventGroupCreate();
     plantfi_sta_status = PLANTFI_STA_STATUS_DISCONNECTED;
+    plantfi_start_nat();
 }
 
 void plantfi_configureAp(const char *ssid, const char *password, int max_connection)
@@ -279,7 +280,6 @@ void plantfi_start_nat()
     esp_netif_set_dns_info(ap_netif, ESP_NETIF_DNS_MAIN, &dnsserver);
     ESP_LOGI(PLANTFI_TAG, "Set AP DNS to: " IPSTR, IP2STR(&(dnsserver.ip.u_addr.ip4)));
     ESP_LOGI(PLANTFI_TAG, "Starting NAT");
-    ESP_ERROR_CHECK_WITHOUT_ABORT(esp_netif_napt_enable(ap_netif));
 }
 
 int8_t plantfi_getRssi()
