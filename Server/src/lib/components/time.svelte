@@ -18,6 +18,13 @@
 	let formatted = $derived(relative ? parsed.from(undefined) : parsed.format());
 	let title: string | undefined = $derived(relative ? parsed.format() : undefined);
 	let interval: NodeJS.Timeout;
+	let dateISOString: string = $derived.by(() => {
+		try {
+			return parsed.toISOString();
+		} catch (e) {
+			return '';
+		}
+	});
 
 	onMount(() => {
 		if (relative) {
@@ -30,6 +37,6 @@
 	});
 </script>
 
-<time {...rest} {title} datetime={parsed.toISOString()}>
+<time {...rest} {title} datetime={dateISOString}>
 	{formatted}
 </time>
