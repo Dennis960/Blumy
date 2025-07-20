@@ -32,12 +32,7 @@ export class MulticonfigurationPage extends BasePage {
     `;
 
     exitMulticonfiguration() {
-        this.errorText =
-            "Multikonfiguration beendet. Bitte starte den Blumy Sensor neu.";
-        setTimeout(() => {
-            location.href =
-                "https://blumy.cloud/selector?redirect=" + location.href;
-        }, 2000);
+        location.href = location.origin;
     }
 
     async sendWifiCredentials() {
