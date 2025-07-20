@@ -10,7 +10,7 @@
 		{
 			icon: IconChecklist,
 			title: 'Den ersten Sensor einrichten',
-			desc: `Richte den ersten sensor ein, wie in der Anleitung <a href="${route('/tutorials/getting-started')}">Erste Schritte</a> beschrieben.`
+			desc: `Richte den ersten Sensor ein, wie in der Anleitung <a href="${route('/tutorials/getting-started')}">Erste Schritte</a> beschrieben.`
 		},
 		{
 			icon: IconPower,
