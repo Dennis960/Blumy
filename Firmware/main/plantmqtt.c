@@ -274,7 +274,7 @@ void plantmqtt_homeassistant_publish_sensor_data(const sensors_full_data_t *sens
     esp_mqtt_client_handle_t mqtt_client = plantmqtt_mqtt_init_from_plantstore(sensorId, 100, topic, sizeof(topic));
     if (mqtt_client == NULL)
     {
-        ESP_LOGE("Plantmqtt", "MQTT client not initialized, cannot publish sensor data");
+        ESP_LOGI("Plantmqtt", "MQTT client not initialized, not publishing sensor data");
         return;
     }
 

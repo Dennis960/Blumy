@@ -560,7 +560,7 @@ void plantfi_send_sensor_data_http(sensors_full_data_t *sensors_data, int8_t rss
     char auth[60];
     if (!plantstore_getCloudConfigurationHttp(sensorId, url, auth, sizeof(sensorId), sizeof(url), sizeof(auth)))
     {
-        ESP_LOGE(PLANTFI_TAG, "No HTTP configuration found");
+        ESP_LOGI(PLANTFI_TAG, "No HTTP configuration found");
         return;
     }
 

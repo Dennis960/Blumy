@@ -36,13 +36,8 @@ void analogWrite(int gpio, int frequency, float duty_cycle, ledc_channel_t chann
         if (ledc_initialized[channel])
         {
             ledc_stop(LEDC_LOW_SPEED_MODE, channel, 0);
-            ledc_initialized[channel] = false;
         }
         return;
-    }
-    else if (!ledc_initialized[channel])
-    {
-        ledc_initialized[channel] = true;
     }
     ledc_timer_bit_t duty_resolution = LEDC_TIMER_13_BIT;
     if (frequency < 1000)
@@ -72,15 +67,25 @@ void analogWrite(int gpio, int frequency, float duty_cycle, ledc_channel_t chann
         .timer_num = LEDC_TIMER_0};
     ESP_ERROR_CHECK(ledc_timer_config(&ledc_timer));
 
-    ledc_channel_config_t ledc_channel = {
-        .gpio_num = gpio,
-        .speed_mode = LEDC_LOW_SPEED_MODE,
-        .channel = channel,
-        .intr_type = LEDC_INTR_DISABLE,
-        .timer_sel = LEDC_TIMER_0,
-        .duty = (1 << duty_resolution) * duty_cycle,
-        .hpoint = 0};
-    ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
+    uint32_t duty = (1 << duty_resolution) * duty_cycle;
+    if (!ledc_initialized[channel])
+    {
+        ledc_initialized[channel] = true;
+        ledc_channel_config_t ledc_channel = {
+            .gpio_num = gpio,
+            .speed_mode = LEDC_LOW_SPEED_MODE,
+            .channel = channel,
+            .intr_type = LEDC_INTR_DISABLE,
+            .timer_sel = LEDC_TIMER_0,
+            .duty = duty,
+            .hpoint = 0};
+        ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
+    }
+    else
+    {
+        ledc_set_duty(LEDC_LOW_SPEED_MODE, channel, duty);
+        ledc_update_duty(LEDC_LOW_SPEED_MODE, channel);
+    }
     vTaskDelay(10 / portTICK_PERIOD_MS); // Calling ledc back to back hangs up the esp
 }
 
