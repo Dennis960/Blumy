@@ -3,7 +3,8 @@
 
 	const tutorialPages = [
 		{ name: 'Erste Schritte', href: route('/tutorials/getting-started') },
-		{ name: 'Home Assistant', href: route('/tutorials/home-assistant') }
+		{ name: 'Home Assistant', href: route('/tutorials/home-assistant') },
+		{ name: 'Mehrere Sensoren einrichten', href: route('/tutorials/multiconfiguration') }
 	];
 
 	let { children } = $props();
