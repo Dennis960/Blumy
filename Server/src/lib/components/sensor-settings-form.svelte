@@ -11,6 +11,7 @@
 		SensorCreatedDTO,
 		SensorValueDistributionDTO
 	} from '$lib/types/api';
+	import loadImage from 'blueimp-load-image';
 	import { PipsMode } from 'nouislider';
 	import { onMount, type Snippet } from 'svelte';
 	import Base64Image from './base64-image.svelte';
@@ -102,19 +103,34 @@
 		};
 	});
 
-	function handleImageInput(e: Event) {
-		const reader = new FileReader();
-		reader.onload = (e: ProgressEvent<FileReader>) => {
-			const url = e.target?.result as string;
-			image = new Image();
-			image.src = url;
-		};
-
+	async function handleImageInput(e: Event) {
 		const target = e.target as HTMLInputElement;
-		if (target.files == undefined || target.files[0] == undefined) {
+		if (!target.files || !target.files[0]) {
 			return;
 		}
-		reader.readAsDataURL(target.files[0]);
+		const file = target.files[0];
+
+		loadImage(
+			file,
+			(canvas: HTMLCanvasElement | HTMLImageElement | Event) => {
+				if (canvas instanceof HTMLCanvasElement) {
+					canvas.toBlob((blob) => {
+						if (blob) {
+							const url = URL.createObjectURL(blob);
+							image = new Image();
+							image.src = url;
+						}
+					}, file.type);
+				} else if (canvas instanceof HTMLImageElement) {
+					image = canvas;
+				}
+			},
+			{
+				canvas: true,
+				orientation: true,
+				meta: true
+			}
+		);
 	}
 
 	async function handleSubmit(event: {
