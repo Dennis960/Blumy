@@ -10,6 +10,7 @@
 	let { data } = $props();
 
 	let sensorLink = $state('');
+	let sensorLinkErrorText = $state('');
 
 	let storedSensors: SensorDTO[] = $state([]);
 
@@ -26,10 +27,51 @@
 		return () => clearInterval(interval);
 	});
 
-	function gotoSensor() {
-		if (sensorLink.trim()) {
-			goto(sensorLink.trim());
+	function addSensors() {
+		const urls = sensorLink
+			.split(/[\s,;]+/)
+			.map((u) => u.trim())
+			.filter((u) => u.length > 0);
+
+		console.log('Adding sensors:', urls);
+
+		if (urls.length === 0) {
+			sensorLinkErrorText = 'Bitte gib mindestens einen gültigen Sensor-Link ein.';
+			return;
 		}
+
+		let hasError = false;
+		for (const urlStr of urls) {
+			try {
+				const url = new URL(urlStr);
+				const searchParams = url.searchParams;
+				const sensorId = url.pathname.split('/').pop() || null;
+				const token = searchParams.get('token');
+				if (!sensorId || !token) {
+					sensorLinkErrorText = 'Ungültiger Sensor-Link. Bitte überprüfe die URL.';
+					return;
+				}
+				const sensorIdNumber = parseInt(sensorId, 10);
+				if (isNaN(sensorIdNumber)) {
+					sensorLinkErrorText = 'Ungültiger Sensor-ID. Bitte überprüfe die URL.';
+					return;
+				}
+
+				SensorStorage.addSensor(sensorIdNumber, token);
+			} catch (error) {
+				hasError = true;
+			}
+		}
+
+		if (hasError) {
+			sensorLinkErrorText = 'Mindestens ein Sensor-Link ist ungültig. Bitte überprüfe die Eingabe.';
+			return;
+		}
+		SensorStorage.loadStoredSensors().then((sensors) => {
+			storedSensors = sensors;
+		});
+		sensorLink = '';
+		sensorLinkErrorText = '';
 	}
 
 	let filteredStoredSensors = $derived(
@@ -98,7 +140,9 @@
 		</div>
 		{#if !data.authenticated}
 			<div class="d-flex flex-column align-items-center mt-5">
-				<label for="sensor-link" class="mb-2">Sensor Share-Link eingeben:</label>
+				<label for="sensor-link" class="mb-2">
+					Einen oder mehrere Sensor Share-Links eingeben:
+				</label>
 				<div class="input-group mb-3" style="max-width: 400px;">
 					<input
 						id="sensor-link"
@@ -108,10 +152,13 @@
 						placeholder="z.B. https://blumy.cloud/sensor/1234?token=1234567890abcdef"
 						autocomplete="off"
 					/>
-					<button class="btn btn-primary" type="button" onclick={gotoSensor}>
-						Gehe zu Sensor
-					</button>
+					<button class="btn btn-primary" type="button" onclick={addSensors}>Hinzufügen</button>
 				</div>
+				{#if sensorLinkErrorText}
+					<p class="form-text text-danger">
+						{sensorLinkErrorText}
+					</p>
+				{/if}
 			</div>
 		{/if}
 	</div>

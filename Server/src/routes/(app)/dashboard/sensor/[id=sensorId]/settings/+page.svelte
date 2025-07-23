@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import { DATA_DEPENDENCY } from '$lib/client/api.js';
 	import SensorSettingsForm from '$lib/components/sensor-settings-form.svelte';
 	import { route } from '$lib/ROUTES.js';
@@ -28,11 +28,20 @@
 				shareLink={data.shareLink}
 				sensorValueDistribution={data.sensorValueDistribution}
 			>
-				{#snippet formActions()}
-					<a
-						href={route('/dashboard/sensor/[id=sensorId]', { id: data.id.toString() })}
-						class="btn btn-link">Abbrechen</a
+				{#snippet formActions({ submitting })}
+					<button
+						type="button"
+						class="btn btn-link"
+						disabled={submitting}
+						onclick={() =>
+							goto(
+								route('/dashboard/sensor/[id=sensorId]', {
+									id: data.id.toString()
+								})
+							)}
 					>
+						Abbrechen
+					</button>
 				{/snippet}
 			</SensorSettingsForm>
 		{/if}

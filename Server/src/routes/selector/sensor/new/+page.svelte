@@ -30,10 +30,11 @@
 		{#if !error}
 			{#if !createdSensor}
 				<SensorSettingsForm bind:createdSensor {onSensorCreate}>
-					{#snippet formActions()}
+					{#snippet formActions({ submitting })}
 						<button
 							type="button"
 							class="btn btn-link"
+							disabled={submitting}
 							onclick={() => goto(route('/selector') + `?${page.url.searchParams.toString()}`)}
 						>
 							Abbrechen

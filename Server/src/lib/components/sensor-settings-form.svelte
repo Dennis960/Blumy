@@ -35,7 +35,7 @@
 		writeToken?: string;
 		shareLink?: string;
 		createdSensor?: SensorCreatedDTO;
-		formActions?: Snippet;
+		formActions?: Snippet<[{ submitting: boolean }]>;
 		onSensorCreate?: (sensor: SensorCreatedDTO) => void;
 	} = $props();
 
@@ -56,6 +56,8 @@
 	let lowerThreshold = $state(initialConfig.lowerThreshold * MAX_FIELD_CAPACITY);
 	let upperThreshold = $state(initialConfig.upperThreshold * MAX_FIELD_CAPACITY);
 	let fieldCapacity = $state(initialConfig.fieldCapacity);
+
+	let submitting = $state(false);
 
 	function onSliderChange(values: (number | string)[]) {
 		[permanentWiltingPoint, lowerThreshold, upperThreshold, fieldCapacity] = values.map((v) =>
@@ -138,21 +140,27 @@
 		preventDefault: () => void;
 	}) {
 		event.preventDefault();
-		const data = new FormData(event.currentTarget);
+		if (submitting) return;
+		submitting = true;
+		try {
+			const data = new FormData(event.currentTarget);
 
-		if (sensorId !== undefined) {
-			const apiCall = clientApi().sensors().withId(sensorId).update(data);
-			if ((await apiCall.response()).ok) {
-				goto(route('/dashboard/sensor/[id=sensorId]', { id: sensorId.toString() }), {
-					invalidateAll: true
-				});
+			if (sensorId !== undefined) {
+				const apiCall = clientApi().sensors().withId(sensorId).update(data);
+				if ((await apiCall.response()).ok) {
+					goto(route('/dashboard/sensor/[id=sensorId]', { id: sensorId.toString() }), {
+						invalidateAll: true
+					});
+				}
+			} else {
+				const apiCall = clientApi().sensors().create(data);
+				if ((await apiCall.response()).ok) {
+					const sensor = await apiCall.parse();
+					onSensorCreate?.(sensor);
+				}
 			}
-		} else {
-			const apiCall = clientApi().sensors().create(data);
-			if ((await apiCall.response()).ok) {
-				const sensor = await apiCall.parse();
-				onSensorCreate?.(sensor);
-			}
+		} finally {
+			submitting = false;
 		}
 	}
 
@@ -306,8 +314,8 @@
 
 					<div class="card-footer text-end">
 						<div class="d-flex justify-content-end column-gap-2">
-							{@render formActions?.()}
-							<button type="submit" class="btn btn-primary">Speichern</button>
+							{@render formActions?.({ submitting })}
+							<button type="submit" class="btn btn-primary" disabled={submitting}>Speichern</button>
 						</div>
 					</div>
 				</div>

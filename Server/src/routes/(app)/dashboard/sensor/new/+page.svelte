@@ -18,8 +18,15 @@
 	<div class="container">
 		{#if createdSensor == undefined}
 			<SensorSettingsForm bind:createdSensor {onSensorCreate}>
-				{#snippet formActions()}
-					<a href={route(`/`)} class="btn btn-link">Abbrechen</a>
+				{#snippet formActions({ submitting })}
+					<button
+						type="button"
+						class="btn btn-link"
+						onclick={() => goto(route(`/`))}
+						disabled={submitting}
+					>
+						Abbrechen
+					</button>
 				{/snippet}
 			</SensorSettingsForm>
 		{:else}
