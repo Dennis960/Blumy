@@ -41,13 +41,13 @@
 	<div class="container-xl container">
 		<SensorDetailNavArrows sensors={data.sensors} currentSensor={data.sensor} />
 		<div class="row row-cards row-deck">
-			<div class="col-md-5 col-lg-4 col-12">
+			<div class="col-lg-4">
 				{#if data.sensor != undefined}
 					<SensorDetailCard sensor={data.sensor} isOwner={!data.accessThroughReadToken} />
 				{/if}
 			</div>
 
-			<div class="col-md-7 col-lg-8 col-12">
+			<div class="col-lg-8">
 				{#if data.sensor != undefined && data.sensorData != undefined}
 					<SensorCapacityHistoryCard
 						sensor={data.sensor}
