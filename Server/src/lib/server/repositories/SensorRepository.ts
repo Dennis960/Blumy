@@ -40,11 +40,14 @@ export default class SensorRepository {
 	}
 
 	/**
-	 * Get all sensors owned by a specific owner.
+	 * Get all sensor ids owned by a specific owner.
 	 * @returns All sensors for the owner.
 	 */
-	static async getAllForOwner(owner: string) {
-		return await db.select().from(sensors).where(eq(sensors.owner, owner));
+	static async getAllIdsForOwner(owner: string) {
+		return await db
+			.select({ sensorAddress: sensors.sensorAddress })
+			.from(sensors)
+			.where(eq(sensors.owner, owner));
 	}
 
 	/**

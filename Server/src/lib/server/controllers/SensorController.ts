@@ -119,7 +119,7 @@ export default class SensorController {
 	}
 
 	public async getSensorOverview(ownerId: string): Promise<SensorOverviewDTO> {
-		const sensorsIds = await SensorRepository.getAllForOwner(ownerId);
+		const sensorsIds = await SensorRepository.getAllIdsForOwner(ownerId);
 
 		const sensors = await Promise.all(
 			sensorsIds.map(async (sensor) => (await this.getSensor(sensor.sensorAddress))!)

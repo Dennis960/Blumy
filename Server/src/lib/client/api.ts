@@ -232,9 +232,9 @@ export function clientApi(_fetch: typeof fetch = fetch, baseUrl: string = '') {
 								(res) => res.json()
 							);
 						},
-						getImage: (token: string) => {
+						getImage: (token?: string) => {
 							url.addPath('image');
-							url.addSearchParam('token', token);
+							if (token) url.addSearchParam('token', token);
 							return fetchWithInit<Blob>(undefined, (res) => res.blob());
 						}
 					};
