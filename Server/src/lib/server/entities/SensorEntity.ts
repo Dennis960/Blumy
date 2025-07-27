@@ -1,3 +1,4 @@
+import { clientApi } from '$lib/client/api';
 import type { SensorConfigurationDTO } from '$lib/types/api';
 import sharp from 'sharp';
 
@@ -50,6 +51,7 @@ export default class SensorEntity {
 		return {
 			name: entity.name,
 			imageBase64: entity.imageBase64 ?? undefined,
+			imageUrl: clientApi(null!).sensors().withId(entity.sensorAddress).getImage().url,
 			fieldCapacity: entity.fieldCapacity,
 			permanentWiltingPoint: entity.permanentWiltingPoint,
 			lowerThreshold: entity.lowerThreshold,

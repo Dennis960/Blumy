@@ -17,6 +17,7 @@ export interface SensorReadingDTO {
 export const sensorConfigurationDTOSchema = z.object({
 	name: z.string(),
 	imageBase64: z.string().optional(), // data URL for now
+	imageUrl: z.string().optional(), // URL to the image
 	/*
 	 * Typical permanent wilting points:
 	 *   26-32% of field capacity for fine-textured soil

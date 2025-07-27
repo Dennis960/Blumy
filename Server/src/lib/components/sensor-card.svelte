@@ -43,6 +43,7 @@
 			<Base64Image
 				class="ratio ratio-1x1 d-block rounded-start-1 h-100 w-100 bg-cover"
 				imageBase64={sensor.config.imageBase64}
+				imageUrl={sensor.config.imageUrl}
 			/>
 		</div>
 		<div class="col-8">
