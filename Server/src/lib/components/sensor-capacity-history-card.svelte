@@ -89,7 +89,7 @@
 
 <style>
 	.charts {
-		height: calc(100vh - 200px);
+		height: calc(100vh - 256px);
 		display: grid;
 		grid-template-rows: minmax(0, 4fr) minmax(0, 3fr) minmax(0, 1fr);
 	}
