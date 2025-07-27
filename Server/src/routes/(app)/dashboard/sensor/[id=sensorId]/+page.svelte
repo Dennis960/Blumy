@@ -5,6 +5,7 @@
 	import { SensorStorage } from '$lib/client/sensor-storage.js';
 	import SensorCapacityHistoryCard from '$lib/components/sensor-capacity-history-card.svelte';
 	import SensorDetailCard from '$lib/components/sensor-detail-card.svelte';
+	import SensorDetailNavArrows from '$lib/components/sensor-detail-nav-arrows.svelte';
 	import { onMount } from 'svelte';
 
 	let { data } = $props();
@@ -38,6 +39,7 @@
 
 <div class="page-body">
 	<div class="container-xl container">
+		<SensorDetailNavArrows sensors={data.sensors} currentSensor={data.sensor} />
 		<div class="row row-cards row-deck">
 			<div class="col-md-5 col-lg-4 col-12">
 				{#if data.sensor != undefined}
