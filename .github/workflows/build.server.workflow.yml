@@ -38,7 +38,9 @@ jobs:
       - name: Build and publish a Docker image for ${{ github.repository }}
         uses: Dennis960/push-to-ghcr@master
         with:
-          image_tag: ${{ steps.extract_branch.outputs.branch }}.${{ github.run_number }},${{ steps.extract_branch.outputs.branch }}.latest
+          image_tag: >-
+            ${{ steps.extract_branch.outputs.branch }}.${{ github.run_number }},
+            ${{ steps.extract_branch.outputs.branch }}.latest
           image_name: ${{ github.repository }}/server
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dockerfile: Server/Dockerfile.build
