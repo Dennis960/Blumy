@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import { authenticateTestUser } from './test-auth-service';
 import { resetDatabase, testDb } from './test-db';
 import { sensors, users } from '$lib/server/db/schema';
+import { eq } from 'drizzle-orm';
 
 test.beforeEach(async () => {
 	await resetDatabase();
@@ -54,7 +55,7 @@ test.describe('Sensor Settings API', () => {
 
 		// Verify the sensor was updated in the database
 		const [updatedSensor] = await testDb.select().from(sensors)
-			.where(sensors.sensorAddress.eq(testSensor.sensorAddress));
+			.where(eq(sensors.sensorAddress, testSensor.sensorAddress));
 		
 		expect(updatedSensor.name).toBe('Updated Sensor Name');
 		expect(updatedSensor.fieldCapacity).toBe(2048);
@@ -64,6 +65,14 @@ test.describe('Sensor Settings API', () => {
 	});
 
 	test('unauthenticated user cannot update sensor settings', async ({ request }) => {
+		// Create a test user to own the sensor
+		const [testUser] = await testDb.insert(users).values({
+			id: 'test-user-for-unauth-test',
+			email: 'unauth-test@example.com',
+			username: 'unauthuser',
+			avatarUrl: 'https://example.com/avatar.png'
+		}).returning();
+		
 		// Create a test sensor (without authenticating)
 		const [testSensor] = await testDb.insert(sensors).values({
 			sensorAddress: 99,
@@ -73,7 +82,7 @@ test.describe('Sensor Settings API', () => {
 			permanentWiltingPoint: 100,
 			lowerThreshold: 300,
 			upperThreshold: 800,
-			owner: 'some-other-user',
+			owner: testUser.id,
 			writeToken: 'blumy_test-write-token',
 			readToken: 'test-read-token'
 		}).returning();
@@ -136,7 +145,7 @@ test.describe('Sensor Settings API', () => {
 
 		// Verify the sensor was NOT updated
 		const [unchangedSensor] = await testDb.select().from(sensors)
-			.where(sensors.sensorAddress.eq(otherUserSensor.sensorAddress));
+			.where(eq(sensors.sensorAddress, otherUserSensor.sensorAddress));
 		
 		expect(unchangedSensor.name).toBe('Other Users Sensor');
 		expect(unchangedSensor.fieldCapacity).toBe(1024);
@@ -189,7 +198,7 @@ test.describe('Sensor Settings API', () => {
 
 		// Verify the sensor was created in the database
 		const dbSensors = await testDb.select().from(sensors)
-			.where(sensors.owner.eq(testUser.id));
+			.where(eq(sensors.owner, testUser.id));
 		
 		expect(dbSensors).toHaveLength(1);
 		expect(dbSensors[0].name).toBe('New API Sensor');

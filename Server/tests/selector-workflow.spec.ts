@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import { authenticateTestUser, createTestUser } from './test-auth-service';
 import { resetDatabase, testDb } from './test-db';
 import { sensors } from '$lib/server/db/schema';
+import { eq } from 'drizzle-orm';
 
 test.beforeEach(async () => {
 	await resetDatabase();
@@ -72,7 +73,7 @@ test.describe('Selector Workflow', () => {
 		await expect(page.getByText('Der Sensor wird nun eingerichtet')).toBeVisible();
 
 		// Check that the sensor was created in the database
-		const createdSensors = await testDb.select().from(sensors).where(sensors.owner.eq(testUser.id));
+		const createdSensors = await testDb.select().from(sensors).where(eq(sensors.owner, testUser.id));
 		expect(createdSensors).toHaveLength(1);
 		expect(createdSensors[0].name).toBe('Test Sensor');
 		expect(createdSensors[0].writeToken).toMatch(/^blumy_.{32}$/);
