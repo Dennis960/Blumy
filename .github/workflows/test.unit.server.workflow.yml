@@ -1,0 +1,34 @@
+name: Unit Tests (Vitest)
+on:
+  workflow_call:
+
+jobs:
+  test-unit:
+    concurrency:
+      group: ${{ github.head_ref ||  github.ref }}-unit
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Cache Node Modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            Server/node_modules
+          key: modules-${{ hashFiles('Server/package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        working-directory: Server
+        run: npm ci
+
+      - name: Run unit tests
+        working-directory: Server
+        run: npm run test:unit

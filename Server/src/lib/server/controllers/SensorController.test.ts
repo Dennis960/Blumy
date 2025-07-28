@@ -217,5 +217,84 @@ describe('SensorController', () => {
 			const createCall = mockSensorRepository.create.mock.calls[0][0];
 			expect(createCall.readToken).toMatch(/^.{16}$/);
 		});
+
+		it('should pass correct parameters to SensorEntity.fromDTO', async () => {
+			const ownerId = 'test-user';
+			const config: SensorConfigurationDTO = {
+				name: 'Test Entity',
+				imageBase64: undefined,
+				permanentWiltingPoint: 200,
+				lowerThreshold: 400,
+				upperThreshold: 900,
+				fieldCapacity: 2048
+			};
+
+			const mockSensor: typeof sensors.$inferSelect = {
+				sensorAddress: 5,
+				name: 'Test Entity',
+				imageBase64: null,
+				fieldCapacity: 2048,
+				permanentWiltingPoint: 200,
+				lowerThreshold: 400,
+				upperThreshold: 900,
+				owner: ownerId,
+				writeToken: 'blumy_token',
+				readToken: 'read_token'
+			};
+
+			mockSensorRepository.create.mockResolvedValue(mockSensor);
+
+			await sensorController.create(ownerId, config);
+
+			expect(mockSensorEntity.fromDTO).toHaveBeenCalledWith(0, config);
+		});
+	});
+
+	describe('updateSensorConfig', () => {
+		it('should update sensor configuration', async () => {
+			// Arrange
+			const sensorId = 1;
+			const config = {
+				name: 'Updated Sensor',
+				fieldCapacity: 2048,
+				lowerThreshold: 400
+			};
+
+			const mockUpdatedSensor: typeof sensors.$inferSelect = {
+				sensorAddress: sensorId,
+				name: 'Updated Sensor',
+				imageBase64: null,
+				fieldCapacity: 2048,
+				permanentWiltingPoint: 100,
+				lowerThreshold: 400,
+				upperThreshold: 800,
+				owner: 'test-user',
+				writeToken: 'blumy_test-token',
+				readToken: 'test-token'
+			};
+
+			mockSensorRepository.update.mockResolvedValue(mockUpdatedSensor);
+			mockSensorEntity.toDTO.mockReturnValue({
+				name: 'Updated Sensor',
+				fieldCapacity: 2048,
+				permanentWiltingPoint: 100,
+				lowerThreshold: 400,
+				upperThreshold: 800
+			});
+
+			// Act
+			const result = await sensorController.updateSensorConfig(sensorId, config);
+
+			// Assert
+			expect(mockSensorRepository.update).toHaveBeenCalledWith(sensorId, config);
+			expect(mockSensorEntity.toDTO).toHaveBeenCalledWith(mockUpdatedSensor);
+			expect(result).toEqual({
+				name: 'Updated Sensor',
+				fieldCapacity: 2048,
+				permanentWiltingPoint: 100,
+				lowerThreshold: 400,
+				upperThreshold: 800
+			});
+		});
 	});
 });
