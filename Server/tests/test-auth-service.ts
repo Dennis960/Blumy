@@ -21,8 +21,10 @@ export const lucia = new Lucia(adapter, {
 
 
 export const createTestUser = async () => {
+    const timestamp = Date.now();
     return await testDb.insert(users).values({
-        id: "test-user",
+        id: `test-user-${timestamp}`,
+        email: `test-${timestamp}@example.com`,
     }).returning().then((users) => users[0]);
 }
 

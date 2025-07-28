@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { authenticateTestUser } from './test-auth-service';
 import { resetDatabase, testDb } from './test-db';
-import { sensors } from '$lib/server/db/schema';
+import { sensors, users } from '$lib/server/db/schema';
 
 test.beforeEach(async () => {
 	await resetDatabase();
@@ -13,7 +13,6 @@ test.describe('Sensor Settings API', () => {
 
 		// Create a test sensor
 		const [testSensor] = await testDb.insert(sensors).values({
-			sensorAddress: 99,
 			name: 'Original Sensor Name',
 			imageBase64: null,
 			fieldCapacity: 1024,
@@ -98,16 +97,21 @@ test.describe('Sensor Settings API', () => {
 	test('user cannot update another users sensor', async ({ request }) => {
 		const { user: testUser, cookie } = await authenticateTestUser();
 
-		// Create a sensor owned by a different user
+		// Create another user
+		const otherUser = await testDb.insert(users).values({
+			id: `other-user-${Date.now()}`,
+			email: `other-${Date.now()}@example.com`,
+		}).returning().then((users) => users[0]);
+
+		// Create a sensor owned by the other user
 		const [otherUserSensor] = await testDb.insert(sensors).values({
-			sensorAddress: 99,
 			name: 'Other Users Sensor',
 			imageBase64: null,
 			fieldCapacity: 1024,
 			permanentWiltingPoint: 100,
 			lowerThreshold: 300,
 			upperThreshold: 800,
-			owner: 'different-user-id',
+			owner: otherUser.id,
 			writeToken: 'blumy_other-write-token',
 			readToken: 'other-read-token'
 		}).returning();
