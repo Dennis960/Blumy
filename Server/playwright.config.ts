@@ -11,8 +11,6 @@ const config: PlaywrightTestConfig = {
 	testDir: 'tests',
 	testMatch: /(.+\.)?(test|spec)\.[jt]s/,
 	use: {
-		// Use system Chrome instead of downloading Playwright browsers
-		channel: 'chrome',
 		launchOptions: {
 			ignoreDefaultArgs: ['--disable-extensions'],
 			args: [
@@ -21,15 +19,6 @@ const config: PlaywrightTestConfig = {
 			],
 		},
 	},
-	projects: [
-		{
-			name: 'chromium',
-			use: { 
-				// Use system Chrome
-				channel: 'chrome',
-			},
-		},
-	],
 	reporter: [["line"], ["playwright-ctrf-json-reporter", {
 		outputDir: "test-results",
 	}]],
