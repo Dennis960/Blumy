@@ -5,3 +5,4 @@ debug.log
 esp_idf_project_configuration.json
 sdkconfig.old
 index_html.c
+CMakeLists.txt.backup
