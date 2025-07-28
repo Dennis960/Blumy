@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { SensorStorage } from '$lib/client/sensor-storage.js';
+	import { SwipeListener as TouchGestureListener } from '$lib/client/touch-gesture-listener';
 	import { route } from '$lib/ROUTES.js';
 	import type { SensorDTO } from '$lib/types/api';
 	import { default as LeftArrow } from '@tabler/icons-svelte/icons/arrow-left';
@@ -59,7 +61,7 @@
 		return allSensors[previousSensorIndex];
 	});
 
-	async function navigatToSensor(sensor: {
+	async function navigateToSensor(sensor: {
 		id: number;
 		accessThroughReadToken: boolean;
 		readToken: string;
@@ -67,28 +69,49 @@
 		if (sensor.accessThroughReadToken) {
 			await goto(
 				route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }) +
-					`?token=${sensor.readToken}`
+					`?token=${sensor.readToken}`,
+				{
+					noScroll: true
+				}
 			);
 		} else {
-			await goto(route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }));
+			await goto(route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }), {
+				noScroll: true
+			});
 		}
 	}
 
+	async function navigateToNextSensor() {
+		await navigateToSensor(nextSensor);
+	}
+
+	async function navigateToPreviousSensor() {
+		await navigateToSensor(previousSensor);
+	}
+
 	onMount(() => {
+		if (!browser) return;
 		SensorStorage.loadStoredSensors().then((sensors) => {
 			storedSensors = sensors;
 		});
+		const swipeListener = new TouchGestureListener();
+		swipeListener.addEventListener('swipeleft', navigateToNextSensor);
+		swipeListener.addEventListener('swiperight', navigateToPreviousSensor);
+		return () => {
+			swipeListener.removeEventListener('swipeleft', navigateToNextSensor);
+			swipeListener.removeEventListener('swiperight', navigateToPreviousSensor);
+		};
 	});
 </script>
 
 <div class="row justify-content-between mb-3">
 	<div class="col-auto">
-		<button class="btn btn-icon" onclick={() => navigatToSensor(previousSensor)}>
+		<button class="btn btn-icon" onclick={() => navigateToSensor(previousSensor)}>
 			<LeftArrow />
 		</button>
 	</div>
 	<div class="col-auto">
-		<button class="btn btn-icon" onclick={() => navigatToSensor(nextSensor)}>
+		<button class="btn btn-icon" onclick={() => navigateToSensor(nextSensor)}>
 			<RightArrow />
 		</button>
 	</div>
