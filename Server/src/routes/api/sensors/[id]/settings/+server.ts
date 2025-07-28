@@ -1,11 +1,21 @@
 import SensorController from '$lib/server/controllers/SensorController';
+import SensorRepository from '$lib/server/repositories/SensorRepository';
 import type { SensorConfigurationDTO } from '$lib/types/api';
-import { json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const PUT = (async (event) => {
+	const user = event.locals.security.allowAuthenticatedElseRedirect();
+	
 	const sensorId = parseInt(event.params.id);
-	await event.locals.security.allowOwnerOfElseRedirect(sensorId);
+	// Check ownership manually
+	const ownerId = await SensorRepository.getOwner(sensorId);
+	if (ownerId === undefined) {
+		throw error(404, 'sensor not found');
+	}
+	if (user.id !== ownerId) {
+		throw error(403, 'not an owner of this sensor');
+	}
 	
 	const data = await event.request.formData();
 
