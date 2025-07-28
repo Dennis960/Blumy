@@ -13,7 +13,7 @@ test('unauthenticated user should not see account dropdown', async ({ page }) =>
 });
 
 test('authenticated user should see account dropdown', async ({ page, context }) => {
-  await authenticateTestUser(context);
+  const { user } = await authenticateTestUser(context);
 
   await page.goto('http://localhost:4173/');
   await expect(page.getByTestId("nav-bar-account")).toBeAttached();

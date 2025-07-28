@@ -26,19 +26,22 @@ export const createTestUser = async () => {
     }).returning().then((users) => users[0]);
 }
 
-export async function authenticateTestUser(context: BrowserContext) {
+export async function authenticateTestUser(context?: BrowserContext) {
     const testUser = await createTestUser();
     const session = await lucia.createSession(testUser.id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
 
-    await context.addCookies([{
-        name: sessionCookie.name,
-        value: sessionCookie.value,
-        httpOnly: true,
-        secure: false,
-        sameSite: 'Lax',
-        path: '/',
-        domain: 'localhost',
-    }]);
-    return testUser;
+    if (context) {
+        await context.addCookies([{
+            name: sessionCookie.name,
+            value: sessionCookie.value,
+            httpOnly: true,
+            secure: false,
+            sameSite: 'Lax',
+            path: '/',
+            domain: 'localhost',
+        }]);
+    }
+    
+    return { user: testUser, cookie: sessionCookie };
 }
