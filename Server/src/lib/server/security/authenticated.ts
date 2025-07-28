@@ -29,12 +29,8 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 	},
 
 	// @enforce-await
-	allowOwnerOf: async function (sensorId: number) {
-		user = this.allowAuthenticated();
-
-		if (!user) {
-			throw error(403, 'not authenticated');
-		}
+	allowOwnerOfElseRedirect: async function (sensorId: number) {
+		const user = this.allowAuthenticatedElseRedirect();
 
 		const ownerId = await SensorRepository.getOwner(sensorId);
 		if (ownerId === undefined) {
@@ -44,6 +40,8 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 		if (user.id !== ownerId) {
 			throw error(403, 'not an owner of this sensor');
 		}
+		
+		return user;
 	},
 
 	// @enforce-await

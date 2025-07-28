@@ -4,9 +4,10 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const PUT = (async (event) => {
-	await event.locals.security.allowOwnerOf(parseInt(event.params.id));
-	const data = await event.request.formData();
 	const sensorId = parseInt(event.params.id);
+	await event.locals.security.allowOwnerOfElseRedirect(sensorId);
+	
+	const data = await event.request.formData();
 
 	const imageFile = data.get('image') as File;
 	let imageBase64: string | undefined = undefined;
