@@ -142,35 +142,44 @@ test.describe('Sensor Settings API', () => {
 		expect(unchangedSensor.fieldCapacity).toBe(1024);
 	});
 
-	test('sensor creation endpoint works correctly', async ({ request }) => {
-		const { user: testUser, cookie } = await authenticateTestUser();
+	test('sensor creation endpoint works correctly', async ({ page }) => {
+		const { user: testUser, cookie } = await authenticateTestUser(page.context());
 
-		const formData = new FormData();
-		formData.append('name', 'New API Sensor');
-		formData.append('fieldCapacity', '1536');
-		formData.append('permanentWiltingPoint', '120');
-		formData.append('lowerThreshold', '350');
-		formData.append('upperThreshold', '850');
-		formData.append('image', new File([''], 'empty.png', { type: 'image/png' }));
-
-		const response = await request.post('/api/sensors', {
-			data: formData,
-			headers: {
-				'Cookie': `${cookie.name}=${cookie.value}`
-			}
+		// Navigate to the sensor creation form
+		await page.goto('/selector/sensor/new?redirect=http://192.168.4.1/setup');
+		
+		// Fill out the form
+		await page.fill('input[name="name"]', 'New API Sensor');
+		await page.fill('input[name="permanentWiltingPoint"]', '120');
+		await page.fill('input[name="lowerThreshold"]', '350');
+		await page.fill('input[name="upperThreshold"]', '850');
+		await page.fill('input[name="fieldCapacity"]', '1536');
+		
+		// Upload a fake image file
+		const fileInput = page.locator('input[name="image"]');
+		await fileInput.setInputFiles({
+			name: 'test.png',
+			mimeType: 'image/png',
+			buffer: Buffer.from('fake-png-data')
 		});
+
+		// Submit the form and wait for the response
+		const [response] = await Promise.all([
+			page.waitForResponse('/api/sensors'),
+			page.locator('button[type="submit"]').click()
+		]);
 
 		expect(response.status()).toBe(200);
 
-		const createdSensor = await response.json();
-		expect(createdSensor).toHaveProperty('id');
-		expect(createdSensor).toHaveProperty('tokens');
-		expect(createdSensor.tokens).toHaveProperty('read');
-		expect(createdSensor.tokens).toHaveProperty('write');
-		expect(createdSensor.tokens.write).toMatch(/^blumy_.{32}$/);
-		expect(createdSensor.tokens.read).toMatch(/^.{16}$/);
+		const responseData = await response.json();
+		expect(responseData).toHaveProperty('id');
+		expect(responseData).toHaveProperty('tokens');
+		expect(responseData.tokens).toHaveProperty('read');
+		expect(responseData.tokens).toHaveProperty('write');
+		expect(responseData.tokens.write).toMatch(/^blumy_.{32}$/);
+		expect(responseData.tokens.read).toMatch(/^.{16}$/);
 
-		expect(createdSensor.config).toMatchObject({
+		expect(responseData.config).toMatchObject({
 			name: 'New API Sensor',
 			fieldCapacity: 1536,
 			permanentWiltingPoint: 120,
@@ -196,6 +205,7 @@ test.describe('Sensor Settings API', () => {
 		formData.append('upperThreshold', '800');
 		formData.append('image', new File([''], 'empty.png', { type: 'image/png' }));
 
+		// Make request without authentication cookie
 		const response = await request.post('/api/sensors', {
 			data: formData
 		});

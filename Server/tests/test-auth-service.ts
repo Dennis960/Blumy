@@ -31,7 +31,11 @@ export const createTestUser = async () => {
 export async function authenticateTestUser(context?: BrowserContext) {
     const testUser = await createTestUser();
     const session = await lucia.createSession(testUser.id, {});
-    const sessionCookie = lucia.createSessionCookie(session.id);
+    
+    // Validate the session to make it not fresh
+    const { session: validatedSession } = await lucia.validateSession(session.id);
+    
+    const sessionCookie = lucia.createSessionCookie(validatedSession!.id);
 
     if (context) {
         await context.addCookies([{
