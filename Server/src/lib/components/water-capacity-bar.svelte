@@ -7,15 +7,23 @@
 
 	let { sensor }: Props = $props();
 	let availableWaterCapacityPercent = $derived((sensor.lastUpdate?.waterCapacity ?? 0) * 100);
-	let color = $derived(
-		sensor.plantHealth.critical ? 'danger' : sensor.plantHealth.warning ? 'warning' : 'primary'
-	);
+	let color = $derived.by(() => {
+		if (sensor.plantHealth.critical) {
+			return 'purple';
+		} else if (sensor.plantHealth.overwatered) {
+			return 'blue';
+		} else if (sensor.plantHealth.warning) {
+			return 'red';
+		} else {
+			return 'green';
+		}
+	});
 </script>
 
 <div class="progress-container">
 	<div class="progress rounded-pill">
 		<div
-			class="progress-bar bg-{color}"
+			class="progress-bar bg-{color} bg-"
 			style="width: {availableWaterCapacityPercent}%"
 			role="progressbar"
 			aria-valuenow={availableWaterCapacityPercent}
