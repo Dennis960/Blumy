@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
+	import { page } from '$app/state';
 	import { env } from '$env/dynamic/public';
 	import { clientApi } from '$lib/client/api.js';
 	import LoginButtonGoogle from '$lib/components/LoginButtonGoogle.svelte';
@@ -29,7 +30,10 @@
 <div class="page">
 	<header class="navbar navbar-expand-lg navbar-light border-bottom d-print-none bg-white">
 		<div class="container-xl">
-			<a class="navbar-brand me-4" href={route('/')}>
+			<a
+				class="navbar-brand me-4"
+				href={page.url.pathname.startsWith('/dashboard') ? route('/dashboard') : route('/')}
+			>
 				Blumy{env.PUBLIC_MODE === 'test' ? ' - Test' : ''}
 			</a>
 
