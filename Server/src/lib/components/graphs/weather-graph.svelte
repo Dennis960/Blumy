@@ -17,7 +17,7 @@
 						x: entry.timestamp,
 						y: Math.round(entry.temperature * 10) / 10
 					})),
-					color: 'var(--tblr-primary)'
+					color: '#ff0000'
 				},
 				{
 					name: 'Luftfeuchtigkeit',
@@ -25,7 +25,7 @@
 						x: entry.timestamp,
 						y: Math.round(entry.humidity)
 					})),
-					color: 'var(--tblr-secondary)'
+					color: '#0074d9'
 				}
 			],
 			chart: {
@@ -46,7 +46,10 @@
 				enabled: false
 			},
 			legend: {
-				show: false
+				show: true,
+				labels: {
+					colors: ['#ff0000', '#0074d9']
+				}
 			},
 			tooltip: {
 				x: {
