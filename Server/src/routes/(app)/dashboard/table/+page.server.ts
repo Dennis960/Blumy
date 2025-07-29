@@ -3,9 +3,12 @@ import SensorController from '$lib/server/controllers/SensorController';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
-	event.locals.security.allowAuthenticatedElseRedirect();
+	const user = event.locals.security.allowAuthenticatedElseRedirect();
 	event.depends(DATA_DEPENDENCY.SENSOR_OVERVIEW);
-	const sensorOverview = await new SensorController().getSensorOverview(event.locals.user!.id);
+	if (!user) {
+		return { sensors: [], sensorOverview: null, sensorHistories: [] };
+	}
+	const sensorOverview = await new SensorController().getSensorOverview(user.id);
 	// const sensorHistory = await new SensorController().getSensorHistory(event.locals.user!.id);
 	const now = new Date();
 	const threeDaysAgo = new Date(now);

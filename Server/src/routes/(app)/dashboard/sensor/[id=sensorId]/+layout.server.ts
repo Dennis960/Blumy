@@ -4,11 +4,14 @@ import { error } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 
 export const load = (async ({ params, locals, depends, url, parent }) => {
-	await locals.security.allowOwnerOrSensorRead(params.id, url.searchParams.get('token'));
+	const user = await locals.security.allowOwnerOrSensorRead(
+		params.id,
+		url.searchParams.get('token')
+	);
 	depends(DATA_DEPENDENCY.SENSOR);
 	const id = parseInt(params.id);
 
-	const sensor = await new SensorController().getSensor(id);
+	const sensor = await new SensorController().getSensor(id, user?.id);
 	if (sensor == undefined) {
 		throw error(404, 'Sensor nicht gefunden');
 	}

@@ -62,7 +62,7 @@ export default class SensorController {
 		};
 	}
 
-	public async getSensor(id: number): Promise<SensorDTO | undefined> {
+	public async getSensor(id: number, userId: string | undefined): Promise<SensorDTO | undefined> {
 		const sensorEntity = await SensorRepository.getById(id);
 		if (sensorEntity == undefined) {
 			return undefined;
@@ -105,7 +105,8 @@ export default class SensorController {
 						}
 					: undefined,
 			sensorHealth,
-			plantHealth
+			plantHealth,
+			canEdit: userId === sensorEntity.owner
 		};
 	}
 
@@ -118,11 +119,11 @@ export default class SensorController {
 		return sensorEntity.writeToken;
 	}
 
-	public async getSensorOverview(ownerId: string): Promise<SensorOverviewDTO> {
-		const sensorsIds = await SensorRepository.getAllIdsForOwner(ownerId);
+	public async getSensorOverview(userId: string): Promise<SensorOverviewDTO> {
+		const sensorsIds = await SensorRepository.getAllIdsForOwner(userId);
 
 		const sensors = await Promise.all(
-			sensorsIds.map(async (sensor) => (await this.getSensor(sensor.sensorAddress))!)
+			sensorsIds.map(async (sensor) => (await this.getSensor(sensor.sensorAddress, userId))!)
 		);
 
 		// sort by water capacity

@@ -87,6 +87,11 @@ export interface SensorDTO {
 		nextWatering: Date;
 		predictedWaterCapacity: WaterCapacityHistoryEntry[];
 	};
+	/**
+	 * True, if the currently logged in user trying to access this sensor is the owner of the sensor.
+	 * False, if the sensor was accessed through a read token.
+	 */
+	canEdit: boolean;
 }
 
 export interface SensorCreatedDTO {

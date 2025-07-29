@@ -5,7 +5,7 @@ import type { RequestEvent } from './$types';
 import SensorController from '$lib/server/controllers/SensorController';
 
 export const POST = async (event: RequestEvent) => {
-	event.locals.security.allowAll();
+	const user = event.locals.security.allowAll();
 	const sensors: {
 		id: number;
 		readToken: string;
@@ -17,7 +17,7 @@ export const POST = async (event: RequestEvent) => {
 		if (sensorId !== sensor.id) {
 			return new Response('Invalid sensor read token', { status: 400 });
 		}
-		const sensorDto = await new SensorController().getSensor(sensor.id);
+		const sensorDto = await new SensorController().getSensor(sensor.id, user?.id);
 		if (!sensorDto) {
 			return new Response(`Sensor with ID ${sensor.id} not found`, { status: 404 });
 		}

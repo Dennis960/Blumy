@@ -26,6 +26,7 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 		if (sensorId !== (await SensorRepository.getIdByWriteToken(writeToken))) {
 			throw error(403, 'missing write token');
 		}
+		return user;
 	},
 
 	// @enforce-await
@@ -44,6 +45,7 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 		if (user.id !== ownerId) {
 			throw error(403, 'not an owner of this sensor');
 		}
+		return user;
 	},
 
 	// @enforce-await
@@ -54,6 +56,7 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 			if (sensorId !== (await SensorRepository.getIdByReadToken(readToken))) {
 				throw error(403, 'wrong sensor for read token');
 			}
+			return null;
 		} else {
 			user = this.allowAuthenticated();
 			const ownerId = await SensorRepository.getOwner(sensorId);
@@ -64,10 +67,13 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 			if (user.id !== ownerId) {
 				throw error(403, 'not an owner of this sensor');
 			}
+			return user;
 		}
 	},
 
-	allowAll: function () {},
+	allowAll: function () {
+		return user;
+	},
 	allowNone: function () {
 		throw error(405, 'not allowed');
 	}

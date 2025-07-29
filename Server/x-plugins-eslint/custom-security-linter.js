@@ -116,7 +116,8 @@ export default {
 							if (fun.body.type !== 'BlockStatement') return;
 							const firstExpression = fun.body.body[0];
 							// check if first expression contains a call to security
-							if (context.sourceCode.getText(firstExpression).match(/(await )?(event\.)?locals\.security\..*\(.*\)/)) {
+							const firstExpressionText = context.sourceCode.getText(firstExpression).replace(/\n/g, '');
+							if (firstExpressionText.match(/(await )?(event\.)?locals\.security\..*\(.*\)/)) {
 								return;
 							}
 							context.report({

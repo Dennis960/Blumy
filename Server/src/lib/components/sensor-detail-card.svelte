@@ -20,18 +20,17 @@
 	} from '$lib/icons';
 	import { route } from '$lib/ROUTES';
 	import type { SensorDTO } from '$lib/types/api';
-	import SensorImage from './sensor-image.svelte';
 	import NotificationToggle from './notification-toggle.svelte';
+	import SensorImage from './sensor-image.svelte';
 	import SensorStatusDatagridItem from './sensor-status-datagrid-item.svelte';
 	import Time from './time.svelte';
 	import WaterCapacityBar from './water-capacity-bar.svelte';
 
 	interface Props {
 		sensor: SensorDTO;
-		isOwner?: boolean;
 	}
 
-	let { sensor, isOwner = false }: Props = $props();
+	let { sensor }: Props = $props();
 
 	let waterToday = $derived(
 		sensor.prediction != undefined &&
@@ -168,7 +167,7 @@
 			{/if}
 		</div>
 	</div>
-	{#if isOwner}
+	{#if sensor.canEdit}
 		<div class="card-footer">
 			<div class="d-flex justify-content-end">
 				<a

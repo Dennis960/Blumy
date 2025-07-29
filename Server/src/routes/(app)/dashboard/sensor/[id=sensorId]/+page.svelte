@@ -23,7 +23,7 @@
 	}
 
 	onMount(() => {
-		if (data.accessThroughReadToken) {
+		if (!data.sensor.canEdit) {
 			SensorStorage.addSensor(data.sensor.id, data.sensor.readToken);
 		}
 
@@ -43,7 +43,7 @@
 		<div class="row row-cards row-deck">
 			<div class="col-lg-4">
 				{#if data.sensor != undefined}
-					<SensorDetailCard sensor={data.sensor} isOwner={!data.accessThroughReadToken} />
+					<SensorDetailCard sensor={data.sensor} />
 				{/if}
 			</div>
 

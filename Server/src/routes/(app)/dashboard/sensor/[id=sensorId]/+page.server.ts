@@ -1,6 +1,5 @@
 import { DATA_DEPENDENCY } from '$lib/client/api';
 import SensorController from '$lib/server/controllers/SensorController';
-import SensorRepository from '$lib/server/repositories/SensorRepository';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async function ({ params, url, depends, locals }) {
@@ -43,14 +42,10 @@ export const load: PageServerLoad = async function ({ params, url, depends, loca
 		maxDataPoints
 	);
 
-	const ownerId = await SensorRepository.getOwner(id);
-	const currentUserIsOwner = ownerId === locals.user?.id;
-
 	return {
 		id,
 		startDate,
 		endDate,
-		sensorData,
-		accessThroughReadToken: !currentUserIsOwner
+		sensorData
 	};
 };

@@ -26,21 +26,7 @@
 		storedSensors.filter((sensor) => !sensors.some((s) => s.id === sensor.id))
 	);
 
-	let allSensors = $derived(
-		sensors
-			.map((sensor) => ({
-				id: sensor.id,
-				accessThroughReadToken: false,
-				readToken: sensor.readToken
-			}))
-			.concat(
-				sharedSensors.map((sensor) => ({
-					id: sensor.id,
-					accessThroughReadToken: true,
-					readToken: sensor.readToken
-				}))
-			)
-	);
+	let allSensors = $derived(sensors.concat(sharedSensors));
 
 	let currentSensorIndex = $derived(
 		allSensors.findIndex((sensor) => sensor.id === currentSensor.id)
@@ -61,12 +47,8 @@
 		return allSensors[previousSensorIndex];
 	});
 
-	async function navigateToSensor(sensor: {
-		id: number;
-		accessThroughReadToken: boolean;
-		readToken: string;
-	}) {
-		if (sensor.accessThroughReadToken) {
+	async function navigateToSensor(sensor: SensorDTO) {
+		if (!sensor.canEdit) {
 			await goto(
 				route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }) +
 					`?token=${sensor.readToken}`,
