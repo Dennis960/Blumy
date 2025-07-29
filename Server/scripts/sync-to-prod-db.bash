@@ -12,7 +12,7 @@ scp Blumy:/tmp/blumy_prod_dump.sql ./
 
 # Step 3: Completely wipe the local development database
 echo "Dropping and recreating the local database schema..."
-docker exec -e PGPASSWORD blumy -i blumy-dev-db-1 psql -U blumy -W blumy -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+docker exec -e PGPASSWORD=blumy -i blumy-dev-db-1 psql -U blumy blumy -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
 
 # Step 4: Restore the dump to the local development database
 echo "Restoring the dump to the local development database..."
