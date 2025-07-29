@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { clientApi } from '$lib/client/api';
 	import type { SensorDTO } from '$lib/types/api';
 
 	interface Props {
@@ -13,7 +14,9 @@
 		'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAOElEQVR42mNkAAIAAAoAAv/lxKUAAAAASUVORK5CYII=';
 
 	const url = $derived(
-		sensor?.id ? `/api/sensors/${sensor.id}/image?token=${sensor.readToken}` : emptyImage
+		sensor?.id
+			? `${clientApi(null!).sensors().withId(sensor.id).getImage().url}?token=${sensor.readToken}`
+			: emptyImage
 	);
 </script>
 
