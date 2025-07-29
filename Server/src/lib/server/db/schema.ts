@@ -54,7 +54,6 @@ export const sensors = pgTable('sensor', {
 	permanentWiltingPoint: integer('permanent_wilting_point').notNull().default(128),
 	lowerThreshold: real('lower_threshold').notNull().default(0.2),
 	upperThreshold: real('upper_threshold').notNull().default(0.8),
-	imageBase64: text('image_base64'),
 	owner: text('owner').references(() => users.id),
 	writeToken: text('write_token').notNull(),
 	readToken: text('read_token').notNull()
@@ -111,4 +110,21 @@ export const waitlist = pgTable('waitlist', {
 		withTimezone: true,
 		mode: 'date'
 	}).defaultNow()
+});
+
+/**
+ * Images for sensors, stored separately to allow lazy loading.
+ */
+export const sensorImages = pgTable('sensor_image', {
+	id: serial('id').primaryKey(),
+	sensorAddress: integer('sensor_address')
+		.notNull()
+		.references(() => sensors.sensorAddress),
+	imageBase64: text('image_base64').notNull(),
+	uploadedAt: timestamp('uploaded_at', {
+		withTimezone: true,
+		mode: 'date'
+	})
+		.notNull()
+		.defaultNow()
 });

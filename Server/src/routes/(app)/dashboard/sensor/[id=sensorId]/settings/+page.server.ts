@@ -1,4 +1,5 @@
 import { DATA_DEPENDENCY } from '$lib/client/api';
+import { route } from '$lib/ROUTES';
 import SensorController from '$lib/server/controllers/SensorController';
 import type { PageServerLoad } from './$types';
 
@@ -12,13 +13,12 @@ export const load: PageServerLoad = async function ({ depends, params, parent, l
 	const sensor = (await parent()).sensor;
 	const shareLink =
 		sensor.readToken != undefined
-			? `${url.origin}/dashboard/sensor/${id}?token=${sensor.readToken}`
+			? `${url.origin}${route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() })}?token=${sensor.readToken}`
 			: undefined;
 
 	return {
 		sensor,
 		sensorValueDistribution,
-		writeToken: sensor.writeToken,
 		shareLink: shareLink
 	};
 };

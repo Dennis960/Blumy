@@ -20,7 +20,7 @@
 	} from '$lib/icons';
 	import { route } from '$lib/ROUTES';
 	import type { SensorDTO } from '$lib/types/api';
-	import Base64Image from './base64-image.svelte';
+	import SensorImage from './sensor-image.svelte';
 	import NotificationToggle from './notification-toggle.svelte';
 	import SensorStatusDatagridItem from './sensor-status-datagrid-item.svelte';
 	import Time from './time.svelte';
@@ -44,10 +44,7 @@
 </script>
 
 <section class="card">
-	<Base64Image
-		class="img-responsive img-responsive-16x9 card-img-top"
-		imageBase64={sensor.config.imageBase64}
-	/>
+	<SensorImage class="img-responsive img-responsive-16x9 card-img-top" {sensor} />
 	<div class="card-header">
 		<h1 class="card-title">{sensor.config.name}</h1>
 	</div>

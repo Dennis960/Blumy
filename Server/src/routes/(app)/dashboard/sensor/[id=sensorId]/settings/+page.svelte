@@ -22,9 +22,7 @@
 	<div class="container">
 		{#if data.sensor.config != undefined}
 			<SensorSettingsForm
-				sensorId={data.sensor.id}
-				config={data.sensor.config}
-				writeToken={data.writeToken ?? undefined}
+				sensor={data.sensor}
 				shareLink={data.shareLink}
 				sensorValueDistribution={data.sensorValueDistribution}
 			>

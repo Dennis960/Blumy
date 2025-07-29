@@ -62,10 +62,8 @@ export default class SensorController {
 		};
 	}
 
-	public async getSensor(id: number, includeImage: boolean = true): Promise<SensorDTO | undefined> {
-		const sensorEntity = includeImage
-			? await SensorRepository.getById(id)
-			: await SensorRepository.getByIdWithoutImage(id);
+	public async getSensor(id: number): Promise<SensorDTO | undefined> {
+		const sensorEntity = await SensorRepository.getById(id);
 		if (sensorEntity == undefined) {
 			return undefined;
 		}
@@ -124,7 +122,7 @@ export default class SensorController {
 		const sensorsIds = await SensorRepository.getAllIdsForOwner(ownerId);
 
 		const sensors = await Promise.all(
-			sensorsIds.map(async (sensor) => (await this.getSensor(sensor.sensorAddress, false))!)
+			sensorsIds.map(async (sensor) => (await this.getSensor(sensor.sensorAddress))!)
 		);
 
 		// sort by water capacity
@@ -205,9 +203,10 @@ export default class SensorController {
 
 	public async updateSensorConfig(
 		sensorId: number,
-		config: Partial<typeof sensors.$inferSelect>
+		config: SensorConfigurationDTO
 	): Promise<SensorConfigurationDTO> {
-		const sensorEntity = await SensorRepository.update(sensorId, config);
+		const redactedSensorEntity = await SensorEntity.fromDTO(sensorId, config);
+		const sensorEntity = await SensorRepository.update(sensorId, redactedSensorEntity);
 
 		return SensorEntity.toDTO(sensorEntity);
 	}
