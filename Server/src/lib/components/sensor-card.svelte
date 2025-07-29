@@ -12,7 +12,7 @@
 	} from '$lib/icons';
 	import type { SensorDTO } from '$lib/types/api';
 	import type { Snippet } from 'svelte';
-	import Base64Image from './base64-image.svelte';
+	import SensorImage from './sensor-image.svelte';
 	import WaterCapacityBar from './water-capacity-bar.svelte';
 
 	interface Props {
@@ -40,11 +40,7 @@
 <section {onclick} class="card d-flex flex-column cursor-pointer">
 	<div class="row row-0 h-100">
 		<div class="col-4">
-			<Base64Image
-				class="ratio ratio-1x1 d-block rounded-start-1 h-100 w-100 bg-cover"
-				imageBase64={sensor.config.imageBase64}
-				imageUrl={sensor.config.imageUrl}
-			/>
+			<SensorImage class="ratio ratio-1x1 d-block rounded-start-1 h-100 w-100 bg-cover" {sensor} />
 		</div>
 		<div class="col-8">
 			<div class="card-body d-flex flex-column h-100">

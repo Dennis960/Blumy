@@ -17,27 +17,6 @@ export default class SensorRepository {
 			.then((results) => results.pop());
 	}
 
-	/**
-	 * Get sensor by its address without the image.
-	 * @param sensorAddress The address of the sensor.
-	 * @returns The sensor or undefined if not found.
-	 */
-	static async getByIdWithoutImage(sensorAddress: number) {
-		return await db
-			.select()
-			.from(sensors)
-			.where(eq(sensors.sensorAddress, sensorAddress))
-			.limit(1)
-			.then((results) =>
-				results
-					.map((sensor) => ({
-						...sensor,
-						imageBase64: null // remove the image
-					}))
-					.pop()
-			);
-	}
-
 	static async getIdByWriteToken(writeToken: string) {
 		return await db
 			.select({ sensorAddress: sensors.sensorAddress })

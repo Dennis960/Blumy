@@ -11,7 +11,7 @@
 	} from '$lib/icons';
 	import { route } from '$lib/ROUTES';
 	import type { SensorDTO, SensorHistoryDTO } from '$lib/types/api';
-	import Base64Image from './base64-image.svelte';
+	import SensorImage from './sensor-image.svelte';
 	import SensorSparkline from './graphs/sensor-sparkline.svelte';
 	import WaterCapacityBar from './water-capacity-bar.svelte';
 
@@ -36,7 +36,7 @@
 
 <tr onclick={() => goto(route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }))}>
 	<th class="w-1">
-		<Base64Image class="avatar avatar-xs" imageBase64={sensor.config.imageBase64} />
+		<SensorImage class="avatar avatar-xs" {sensor} />
 	</th>
 	<th scope="row" class="sensor-name">{sensor.config.name}</th>
 	<td>

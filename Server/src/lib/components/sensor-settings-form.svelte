@@ -9,43 +9,39 @@
 	import type {
 		SensorConfigurationDTO,
 		SensorCreatedDTO,
+		SensorDTO,
 		SensorValueDistributionDTO
 	} from '$lib/types/api';
 	import loadImage from 'blueimp-load-image';
 	import { PipsMode } from 'nouislider';
 	import { onMount, type Snippet } from 'svelte';
-	import Base64Image from './base64-image.svelte';
 	import CopyText from './copy-text.svelte';
+	import SensorImage from './sensor-image.svelte';
 
 	let {
-		sensorId = undefined,
-		config = undefined,
+		sensor = undefined,
 		sensorValueDistribution = undefined,
-		error = undefined,
-		writeToken = undefined,
 		shareLink = undefined,
+		error = undefined,
 		createdSensor = $bindable(undefined),
 		formActions,
 		onSensorCreate
 	}: {
-		sensorId?: number;
-		config?: SensorConfigurationDTO;
+		sensor?: SensorDTO;
 		sensorValueDistribution?: SensorValueDistributionDTO;
-		error?: string;
-		writeToken?: string;
 		shareLink?: string;
+		error?: string;
 		createdSensor?: SensorCreatedDTO;
 		formActions?: Snippet<[{ submitting: boolean }]>;
 		onSensorCreate?: (sensor: SensorCreatedDTO) => void;
 	} = $props();
 
 	let initialConfig: SensorConfigurationDTO =
-		config != undefined
-			? { ...config }
+		sensor?.config != undefined
+			? { ...sensor.config }
 			: {
 					...defaultSensorConfig,
-					name: funnyPlantNames[Math.floor(Math.random() * funnyPlantNames.length)],
-					imageBase64: undefined
+					name: funnyPlantNames[Math.floor(Math.random() * funnyPlantNames.length)]
 				};
 
 	let sliderOptions: SliderOptions | undefined = $state();
@@ -145,10 +141,10 @@
 		try {
 			const data = new FormData(event.currentTarget);
 
-			if (sensorId !== undefined) {
-				const apiCall = clientApi().sensors().withId(sensorId).update(data);
+			if (sensor?.id !== undefined) {
+				const apiCall = clientApi().sensors().withId(sensor.id).update(data);
 				if ((await apiCall.response()).ok) {
-					goto(route('/dashboard/sensor/[id=sensorId]', { id: sensorId.toString() }), {
+					goto(route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }), {
 						invalidateAll: true
 					});
 				}
@@ -165,7 +161,7 @@
 	}
 
 	async function deleteSensor() {
-		if (!sensorId) {
+		if (!sensor?.id) {
 			return;
 		}
 		if (
@@ -173,7 +169,7 @@
 				'Soll der Sensor wirklich gelöscht werden? Dieser Prozess kann nicht rückgängig gemacht werden.'
 			)
 		) {
-			await clientApi().sensors().withId(sensorId).delete().response();
+			await clientApi().sensors().withId(sensor.id).delete().response();
 			goto(route('/'));
 		}
 	}
@@ -207,10 +203,7 @@
 								<span class="avatar avatar-2xl mb-2" style={`background-image: url(${image.src})`}
 								></span>
 							{:else}
-								<Base64Image
-									class="avatar avatar-2xl mb-2"
-									imageBase64={initialConfig.imageBase64}
-								/>
+								<SensorImage class="avatar avatar-2xl mb-2" {sensor} />
 							{/if}
 							<input
 								type="file"
@@ -219,7 +212,7 @@
 								id="image"
 								name="image"
 								onchange={handleImageInput}
-								required={image === undefined && initialConfig.imageBase64 === undefined}
+								required={image === undefined}
 								capture="environment"
 							/>
 						</div>
@@ -274,13 +267,13 @@
 						{/if}
 					</div>
 
-					{#if writeToken}
+					{#if sensor?.writeToken}
 						<div class="row mb-3">
 							<div class="col-md-6 col-lg-4 col-12">
 								<CopyText
 									label="Zugangsschlüssel"
 									hint="Kopiere den Zugangsschlüssel zur Einrichtung des Sensors."
-									value={writeToken}
+									value={sensor.writeToken}
 								/>
 							</div>
 						</div>
@@ -298,7 +291,7 @@
 						</div>
 					{/if}
 
-					{#if sensorId}
+					{#if sensor?.id}
 						<!-- Delete button -->
 						<div class="row mb-3">
 							<div

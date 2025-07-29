@@ -64,6 +64,13 @@
       "when": 1752349647666,
       "tag": "0008_silly_talisman",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1753799421738,
+      "tag": "0009_polite_cannonball",
+      "breakpoints": true
     }
   ]
 }
