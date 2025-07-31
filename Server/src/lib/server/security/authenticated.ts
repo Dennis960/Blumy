@@ -56,7 +56,6 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 			if (sensorId !== (await SensorRepository.getIdByReadToken(readToken))) {
 				throw error(403, 'wrong sensor for read token');
 			}
-			return null;
 		} else {
 			user = this.allowAuthenticated();
 			const ownerId = await SensorRepository.getOwner(sensorId);
@@ -67,8 +66,8 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 			if (user.id !== ownerId) {
 				throw error(403, 'not an owner of this sensor');
 			}
-			return user;
 		}
+		return user;
 	},
 
 	allowAll: function () {
