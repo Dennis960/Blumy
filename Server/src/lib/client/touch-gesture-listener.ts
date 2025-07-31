@@ -7,18 +7,28 @@ export type SwipeEventDetail = {
 	endX: number;
 };
 
+export type SwipeStartEventDetail = {
+	direction: 'swipeleftstart' | 'swiperightstart';
+	startX: number;
+	startY: number;
+};
+
 export class SwipeListener {
 	target: EventTarget;
 	MIN_SWIPE_DISTANCE: number;
 	MAX_SWIPE_TIME: number;
 	MIN_SWIPE_SPEED: number;
 	MAX_VERTICAL_OFFSET: number;
+	DIRECTION_GUESS_THRESHOLD: number;
 	touchStartX: number;
 	touchStartY: number;
 	touchStartTime: number;
+	directionGuessed: boolean;
 	eventHandlers: {
 		swipeleft: ((event: CustomEvent) => void)[];
 		swiperight: ((event: CustomEvent) => void)[];
+		swipeleftstart: ((event: CustomEvent) => void)[];
+		swiperightstart: ((event: CustomEvent) => void)[];
 	};
 
 	constructor(target = document) {
@@ -27,21 +37,27 @@ export class SwipeListener {
 		this.MAX_SWIPE_TIME = 500;
 		this.MIN_SWIPE_SPEED = 0.3;
 		this.MAX_VERTICAL_OFFSET = 75;
+		this.DIRECTION_GUESS_THRESHOLD = 10;
 
 		this.touchStartX = 0;
 		this.touchStartY = 0;
 		this.touchStartTime = 0;
+		this.directionGuessed = false;
 
 		this.eventHandlers = {
 			swipeleft: [],
-			swiperight: []
+			swiperight: [],
+			swipeleftstart: [],
+			swiperightstart: []
 		};
 
 		this._handleTouchStart = this._handleTouchStart.bind(this);
 		this._handleTouchEnd = this._handleTouchEnd.bind(this);
+		this._handleTouchMove = this._handleTouchMove.bind(this);
 
 		this.target.addEventListener('touchstart', this._handleTouchStart, { passive: true });
 		this.target.addEventListener('touchend', this._handleTouchEnd, { passive: true });
+		this.target.addEventListener('touchmove', this._handleTouchMove, { passive: true });
 	}
 
 	_handleTouchStart(e: Event) {
@@ -51,6 +67,29 @@ export class SwipeListener {
 		this.touchStartX = touch.clientX;
 		this.touchStartY = touch.clientY;
 		this.touchStartTime = Date.now();
+		this.directionGuessed = false;
+	}
+
+	_handleTouchMove(e: Event) {
+		if (this.directionGuessed) return;
+		const touchEvent = e as TouchEvent;
+		if (touchEvent.touches.length === 0) return;
+		const touch = touchEvent.touches[0];
+		const dx = touch.clientX - this.touchStartX;
+		const dy = touch.clientY - this.touchStartY;
+
+		if (
+			Math.abs(dx) >= this.DIRECTION_GUESS_THRESHOLD &&
+			Math.abs(dy) <= this.MAX_VERTICAL_OFFSET
+		) {
+			const direction = dx > 0 ? 'swiperightstart' : 'swipeleftstart';
+			this._dispatchSwipeStartEvent(direction, {
+				direction,
+				startX: this.touchStartX,
+				startY: this.touchStartY
+			});
+			this.directionGuessed = true;
+		}
 	}
 
 	_handleTouchEnd(e: Event) {
@@ -91,13 +130,29 @@ export class SwipeListener {
 		}
 	}
 
-	addEventListener(type: 'swipeleft' | 'swiperight', handler: (event: CustomEvent) => void) {
+	_dispatchSwipeStartEvent(
+		type: 'swipeleftstart' | 'swiperightstart',
+		detail: SwipeStartEventDetail
+	) {
+		const event = new CustomEvent(type, { detail });
+		for (const handler of this.eventHandlers[type]) {
+			handler(event);
+		}
+	}
+
+	addEventListener(
+		type: 'swipeleft' | 'swiperight' | 'swipeleftstart' | 'swiperightstart',
+		handler: (event: CustomEvent) => void
+	) {
 		if (this.eventHandlers[type]) {
 			this.eventHandlers[type].push(handler);
 		}
 	}
 
-	removeEventListener(type: 'swipeleft' | 'swiperight', handler: (event: CustomEvent) => void) {
+	removeEventListener(
+		type: 'swipeleft' | 'swiperight' | 'swipeleftstart' | 'swiperightstart',
+		handler: (event: CustomEvent) => void
+	) {
 		if (this.eventHandlers[type]) {
 			this.eventHandlers[type] = this.eventHandlers[type].filter((h) => h !== handler);
 		}
@@ -106,6 +161,12 @@ export class SwipeListener {
 	destroy() {
 		this.target.removeEventListener('touchstart', this._handleTouchStart);
 		this.target.removeEventListener('touchend', this._handleTouchEnd);
-		this.eventHandlers = { swipeleft: [], swiperight: [] };
+		this.target.removeEventListener('touchmove', this._handleTouchMove);
+		this.eventHandlers = {
+			swipeleft: [],
+			swiperight: [],
+			swipeleftstart: [],
+			swiperightstart: []
+		};
 	}
 }

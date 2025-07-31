@@ -85,8 +85,7 @@
 			{#each data.sensors as sensor (sensor.id)}
 				<div class="col-md-6 col-lg-4 col-12">
 					<SensorCard
-						onclick={() =>
-							goto(route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }))}
+						href={`${route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() })}`}
 						{sensor}
 					/>
 				</div>
@@ -99,10 +98,7 @@
 				{#each filteredStoredSensors as sensor (sensor.id)}
 					<div class="col-md-6 col-lg-4 col-12">
 						<SensorCard
-							onclick={() =>
-								goto(
-									`${route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() })}?token=${sensor.readToken}`
-								)}
+							href={`${route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() })}?token=${sensor.readToken}`}
 							{sensor}
 						>
 							<button

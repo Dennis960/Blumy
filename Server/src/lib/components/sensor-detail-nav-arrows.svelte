@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
+	import { goto, preloadData } from '$app/navigation';
 	import { SensorStorage } from '$lib/client/sensor-storage.js';
 	import { SwipeListener as TouchGestureListener } from '$lib/client/touch-gesture-listener';
 	import { route } from '$lib/ROUTES.js';
@@ -47,20 +47,20 @@
 		return allSensors[previousSensorIndex];
 	});
 
-	async function navigateToSensor(sensor: SensorDTO) {
+	function getSensorRoute(sensor: SensorDTO): string {
 		if (!sensor.canEdit) {
-			await goto(
+			return (
 				route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }) +
-					`?token=${sensor.readToken}`,
-				{
-					noScroll: true
-				}
+				`?token=${sensor.readToken}`
 			);
-		} else {
-			await goto(route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }), {
-				noScroll: true
-			});
 		}
+		return route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() });
+	}
+
+	async function navigateToSensor(sensor: SensorDTO) {
+		await goto(getSensorRoute(sensor), {
+			noScroll: true
+		});
 	}
 
 	async function navigateToNextSensor() {
@@ -71,6 +71,16 @@
 		await navigateToSensor(previousSensor);
 	}
 
+	function preloadPreviousSensor() {
+		const previousSensorRoute = getSensorRoute(previousSensor);
+		preloadData(previousSensorRoute);
+	}
+
+	function preloadNextSensor() {
+		const nextSensorRoute = getSensorRoute(nextSensor);
+		preloadData(nextSensorRoute);
+	}
+
 	onMount(() => {
 		if (!browser) return;
 		SensorStorage.loadStoredSensors().then((sensors) => {
@@ -79,9 +89,13 @@
 		const swipeListener = new TouchGestureListener();
 		swipeListener.addEventListener('swipeleft', navigateToNextSensor);
 		swipeListener.addEventListener('swiperight', navigateToPreviousSensor);
+		swipeListener.addEventListener('swipeleftstart', preloadNextSensor);
+		swipeListener.addEventListener('swiperightstart', preloadPreviousSensor);
 		return () => {
 			swipeListener.removeEventListener('swipeleft', navigateToNextSensor);
 			swipeListener.removeEventListener('swiperight', navigateToPreviousSensor);
+			swipeListener.removeEventListener('swipeleftstart', preloadNextSensor);
+			swipeListener.removeEventListener('swiperightstart', preloadPreviousSensor);
 		};
 	});
 </script>
