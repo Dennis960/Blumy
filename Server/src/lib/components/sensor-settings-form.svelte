@@ -212,7 +212,7 @@
 								id="image"
 								name="image"
 								onchange={handleImageInput}
-								required={image === undefined}
+								required={image === undefined && !sensor?.id}
 								capture="environment"
 							/>
 						</div>
