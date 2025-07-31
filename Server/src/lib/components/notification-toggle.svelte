@@ -2,7 +2,6 @@
 	import { env } from '$env/dynamic/public';
 	import { clientApi } from '$lib/client/api';
 	import type { SensorDTO } from '$lib/types/api';
-	import { onMount } from 'svelte';
 
 	interface Props {
 		sensor: SensorDTO;
@@ -10,25 +9,31 @@
 
 	let { sensor }: Props = $props();
 
-	let subscription: PushSubscription | null;
+	let subscription: PushSubscription | null = $state(null);
+	let checkingSubscription: boolean = $state(true);
 	let subscribed: boolean = $state(false);
 
-	onMount(async () => {
-		const sw = await navigator.serviceWorker.ready;
-		subscription = await sw.pushManager.getSubscription();
-		if (subscription == null) {
-			const key = env.PUBLIC_VAPID_KEY;
-			subscription = await sw.pushManager.subscribe({
-				userVisibleOnly: true,
-				applicationServerKey: key
-			});
-		} else {
-			subscribed = await clientApi()
-				.sensors()
-				.withId(sensor.id, sensor.readToken)
-				.checkSubscription(subscription)
-				.parse();
-		}
+	$effect(() => {
+		sensor;
+		(async () => {
+			checkingSubscription = true;
+			const sw = await navigator.serviceWorker.ready;
+			subscription = await sw.pushManager.getSubscription();
+			if (subscription == null) {
+				const key = env.PUBLIC_VAPID_KEY;
+				subscription = await sw.pushManager.subscribe({
+					userVisibleOnly: true,
+					applicationServerKey: key
+				});
+			} else {
+				subscribed = await clientApi()
+					.sensors()
+					.withId(sensor.id, sensor.readToken)
+					.checkSubscription(subscription)
+					.parse();
+			}
+			checkingSubscription = false;
+		})();
 	});
 
 	async function handleToggleNotifications() {
@@ -69,8 +74,15 @@
 				id="push-switch"
 				checked={subscribed}
 				oninput={handleToggleNotifications}
+				disabled={checkingSubscription}
 			/>
-			<span>{subscribed ? 'Aktiviert' : 'Deaktiviert'}</span>
+			{#if checkingSubscription}
+				Wird überprüft...
+			{:else if subscribed}
+				Aktiviert
+			{:else}
+				Deaktiviert
+			{/if}
 		</div>
 	</div>
 </div>
