@@ -46,6 +46,7 @@
 
 	let sliderOptions: SliderOptions | undefined = $state();
 	let image: HTMLImageElement | undefined = $state(undefined);
+	let imageBlob: Blob | undefined = $state(undefined);
 	let sliderValues: (number | string)[] = $state([]);
 
 	let permanentWiltingPoint = $state(initialConfig.permanentWiltingPoint);
@@ -114,6 +115,7 @@
 				if (canvas instanceof HTMLCanvasElement) {
 					canvas.toBlob((blob) => {
 						if (blob) {
+							imageBlob = blob;
 							const url = URL.createObjectURL(blob);
 							image = new Image();
 							image.src = url;
@@ -140,6 +142,10 @@
 		submitting = true;
 		try {
 			const data = new FormData(event.currentTarget);
+
+			if (imageBlob) {
+				data.set('image', imageBlob);
+			}
 
 			if (sensor?.id !== undefined) {
 				const apiCall = clientApi().sensors().withId(sensor.id).update(data);
@@ -202,8 +208,8 @@
 							{#if image}
 								<span class="avatar avatar-2xl mb-2" style={`background-image: url(${image.src})`}
 								></span>
-							{:else}
-								<SensorImage class="avatar avatar-2xl mb-2" {sensor} />
+							{:else if sensor}
+								<SensorImage class="avatar avatar-2xl mb-2" {sensor} clickable={true} />
 							{/if}
 							<input
 								type="file"

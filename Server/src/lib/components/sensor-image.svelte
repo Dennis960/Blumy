@@ -3,21 +3,26 @@
 	import type { SensorDTO } from '$lib/types/api';
 
 	interface Props {
-		sensor?: SensorDTO | undefined;
+		sensor: SensorDTO;
+		clickable?: boolean;
 		style?: string | undefined;
 		class?: string | undefined;
 	}
 
-	let { sensor = undefined, style = undefined, class: clazz }: Props = $props();
-
-	const emptyImage =
-		'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAOElEQVR42mNkAAIAAAoAAv/lxKUAAAAASUVORK5CYII=';
+	let { sensor, style = undefined, class: clazz, clickable = false }: Props = $props();
 
 	const url = $derived(
-		sensor?.id
-			? `${clientApi(null!).sensors().withId(sensor.id).getImage().url}?token=${sensor.readToken}`
-			: emptyImage
+		`${clientApi(null!).sensors().withId(sensor.id).getImage().url}?token=${sensor.readToken}`
 	);
 </script>
 
-<span class={clazz} style="background-image: url({url}); {style ?? ''}"></span>
+{#if clickable}
+	<a
+		href={url}
+		class={clazz}
+		style="background-image: url({url}); {style ?? ''}"
+		aria-label="Sensor image"
+	></a>
+{:else}
+	<span class={clazz} style="background-image: url({url}); {style ?? ''}"></span>
+{/if}

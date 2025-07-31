@@ -12,8 +12,7 @@ export const GET = (async ({ locals, params, url }) => {
 	return new Response(image, {
 		headers: {
 			'Content-Type': 'image/webp',
-			'Content-Length': image.length.toString(),
-			'Cache-Control': 'public, max-age=3600'
+			'Content-Length': image.length.toString()
 		}
 	});
 }) satisfies RequestHandler;

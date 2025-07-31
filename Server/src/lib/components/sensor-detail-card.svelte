@@ -43,7 +43,7 @@
 </script>
 
 <section class="card">
-	<SensorImage class="img-responsive img-responsive-16x9 card-img-top" {sensor} />
+	<SensorImage class="img-responsive img-responsive-16x9 card-img-top" {sensor} clickable={true} />
 	<div class="card-header">
 		<h1 class="card-title">{sensor.config.name}</h1>
 	</div>
