@@ -32,7 +32,9 @@
 		<div class="container-xl">
 			<a
 				class="navbar-brand me-4"
-				href={page.url.pathname.startsWith('/dashboard') ? route('/dashboard') : route('/')}
+				href={page.url.pathname.startsWith(`${route('/dashboard')}/`)
+					? route('/dashboard')
+					: route('/')}
 			>
 				Blumy{env.PUBLIC_MODE === 'test' ? ' - Test' : ''}
 			</a>
