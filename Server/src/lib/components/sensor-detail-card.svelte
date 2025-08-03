@@ -106,9 +106,9 @@
 						<Time relative timestamp={sensor.prediction.nextWatering} />
 					</SensorStatusDatagridItem>
 				{/if}
-
-				<NotificationToggle {sensor} />
-
+			{/if}
+			<NotificationToggle {sensor} />
+			{#if sensor.lastUpdate != undefined}
 				<SensorStatusDatagridItem
 					title="Sensor-Status"
 					critical={sensor.sensorHealth.critical}
