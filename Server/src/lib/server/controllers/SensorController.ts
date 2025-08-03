@@ -16,6 +16,7 @@ import crypto from 'crypto';
 import type { sensors } from '../db/schema';
 import SensorEntity from '../entities/SensorEntity';
 import SensorDataRepository from '../repositories/SensorDataRepository';
+import SensorImageRepository from '../repositories/SensorImageRepository';
 import SensorRepository from '../repositories/SensorRepository';
 import SensorService from '../services/SensorService';
 
@@ -77,6 +78,8 @@ export default class SensorController {
 		const sensorHealth = SensorService.getSensorHealth(lastReading);
 		const plantHealth = this.getPlantHealth(lastReading, config);
 
+		const images = await SensorImageRepository.getAllBySensorAddress(id);
+
 		return {
 			id,
 			readToken: sensorEntity.readToken,
@@ -106,7 +109,8 @@ export default class SensorController {
 					: undefined,
 			sensorHealth,
 			plantHealth,
-			canEdit: userId === sensorEntity.owner
+			canEdit: userId === sensorEntity.owner,
+			images
 		};
 	}
 

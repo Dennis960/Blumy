@@ -71,6 +71,12 @@ export interface PlantHealthDTO {
 	underwatered: boolean;
 }
 
+export interface SensorImageInformationDTO {
+	id: number;
+	sensorAddress: number;
+	uploadedAt: Date;
+}
+
 export interface SensorDTO {
 	id: number;
 	readToken: string;
@@ -92,6 +98,7 @@ export interface SensorDTO {
 	 * False, if the sensor was accessed through a read token.
 	 */
 	canEdit: boolean;
+	images: SensorImageInformationDTO[];
 }
 
 export interface SensorCreatedDTO {

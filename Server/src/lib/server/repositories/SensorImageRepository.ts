@@ -1,6 +1,7 @@
 import { sensorImages } from '$lib/server/db/schema';
 import { db } from '$lib/server/db/worker';
-import { desc, eq } from 'drizzle-orm';
+import type { SensorImageInformationDTO } from '$lib/types/api';
+import { and, desc, eq } from 'drizzle-orm';
 
 export default class SensorImageRepository {
 	/**
@@ -31,6 +32,38 @@ export default class SensorImageRepository {
 			.from(sensorImages)
 			.where(eq(sensorImages.sensorAddress, sensorAddress))
 			.orderBy(desc(sensorImages.uploadedAt))
+			.limit(1)
+			.then((results) => results.pop());
+	}
+
+	/**
+	 * Get information about all images for a sensor.
+	 * @param sensorAddress The address of the sensor.
+	 * @returns An array of sensor image information.
+	 */
+	static async getAllBySensorAddress(sensorAddress: number): Promise<SensorImageInformationDTO[]> {
+		return await db
+			.select({
+				id: sensorImages.id,
+				sensorAddress: sensorImages.sensorAddress,
+				uploadedAt: sensorImages.uploadedAt
+			})
+			.from(sensorImages)
+			.where(eq(sensorImages.sensorAddress, sensorAddress))
+			.orderBy(desc(sensorImages.uploadedAt));
+	}
+
+	/**
+	 * Get a specific image by its ID for a sensor.
+	 * @param sensorAddress The address of the sensor.
+	 * @param imageId The ID of the image.
+	 * @returns The sensor image or undefined if not found.
+	 */
+	static async getBySensorAddressAndId(sensorAddress: number, imageId: number) {
+		return await db
+			.select()
+			.from(sensorImages)
+			.where(and(eq(sensorImages.sensorAddress, sensorAddress), eq(sensorImages.id, imageId)))
 			.limit(1)
 			.then((results) => results.pop());
 	}

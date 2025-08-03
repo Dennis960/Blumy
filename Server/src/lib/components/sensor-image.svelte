@@ -12,7 +12,10 @@
 	let { sensor, style = undefined, class: clazz, clickable = false }: Props = $props();
 
 	const url = $derived(
-		`${clientApi(null!).sensors().withId(sensor.id).getImage().url}?token=${sensor.readToken}`
+		clientApi(null!)
+			.sensors()
+			.withId(sensor.id)
+			.getImage(sensor.images[0].id, sensor.canEdit ? undefined : sensor.readToken).url
 	);
 </script>
 

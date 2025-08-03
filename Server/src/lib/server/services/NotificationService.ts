@@ -51,7 +51,7 @@ export default class NotificationService {
 			icon: clientApi(null!, env.ORIGIN)
 				.sensors()
 				.withId(sensor.sensorAddress)
-				.getImage(sensor.readToken).url,
+				.getImage(null, sensor.readToken).url,
 			data: {
 				url:
 					route('/dashboard/sensor/[id=sensorId]', { id: sensor.sensorAddress.toString() }) +
