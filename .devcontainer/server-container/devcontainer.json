@@ -1,5 +1,5 @@
 {
-	"name": "Server container",
+	"name": "Blumy Server",
 	"service": "server",
 	"workspaceFolder": "/workspace",
 	"mounts": [
