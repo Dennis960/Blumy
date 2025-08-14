@@ -18,7 +18,7 @@
 	async function updateDate() {
 		page.url.searchParams.set('from', dateRange.startDate.getTime().toString());
 		page.url.searchParams.set('to', dateRange.endDate.getTime().toString());
-		await goto(page.url);
+		await goto(page.url, { noScroll: true });
 		invalidate(DATA_DEPENDENCY.SENSOR);
 	}
 
