@@ -11,6 +11,7 @@
 		IconDroplet,
 		IconDropletFilled,
 		IconDropletFilled2,
+		IconEdit,
 		IconGrave,
 		IconScubaMask,
 		IconSettings,
@@ -21,6 +22,7 @@
 	import { route } from '$lib/ROUTES';
 	import type { SensorDTO } from '$lib/types/api';
 	import NotificationToggle from './notification-toggle.svelte';
+	import SensorImageUploadInput from './sensor-image-upload-input.svelte';
 	import SensorImage from './sensor-image.svelte';
 	import SensorStatusDatagridItem from './sensor-status-datagrid-item.svelte';
 	import Time from './time.svelte';
@@ -43,7 +45,20 @@
 </script>
 
 <section class="card">
-	<SensorImage class="img-responsive img-responsive-16x9 card-img-top" {sensor} clickable={true} />
+	{#if sensor.images.length > 0}
+		<SensorImage
+			class="img-responsive img-responsive-16x9 card-img-top"
+			{sensor}
+			clickable={true}
+		/>
+	{:else if sensor.canEdit}
+		<SensorImageUploadInput
+			class="card-img-top p-4"
+			{sensor}
+			description="Bild hinzufügen"
+			saveOnChange={true}
+		/>
+	{/if}
 	<div class="card-header">
 		<h1 class="card-title">{sensor.config.name}</h1>
 	</div>

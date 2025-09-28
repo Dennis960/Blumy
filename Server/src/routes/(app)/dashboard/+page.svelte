@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto, invalidate } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 	import { DATA_DEPENDENCY } from '$lib/client/api.js';
 	import { SensorStorage } from '$lib/client/sensor-storage.js';
 	import SensorCard from '$lib/components/sensor-card.svelte';

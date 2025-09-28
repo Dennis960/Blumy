@@ -3,9 +3,10 @@
 		label: string;
 		value: string;
 		hint: string;
+		id: string;
 	}
 
-	let { label, value, hint }: Props = $props();
+	let { label, value, hint, id }: Props = $props();
 
 	let tokenInput: HTMLInputElement = $state()!;
 	let copied = $state(false);
@@ -24,9 +25,9 @@
 	}
 </script>
 
-<label for="token" class="form-label">{label}</label>
+<label for={id} class="form-label">{label}</label>
 <div class="d-flex column-gap-1">
-	<input bind:this={tokenInput} id="token" type="text" class="form-control" {value} readonly />
+	<input bind:this={tokenInput} {id} type="text" class="form-control" {value} readonly />
 	<button class="btn btn-outline-secondary" type="button" onclick={handleCopy}>Kopieren</button>
 </div>
 {#if copied}

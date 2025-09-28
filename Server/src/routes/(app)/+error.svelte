@@ -8,7 +8,7 @@
 </svelte:head>
 
 <main style="text-align: center; margin-top: 5rem;">
-	<IconAlertCircle size={64} class="mb-4"/>
+	<IconAlertCircle size={64} class="mb-4" />
 	<h2>Etwas ist schiefgelaufen</h2>
 	<p>Ein unerwarteter Fehler ist aufgetreten.</p>
 	<a href={route('/')}>Zur Startseite</a>

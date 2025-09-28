@@ -19,6 +19,13 @@ export { default as IconBatteryOff } from '@tabler/icons-svelte/icons/battery-of
 export { default as IconBatteryCharging2 } from '@tabler/icons-svelte/icons/battery-charging-2';
 export { default as IconPlus } from '@tabler/icons-svelte/icons/plus';
 export { default as IconTrash } from '@tabler/icons-svelte/icons/trash';
+export { default as IconEdit } from '@tabler/icons-svelte/icons/edit';
+export { default as IconInfoCircle } from '@tabler/icons-svelte/icons/info-circle';
+export { default as IconChevronRight } from '@tabler/icons-svelte/icons/chevron-right';
+export { default as IconChevronLeft } from '@tabler/icons-svelte/icons/chevron-left';
+export { default as IconCalendarStats } from '@tabler/icons-svelte/icons/calendar-stats';
+export { default as IconPhoto } from '@tabler/icons-svelte/icons/photo';
+export { default as IconPhotoPlus } from '@tabler/icons-svelte/icons/photo-plus';
 
 export { default as IconChevronLeftRaw } from '@tabler/icons/outline/chevron-left.svg?raw';
 export { default as IconChevronRightRaw } from '@tabler/icons/outline/chevron-right.svg?raw';

@@ -30,7 +30,8 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 	},
 
 	// @enforce-await
-	allowOwnerOf: async function (sensorId: number) {
+	allowOwnerOf: async function (sensorId: number | string) {
+		sensorId = parseInt(sensorId.toString());
 		user = this.allowAuthenticated();
 
 		if (!user) {

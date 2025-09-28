@@ -15,6 +15,9 @@ const PAGES = {
   "/dashboard/sensor/[id=sensorId]": (params: { id: (ExtractParamType<typeof import('../params/sensorId.ts').match>) }) => {
     return `/dashboard/sensor/${params['id']}`
   },
+  "/dashboard/sensor/[id=sensorId]/image-gallery": (params: { id: (ExtractParamType<typeof import('../params/sensorId.ts').match>) }) => {
+    return `/dashboard/sensor/${params['id']}/image-gallery`
+  },
   "/dashboard/sensor/[id=sensorId]/settings": (params: { id: (ExtractParamType<typeof import('../params/sensorId.ts').match>) }) => {
     return `/dashboard/sensor/${params['id']}/settings`
   },
@@ -53,6 +56,9 @@ const SERVERS = {
     return `/api/sensors/${params['id']}/check-subscription`
   },
   "GET /api/sensors/[id]/image": (params: { id: (string | number) }) => {
+    return `/api/sensors/${params['id']}/image`
+  },
+  "POST /api/sensors/[id]/image": (params: { id: (string | number) }) => {
     return `/api/sensors/${params['id']}/image`
   },
   "PUT /api/sensors/[id]/settings": (params: { id: (string | number) }) => {
@@ -195,8 +201,8 @@ type ExtractParamType<T extends (param: any) => any> = ExtractFnPredicate<T> ext
 * ```
 */
 export type KIT_ROUTES = {
-  PAGES: { '/': never, '/account': never, '/dashboard': never, '/dashboard/sensor/[id=sensorId]': 'id', '/dashboard/sensor/[id=sensorId]/settings': 'id', '/dashboard/sensor/new': never, '/dashboard/table': never, '/impressum': never, '/privacy-policy': never, '/shop': never, '/tutorials/getting-started': never, '/tutorials/home-assistant': never, '/tutorials/multiconfiguration': never, '/selector': never, '/selector/sensor/new': never }
-  SERVERS: { 'POST /api/auth/default/login': never, 'POST /api/auth/default/register': never, 'GET /api/auth/google/callback': never, 'POST /api/auth/google/login': never, 'POST /api/auth/logout': never, 'GET /api/blumyWrl': never, 'POST /api/cron': never, 'DELETE /api/currentAccount': never, 'PUT /api/currentAccount/email': never, 'PUT /api/currentAccount/password': never, 'POST /api/sensorList': never, 'POST /api/sensors': never, 'DELETE /api/sensors/[id]': 'id', 'POST /api/sensors/[id]/check-subscription': 'id', 'GET /api/sensors/[id]/image': 'id', 'PUT /api/sensors/[id]/settings': 'id', 'POST /api/sensors/[id]/subscribe': 'id', 'POST /api/sensors/[id]/unsubscribe': 'id', 'POST /api/sensors/[id]/write-token': 'id', 'POST /api/v2/data': never, 'GET /api/v2/data': never, 'POST /api/waitingList': never }
+  PAGES: { '/': never, '/account': never, '/dashboard': never, '/dashboard/sensor/[id=sensorId]': 'id', '/dashboard/sensor/[id=sensorId]/image-gallery': 'id', '/dashboard/sensor/[id=sensorId]/settings': 'id', '/dashboard/sensor/new': never, '/dashboard/table': never, '/impressum': never, '/privacy-policy': never, '/shop': never, '/tutorials/getting-started': never, '/tutorials/home-assistant': never, '/tutorials/multiconfiguration': never, '/selector': never, '/selector/sensor/new': never }
+  SERVERS: { 'POST /api/auth/default/login': never, 'POST /api/auth/default/register': never, 'GET /api/auth/google/callback': never, 'POST /api/auth/google/login': never, 'POST /api/auth/logout': never, 'GET /api/blumyWrl': never, 'POST /api/cron': never, 'DELETE /api/currentAccount': never, 'PUT /api/currentAccount/email': never, 'PUT /api/currentAccount/password': never, 'POST /api/sensorList': never, 'POST /api/sensors': never, 'DELETE /api/sensors/[id]': 'id', 'POST /api/sensors/[id]/check-subscription': 'id', 'GET /api/sensors/[id]/image': 'id', 'POST /api/sensors/[id]/image': 'id', 'PUT /api/sensors/[id]/settings': 'id', 'POST /api/sensors/[id]/subscribe': 'id', 'POST /api/sensors/[id]/unsubscribe': 'id', 'POST /api/sensors/[id]/write-token': 'id', 'POST /api/v2/data': never, 'GET /api/v2/data': never, 'POST /api/waitingList': never }
   ACTIONS: Record<string, never>
   LINKS: Record<string, never>
   Params: { 'id': never }

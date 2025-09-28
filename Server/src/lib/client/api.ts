@@ -237,6 +237,18 @@ export function clientApi(_fetch: typeof fetch = fetch, baseUrl: string = '') {
 							if (token) url.addSearchParam('token', token);
 							if (imageId) url.addSearchParam('id', imageId.toString());
 							return fetchWithInit<Blob>(undefined, (res) => res.blob());
+						},
+						uploadImage: (image: Blob) => {
+							const formData = new FormData();
+							formData.append('image', image);
+							url.addPath('image');
+							return fetchWithInit(
+								{
+									method: 'POST',
+									body: formData
+								},
+								(res) => res.text()
+							);
 						}
 					};
 				}

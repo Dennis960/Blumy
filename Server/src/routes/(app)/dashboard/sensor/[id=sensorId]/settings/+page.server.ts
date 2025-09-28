@@ -6,6 +6,7 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async function ({ depends, params, parent, locals, url }) {
 	await locals.security.allowOwnerOrSensorRead(params.id, url.searchParams.get('token'));
 	depends(DATA_DEPENDENCY.SENSOR_VALUE_DISTRIBUTION);
+	depends(DATA_DEPENDENCY.SENSOR);
 	const id = parseInt(params.id);
 
 	const sensorValueDistribution = await new SensorController().getSensorValueDistribution(id);

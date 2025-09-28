@@ -43,6 +43,7 @@
 										label="Zugangsschlüssel"
 										value={createdSensor.tokens.write}
 										hint="Kopiere den Zugangsschlüssel zur Einrichtung des Sensors."
+										id="sensor-write-token"
 									/>
 								</div>
 							</div>

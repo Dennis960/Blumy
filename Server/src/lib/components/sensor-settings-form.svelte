@@ -12,11 +12,10 @@
 		SensorDTO,
 		SensorValueDistributionDTO
 	} from '$lib/types/api';
-	import loadImage from 'blueimp-load-image';
 	import { PipsMode } from 'nouislider';
 	import { onMount, type Snippet } from 'svelte';
 	import CopyText from './copy-text.svelte';
-	import SensorImage from './sensor-image.svelte';
+	import SensorImageUploadInput from './sensor-image-upload-input.svelte';
 
 	let {
 		sensor = undefined,
@@ -45,8 +44,6 @@
 				};
 
 	let sliderOptions: SliderOptions | undefined = $state();
-	let image: HTMLImageElement | undefined = $state(undefined);
-	let imageBlob: Blob | undefined = $state(undefined);
 	let sliderValues: (number | string)[] = $state([]);
 
 	let permanentWiltingPoint = $state(initialConfig.permanentWiltingPoint);
@@ -102,37 +99,6 @@
 		};
 	});
 
-	async function handleImageInput(e: Event) {
-		const target = e.target as HTMLInputElement;
-		if (!target.files || !target.files[0]) {
-			return;
-		}
-		const file = target.files[0];
-
-		loadImage(
-			file,
-			(canvas: HTMLCanvasElement | HTMLImageElement | Event) => {
-				if (canvas instanceof HTMLCanvasElement) {
-					canvas.toBlob((blob) => {
-						if (blob) {
-							imageBlob = blob;
-							const url = URL.createObjectURL(blob);
-							image = new Image();
-							image.src = url;
-						}
-					}, file.type);
-				} else if (canvas instanceof HTMLImageElement) {
-					image = canvas;
-				}
-			},
-			{
-				canvas: true,
-				orientation: true,
-				meta: true
-			}
-		);
-	}
-
 	async function handleSubmit(event: {
 		currentTarget: EventTarget & HTMLFormElement;
 		preventDefault: () => void;
@@ -142,10 +108,6 @@
 		submitting = true;
 		try {
 			const data = new FormData(event.currentTarget);
-
-			if (imageBlob) {
-				data.set('image', imageBlob);
-			}
 
 			if (sensor?.id !== undefined) {
 				const apiCall = clientApi().sensors().withId(sensor.id).update(data);
@@ -205,22 +167,7 @@
 					<div class="row mb-3">
 						<div class="col-md-6 col-lg-4 col-12">
 							<label for="image" class="form-label">Foto</label>
-							{#if image}
-								<span class="avatar avatar-2xl mb-2" style={`background-image: url(${image.src})`}
-								></span>
-							{:else if sensor}
-								<SensorImage class="avatar avatar-2xl mb-2" {sensor} clickable={true} />
-							{/if}
-							<input
-								type="file"
-								accept="image/*"
-								class="form-control"
-								id="image"
-								name="image"
-								onchange={handleImageInput}
-								required={image === undefined && !sensor?.id}
-								capture="environment"
-							/>
+							<SensorImageUploadInput {sensor} />
 						</div>
 					</div>
 
@@ -280,6 +227,7 @@
 									label="Zugangsschlüssel"
 									hint="Kopiere den Zugangsschlüssel zur Einrichtung des Sensors."
 									value={sensor.writeToken}
+									id="sensor-write-token"
 								/>
 							</div>
 						</div>
@@ -292,6 +240,7 @@
 									label="Share-Link"
 									hint="Jeder mit diesem Link hat Zugriff auf die Sensorwerte."
 									value={shareLink}
+									id="sensor-share-link"
 								/>
 							</div>
 						</div>
