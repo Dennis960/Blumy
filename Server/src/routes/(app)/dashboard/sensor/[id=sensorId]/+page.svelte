@@ -23,8 +23,8 @@
 	}
 
 	onMount(() => {
-		if (!data.sensor.canEdit) {
-			SensorStorage.addSensor(data.sensor.id, data.sensor.readToken);
+		if (!data.sensor.isCurrentUserOwner) {
+			SensorStorage.addSensor(data.sensor.id, data.sensor.sensorToken);
 		}
 
 		const interval = setInterval(

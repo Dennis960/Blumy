@@ -24,7 +24,7 @@
 
 	async function onchange(blob: Blob) {
 		if (saveOnChange && sensor) {
-			await clientApi().sensors().withId(sensor.id).uploadImage(blob).response();
+			await clientApi().sensors().withId(sensor.id, sensor.sensorToken).uploadImage(blob).response();
 			invalidate(DATA_DEPENDENCY.SENSOR);
 		}
 	}

@@ -1,6 +1,6 @@
 import type { SensorConfigurationDTO } from '$lib/types/api';
 
-type RedactedSensorEntity = Omit<SensorEntity, 'owner' | 'readToken' | 'writeToken'>;
+type RedactedSensorEntity = Omit<SensorEntity, 'owner' | 'sensorToken' | 'writeToken'>;
 
 export default class SensorEntity {
 	constructor(
@@ -12,7 +12,8 @@ export default class SensorEntity {
 		public upperThreshold: number,
 		public owner: string | null,
 		public writeToken: string,
-		public readToken: string
+		public sensorToken: string,
+		public sensorTokenHasEditPermissions: boolean
 	) {}
 
 	public static async fromDTO(
@@ -25,7 +26,8 @@ export default class SensorEntity {
 			fieldCapacity: dto.fieldCapacity,
 			permanentWiltingPoint: dto.permanentWiltingPoint,
 			lowerThreshold: dto.lowerThreshold,
-			upperThreshold: dto.upperThreshold
+			upperThreshold: dto.upperThreshold,
+			sensorTokenHasEditPermissions: dto.sensorTokenHasEditPermissions,
 		};
 	}
 
@@ -35,7 +37,8 @@ export default class SensorEntity {
 			fieldCapacity: entity.fieldCapacity,
 			permanentWiltingPoint: entity.permanentWiltingPoint,
 			lowerThreshold: entity.lowerThreshold,
-			upperThreshold: entity.upperThreshold
+			upperThreshold: entity.upperThreshold,
+			sensorTokenHasEditPermissions: entity.sensorTokenHasEditPermissions,
 		};
 	}
 }

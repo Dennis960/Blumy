@@ -14,13 +14,14 @@
 
 	const url =
 		route('/dashboard/sensor/[id=sensorId]/image-gallery', { id: sensor.id.toString() }) +
-		`?token=${sensor.readToken}`;
+		`?token=${sensor.sensorToken}`;
 	const imageUrl = $derived(
 		sensor.images.length > 0
 			? clientApi(null!)
 					.sensors()
 					.withId(sensor.id)
-					.getImage(sensor.images[0].id, sensor.canEdit ? undefined : sensor.readToken).url
+					.getImage(sensor.images[0].id, sensor.isCurrentUserOwner ? undefined : sensor.sensorToken)
+					.url
 			: null
 	);
 </script>

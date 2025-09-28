@@ -1,0 +1,1 @@
+ALTER TABLE "sensor" ADD COLUMN "read_token_can_edit" boolean DEFAULT false NOT NULL;

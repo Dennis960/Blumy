@@ -6,7 +6,10 @@ export const load: LayoutServerLoad = async (event) => {
 	const user = event.locals.security.allowAll();
 	event.depends(DATA_DEPENDENCY.SENSOR_OVERVIEW);
 	if (user) {
-		const sensorOverview = await new SensorController().getSensorOverview(user.id);
+		const sensorOverview = await new SensorController().getSensorOverview(
+			user.id,
+			event.url.searchParams.get('token')
+		);
 		return sensorOverview;
 	}
 	return {

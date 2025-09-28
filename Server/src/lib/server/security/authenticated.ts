@@ -50,11 +50,32 @@ export const authenticated = (user: User | null, session: Session | null) => ({
 	},
 
 	// @enforce-await
-	allowOwnerOrSensorRead: async function (sensorId: number | string, readToken?: string | null) {
+	allowOwnerOfOrTokenHasEditPermission: async function (
+		sensorId: number | string,
+		sensorToken?: string | null
+	) {
+		sensorId = parseInt(sensorId.toString());
+		const sensor = await SensorRepository.getById(sensorId);
+		if (!sensor) {
+			throw error(404, 'sensor not found');
+		}
+
+		if (!sensor.sensorTokenHasEditPermissions) {
+			return await this.allowOwnerOf(sensorId);
+		}
+
+		if (sensor.sensorToken !== sensorToken) {
+			throw error(404, 'sensor not found');
+		}
+		return user;
+	},
+
+	// @enforce-await
+	allowOwnerOrSensorRead: async function (sensorId: number | string, sensorToken?: string | null) {
 		sensorId = parseInt(sensorId.toString());
 
-		if (readToken) {
-			if (sensorId !== (await SensorRepository.getIdByReadToken(readToken))) {
+		if (sensorToken) {
+			if (sensorId !== (await SensorRepository.getIdBySensorToken(sensorToken))) {
 				throw error(403, 'wrong sensor for read token');
 			}
 		} else {

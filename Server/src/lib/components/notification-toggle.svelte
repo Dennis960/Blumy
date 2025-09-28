@@ -28,7 +28,7 @@
 			} else {
 				subscribed = await clientApi()
 					.sensors()
-					.withId(sensor.id, sensor.readToken)
+					.withId(sensor.id, sensor.sensorToken)
 					.checkSubscription(subscription)
 					.parse();
 			}
@@ -44,7 +44,7 @@
 			if (
 				await clientApi()
 					.sensors()
-					.withId(sensor.id, sensor.readToken)
+					.withId(sensor.id, sensor.sensorToken)
 					.submitUnsubscription(subscription)
 					.parse()
 			) {
@@ -54,7 +54,7 @@
 			if (
 				await clientApi()
 					.sensors()
-					.withId(sensor.id, sensor.readToken)
+					.withId(sensor.id, sensor.sensorToken)
 					.submitSubscription(subscription)
 					.parse()
 			) {

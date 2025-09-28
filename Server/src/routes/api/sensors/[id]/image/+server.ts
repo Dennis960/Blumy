@@ -25,8 +25,11 @@ export const GET = (async ({ locals, params, url }) => {
 	});
 }) satisfies RequestHandler;
 
-export const POST = (async ({ locals, params, request }) => {
-	await locals.security.allowOwnerOf(params.id);
+export const POST = (async ({ locals, params, request, url }) => {
+	await locals.security.allowOwnerOfOrTokenHasEditPermission(
+		params.id,
+		url.searchParams.get('token')
+	);
 	const sensorId = parseInt(params.id);
 	const data = await request.formData();
 	const imageFile = data.get('image') as File;

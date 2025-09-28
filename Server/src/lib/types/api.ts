@@ -27,7 +27,8 @@ export const sensorConfigurationDTOSchema = z.object({
 	// difference between fc and pwp in %: available water capacity
 	// thresholds for available water capacity
 	upperThreshold: z.number(),
-	lowerThreshold: z.number()
+	lowerThreshold: z.number(),
+	sensorTokenHasEditPermissions: z.boolean().default(false)
 });
 
 export type SensorConfigurationDTO = z.infer<typeof sensorConfigurationDTOSchema>;
@@ -79,7 +80,7 @@ export interface SensorImageInformationDTO {
 
 export interface SensorDTO {
 	id: number;
-	readToken: string;
+	sensorToken: string;
 	writeToken: string;
 	config: SensorConfigurationDTO;
 	sensorHealth: SensorHealthDTO;
@@ -97,15 +98,28 @@ export interface SensorDTO {
 	 * True, if the currently logged in user trying to access this sensor is the owner of the sensor.
 	 * False, if the sensor was accessed through a read token.
 	 */
-	canEdit: boolean;
+	isCurrentUserOwner: boolean;
+	/**
+	 * True, if the currently logged in user trying to access this sensor is the owner of the sensor
+	 * or if the sensor was accessed through a read token that allows editing.
+	 * False otherwise.
+	 */
+	hasCurrentUserEditPermissions: boolean;
 	images: SensorImageInformationDTO[];
 }
 
 export interface SensorCreatedDTO {
 	id: number;
 	tokens: {
+		/**
+		 * The write token is used to submit new sensor readings to the server.
+		 */
 		write: string;
-		read: string;
+		/**
+		 * The sensor token is used to access the sensor of different user.
+		 * The sensor token can have edit permissions, if the owner of the sensor allowed this.
+		 */
+		sensor: string;
 	};
 	config: SensorConfigurationDTO;
 }

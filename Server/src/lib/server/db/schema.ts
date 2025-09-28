@@ -56,7 +56,8 @@ export const sensors = pgTable('sensor', {
 	upperThreshold: real('upper_threshold').notNull().default(0.8),
 	owner: text('owner').references(() => users.id),
 	writeToken: text('write_token').notNull(),
-	readToken: text('read_token').notNull()
+	sensorToken: text('read_token').notNull(),
+	sensorTokenHasEditPermissions: boolean('read_token_can_edit').notNull().default(false)
 });
 
 export const sensorReadings = pgTable('data', {

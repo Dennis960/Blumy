@@ -102,7 +102,7 @@
 				{#each filteredStoredSensors as sensor (sensor.id)}
 					<div class="col-md-6 col-lg-4 col-12">
 						<SensorCard
-							href={`${route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() })}?token=${sensor.readToken}`}
+							href={`${route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() })}?token=${sensor.sensorToken}`}
 							{sensor}
 						>
 							<button

@@ -13,8 +13,8 @@ export const load: PageServerLoad = async function ({ depends, params, parent, l
 
 	const sensor = (await parent()).sensor;
 	const shareLink =
-		sensor.readToken != undefined
-			? `${url.origin}${route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() })}?token=${sensor.readToken}`
+		sensor.sensorToken != undefined
+			? `${url.origin}${route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() })}?token=${sensor.sensorToken}`
 			: undefined;
 
 	return {

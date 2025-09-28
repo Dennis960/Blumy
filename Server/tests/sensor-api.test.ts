@@ -43,7 +43,8 @@ test.beforeEach(async () => {
 		upperThreshold: 800,
 		owner: testUser.id,
 		writeToken: 'test-token-write',
-		readToken: 'test-token-read'
+		sensorToken: 'test-token-read',
+		sensorTokenHasEditPermissions: false
 	};
 	await testDb.insert(sensors).values(testSensor);
 });

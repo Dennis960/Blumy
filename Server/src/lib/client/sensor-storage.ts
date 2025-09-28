@@ -2,32 +2,57 @@ import { clientApi } from './api';
 
 interface Sensor {
 	id: number;
+	sensorToken: string;
+}
+
+/**
+ * @deprecated
+ */
+interface OldSensor {
+	id: number;
 	readToken: string;
+}
+
+function isOldSensor(sensor: Sensor | OldSensor): sensor is OldSensor {
+	return (sensor as OldSensor).readToken !== undefined;
 }
 
 const STORAGE_KEY = 'sensors';
 
 /**
  * SensorStorage is a utility class for managing sensor data in local storage.
- * It allows adding, removing, and retrieving sensors that are not owned by the current user but can be accessed via read tokens.
+ * It allows adding, removing, and retrieving sensors that are not owned by the current user but can be accessed via sensor tokens.
  */
 export class SensorStorage {
 	static getSensors(): Sensor[] {
 		if (typeof localStorage === 'undefined') return [];
 		const data = localStorage.getItem(STORAGE_KEY);
-		return data ? (JSON.parse(data) as Sensor[]) : [];
+		const sensorsFromStorage = data ? (JSON.parse(data) as (Sensor | OldSensor)[]) : [];
+		let migrated = false;
+		const sensors = sensorsFromStorage.map((sensor) => {
+			if (isOldSensor(sensor)) {
+				migrated = true;
+				return {
+					id: sensor.id,
+					sensorToken: sensor.readToken
+				};
+			}
+			return sensor;
+		});
+		if (migrated) localStorage.setItem(STORAGE_KEY, JSON.stringify(sensors));
+		return sensors;
 	}
 
-	static addSensor(id: number, readToken: string): void {
+	static addSensor(id: number, sensorToken: string): void {
 		const sensors = SensorStorage.getSensors();
 		const index = sensors.findIndex((s) => s.id === id);
 		if (index !== -1) {
 			sensors[index] = {
 				id,
-				readToken
+				sensorToken
 			};
 		} else {
-			sensors.push({ id, readToken });
+			sensors.push({ id, sensorToken });
 		}
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(sensors));
 	}

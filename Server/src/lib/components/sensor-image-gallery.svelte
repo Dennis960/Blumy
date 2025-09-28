@@ -14,7 +14,7 @@
 		return clientApi(null!)
 			.sensors()
 			.withId(sensor.id)
-			.getImage(imageInfo.id, sensor.canEdit ? undefined : sensor.readToken).url;
+			.getImage(imageInfo.id, sensor.isCurrentUserOwner ? undefined : sensor.sensorToken).url;
 	}
 </script>
 
@@ -28,13 +28,13 @@
 	<div class="card-body bg-white">
 		<div class="row g-3">
 			{#if sensor.images.length > 0}
-				{#if sensor.canEdit}
+				{#if sensor.hasCurrentUserEditPermissions}
 					<SensorImageUploadInput
-						sensor={sensor}
+						{sensor}
 						description="Neues Bild hinzufügen"
 						saveOnChange={true}
-                        hidePreview={true}
-                        class="col-md-4 col-lg-3 col-6"
+						hidePreview={true}
+						class="col-md-4 col-lg-3 col-6"
 					/>
 				{/if}
 				{#each sensor.images as image, i}

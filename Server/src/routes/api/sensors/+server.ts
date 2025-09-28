@@ -13,13 +13,18 @@ export const POST = (async (event) => {
 		permanentWiltingPoint: Number(data.get('permanentWiltingPoint')),
 		lowerThreshold: Number(data.get('lowerThreshold')),
 		upperThreshold: Number(data.get('upperThreshold')),
-		fieldCapacity: Number(data.get('fieldCapacity'))
+		fieldCapacity: Number(data.get('fieldCapacity')),
+		sensorTokenHasEditPermissions: !!data.get('sensorTokenHasEditPermissions')
 	};
 	const sensor = await new SensorController().create(event.locals.user.id, config);
 
 	const imageFile = data.get('image') as File;
 	if (imageFile && imageFile.size > 0) {
-		await clientApi(event.fetch).sensors().withId(sensor.id).uploadImage(imageFile).response();
+		await clientApi(event.fetch)
+			.sensors()
+			.withId(sensor.id, event.url.searchParams.get('token'))
+			.uploadImage(imageFile)
+			.response();
 	}
 
 	return json(sensor);

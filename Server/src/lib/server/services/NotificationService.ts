@@ -51,11 +51,11 @@ export default class NotificationService {
 			icon: clientApi(null!, env.ORIGIN)
 				.sensors()
 				.withId(sensor.sensorAddress)
-				.getImage(null, sensor.readToken).url,
+				.getImage(null, sensor.sensorToken).url,
 			data: {
 				url:
 					route('/dashboard/sensor/[id=sensorId]', { id: sensor.sensorAddress.toString() }) +
-					`?token=${sensor.readToken}`
+					`?token=${sensor.sensorToken}`
 			}
 		});
 

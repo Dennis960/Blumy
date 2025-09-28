@@ -63,7 +63,11 @@ export default class SensorController {
 		};
 	}
 
-	public async getSensor(id: number, userId: string | undefined): Promise<SensorDTO | undefined> {
+	public async getSensor(
+		id: number,
+		userId: string | undefined,
+		sensorToken: string | null | undefined
+	): Promise<SensorDTO | undefined> {
 		const sensorEntity = await SensorRepository.getById(id);
 		if (sensorEntity == undefined) {
 			return undefined;
@@ -82,7 +86,7 @@ export default class SensorController {
 
 		return {
 			id,
-			readToken: sensorEntity.readToken,
+			sensorToken: sensorEntity.sensorToken,
 			writeToken: sensorEntity.writeToken,
 			config,
 			lastUpdate:
@@ -109,7 +113,10 @@ export default class SensorController {
 					: undefined,
 			sensorHealth,
 			plantHealth,
-			canEdit: userId === sensorEntity.owner,
+			isCurrentUserOwner: userId === sensorEntity.owner,
+			hasCurrentUserEditPermissions:
+				userId === sensorEntity.owner ||
+				(sensorEntity.sensorTokenHasEditPermissions && sensorEntity.sensorToken === sensorToken),
 			images
 		};
 	}
@@ -123,11 +130,16 @@ export default class SensorController {
 		return sensorEntity.writeToken;
 	}
 
-	public async getSensorOverview(userId: string): Promise<SensorOverviewDTO> {
+	public async getSensorOverview(
+		userId: string,
+		sensorToken: string | null | undefined
+	): Promise<SensorOverviewDTO> {
 		const sensorsIds = await SensorRepository.getAllIdsForOwner(userId);
 
 		const sensors = await Promise.all(
-			sensorsIds.map(async (sensor) => (await this.getSensor(sensor.sensorAddress, userId))!)
+			sensorsIds.map(
+				async (sensor) => (await this.getSensor(sensor.sensorAddress, userId, sensorToken))!
+			)
 		);
 
 		// sort by water capacity
@@ -230,13 +242,13 @@ export default class SensorController {
 		return this.generateToken('blumy_', 32);
 	}
 
-	private generateReadToken(): string {
+	private generateSensorToken(): string {
 		return this.generateToken('', 16);
 	}
 
 	public async create(ownerId: string, config: SensorConfigurationDTO): Promise<SensorCreatedDTO> {
 		const writeToken = this.generateWriteToken();
-		const readToken = this.generateReadToken();
+		const sensorToken = this.generateSensorToken();
 		const sensorEntityPartial = await SensorEntity.fromDTO(0, config);
 
 		const creatingSensorEntity: typeof sensors.$inferInsert = {
@@ -244,13 +256,13 @@ export default class SensorController {
 			sensorAddress: undefined,
 			owner: ownerId,
 			writeToken,
-			readToken
+			sensorToken
 		};
 		const sensorEntity = await SensorRepository.create(creatingSensorEntity);
 
 		return {
 			tokens: {
-				read: sensorEntity.readToken,
+				sensor: sensorEntity.sensorToken,
 				write: sensorEntity.writeToken
 			},
 			id: sensorEntity.sensorAddress,

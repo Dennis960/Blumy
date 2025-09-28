@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import {
 		IconAlertTriangle,
 		IconBattery2,
@@ -11,7 +12,6 @@
 		IconDroplet,
 		IconDropletFilled,
 		IconDropletFilled2,
-		IconEdit,
 		IconGrave,
 		IconScubaMask,
 		IconSettings,
@@ -51,7 +51,7 @@
 			{sensor}
 			clickable={true}
 		/>
-	{:else if sensor.canEdit}
+	{:else if sensor.hasCurrentUserEditPermissions}
 		<SensorImageUploadInput
 			class="card-img-top p-4"
 			{sensor}
@@ -182,12 +182,13 @@
 			{/if}
 		</div>
 	</div>
-	{#if sensor.canEdit}
+	{#if sensor.hasCurrentUserEditPermissions}
 		<div class="card-footer">
 			<div class="d-flex justify-content-end">
 				<a
 					class="btn"
-					href={route('/dashboard/sensor/[id=sensorId]/settings', { id: sensor.id.toString() })}
+					href={route('/dashboard/sensor/[id=sensorId]/settings', { id: sensor.id.toString() }) +
+						`?${page.url.searchParams.toString()}`}
 				>
 					<IconSettings />
 					<span class="ms-2">Einstellungen</span>

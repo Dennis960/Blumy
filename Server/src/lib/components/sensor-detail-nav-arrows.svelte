@@ -48,10 +48,10 @@
 	});
 
 	function getSensorRoute(sensor: SensorDTO): string {
-		if (!sensor.canEdit) {
+		if (!sensor.isCurrentUserOwner) {
 			return (
 				route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }) +
-				`?token=${sensor.readToken}`
+				`?token=${sensor.sensorToken}`
 			);
 		}
 		return route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() });

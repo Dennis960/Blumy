@@ -33,5 +33,6 @@ export const defaultSensorConfig = {
 	fieldCapacity: MAX_FIELD_CAPACITY * 0.85,
 	permanentWiltingPoint: MAX_FIELD_CAPACITY * 0.15,
 	upperThreshold: 0.75,
-	lowerThreshold: 0.4
+	lowerThreshold: 0.4,
+	sensorTokenHasEditPermissions: false
 };

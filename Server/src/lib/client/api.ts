@@ -171,9 +171,9 @@ export function clientApi(_fetch: typeof fetch = fetch, baseUrl: string = '') {
 						(res) => res.json()
 					);
 				},
-				withId: (id: number, readToken?: string) => {
+				withId: (id: number, sensorToken?: string | null) => {
 					url.addPath(id.toString());
-					if (readToken) url.addSearchParam('token', readToken);
+					if (sensorToken) url.addSearchParam('token', sensorToken);
 					return {
 						update: (config: FormData) => {
 							url.addPath('settings');
@@ -260,7 +260,7 @@ export function clientApi(_fetch: typeof fetch = fetch, baseUrl: string = '') {
 				withIdsAndTokens: (
 					sensors: {
 						id: number;
-						readToken: string;
+						sensorToken: string;
 					}[]
 				) => {
 					return fetchWithInit<SensorDTO[]>(

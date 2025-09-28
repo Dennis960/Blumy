@@ -8,7 +8,10 @@ export const load: PageServerLoad = async (event) => {
 	if (!user) {
 		return { sensors: [], sensorOverview: null, sensorHistories: [] };
 	}
-	const sensorOverview = await new SensorController().getSensorOverview(user.id);
+	const sensorOverview = await new SensorController().getSensorOverview(
+		user.id,
+		event.url.searchParams.get('token')
+	);
 	// const sensorHistory = await new SensorController().getSensorHistory(event.locals.user!.id);
 	const now = new Date();
 	const threeDaysAgo = new Date(now);

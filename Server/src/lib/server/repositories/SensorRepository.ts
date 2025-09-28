@@ -26,11 +26,11 @@ export default class SensorRepository {
 			.then((results) => results.pop()?.sensorAddress);
 	}
 
-	static async getIdByReadToken(readToken: string) {
+	static async getIdBySensorToken(sensorToken: string) {
 		return await db
 			.select({ sensorAddress: sensors.sensorAddress })
 			.from(sensors)
-			.where(eq(sensors.readToken, readToken))
+			.where(eq(sensors.sensorToken, sensorToken))
 			.limit(1)
 			.then((results) => results.pop()?.sensorAddress);
 	}

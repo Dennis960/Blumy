@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { route } from '$lib/ROUTES';
 	import { clientApi } from '$lib/client/api';
 	import { defaultSensorConfig, MAX_FIELD_CAPACITY } from '$lib/client/config';
@@ -35,13 +36,14 @@
 		onSensorCreate?: (sensor: SensorCreatedDTO) => void;
 	} = $props();
 
-	let initialConfig: SensorConfigurationDTO =
+	let initialConfig: SensorConfigurationDTO = $state(
 		sensor?.config != undefined
 			? { ...sensor.config }
 			: {
 					...defaultSensorConfig,
 					name: funnyPlantNames[Math.floor(Math.random() * funnyPlantNames.length)]
-				};
+				}
+	);
 
 	let sliderOptions: SliderOptions | undefined = $state();
 	let sliderValues: (number | string)[] = $state([]);
@@ -110,11 +112,15 @@
 			const data = new FormData(event.currentTarget);
 
 			if (sensor?.id !== undefined) {
-				const apiCall = clientApi().sensors().withId(sensor.id).update(data);
+				const apiCall = clientApi().sensors().withId(sensor.id, sensor.sensorToken).update(data);
 				if ((await apiCall.response()).ok) {
-					goto(route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }), {
-						invalidateAll: true
-					});
+					goto(
+						route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }) +
+							`?${page.url.searchParams.toString()}`,
+						{
+							invalidateAll: true
+						}
+					);
 				}
 			} else {
 				const apiCall = clientApi().sensors().create(data);
@@ -238,21 +244,32 @@
 							<div class="col-md-6 col-lg-4 col-12">
 								<CopyText
 									label="Share-Link"
-									hint="Jeder mit diesem Link kann deinen Sensor sehen (aber nicht bearbeiten)."
+									hint={`Jeder mit diesem Link kann deinen Sensor ${
+										initialConfig.sensorTokenHasEditPermissions ? 'bearbeiten' : 'ansehen'
+									} (auch ohne Account).`}
 									value={shareLink}
 									id="sensor-share-link"
 								/>
+								{#if sensor?.isCurrentUserOwner}
+									<label class="form-check-label mb-0 mt-2">
+										<input
+											class="form-check-input me-2"
+											type="checkbox"
+											name="sensorTokenHasEditPermissions"
+											bind:checked={initialConfig.sensorTokenHasEditPermissions}
+											disabled={sensor != undefined && !sensor.isCurrentUserOwner}
+										/>
+										Jeder mit dem Share-Link kann den Sensor bearbeiten
+									</label>
+								{/if}
 							</div>
 						</div>
 					{/if}
 
-					{#if sensor?.id}
+					{#if sensor?.isCurrentUserOwner}
 						<!-- Delete button -->
 						<div class="row mb-3">
-							<div
-								class="col -md-6
-								col-lg-4 col-12"
-							>
+							<div class="col-md-6 col-lg-4 col-12">
 								<button type="button" class="btn btn-danger" onclick={deleteSensor}>
 									Sensor löschen
 								</button>

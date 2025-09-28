@@ -11,7 +11,7 @@ export const load = (async ({ params, locals, depends, url, parent }) => {
 	depends(DATA_DEPENDENCY.SENSOR);
 	const id = parseInt(params.id);
 
-	const sensor = await new SensorController().getSensor(id, user?.id);
+	const sensor = await new SensorController().getSensor(id, user?.id, url.searchParams.get('token'));
 	if (sensor == undefined) {
 		throw error(404, 'Sensor nicht gefunden');
 	}
