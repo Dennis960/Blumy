@@ -138,7 +138,7 @@
 			)
 		) {
 			await clientApi().sensors().withId(sensor.id).delete().response();
-			goto(route('/'));
+			goto(route('/dashboard'), { invalidateAll: true });
 		}
 	}
 </script>
@@ -238,7 +238,7 @@
 							<div class="col-md-6 col-lg-4 col-12">
 								<CopyText
 									label="Share-Link"
-									hint="Jeder mit diesem Link hat Zugriff auf die Sensorwerte."
+									hint="Jeder mit diesem Link kann deinen Sensor sehen (aber nicht bearbeiten)."
 									value={shareLink}
 									id="sensor-share-link"
 								/>
