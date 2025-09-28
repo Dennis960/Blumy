@@ -18,6 +18,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>{data.sensor.config.name} - Sensor Einstellungen</title>
+</svelte:head>
+
 <div class="page-header">
 	<div class="container">
 		{#if data.sensor.config != undefined}

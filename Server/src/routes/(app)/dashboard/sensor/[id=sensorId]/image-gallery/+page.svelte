@@ -5,8 +5,9 @@
 </script>
 
 <svelte:head>
-	<title>Bildergalerie für {data.sensor.config.name}</title>
+	<title>{data.sensor.config.name} - Sensor Bildergalerie</title>
 </svelte:head>
+
 <main class="container py-4">
 	<div class="row justify-content-center">
 		<div class="col-md-8">

@@ -70,6 +70,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Dashboard - Tabellenansicht</title>
+</svelte:head>
+
 <div class="page-body">
 	<div class="container-xl">
 		<div class="row row-deck row-cards">

@@ -37,6 +37,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>{data.sensor.config.name} - Sensor Dashboard</title>
+</svelte:head>
+
 <div class="page-body">
 	<div class="container-xl container">
 		<SensorDetailNavArrows sensors={data.sensors} currentSensor={data.sensor} />

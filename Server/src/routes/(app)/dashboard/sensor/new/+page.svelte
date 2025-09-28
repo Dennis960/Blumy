@@ -14,6 +14,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Neuen Sensor erstellen</title>
+</svelte:head>
+
 <div class="page-header">
 	<div class="container">
 		{#if createdSensor == undefined}
