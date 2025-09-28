@@ -56,9 +56,11 @@
 					<li class="nav-item">
 						<a class="nav-link" href={route('/dashboard')}>Dashboard</a>
 					</li>
-					<li class="nav-item">
-						<a class="nav-link" href={route('/dashboard/table')}>Tabellenansicht</a>
-					</li>
+					{#if data.authenticated}
+						<li class="nav-item">
+							<a class="nav-link" href={route('/dashboard/table')}>Tabellenansicht</a>
+						</li>
+					{/if}
 					<li class="nav-item">
 						<a class="nav-link" href={route('/tutorials/getting-started')}>Erste Schritte</a>
 					</li>
