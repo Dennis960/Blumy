@@ -89,15 +89,16 @@
 
 <style>
 	.charts {
-		height: calc(100vh - 256px);
+		height: calc(max(100vh, 100vw) - 256px);
 		display: grid;
-		grid-template-rows: minmax(0, 4fr) minmax(0, 3fr) minmax(0, 1fr);
+		grid-template-rows: minmax(0, 4fr) minmax(0, 3fr) minmax(0, 2fr);
 	}
 
 	.charts__graph {
 		height: 100%;
 		/* disable graph touch events on mobile to allow touch scrolling */
 		pointer-events: none;
+		min-width: 0;
 	}
 	@media (hover: hover) {
 		.charts__graph {
