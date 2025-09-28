@@ -1,4 +1,4 @@
-import type { SensorCreatedDTO, SensorDTO } from '$lib/types/api';
+import type { SensorCreatedDTO, SensorDTO, SensorHistoryDTO } from '$lib/types/api';
 
 export enum DATA_DEPENDENCY {
 	SENSOR = 'SENSOR',
@@ -249,6 +249,12 @@ export function clientApi(_fetch: typeof fetch = fetch, baseUrl: string = '') {
 								},
 								(res) => res.text()
 							);
+						},
+						getHistory: (from?: Date, to?: Date) => {
+							url.addPath('history');
+							if (from) url.addSearchParam('from', from.toISOString());
+							if (to) url.addSearchParam('to', to.toISOString());
+							return fetchWithInit<SensorHistoryDTO>(undefined, (res) => res.json());
 						}
 					};
 				}

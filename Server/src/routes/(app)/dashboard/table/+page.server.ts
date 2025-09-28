@@ -3,7 +3,7 @@ import SensorController from '$lib/server/controllers/SensorController';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
-	const user = event.locals.security.allowAuthenticatedElseRedirect();
+	const user = event.locals.security.allowAll();
 	event.depends(DATA_DEPENDENCY.SENSOR_OVERVIEW);
 	if (!user) {
 		return { sensors: [], sensorOverview: null, sensorHistories: [] };
@@ -21,15 +21,16 @@ export const load: PageServerLoad = async (event) => {
 	}
 	const sensorHistories = await Promise.all(
 		sensorOverview.sensors
-			.map(async (sensor) => ({
-				sensor,
-				history: await new SensorController().getSensorHistory(sensor.id, threeDaysAgo, now)
-			}))
+			.map(async (sensor) => new SensorController().getSensorHistory(sensor.id, threeDaysAgo, now))
 			.filter(isNotUndefined)
 	);
 	return {
 		sensors: sensorOverview.sensors,
 		sensorOverview,
-		sensorHistories
+		sensorHistories,
+		historySettings: {
+			from: threeDaysAgo,
+			to: now
+		}
 	};
 };

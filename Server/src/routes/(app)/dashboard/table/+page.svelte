@@ -1,16 +1,23 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
-	import { DATA_DEPENDENCY } from '$lib/client/api.js';
+	import { clientApi, DATA_DEPENDENCY } from '$lib/client/api.js';
+	import { SensorStorage } from '$lib/client/sensor-storage.js';
 	import SensorRow from '$lib/components/sensor-row.svelte';
 	import SensorStatusCard from '$lib/components/sensor-status-card.svelte';
 	import TableSorter, { type SortDirection } from '$lib/components/table-sorter.svelte';
 	import Time from '$lib/components/time.svelte';
 	import { IconBucketDroplet, IconPlant } from '$lib/icons';
 	import { SortKey, sortQueryDataBy } from '$lib/sort-query-data';
-	import type { SensorDTO } from '$lib/types/api.js';
+	import type { SensorDTO, SensorHistoryDTO } from '$lib/types/api.js';
 	import { onMount } from 'svelte';
 
 	let { data } = $props();
+
+	let storedSensorHistories: SensorHistoryDTO[] = $state([]);
+	let sensorHistories = $derived([...data.sensorHistories, ...storedSensorHistories]);
+
+	let storedSensors: SensorDTO[] = $state([]);
+	let sensors = $derived([...data.sensors, ...storedSensors]);
 
 	onMount(() => {
 		const interval = setInterval(
@@ -19,18 +26,29 @@
 			},
 			60 * 60 * 1000
 		);
+		SensorStorage.loadStoredSensors().then(async (loadedSensors) => {
+			storedSensors = loadedSensors.filter(
+				(loadedSensor) => !data.sensors.some((sensor) => sensor.id === loadedSensor.id)
+			);
+			storedSensorHistories = await Promise.all(
+				storedSensors.map(
+					async (sensor) =>
+						await clientApi()
+							.sensors()
+							.withId(sensor.id, sensor.sensorToken)
+							.getHistory(data.historySettings?.from, data.historySettings?.to)
+							.parse()
+				)
+			);
+		});
 		return () => clearInterval(interval);
 	});
 
-	let totalSensors = $derived(data.sensors.length);
-	let poorPlantHealth = $derived(
-		data.sensors.filter((sensor) => sensor.plantHealth.critical).length
-	);
-	let poorSensorHealth = $derived(
-		data.sensors.filter((sensor) => sensor.sensorHealth.critical).length
-	);
+	let totalSensors = $derived(sensors.length);
+	let poorPlantHealth = $derived(sensors.filter((sensor) => sensor.plantHealth.critical).length);
+	let poorSensorHealth = $derived(sensors.filter((sensor) => sensor.sensorHealth.critical).length);
 	let minNextWatering = $derived(
-		data.sensors
+		sensors
 			.filter((sensor) => sensor.prediction)
 			.map((sensor) => sensor.prediction!.nextWatering)
 			.filter((nextWatering) => nextWatering != undefined)
@@ -66,7 +84,7 @@
 	}
 	let queryDataSorted: SensorDTO[] = $state([]);
 	$effect(() => {
-		queryDataSorted = sortQueryDataBy(data.sensors, sortKey, sortAsc);
+		queryDataSorted = sortQueryDataBy(sensors, sortKey, sortAsc);
 	});
 </script>
 
@@ -167,12 +185,12 @@
 							</thead>
 							<tbody>
 								{#each queryDataSorted as sensor (sensor.id)}
-									<SensorRow
-										{sensor}
-										sensorHistory={data.sensorHistories.filter(
-											(history) => history.sensor.id === sensor.id
-										)[0].history}
-									/>
+									{@const sensorHistory = sensorHistories.find(
+										(history) => history.id === sensor.id
+									)}
+									{#if sensorHistory}
+										<SensorRow {sensor} {sensorHistory} />
+									{/if}
 								{/each}
 							</tbody>
 						</table>

@@ -32,9 +32,19 @@
 			sensor.prediction.nextWatering.toLocaleDateString() ==
 				new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString()
 	);
+
+	function getSensorRoute(sensor: SensorDTO): string {
+		if (!sensor.isCurrentUserOwner) {
+			return (
+				route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }) +
+				`?token=${sensor.sensorToken}`
+			);
+		}
+		return route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() });
+	}
 </script>
 
-<tr onclick={() => goto(route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() }))}>
+<tr onclick={() => goto(getSensorRoute(sensor))}>
 	<th class="w-1">
 		<SensorImage class="avatar avatar-xs" {sensor} />
 	</th>
