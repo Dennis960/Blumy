@@ -37,7 +37,6 @@ test.beforeEach(async () => {
 	testSensor = {
 		sensorAddress: 99,
 		name: 'test-sensor',
-		imageBase64: null,
 		fieldCapacity: 1024,
 		permanentWiltingPoint: 100,
 		lowerThreshold: 300,
