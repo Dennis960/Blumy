@@ -11,7 +11,10 @@
 	} = $props();
 
 	function getImageUrl(imageInfo: SensorImageInformationDTO) {
-		return clientApi(null!).sensors().withId(sensor.id).getImage(imageInfo.id).url;
+		return clientApi(null!)
+			.sensors()
+			.withId(sensor.id)
+			.getImage(imageInfo.id, sensor.canEdit ? undefined : sensor.readToken).url;
 	}
 </script>
 
