@@ -30,9 +30,11 @@
 			{#if sensor.images.length > 0}
 				{#if sensor.canEdit}
 					<SensorImageUploadInput
-						sensor={undefined}
+						sensor={sensor}
 						description="Neues Bild hinzufügen"
 						saveOnChange={true}
+                        hidePreview={true}
+                        class="col-md-4 col-lg-3 col-6"
 					/>
 				{/if}
 				{#each sensor.images as image, i}

@@ -10,11 +10,13 @@
 		sensor,
 		description = 'Klicke, um ein Bild deiner Pflanze hinzuzufügen',
 		saveOnChange = false,
+		hidePreview = false,
 		class: clazz = ''
 	}: {
 		sensor: SensorDTO | undefined;
 		description?: string;
 		saveOnChange?: boolean;
+		hidePreview?: boolean;
 		class?: string;
 	} = $props();
 
@@ -62,8 +64,8 @@
 </script>
 
 <label style="cursor: pointer; position: relative; display: inline-block;" class={clazz}>
-	<div class="position-relative">
-		{#if imageBlob || (sensor && sensor.images.length > 0)}
+	<div class="position-relative w-100 h-100">
+		{#if !hidePreview && (imageBlob || (sensor && sensor.images.length > 0))}
 			{#if imageBlob}
 				<img
 					src={URL.createObjectURL(imageBlob)}
@@ -81,7 +83,7 @@
 			</span>
 		{:else}
 			<div
-				class="d-flex flex-column align-items-center justify-content-center p-3"
+				class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3"
 				style="border: 2px dashed #ccc; border-radius: 1rem;"
 			>
 				<IconPhotoPlus size={48} />
