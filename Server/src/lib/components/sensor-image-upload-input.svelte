@@ -24,7 +24,11 @@
 
 	async function onchange(blob: Blob) {
 		if (saveOnChange && sensor) {
-			await clientApi().sensors().withId(sensor.id, sensor.sensorToken).uploadImage(blob).response();
+			await clientApi()
+				.sensors()
+				.withId(sensor.id, sensor.sensorToken)
+				.uploadImage(blob)
+				.response();
 			invalidate(DATA_DEPENDENCY.SENSOR);
 		}
 	}
@@ -95,10 +99,9 @@
 	</div>
 	<input
 		type="file"
-		accept="image/*"
+		accept="capture=camera"
 		class="form-control"
 		onchange={handleImageInput}
-		capture="environment"
 		name="image"
 		style="display: none;"
 	/>
