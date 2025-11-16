@@ -33,7 +33,10 @@ export default class SubscriptionController {
 		sensorAddress: number,
 		subscription: PushSubscription
 	): Promise<boolean> {
-		await SubscriptionRepository.delete({ endpoint: subscription.endpoint });
+		await SubscriptionRepository.delete({
+			endpoint: subscription.endpoint,
+			sensorAddress: sensorAddress
+		});
 		console.log(`Unsubscribed from sensor ${sensorAddress}`);
 		return true;
 	}

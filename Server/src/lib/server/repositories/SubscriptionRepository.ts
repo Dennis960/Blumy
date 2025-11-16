@@ -12,8 +12,15 @@ export default class SubscriptionRepository {
 		return insertedRecord[0]!;
 	}
 
-	static async delete(subscription: { endpoint: string }): Promise<void> {
-		await db.delete(subscriptions).where(eq(subscriptions.endpoint, subscription.endpoint));
+	static async delete(subscription: { endpoint: string; sensorAddress: number }): Promise<void> {
+		await db
+			.delete(subscriptions)
+			.where(
+				and(
+					eq(subscriptions.endpoint, subscription.endpoint),
+					eq(subscriptions.sensorAddress, subscription.sensorAddress)
+				)
+			);
 	}
 
 	static async exists(subscription: Partial<typeof subscriptions.$inferInsert>): Promise<boolean> {
