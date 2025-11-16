@@ -13,6 +13,7 @@
 	import type { SensorDTO, SensorHistoryDTO } from '$lib/types/api';
 	import SensorImage from './sensor-image.svelte';
 	import SensorSparkline from './graphs/sensor-sparkline.svelte';
+	import NotificationBell from './notification-bell.svelte';
 	import WaterCapacityBar from './water-capacity-bar.svelte';
 
 	interface Props {
@@ -108,6 +109,10 @@
 
 	<td class="text-end">
 		<a href={route('/dashboard/sensor/[id=sensorId]', { id: sensor.id.toString() })}>Details</a>
+	</td>
+
+	<td>
+		<NotificationBell {sensor} />
 	</td>
 </tr>
 

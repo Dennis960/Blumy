@@ -181,6 +181,7 @@
 									</th>
 									<th>Letzte 3 Tage</th>
 									<th></th>
+									<th></th>
 								</tr>
 							</thead>
 							<tbody>

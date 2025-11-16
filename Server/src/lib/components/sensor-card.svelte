@@ -14,6 +14,7 @@
 	import type { Snippet } from 'svelte';
 	import SensorImage from './sensor-image.svelte';
 	import WaterCapacityBar from './water-capacity-bar.svelte';
+	import NotificationBell from './notification-bell.svelte';
 
 	interface Props {
 		sensor: SensorDTO;
@@ -37,8 +38,9 @@
 
 <a {href} class="card d-flex flex-column cursor-pointer">
 	<div class="row row-0 h-100">
-		<div class="col-4">
-			<SensorImage class="ratio ratio-1x1 d-block rounded-start-1 h-100 w-100 bg-cover" {sensor} />
+		<div class="col-4 position-relative">
+			<SensorImage class="ratio ratio-1x1 d-block rounded-start-1 h-100 w-100 bg-cover position-absolute top-0 left-0" {sensor} />
+			<NotificationBell {sensor} />
 		</div>
 		<div class="col-8">
 			<div class="card-body d-flex flex-column h-100">

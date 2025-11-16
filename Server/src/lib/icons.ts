@@ -26,6 +26,8 @@ export { default as IconChevronLeft } from '@tabler/icons-svelte/icons/chevron-l
 export { default as IconCalendarStats } from '@tabler/icons-svelte/icons/calendar-stats';
 export { default as IconPhoto } from '@tabler/icons-svelte/icons/photo';
 export { default as IconPhotoPlus } from '@tabler/icons-svelte/icons/photo-plus';
+export { default as IconBellOff } from '@tabler/icons-svelte/icons/bell-off';
+export { default as IconBellRinging } from '@tabler/icons-svelte/icons/bell-ringing';
 
 export { default as IconChevronLeftRaw } from '@tabler/icons/outline/chevron-left.svg?raw';
 export { default as IconChevronRightRaw } from '@tabler/icons/outline/chevron-right.svg?raw';
