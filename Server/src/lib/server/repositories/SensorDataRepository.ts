@@ -1,6 +1,6 @@
 import { sensorReadings } from '$lib/server/db/schema';
 import { db } from '$lib/server/db/worker';
-import { and, asc, avg, count, desc, eq, gte, lte, max, min, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gte, lte, max, min, sql } from 'drizzle-orm';
 
 const MAX_FIELD_CAPACITY = 2500;
 

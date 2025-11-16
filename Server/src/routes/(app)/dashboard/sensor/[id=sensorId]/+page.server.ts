@@ -12,7 +12,7 @@ export const load: PageServerLoad = async function ({ params, url, depends, loca
 	startDate.setHours(0, 0, 0, 0);
 	let endDate = new Date();
 	endDate.setHours(23, 59, 59, 999);
-	let maxDataPoints = 100;
+	let maxDataPoints = 1000;
 
 	if (url.searchParams.has('from')) {
 		const from = parseInt(url.searchParams.get('from') ?? '');
