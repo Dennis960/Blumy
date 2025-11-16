@@ -1,7 +1,7 @@
 if(DEFINED ENV{FIRMWARE_VERSION})
     set(FIRMWARE_VERSION $ENV{FIRMWARE_VERSION})
 else()
-    set(FIRMWARE_VERSION 0)
+    set(FIRMWARE_VERSION 1000)
 endif()
 
 idf_component_register(
