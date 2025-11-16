@@ -76,7 +76,7 @@ export default class SensorController {
 
 		const sensorData = await SensorService.getRecentReadings(id);
 
-		const lastReading = sensorData[sensorData.length - 1];
+		const lastReading = await SensorService.getLastReading(id);
 		const model = SensorService.fitModel(sensorData);
 
 		const sensorHealth = SensorService.getSensorHealth(lastReading);
