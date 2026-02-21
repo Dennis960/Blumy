@@ -15,7 +15,7 @@
 		<script
 			defer
 			data-domain={page.url.host}
-			src="https://plausible.paramecad.com/js/script.tagged-events.js"
+			src="https://plausible.dennis960.com/js/script.tagged-events.js"
 		></script>
 		<script>
 			window.plausible =
