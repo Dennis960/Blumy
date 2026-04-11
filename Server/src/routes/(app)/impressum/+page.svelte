@@ -10,7 +10,7 @@
 					<h1 class="card-title mb-0">Impressum</h1>
 				</div>
 				<div class="card-body">
-					<h2 class="h4">Angaben gemäß § 5 TMG</h2>
+					<h2 class="h4">Angaben</h2>
 					<p>
 						{publicEnv.PUBLIC_IMPRESSUM_NAME}<br />
 						{publicEnv.PUBLIC_IMPRESSUM_ADDRESS}<br />
